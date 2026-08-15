@@ -1,0 +1,28 @@
+services:
+  oj-submission-wall:
+    build: .
+    container_name: oj-submission-wall
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - ./data:/data
+    environment:
+      APP_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8000
+      DATA_DIR: /data
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8000}
+      SYNC_INTERVAL_SECONDS: ${SYNC_INTERVAL_SECONDS:-900}
+      SYNC_MIN_AGE_SECONDS: ${SYNC_MIN_AGE_SECONDS:-120}
+      FETCH_LOOKBACK_DAYS: ${FETCH_LOOKBACK_DAYS:-365}
+      FETCH_LIMIT: ${FETCH_LIMIT:-200}
+      OJ_USER_AGENT: ${OJ_USER_AGENT:-OJSubmissionWall/1.0}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SSL: ${SMTP_SSL:-false}
+      SMTP_TLS: ${SMTP_TLS:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}

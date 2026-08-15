@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OJ Submission Wall</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>OJ 训练墙</h1>
+        <p id="subtitle">同步 Codeforces / AtCoder / 牛客 / 洛谷 / VJudge / QOJ 提交记录</p>
+      </div>
+      <div class="top-actions">
+        <span id="sessionBadge" class="session-badge">未登录</span>
+        <button id="refreshBtn" class="button primary" type="button">刷新同步</button>
+        <button id="logoutBtn" class="button ghost hidden" type="button">退出</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <section id="authPanel" class="panel">
+          <div class="panel-title">
+            <h2>进入训练墙</h2>
+          </div>
+
+          <div class="segmented" role="tablist">
+            <button id="guestTab" class="segment active" type="button">游客</button>
+            <button id="loginTab" class="segment" type="button">登录</button>
+            <button id="registerTab" class="segment" type="button">注册</button>
+          </div>
+
+          <form id="guestForm" class="stack auth-form">
+            <label>
+              <span>显示名</span>
+              <input name="displayName" autocomplete="nickname" placeholder="比如 23级-Alice">
+            </label>
+            <button class="button primary full" type="submit">游客进入</button>
+          </form>
+
+          <form id="loginForm" class="stack auth-form hidden">
+            <label>
+              <span>用户名</span>
+              <input name="username" autocomplete="username" required>
+            </label>
+            <label>
+              <span>密码</span>
+              <input name="password" type="password" autocomplete="current-password" required>
+            </label>
+            <button class="button primary full" type="submit">登录</button>
+          </form>
+
+          <form id="registerForm" class="stack auth-form hidden">
+            <label>
+              <span>用户名</span>
+              <input name="username" autocomplete="username" placeholder="比如 yzm007" required>
+            </label>
+            <label>
+              <span>邮箱</span>
+              <input name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>
+              <span>密码</span>
+              <input name="password" type="password" autocomplete="new-password" minlength="8" required>
+            </label>
+            <button class="button primary full" type="submit">注册并发验证邮件</button>
+          </form>
+        </section>
+
+        <section id="bindPanel" class="panel hidden">
+          <div class="panel-title">
+            <h2>绑定 OJ</h2>
+          </div>
+          <form id="handleForm" class="stack">
+            <label>
+              <span>平台</span>
+              <select id="platformSelect" name="platform"></select>
+            </label>
+            <label>
+              <span>账号</span>
+              <input id="handleInput" name="handle" placeholder="选择平台后填写">
+            </label>
+            <button class="button primary full" type="submit">绑定并同步</button>
+          </form>
+          <div id="myHandles" class="handle-list"></div>
+        </section>
+      </aside>
+
+      <section class="content">
+        <div class="toolbar">
+          <div>
+            <h2>队内概览</h2>
+            <div class="toolbar-subline">
+              <p id="lastUpdated">等待同步</p>
+              <label class="wall-year-control">
+                绿墙范围
+                <select id="wallYearSelect"></select>
+              </label>
+            </div>
+          </div>
+          <div class="stats-strip">
+            <div>
+              <strong id="memberCount">0</strong>
+              <span>成员</span>
+            </div>
+            <div>
+              <strong id="todayCount">0</strong>
+              <span>今日解题</span>
+            </div>
+            <div>
+              <strong id="feedCount">0</strong>
+              <span>近期提交</span>
+            </div>
+            <div>
+              <strong id="contestCount">0</strong>
+              <span>参赛</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="message" class="message hidden"></div>
+
+        <section id="members" class="member-grid"></section>
+      </section>
+
+      <aside class="feed-panel">
+        <div class="panel-title">
+          <h2>最新提交</h2>
+        </div>
+        <div class="feed-controls">
+          <label>
+            平台
+            <select id="feedPlatformFilter"></select>
+          </label>
+          <label>
+            用户/账户
+            <input id="feedUserFilter" type="search" placeholder="输入名称">
+          </label>
+          <label>
+            语言
+            <select id="feedLanguageFilter"></select>
+          </label>
+          <label>
+            状态
+            <select id="feedVerdictFilter"></select>
+          </label>
+          <label>
+            起始
+            <input id="feedDateFrom" type="date">
+          </label>
+          <label>
+            结束
+            <input id="feedDateTo" type="date">
+          </label>
+          <button id="feedResetFilters" class="button ghost" type="button">重置</button>
+        </div>
+        <div class="feed-meta-bar">
+          <span id="feedSummary">0-0 / 0 条</span>
+          <div class="feed-pagination">
+            <button id="feedPrevPage" class="button ghost" type="button">上一页</button>
+            <label class="page-jump">
+              第
+              <input id="feedPageInput" type="number" min="1" value="1">
+              <span id="feedPageTotal">/ 1 页</span>
+            </label>
+            <button id="feedJumpPage" class="button ghost" type="button">跳转</button>
+            <button id="feedNextPage" class="button ghost" type="button">下一页</button>
+            <select id="feedPageSize" aria-label="每页条数">
+              <option value="10">10 / 页</option>
+              <option value="25" selected>25 / 页</option>
+              <option value="50">50 / 页</option>
+              <option value="100">100 / 页</option>
+            </select>
+          </div>
+        </div>
+        <div id="feed" class="feed"></div>
+      </aside>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
