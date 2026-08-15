@@ -21,7 +21,7 @@ python3 app.py
 
 打开 `http://localhost:8000`。
 
-开发环境未配置 SMTP 时，注册后页面会返回验证链接，服务日志也会打印验证链接。要真正发邮件，必须配置 SMTP。
+未配置 SMTP 时，注册后页面会返回验证链接，服务日志也会打印验证链接。要真正发邮件，必须配置 SMTP。
 
 ## Docker 部署
 
@@ -66,7 +66,7 @@ git pull
 docker compose up -d --build
 ```
 
-生产部署一定要在 `.env` 里配置 `PUBLIC_BASE_URL` 和 SMTP，否则邮箱验证邮件无法真正发出。
+生产部署一定要在 `.env` 里配置 `PUBLIC_BASE_URL`；SMTP 可选，不配置时页面会直接给出验证链接。
 
 ## 账号绑定格式
 
@@ -84,7 +84,7 @@ docker compose up -d --build
 | `PUBLIC_BASE_URL` | 当前 Host | 邮箱验证链接使用的公网地址 |
 | `PORT` | `8000` | 容器外暴露端口由 compose 的 `${PORT}` 控制 |
 | `DATA_DIR` | `/data` | SQLite 数据目录 |
-| `APP_ENV` | `production` | `development` 下未配置 SMTP 会返回验证链接 |
+| `APP_ENV` | `production` | 运行环境标记 |
 | `COOKIE_SECURE` | `false` | HTTPS 部署建议设为 `true` |
 | `SYNC_INTERVAL_SECONDS` | `900` | 后台同步间隔；设为 `0` 关闭后台同步 |
 | `SYNC_MIN_AGE_SECONDS` | `120` | 同一账号最短同步间隔 |
@@ -95,7 +95,7 @@ docker compose up -d --build
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent |
 | `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；配置可访问 `qoj.ac` 的登录态 Cookie 后才能同步 |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SSL` / `SMTP_TLS` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | 空 | 邮箱验证 SMTP 配置 |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SSL` / `SMTP_TLS` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | 空 | 邮箱验证 SMTP 配置；不配置时页面返回验证链接 |
 
 ## 数据源说明
 
@@ -111,6 +111,6 @@ docker compose up -d --build
 ## 生产建议
 
 - 放到 Nginx/Caddy 后面，开启 HTTPS，并把 `COOKIE_SECURE=true`。
-- 配置真实 SMTP，否则生产环境注册后无法收到验证邮件。QQ 邮箱常用 `SMTP_HOST=smtp.qq.com`、`SMTP_PORT=465`、`SMTP_SSL=true`，`SMTP_PASSWORD` 填 SMTP 授权码，不是 QQ 登录密码。
+- 配置真实 SMTP 后注册邮件会自动发送。QQ 邮箱常用 `SMTP_HOST=smtp.qq.com`、`SMTP_PORT=465`、`SMTP_SSL=true`，`SMTP_PASSWORD` 填 SMTP 授权码，不是 QQ 登录密码。
 - 把 `OJ_USER_AGENT` 改成你自己的域名和联系方式。
 - 如果队员很多，建议把 `SYNC_INTERVAL_SECONDS` 调大，减少对 OJ 的请求压力。

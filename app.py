@@ -48,6 +48,12 @@ USER_AGENT = os.environ.get(
     "OJ_USER_AGENT",
     "OJSubmissionWall/1.0 (+https://github.com/your-name/oj-submission-wall)",
 )
+SMTP_PLACEHOLDERS = {
+    "smtp.example.com",
+    "noreply@example.com",
+    "change-me",
+    "your@qq.com",
+}
 
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -1271,17 +1277,30 @@ def create_verification_token(conn: sqlite3.Connection, user_id: int) -> str:
     return token
 
 
+def env_value(name: str, default: str = "") -> str:
+    return str(os.environ.get(name, default) or "").strip()
+
+
+def is_placeholder_env(value: str) -> bool:
+    text = value.strip()
+    return not text or text.lower() in SMTP_PLACEHOLDERS
+
+
 def send_verification_email(email: str, display_name: str, verify_url: str) -> bool:
-    smtp_host = os.environ.get("SMTP_HOST")
-    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
-    smtp_user = os.environ.get("SMTP_USER")
-    smtp_password = os.environ.get("SMTP_PASSWORD")
-    smtp_from = os.environ.get("SMTP_FROM", smtp_user or "noreply@example.com")
-    smtp_ssl = os.environ.get("SMTP_SSL", "").lower() in {"1", "true", "yes"} or smtp_port == 465
-    smtp_tls = os.environ.get("SMTP_TLS", "true").lower() not in {"0", "false", "no"}
-    if not smtp_host:
-        print(f"[mail] SMTP_HOST 未配置，验证链接: {verify_url}", flush=True)
+    smtp_host = env_value("SMTP_HOST")
+    smtp_user = env_value("SMTP_USER")
+    smtp_password = env_value("SMTP_PASSWORD")
+    smtp_from = env_value("SMTP_FROM", smtp_user)
+    if is_placeholder_env(smtp_host) or is_placeholder_env(smtp_from) or is_placeholder_env(smtp_password):
+        print(f"[mail] SMTP 未配置或仍是占位值，验证链接: {verify_url}", flush=True)
         return False
+    try:
+        smtp_port = int(env_value("SMTP_PORT", "587"))
+    except ValueError:
+        print(f"[mail] SMTP_PORT 配置错误，验证链接: {verify_url}", flush=True)
+        return False
+    smtp_ssl = env_value("SMTP_SSL").lower() in {"1", "true", "yes"} or smtp_port == 465
+    smtp_tls = env_value("SMTP_TLS", "true").lower() not in {"0", "false", "no"}
 
     msg = EmailMessage()
     msg["Subject"] = "验证你的 OJ Submission Wall 邮箱"
@@ -1295,13 +1314,18 @@ def send_verification_email(email: str, display_name: str, verify_url: str) -> b
 
     context = ssl.create_default_context()
     smtp_cls = smtplib.SMTP_SSL if smtp_ssl else smtplib.SMTP
-    with smtp_cls(smtp_host, smtp_port, timeout=20, context=context) if smtp_ssl else smtp_cls(smtp_host, smtp_port, timeout=20) as smtp:
-        if not smtp_ssl and smtp_tls:
-            smtp.starttls(context=context)
-        if smtp_user and smtp_password:
-            smtp.login(smtp_user, smtp_password)
-        smtp.send_message(msg)
-    return True
+    try:
+        with smtp_cls(smtp_host, smtp_port, timeout=20, context=context) if smtp_ssl else smtp_cls(smtp_host, smtp_port, timeout=20) as smtp:
+            if not smtp_ssl and smtp_tls:
+                smtp.starttls(context=context)
+            if smtp_user and smtp_password:
+                smtp.login(smtp_user, smtp_password)
+            smtp.send_message(msg)
+        return True
+    except Exception as exc:
+        print(f"[mail] SMTP 发送失败: {exc}; 验证链接: {verify_url}", flush=True)
+        return False
+
 
 
 def owner_display_name(conn: sqlite3.Connection, owner_type: str, owner_id: str) -> str:
@@ -2128,8 +2152,6 @@ class AppHandler(BaseHTTPRequestHandler):
         email = normalize_email(str(data.get("email") or ""))
         display_name = str(data.get("displayName") or data.get("username") or "").strip()[:40]
         password = str(data.get("password") or "")
-        if APP_ENV == "production" and not os.environ.get("SMTP_HOST"):
-            return self.send_error_json(503, "服务器未配置 SMTP，无法发送验证邮件")
         if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
             raise ValueError("邮箱格式不正确")
         if len(password) < 8:
@@ -2159,7 +2181,8 @@ class AppHandler(BaseHTTPRequestHandler):
             verify_url = f"{base_url}/api/auth/verify?token={urllib.parse.quote(token)}"
             sent = send_verification_email(email, display_name, verify_url)
         response = {"ok": True, "emailSent": sent, "message": "注册成功，请先完成邮箱验证再用用户名登录。"}
-        if not sent and APP_ENV != "production":
+        if not sent:
+            response["verifyUrl"] = verify_url
             response["devVerifyUrl"] = verify_url
         return self.send_json(201, response)
 

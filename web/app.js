@@ -914,7 +914,7 @@ async function submitRegister(event) {
         password: form.get("password"),
       },
     });
-    showMessage(data.emailSent ? data.message : "注册成功，但当前未配置 SMTP，邮件不会真正发出。开发环境会返回验证链接。", "info", data.devVerifyUrl);
+    showMessage(data.emailSent ? data.message : "注册成功，当前邮件没有发出，请点击验证链接完成验证。", "info", data.verifyUrl || data.devVerifyUrl);
   } catch (error) {
     showMessage(error.message, "error");
   }
