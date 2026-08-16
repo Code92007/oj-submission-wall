@@ -14,6 +14,8 @@ const state = {
   feedPage: 1,
   feedPageSize: 25,
   wallRange: "",
+  selectedMemberKey: "",
+  memberGroupFilter: "",
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -191,9 +193,16 @@ function renderAll() {
   renderPlatformSelect();
   renderWallYearSelect();
   renderStats();
+  renderTeamForm();
   renderMyHandles();
   renderMembers();
   renderFeed();
+}
+
+function renderTeamForm() {
+  const input = $("#teamInput");
+  if (!input || document.activeElement === input) return;
+  input.value = state.user?.teamName || "";
 }
 
 function renderWallYearSelect() {
@@ -277,24 +286,318 @@ function renderMyHandles() {
 function renderMembers() {
   const container = $("#members");
   container.innerHTML = "";
-  const members = [...(state.overview?.members || [])];
+  const members = sortedMembers([...(state.overview?.members || [])]);
   if (!members.length) {
     const empty = el("div", "empty-state");
-    empty.textContent = "还没有成员完成邮箱验证。可以先用游客模式绑定账号看效果。";
+    empty.textContent = "还没有成员。可以先注册或用游客模式绑定账号看效果。";
     container.appendChild(empty);
     return;
   }
 
+  let selected = null;
+  if (state.selectedMemberKey) {
+    selected = members.find((member) => memberKey(member) === state.selectedMemberKey);
+    if (!selected) state.selectedMemberKey = "";
+  }
+  container.classList.toggle("member-detail-mode", Boolean(selected));
+  if (selected) {
+    container.appendChild(renderMemberDetail(selected));
+    return;
+  }
+
+  container.append(renderTeamOverview(members), renderMemberDirectory(members));
+}
+
+function sortedMembers(members) {
   members.sort((a, b) => {
     const today = state.overview.today;
     const aToday = a.days?.[today]?.accepted || 0;
     const bToday = b.days?.[today]?.accepted || 0;
     return bToday - aToday || b.stats.accepted - a.stats.accepted || a.displayName.localeCompare(b.displayName);
   });
+  return members;
+}
 
-  for (const member of members) {
-    container.appendChild(renderMemberCard(member));
+function memberKey(member) {
+  return `${member.ownerType}:${member.ownerId}`;
+}
+
+function memberTeam(member) {
+  return member.teamName || (member.ownerType === "guest" ? "游客" : "未分组");
+}
+
+function renderTeamOverview(members) {
+  const section = el("section", "team-overview");
+  const groups = summarizeTeams(members);
+  const selectedGroup = groups.some((group) => group.name === state.memberGroupFilter) ? state.memberGroupFilter : "";
+  state.memberGroupFilter = selectedGroup;
+
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  title.textContent = "分组";
+  const meta = document.createElement("span");
+  meta.textContent = `${groups.length} 组 · ${members.length} 人`;
+  head.append(title, meta);
+
+  const filters = el("div", "team-filters");
+  filters.appendChild(teamFilterButton("全部", "", selectedGroup === ""));
+  for (const group of groups) {
+    filters.appendChild(teamFilterButton(`${group.name} ${group.memberCount}`, group.name, selectedGroup === group.name));
   }
+
+  const grid = el("div", "team-grid");
+  for (const group of groups) {
+    const card = el("button", `team-card${selectedGroup === group.name ? " active" : ""}`);
+    card.type = "button";
+    card.dataset.teamFilter = group.name;
+
+    const name = document.createElement("strong");
+    name.textContent = group.name;
+    const stats = el("div", "team-card-stats");
+    stats.innerHTML = `
+      <span><b>${group.memberCount}</b> 人</span>
+      <span><b>${group.accepted}</b> 历史解题</span>
+      <span><b>${group.rangeAccepted}</b> 当前范围解题</span>
+      <span><b>${group.contests}</b> 参赛</span>
+    `;
+    card.append(name, stats);
+    grid.appendChild(card);
+  }
+
+  section.append(head, filters, grid);
+  return section;
+}
+
+function teamFilterButton(label, value, active) {
+  const button = el("button", `team-filter${active ? " active" : ""}`);
+  button.type = "button";
+  button.dataset.teamFilter = value;
+  button.textContent = label;
+  return button;
+}
+
+function summarizeTeams(members) {
+  const groups = new Map();
+  for (const member of members) {
+    const name = memberTeam(member);
+    const entry = groups.get(name) || {
+      name,
+      memberCount: 0,
+      accepted: 0,
+      rangeAccepted: 0,
+      contests: 0,
+    };
+    const periodStats = statsForRange(member.days || {}, state.wallRange, state.overview.today, state.overview.dateRange);
+    entry.memberCount += 1;
+    entry.accepted += member.stats?.allTimeAccepted ?? member.stats?.accepted ?? 0;
+    entry.rangeAccepted += periodStats.accepted;
+    entry.contests += contestItemsForRange(member.contests?.items || [], state.wallRange).length;
+    groups.set(name, entry);
+  }
+  return [...groups.values()].sort((a, b) => {
+    if (a.name === "未分组") return 1;
+    if (b.name === "未分组") return -1;
+    if (a.name === "游客") return 1;
+    if (b.name === "游客") return -1;
+    return b.accepted - a.accepted || a.name.localeCompare(b.name, "zh-CN");
+  });
+}
+
+function renderMemberDirectory(members) {
+  const section = el("section", "member-directory");
+  const filteredMembers = state.memberGroupFilter
+    ? members.filter((member) => memberTeam(member) === state.memberGroupFilter)
+    : members;
+  const rangeLabel = state.wallRange === "all" ? "近 10 年" : `${state.wallRange} 年`;
+
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  title.textContent = "人员列表";
+  const meta = document.createElement("span");
+  meta.textContent = `${filteredMembers.length} / ${members.length} 人`;
+  head.append(title, meta);
+  section.appendChild(head);
+
+  if (!filteredMembers.length) {
+    const empty = el("div", "empty-state compact");
+    empty.textContent = "这个分组里还没有成员";
+    section.appendChild(empty);
+    return section;
+  }
+
+  const wrap = el("div", "member-table-wrap");
+  const table = el("table", "member-table");
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>成员</th>
+      <th>分组</th>
+      <th>OJ 账号</th>
+      <th>历史解题</th>
+      <th>${escapeHtml(rangeLabel)} 解题</th>
+      <th>今日</th>
+      <th>连续</th>
+      <th>参赛</th>
+      <th></th>
+    </tr>
+  `;
+  const tbody = document.createElement("tbody");
+  const today = state.overview.today;
+  for (const member of filteredMembers) {
+    const row = document.createElement("tr");
+    row.dataset.memberKey = memberKey(member);
+    row.tabIndex = 0;
+
+    const name = el("td", "member-cell");
+    const nameWrap = el("div", "member-cell-name");
+    const strong = document.createElement("strong");
+    strong.textContent = member.displayName;
+    nameWrap.appendChild(strong);
+    if (member.isCurrent) {
+      const current = el("span", "current-pill");
+      current.textContent = "当前";
+      nameWrap.appendChild(current);
+    }
+    name.appendChild(nameWrap);
+
+    const team = document.createElement("td");
+    const teamPill = el("span", "team-pill");
+    teamPill.textContent = memberTeam(member);
+    team.appendChild(teamPill);
+
+    const handles = el("td", "member-handles-cell");
+    handles.textContent = member.handles?.length
+      ? member.handles.map((handle) => `${handle.platformLabel}:${handle.handle}`).join(" / ")
+      : "未绑定";
+    handles.title = handles.textContent;
+
+    const periodStats = statsForRange(member.days || {}, state.wallRange, state.overview.today, state.overview.dateRange);
+    const contestCount = contestItemsForRange(member.contests?.items || [], state.wallRange).length;
+    const values = [
+      member.stats?.allTimeAccepted ?? member.stats?.accepted ?? 0,
+      periodStats.accepted,
+      member.days?.[today]?.accepted || 0,
+      `${member.stats?.streak ?? 0} 天`,
+      contestCount,
+    ].map((value) => {
+      const td = el("td", "metric-cell");
+      td.textContent = value;
+      return td;
+    });
+
+    const action = el("td", "member-action-cell");
+    const actionText = el("span", "detail-link");
+    actionText.textContent = "查看";
+    action.appendChild(actionText);
+
+    row.append(name, team, handles, ...values, action);
+    tbody.appendChild(row);
+  }
+  table.append(thead, tbody);
+  wrap.appendChild(table);
+  section.appendChild(wrap);
+  return section;
+}
+
+function renderMemberDetail(member) {
+  const detail = el("div", "member-detail-view");
+  const bar = el("div", "member-detail-bar");
+  const back = el("button", "button ghost");
+  back.type = "button";
+  back.dataset.backMembers = "true";
+  back.textContent = "返回列表";
+
+  const title = el("div", "member-detail-title");
+  const h3 = document.createElement("h3");
+  h3.textContent = member.displayName;
+  const meta = document.createElement("span");
+  meta.textContent = `${memberTeam(member)} · ${member.handles?.length || 0} 个 OJ 账号`;
+  title.append(h3, meta);
+
+  bar.append(back, title);
+  detail.append(bar, renderMemberCard(member), renderMemberSubmissions(member));
+  return detail;
+}
+
+function renderMemberSubmissions(member) {
+  const section = el("section", "member-submissions");
+  const rows = (state.overview?.feed || [])
+    .filter((item) => item.ownerType === member.ownerType && String(item.ownerId) === String(member.ownerId))
+    .slice(0, 50);
+
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  title.textContent = "该成员最近提交";
+  const meta = document.createElement("span");
+  meta.textContent = rows.length ? `最近 ${rows.length} 条` : "暂无记录";
+  head.append(title, meta);
+  section.appendChild(head);
+
+  if (!rows.length) {
+    const empty = el("div", "empty-state compact");
+    empty.textContent = "这个成员还没有提交记录";
+    section.appendChild(empty);
+    return section;
+  }
+
+  const wrap = el("div", "member-feed-wrap");
+  const table = el("table", "feed-table member-feed-table");
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th class="feed-time">提交时间</th>
+      <th class="feed-platform">平台</th>
+      <th class="feed-account">账户</th>
+      <th>题目</th>
+      <th class="feed-language">语言</th>
+      <th class="feed-result">结果</th>
+    </tr>
+  `;
+  const tbody = document.createElement("tbody");
+  for (const item of rows) {
+    const row = document.createElement("tr");
+
+    const time = el("td", "feed-time");
+    time.textContent = formatFullDateTime(item.submittedAt);
+
+    const platform = el("td", "feed-platform");
+    const platformLabel = el("span", "platform-badge");
+    platformLabel.textContent = item.platformLabel || item.platform;
+    platform.appendChild(platformLabel);
+
+    const account = el("td", "feed-account account-cell");
+    account.textContent = item.handle || member.displayName || "";
+    account.title = account.textContent;
+
+    const problem = el("td", "problem-cell");
+    const problemLink = document.createElement(item.url ? "a" : "span");
+    problemLink.className = "submission-link";
+    problemLink.textContent = item.problemName || item.problemId || "未知题目";
+    problemLink.title = problemLink.textContent;
+    if (item.url) {
+      problemLink.href = item.url;
+      problemLink.target = "_blank";
+      problemLink.rel = "noreferrer";
+    }
+    problem.appendChild(problemLink);
+
+    const language = el("td", "feed-language account-cell");
+    language.textContent = item.language || "-";
+    language.title = item.language || "";
+
+    const result = el("td", "feed-result");
+    const verdict = el("span", `verdict ${verdictClass(item.verdict)}`);
+    verdict.textContent = verdictLabel(item.verdict);
+    verdict.title = item.verdict || "UNKNOWN";
+    result.appendChild(verdict);
+
+    row.append(time, platform, account, problem, language, result);
+    tbody.appendChild(row);
+  }
+  table.append(thead, tbody);
+  wrap.appendChild(table);
+  section.appendChild(wrap);
+  return section;
 }
 
 function renderMemberCard(member) {
@@ -875,7 +1178,10 @@ async function submitGuest(event) {
   try {
     await api("/api/guest", {
       method: "POST",
-      body: { displayName: form.get("displayName") },
+      body: {
+        displayName: form.get("displayName"),
+        teamName: form.get("teamName"),
+      },
     });
     await loadOverview();
   } catch (error) {
@@ -910,11 +1216,29 @@ async function submitRegister(event) {
       method: "POST",
       body: {
         username: form.get("username"),
+        teamName: form.get("teamName"),
         password: form.get("password"),
       },
     });
     await loadOverview();
     showMessage(data.message || "注册成功，已登录。");
+  } catch (error) {
+    showMessage(error.message, "error");
+  }
+}
+
+async function submitTeam(event) {
+  event.preventDefault();
+  clearMessage();
+  const form = new FormData(event.currentTarget);
+  try {
+    const data = await api("/api/me/team", {
+      method: "POST",
+      body: { teamName: form.get("teamName") },
+    });
+    state.user = data.user;
+    await loadOverview();
+    showMessage("分组已更新。");
   } catch (error) {
     showMessage(error.message, "error");
   }
@@ -1012,12 +1336,40 @@ function bindEvents() {
   $("#guestForm").addEventListener("submit", submitGuest);
   $("#loginForm").addEventListener("submit", submitLogin);
   $("#registerForm").addEventListener("submit", submitRegister);
+  $("#teamForm").addEventListener("submit", submitTeam);
   $("#handleForm").addEventListener("submit", submitHandle);
   $("#platformSelect").addEventListener("change", updateHandleHint);
   $("#refreshBtn").addEventListener("click", refreshSync);
   $("#logoutBtn").addEventListener("click", logout);
   $("#wallYearSelect").addEventListener("change", (event) => {
     state.wallRange = event.currentTarget.value;
+    renderMembers();
+  });
+  $("#members").addEventListener("click", (event) => {
+    const back = event.target.closest("[data-back-members]");
+    if (back) {
+      state.selectedMemberKey = "";
+      renderMembers();
+      return;
+    }
+    const team = event.target.closest("[data-team-filter]");
+    if (team) {
+      state.memberGroupFilter = team.dataset.teamFilter || "";
+      renderMembers();
+      return;
+    }
+    const row = event.target.closest("[data-member-key]");
+    if (row) {
+      state.selectedMemberKey = row.dataset.memberKey;
+      renderMembers();
+    }
+  });
+  $("#members").addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const row = event.target.closest("[data-member-key]");
+    if (!row) return;
+    event.preventDefault();
+    state.selectedMemberKey = row.dataset.memberKey;
     renderMembers();
   });
   $("#feedPlatformFilter").addEventListener("change", (event) => updateFeedFilter("platform", event.currentTarget.value));

@@ -37,6 +37,10 @@
               <span>显示名</span>
               <input name="displayName" autocomplete="nickname" placeholder="比如 23级-Alice">
             </label>
+            <label>
+              <span>分组</span>
+              <input name="teamName" placeholder="比如 2026级 / 暑训一队">
+            </label>
             <button class="button primary full" type="submit">游客进入</button>
           </form>
 
@@ -58,6 +62,10 @@
               <input name="username" autocomplete="username" placeholder="比如 yzm007" required>
             </label>
             <label>
+              <span>分组</span>
+              <input name="teamName" placeholder="比如 2026级 / 暑训一队">
+            </label>
+            <label>
               <span>密码</span>
               <input name="password" type="password" autocomplete="new-password" minlength="8" required>
             </label>
@@ -69,6 +77,14 @@
           <div class="panel-title">
             <h2>绑定 OJ</h2>
           </div>
+          <form id="teamForm" class="stack team-form">
+            <label>
+              <span>我的分组</span>
+              <input id="teamInput" name="teamName" placeholder="未分组">
+            </label>
+            <button class="button ghost full" type="submit">保存分组</button>
+          </form>
+          <div class="panel-divider"></div>
           <form id="handleForm" class="stack">
             <label>
               <span>平台</span>

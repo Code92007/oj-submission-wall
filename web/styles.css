@@ -330,9 +330,243 @@ select:focus {
   color: var(--brand);
 }
 
+.panel-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 14px 0;
+}
+
+.team-form {
+  margin-bottom: 0;
+}
+
 .member-grid {
   display: grid;
   gap: 14px;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.section-head span {
+  color: var(--muted);
+}
+
+.team-overview,
+.member-directory,
+.member-detail-view,
+.member-submissions {
+  display: grid;
+  gap: 12px;
+}
+
+.team-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.team-filter {
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 4px 10px;
+}
+
+.team-filter.active {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.team-card {
+  min-height: 96px;
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+}
+
+.team-card:hover,
+.team-card.active {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+.team-card strong {
+  font-size: 17px;
+}
+
+.team-card-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  color: var(--muted);
+}
+
+.team-card-stats span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-card-stats b {
+  color: var(--ink);
+}
+
+.member-table-wrap,
+.member-feed-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.member-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.member-table th,
+.member-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.member-table th {
+  background: #f8faf7;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.member-table tbody tr {
+  cursor: pointer;
+}
+
+.member-table tbody tr:hover td,
+.member-table tbody tr:focus td {
+  background: #fbfcfa;
+}
+
+.member-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.member-cell {
+  width: 160px;
+}
+
+.member-cell-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.member-cell-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-handles-cell {
+  width: 260px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metric-cell,
+.member-action-cell {
+  width: 90px;
+  white-space: nowrap;
+}
+
+.team-pill {
+  display: inline-flex;
+  max-width: 140px;
+  min-height: 24px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-link {
+  color: var(--brand);
+}
+
+.member-detail-bar {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 10px 12px;
+}
+
+.member-detail-title {
+  min-width: 0;
+  text-align: right;
+}
+
+.member-detail-title h3 {
+  margin: 0;
+  font-size: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-detail-title span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.member-feed-table {
+  min-width: 920px;
+}
+
+.empty-state.compact {
+  min-height: 96px;
 }
 
 .member-card {
@@ -859,6 +1093,23 @@ select:focus {
   .stats-strip {
     width: 100%;
     min-width: 0;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-card-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .member-detail-bar {
+    align-items: flex-start;
+    display: grid;
+  }
+
+  .member-detail-title {
+    text-align: left;
   }
 
   .member-head {
