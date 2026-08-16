@@ -16,6 +16,7 @@ import ssl
 import threading
 import time
 import traceback
+import http.cookiejar
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -397,7 +398,8 @@ def http_get(
     for attempt in range(attempts):
         req = urllib.request.Request(url, headers=request_headers)
         try:
-            with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
+            opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+            with opener.open(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
                 content_type = resp.headers.get("content-type", "")
                 body = resp.read()
                 with contextlib.suppress(Exception):
@@ -2360,9 +2362,11 @@ class AppHandler(BaseHTTPRequestHandler):
     def do_DELETE(self) -> None:
         parsed = urllib.parse.urlparse(self.path)
         try:
-            if parsed.path == "/api/handles":
+            if parsed.path == "/api/handles" or parsed.path.startswith("/api/handles/"):
                 return self.handle_delete_handle(parsed)
             return self.send_error_json(404, "没有这个接口")
+        except ValueError as exc:
+            return self.send_error_json(400, str(exc))
         except Exception as exc:
             traceback.print_exc()
             return self.send_error_json(500, str(exc) if APP_ENV != "production" else "服务器内部错误")
@@ -2571,16 +2575,21 @@ class AppHandler(BaseHTTPRequestHandler):
             return self.send_error_json(401, "请先登录或进入游客模式")
         params = urllib.parse.parse_qs(parsed.query)
         handle_id = params.get("id", [""])[0]
+        path_match = re.match(r"^/api/handles/(\d+)$", parsed.path)
+        if not handle_id and path_match:
+            handle_id = path_match.group(1)
         if not handle_id.isdigit():
-            return self.send_error_json(400, "缺少账号绑定 ID")
+            raise ValueError("缺少账号绑定 ID")
         with connect_db() as conn:
-            conn.execute(
+            cursor = conn.execute(
                 """
                 UPDATE handles SET active = 0
                 WHERE id = ? AND owner_type = ? AND owner_id = ?
                 """,
                 (int(handle_id), principal["type"], str(principal["id"])),
             )
+            if cursor.rowcount <= 0:
+                return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
         return self.send_json(200, {"ok": True})
 
     def handle_sync(self) -> None:

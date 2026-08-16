@@ -1352,7 +1352,7 @@ async function logout() {
 async function removeHandle(id) {
   clearMessage();
   try {
-    await api(`/api/handles?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    await api(`/api/handles/${encodeURIComponent(id)}`, { method: "DELETE" });
     await loadOverview();
   } catch (error) {
     showMessage(error.message, "error");
