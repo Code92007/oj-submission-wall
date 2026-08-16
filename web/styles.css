@@ -336,7 +336,7 @@ select:focus {
   margin: 14px 0;
 }
 
-.team-form {
+.profile-form {
   margin-bottom: 0;
 }
 
@@ -491,6 +491,17 @@ select:focus {
 }
 
 .member-cell-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-real-name,
+.member-card-real-name {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

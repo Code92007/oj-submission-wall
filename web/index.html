@@ -34,8 +34,12 @@
 
           <form id="guestForm" class="stack auth-form">
             <label>
-              <span>显示名</span>
+              <span>昵称</span>
               <input name="displayName" autocomplete="nickname" placeholder="比如 23级-Alice">
+            </label>
+            <label>
+              <span>姓名</span>
+              <input name="realName" autocomplete="name" placeholder="同组成员可见">
             </label>
             <label>
               <span>分组</span>
@@ -62,6 +66,14 @@
               <input name="username" autocomplete="username" placeholder="比如 yzm007" required>
             </label>
             <label>
+              <span>昵称</span>
+              <input name="displayName" autocomplete="nickname" placeholder="公开展示名">
+            </label>
+            <label>
+              <span>姓名</span>
+              <input name="realName" autocomplete="name" placeholder="同组成员可见">
+            </label>
+            <label>
               <span>分组</span>
               <input name="teamName" placeholder="比如 2026级 / 暑训一队">
             </label>
@@ -77,12 +89,20 @@
           <div class="panel-title">
             <h2>绑定 OJ</h2>
           </div>
-          <form id="teamForm" class="stack team-form">
+          <form id="profileForm" class="stack profile-form">
             <label>
-              <span>我的分组</span>
-              <input id="teamInput" name="teamName" placeholder="未分组">
+              <span>昵称</span>
+              <input id="profileDisplayNameInput" name="displayName" placeholder="公开展示名">
             </label>
-            <button class="button ghost full" type="submit">保存分组</button>
+            <label>
+              <span>姓名</span>
+              <input id="profileRealNameInput" name="realName" placeholder="同组成员可见">
+            </label>
+            <label>
+              <span>分组</span>
+              <input id="profileTeamInput" name="teamName" placeholder="未分组">
+            </label>
+            <button class="button ghost full" type="submit">保存资料</button>
           </form>
           <div class="panel-divider"></div>
           <form id="handleForm" class="stack">

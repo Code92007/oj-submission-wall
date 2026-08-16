@@ -193,16 +193,23 @@ function renderAll() {
   renderPlatformSelect();
   renderWallYearSelect();
   renderStats();
-  renderTeamForm();
+  renderProfileForm();
   renderMyHandles();
   renderMembers();
   renderFeed();
 }
 
-function renderTeamForm() {
-  const input = $("#teamInput");
-  if (!input || document.activeElement === input) return;
-  input.value = state.user?.teamName || "";
+function renderProfileForm() {
+  const fields = [
+    ["#profileDisplayNameInput", state.user?.displayName || ""],
+    ["#profileRealNameInput", state.user?.realName || ""],
+    ["#profileTeamInput", state.user?.teamName || ""],
+  ];
+  for (const [selector, value] of fields) {
+    const input = $(selector);
+    if (!input || document.activeElement === input) continue;
+    input.value = value;
+  }
 }
 
 function renderWallYearSelect() {
@@ -459,6 +466,11 @@ function renderMemberDirectory(members) {
       nameWrap.appendChild(current);
     }
     name.appendChild(nameWrap);
+    if (member.realName) {
+      const realName = el("span", "member-real-name");
+      realName.textContent = member.realName;
+      name.appendChild(realName);
+    }
 
     const team = document.createElement("td");
     const teamPill = el("span", "team-pill");
@@ -511,7 +523,11 @@ function renderMemberDetail(member) {
   const h3 = document.createElement("h3");
   h3.textContent = member.displayName;
   const meta = document.createElement("span");
-  meta.textContent = `${memberTeam(member)} · ${member.handles?.length || 0} 个 OJ 账号`;
+  meta.textContent = [
+    member.realName ? `姓名：${member.realName}` : "",
+    memberTeam(member),
+    `${member.handles?.length || 0} 个 OJ 账号`,
+  ].filter(Boolean).join(" · ");
   title.append(h3, meta);
 
   bar.append(back, title);
@@ -614,6 +630,11 @@ function renderMemberCard(member) {
     name.appendChild(pill);
   }
   identity.appendChild(name);
+  if (member.realName) {
+    const realName = el("div", "member-card-real-name");
+    realName.textContent = `姓名：${member.realName}`;
+    identity.appendChild(realName);
+  }
 
   const handles = el("div", "member-handles");
   if (member.handles?.length) {
@@ -1046,6 +1067,7 @@ function populateSelect(select, options, allLabel, selectedValue) {
 function filteredFeedRows() {
   const filters = state.feedFilters;
   const userQuery = filters.user.trim().toLowerCase();
+  const visibleNames = new Map((state.overview?.members || []).map((member) => [memberKey(member), member.realName || ""]));
   return (state.overview?.feed || []).filter((item) => {
     if (filters.platform && item.platform !== filters.platform) return false;
     if (filters.language && item.language !== filters.language) return false;
@@ -1053,7 +1075,8 @@ function filteredFeedRows() {
     if (filters.from && item.submittedDate < filters.from) return false;
     if (filters.to && item.submittedDate > filters.to) return false;
     if (userQuery) {
-      const haystack = `${item.displayName || ""} ${item.handle || ""} ${item.ownerId || ""}`.toLowerCase();
+      const realName = visibleNames.get(`${item.ownerType}:${item.ownerId}`) || "";
+      const haystack = `${item.displayName || ""} ${realName} ${item.handle || ""} ${item.ownerId || ""}`.toLowerCase();
       if (!haystack.includes(userQuery)) return false;
     }
     return true;
@@ -1180,6 +1203,7 @@ async function submitGuest(event) {
       method: "POST",
       body: {
         displayName: form.get("displayName"),
+        realName: form.get("realName"),
         teamName: form.get("teamName"),
       },
     });
@@ -1216,6 +1240,8 @@ async function submitRegister(event) {
       method: "POST",
       body: {
         username: form.get("username"),
+        displayName: form.get("displayName"),
+        realName: form.get("realName"),
         teamName: form.get("teamName"),
         password: form.get("password"),
       },
@@ -1227,18 +1253,22 @@ async function submitRegister(event) {
   }
 }
 
-async function submitTeam(event) {
+async function submitProfile(event) {
   event.preventDefault();
   clearMessage();
   const form = new FormData(event.currentTarget);
   try {
-    const data = await api("/api/me/team", {
+    const data = await api("/api/me/profile", {
       method: "POST",
-      body: { teamName: form.get("teamName") },
+      body: {
+        displayName: form.get("displayName"),
+        realName: form.get("realName"),
+        teamName: form.get("teamName"),
+      },
     });
     state.user = data.user;
     await loadOverview();
-    showMessage("分组已更新。");
+    showMessage("资料已更新。");
   } catch (error) {
     showMessage(error.message, "error");
   }
@@ -1336,7 +1366,7 @@ function bindEvents() {
   $("#guestForm").addEventListener("submit", submitGuest);
   $("#loginForm").addEventListener("submit", submitLogin);
   $("#registerForm").addEventListener("submit", submitRegister);
-  $("#teamForm").addEventListener("submit", submitTeam);
+  $("#profileForm").addEventListener("submit", submitProfile);
   $("#handleForm").addEventListener("submit", submitHandle);
   $("#platformSelect").addEventListener("change", updateHandleHint);
   $("#refreshBtn").addEventListener("click", refreshSync);

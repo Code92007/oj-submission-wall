@@ -99,6 +99,15 @@ def normalize_team_name(value: str | None, fallback: str = DEFAULT_TEAM_NAME) ->
     return team_name or fallback
 
 
+def normalize_display_name(value: str | None, fallback: str) -> str:
+    display_name = re.sub(r"\s+", " ", str(value or "").strip())[:40]
+    return display_name or fallback
+
+
+def normalize_real_name(value: str | None) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip())[:40]
+
+
 def username_base(value: str) -> str:
     value = re.sub(r"\s+", "", value.strip()).lower()
     value = re.sub(r"[^0-9a-zA-Z_\-\u4e00-\u9fff]", "", value)
@@ -211,6 +220,7 @@ def init_db() -> None:
                 username TEXT UNIQUE,
                 email TEXT NOT NULL UNIQUE,
                 display_name TEXT NOT NULL,
+                real_name TEXT NOT NULL DEFAULT '',
                 password_hash TEXT NOT NULL,
                 verified INTEGER NOT NULL DEFAULT 0,
                 team_name TEXT NOT NULL DEFAULT '未分组',
@@ -220,6 +230,7 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS guests (
                 id TEXT PRIMARY KEY,
                 display_name TEXT NOT NULL,
+                real_name TEXT NOT NULL DEFAULT '',
                 team_name TEXT NOT NULL DEFAULT '游客',
                 created_at INTEGER NOT NULL
             );
@@ -303,6 +314,8 @@ def migrate_db(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE users ADD COLUMN username TEXT")
     if "team_name" not in columns:
         conn.execute("ALTER TABLE users ADD COLUMN team_name TEXT")
+    if "real_name" not in columns:
+        conn.execute("ALTER TABLE users ADD COLUMN real_name TEXT")
 
     rows = conn.execute(
         "SELECT id, email, display_name, username FROM users WHERE username IS NULL OR username = '' ORDER BY id"
@@ -327,14 +340,18 @@ def migrate_db(conn: sqlite3.Connection) -> None:
         "UPDATE users SET team_name = ? WHERE team_name IS NULL OR TRIM(team_name) = ''",
         (DEFAULT_TEAM_NAME,),
     )
+    conn.execute("UPDATE users SET real_name = '' WHERE real_name IS NULL")
 
     guest_columns = {row["name"] for row in conn.execute("PRAGMA table_info(guests)").fetchall()}
     if "team_name" not in guest_columns:
         conn.execute("ALTER TABLE guests ADD COLUMN team_name TEXT")
+    if "real_name" not in guest_columns:
+        conn.execute("ALTER TABLE guests ADD COLUMN real_name TEXT")
     conn.execute(
         "UPDATE guests SET team_name = ? WHERE team_name IS NULL OR TRIM(team_name) = ''",
         (GUEST_TEAM_NAME,),
     )
+    conn.execute("UPDATE guests SET real_name = '' WHERE real_name IS NULL")
 
 
 def http_get(
@@ -1504,6 +1521,18 @@ def owner_display_name(conn: sqlite3.Connection, owner_type: str, owner_id: str)
     return row["display_name"] if row else "未知成员"
 
 
+def can_view_real_name(principal: dict | None, owner: dict) -> bool:
+    if not principal:
+        return False
+    if principal["type"] == owner["ownerType"] and str(principal["id"]) == str(owner["ownerId"]):
+        return True
+    viewer_team = normalize_team_name(principal.get("teamName"), "")
+    owner_team = normalize_team_name(owner.get("teamName"), "")
+    if not viewer_team or viewer_team in {DEFAULT_TEAM_NAME, GUEST_TEAM_NAME}:
+        return False
+    return viewer_team == owner_team
+
+
 def get_current_principal(handler) -> dict | None:
     cookie_header = handler.headers.get("Cookie", "")
     jar = cookies.SimpleCookie()
@@ -1527,7 +1556,7 @@ def get_current_principal(handler) -> dict | None:
             return None
         if row["owner_type"] == "user":
             user = conn.execute(
-                "SELECT id, username, email, display_name, verified, team_name FROM users WHERE id = ?",
+                "SELECT id, username, email, display_name, real_name, verified, team_name FROM users WHERE id = ?",
                 (row["owner_id"],),
             ).fetchone()
             if not user:
@@ -1537,11 +1566,12 @@ def get_current_principal(handler) -> dict | None:
                 "id": str(user["id"]),
                 "username": user["username"],
                 "displayName": user["display_name"],
+                "realName": user["real_name"] or "",
                 "teamName": user["team_name"] or DEFAULT_TEAM_NAME,
                 "verified": True,
             }
         guest = conn.execute(
-            "SELECT id, display_name, team_name FROM guests WHERE id = ?",
+            "SELECT id, display_name, real_name, team_name FROM guests WHERE id = ?",
             (row["owner_id"],),
         ).fetchone()
         if not guest:
@@ -1550,6 +1580,7 @@ def get_current_principal(handler) -> dict | None:
             "type": "guest",
             "id": guest["id"],
             "displayName": guest["display_name"],
+            "realName": guest["real_name"] or "",
             "teamName": guest["team_name"] or GUEST_TEAM_NAME,
             "verified": False,
         }
@@ -1836,6 +1867,8 @@ def write_overview_cache(overview: dict) -> None:
     payload["user"] = None
     for member in payload.get("members", []):
         member["isCurrent"] = False
+        member["realName"] = ""
+        member["realNameVisible"] = False
     payload.setdefault("mirror", {})["cachedAt"] = iso_from_ts(utcnow())
     tmp_path = OVERVIEW_CACHE_PATH.with_name(f"{OVERVIEW_CACHE_PATH.name}.{threading.get_ident()}.tmp")
     tmp_path.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), "utf-8")
@@ -1856,6 +1889,8 @@ def read_overview_cache(principal: dict | None, error: Exception | None = None) 
             and member.get("ownerType") == principal.get("type")
             and str(member.get("ownerId")) == str(principal.get("id"))
         )
+        member["realName"] = ""
+        member["realNameVisible"] = False
     mirror = data.setdefault("mirror", {})
     mirror["fallback"] = True
     mirror["servedAt"] = iso_from_ts(utcnow())
@@ -1883,7 +1918,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
 
         user_rows = conn.execute(
             """
-            SELECT id, username, display_name, email, team_name
+            SELECT id, username, display_name, email, real_name, team_name
             FROM users
             ORDER BY created_at
             """
@@ -1897,6 +1932,8 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "displayName": row["display_name"],
                 "teamName": row["team_name"] or DEFAULT_TEAM_NAME,
                 "isCurrent": bool(principal and principal["type"] == "user" and principal["id"] == str(row["id"])),
+                "realName": "",
+                "realNameVisible": False,
                 "handles": [],
                 "days": {},
                 "stats": {
@@ -1915,6 +1952,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "contests": {"items": [], "total": 0, "byCategory": [], "byPlatform": []},
                 "_all_days": {},
                 "_solved_keys": set(),
+                "_real_name": row["real_name"] or "",
             }
 
         if principal and principal["type"] == "guest":
@@ -1925,6 +1963,8 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "displayName": principal["displayName"],
                 "teamName": principal.get("teamName") or GUEST_TEAM_NAME,
                 "isCurrent": True,
+                "realName": "",
+                "realNameVisible": False,
                 "handles": [],
                 "days": {},
                 "stats": {
@@ -1943,6 +1983,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "contests": {"items": [], "total": 0, "byCategory": [], "byPlatform": []},
                 "_all_days": {},
                 "_solved_keys": set(),
+                "_real_name": principal.get("realName") or "",
             }
 
         handle_rows = get_handle_rows(conn, principal=principal, include_guests=False)
@@ -2010,6 +2051,9 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             contest_summary = summarize_contests(owner["contests"]["items"])
             owner["contests"].update(contest_summary)
             owner["stats"]["contests"] = contest_summary["total"]
+            owner["realNameVisible"] = can_view_real_name(principal, owner)
+            owner["realName"] = owner.get("_real_name", "") if owner["realNameVisible"] else ""
+            owner.pop("_real_name", None)
 
         feed_rows = conn.execute(
             """
@@ -2241,8 +2285,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.handle_guest()
             if parsed.path == "/api/handles":
                 return self.handle_add_handle()
-            if parsed.path == "/api/me/team":
-                return self.handle_update_team()
+            if parsed.path in {"/api/me/team", "/api/me/profile"}:
+                return self.handle_update_profile()
             if parsed.path == "/api/sync":
                 return self.handle_sync()
             return self.send_error_json(404, "没有这个接口")
@@ -2322,13 +2366,12 @@ class AppHandler(BaseHTTPRequestHandler):
         data = read_json_body(self)
         username = normalize_username(str(data.get("username") or data.get("displayName") or ""))
         email = local_account_email(username)
-        display_name = str(data.get("displayName") or data.get("username") or "").strip()[:40]
+        display_name = normalize_display_name(data.get("displayName") or data.get("username"), username)
+        real_name = normalize_real_name(data.get("realName"))
         team_name = normalize_team_name(data.get("teamName"), DEFAULT_TEAM_NAME)
         password = str(data.get("password") or "")
         if len(password) < 8:
             raise ValueError("密码至少 8 位")
-        if not display_name:
-            display_name = username
 
         with connect_db() as conn:
             existing = conn.execute(
@@ -2339,10 +2382,10 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise ValueError("用户名已经被注册")
             cur = conn.execute(
                 """
-                INSERT INTO users(username, email, display_name, password_hash, verified, team_name, created_at)
-                VALUES(?, ?, ?, ?, 1, ?, ?)
+                INSERT INTO users(username, email, display_name, real_name, password_hash, verified, team_name, created_at)
+                VALUES(?, ?, ?, ?, ?, 1, ?, ?)
                 """,
-                (username, email, display_name, password_hash(password), team_name, utcnow()),
+                (username, email, display_name, real_name, password_hash(password), team_name, utcnow()),
             )
             user_id = str(cur.lastrowid)
             token = create_session(conn, "user", user_id, days=30)
@@ -2356,6 +2399,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     "id": user_id,
                     "username": username,
                     "displayName": display_name,
+                    "realName": real_name,
                     "teamName": team_name,
                     "verified": True,
                 },
@@ -2369,7 +2413,7 @@ class AppHandler(BaseHTTPRequestHandler):
         password = str(data.get("password") or "")
         with connect_db() as conn:
             row = conn.execute(
-                "SELECT id, username, email, display_name, password_hash, verified, team_name FROM users WHERE username = ?",
+                "SELECT id, username, email, display_name, real_name, password_hash, verified, team_name FROM users WHERE username = ?",
                 (username,),
             ).fetchone()
             if not row or not verify_password(password, row["password_hash"]):
@@ -2384,6 +2428,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     "id": str(row["id"]),
                     "username": row["username"],
                     "displayName": row["display_name"],
+                    "realName": row["real_name"] or "",
                     "teamName": row["team_name"] or DEFAULT_TEAM_NAME,
                     "verified": True,
                 },
@@ -2403,15 +2448,14 @@ class AppHandler(BaseHTTPRequestHandler):
 
     def handle_guest(self) -> None:
         data = read_json_body(self)
-        display_name = str(data.get("displayName") or "").strip()[:40]
+        display_name = normalize_display_name(data.get("displayName"), "游客-" + secrets.token_hex(2))
+        real_name = normalize_real_name(data.get("realName"))
         team_name = normalize_team_name(data.get("teamName"), GUEST_TEAM_NAME)
-        if not display_name:
-            display_name = "游客-" + secrets.token_hex(2)
         guest_id = secrets.token_urlsafe(12)
         with connect_db() as conn:
             conn.execute(
-                "INSERT INTO guests(id, display_name, team_name, created_at) VALUES(?, ?, ?, ?)",
-                (guest_id, display_name, team_name, utcnow()),
+                "INSERT INTO guests(id, display_name, real_name, team_name, created_at) VALUES(?, ?, ?, ?, ?)",
+                (guest_id, display_name, real_name, team_name, utcnow()),
             )
             token = create_session(conn, "guest", guest_id, days=7)
         return self.send_json(
@@ -2422,6 +2466,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     "type": "guest",
                     "id": guest_id,
                     "displayName": display_name,
+                    "realName": real_name,
                     "teamName": team_name,
                     "verified": False,
                 },
@@ -2429,16 +2474,23 @@ class AppHandler(BaseHTTPRequestHandler):
             extra_headers=[("Set-Cookie", cookie_header(token, 7 * 86400))],
         )
 
-    def handle_update_team(self) -> None:
+    def handle_update_profile(self) -> None:
         principal = get_current_principal(self)
         if not principal:
             return self.send_error_json(401, "请先登录或进入游客模式")
         data = read_json_body(self)
         fallback = GUEST_TEAM_NAME if principal["type"] == "guest" else DEFAULT_TEAM_NAME
+        display_name = normalize_display_name(data.get("displayName", principal.get("displayName")), principal["displayName"])
+        real_name = normalize_real_name(data.get("realName", principal.get("realName") or ""))
         team_name = normalize_team_name(data.get("teamName"), fallback)
         table = "guests" if principal["type"] == "guest" else "users"
         with connect_db() as conn:
-            conn.execute(f"UPDATE {table} SET team_name = ? WHERE id = ?", (team_name, str(principal["id"])))
+            conn.execute(
+                f"UPDATE {table} SET display_name = ?, real_name = ?, team_name = ? WHERE id = ?",
+                (display_name, real_name, team_name, str(principal["id"])),
+            )
+        principal["displayName"] = display_name
+        principal["realName"] = real_name
         principal["teamName"] = team_name
         return self.send_json(200, {"ok": True, "user": principal})
 
