@@ -81,6 +81,10 @@ def normalize_email(email: str) -> str:
     return email.strip().lower()
 
 
+def local_account_email(username: str) -> str:
+    return f"{username}@local.ojwall.invalid"
+
+
 def normalize_username(username: str) -> str:
     username = re.sub(r"\s+", "", username.strip()).lower()
     if not re.match(r"^[0-9a-zA-Z_\-\u4e00-\u9fff]{2,30}$", username):
@@ -307,6 +311,7 @@ def migrate_db(conn: sqlite3.Connection) -> None:
         conn.execute("UPDATE users SET username = ? WHERE id = ?", (candidate, row["id"]))
 
     conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)")
+    conn.execute("UPDATE users SET verified = 1 WHERE verified != 1")
 
 
 def http_get(
@@ -359,6 +364,20 @@ def http_get_json(
     return json.loads(body.decode("utf-8"))
 
 
+def http_post_json(url: str, payload: dict, headers: dict[str, str] | None = None):
+    request_headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json,text/plain,*/*",
+        "Content-Type": "application/json",
+    }
+    if headers:
+        request_headers.update(headers)
+    body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    req = urllib.request.Request(url, data=body, headers=request_headers, method="POST")
+    with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
 def strip_tags(fragment: str) -> str:
     text = re.sub(r"<script\b[^>]*>.*?</script>", " ", fragment, flags=re.I | re.S)
     text = re.sub(r"<style\b[^>]*>.*?</style>", " ", text, flags=re.I | re.S)
@@ -407,7 +426,10 @@ def normalize_verdict(value) -> str:
         return "AC"
     if text == "12":
         return "AC"
-    return upper or "UNKNOWN"
+    camel = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", text)
+    camel = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", camel).upper()
+    normalized = re.sub(r"[^0-9A-Z]+", "_", camel).strip("_")
+    return normalized or upper or "UNKNOWN"
 
 
 CONTEST_CATEGORY_LABELS = {
@@ -1018,6 +1040,19 @@ class VJudgeAdapter(OJAdapter):
         return handle
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
+        submissions = self._fetch_recent_submissions(handle, since_ts)
+        recent_solved = {
+            item["problem_id"]
+            for item in submissions
+            if item.get("problem_id") and normalize_verdict(item.get("verdict")) == "AC"
+        }
+        for item in self._fetch_solve_detail(handle, since_ts):
+            if item["problem_id"] in recent_solved:
+                continue
+            submissions.append(item)
+        return submissions
+
+    def _fetch_recent_submissions(self, handle: str, since_ts: int) -> list[dict]:
         submissions = []
         page_size = 100
         start = 0
@@ -1071,6 +1106,50 @@ class VJudgeAdapter(OJAdapter):
             start += page_size
         return submissions
 
+    def _fetch_solve_detail(self, handle: str, since_ts: int) -> list[dict]:
+        data = http_get_json(
+            f"https://vjudge.net/user/solveDetail2/{urllib.parse.quote(handle)}",
+            cache_ttl_seconds=3600,
+        )
+        if not isinstance(data, list):
+            raise RuntimeError("VJudge solveDetail2 返回格式异常")
+
+        submissions = []
+        seen = set()
+        for item in data:
+            if not isinstance(item, list) or len(item) < 3 or not item[2]:
+                continue
+            oj = str(item[0] or "").strip()
+            prob_num = str(item[1] or "").strip()
+            if not oj or not prob_num:
+                continue
+            submitted_ms = int(item[2] or 0)
+            submitted_at = submitted_ms // 1000 if submitted_ms > 10_000_000_000 else submitted_ms
+            if submitted_at < since_ts:
+                continue
+            problem_id = f"{oj}-{prob_num}"
+            if problem_id in seen:
+                continue
+            seen.add(problem_id)
+            submissions.append(
+                {
+                    "remote_id": f"solve-{problem_id}",
+                    "problem_id": problem_id,
+                    "problem_name": problem_id,
+                    "verdict": "AC",
+                    "language": "",
+                    "submitted_at": submitted_at,
+                    "url": f"https://vjudge.net/problem/{urllib.parse.quote(problem_id)}",
+                    "raw": {
+                        "oj": oj,
+                        "probNum": prob_num,
+                        "firstAcceptedAt": submitted_ms,
+                        "syntheticFromSolveDetail2": True,
+                    },
+                }
+            )
+        return submissions
+
     def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
         contests = {}
         for item in submissions:
@@ -1089,6 +1168,71 @@ class VJudgeAdapter(OJAdapter):
                 "raw": raw,
             }
         return list(contests.values())
+
+
+class LOJAdapter(OJAdapter):
+    key = "loj"
+    label = "LOJ"
+    handle_hint = "LOJ 用户名，例如 Yzm007"
+
+    def normalize_handle(self, handle: str) -> str:
+        handle = handle.strip()
+        if not re.match(r"^[0-9A-Za-z_\-.]{2,64}$", handle):
+            raise ValueError("LOJ 请填写用户名")
+        return handle
+
+    def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
+        submissions = []
+        page_size = min(max(FETCH_LIMIT, 1), 100)
+        max_id = None
+        while True:
+            payload = {
+                "submitter": handle,
+                "locale": "zh_CN",
+                "takeCount": page_size,
+            }
+            if max_id is not None:
+                payload["maxId"] = max_id
+            data = http_post_json("https://api.loj.ac/api/submission/querySubmission", payload)
+            if data.get("error"):
+                raise RuntimeError(f"LOJ 返回失败：{data.get('error')}")
+            items = data.get("submissions") if isinstance(data, dict) else []
+            if not isinstance(items, list) or not items:
+                break
+
+            reached_older = False
+            for item in items:
+                submitted_at = parse_iso_datetime(str(item.get("submitTime") or "")) or 0
+                if submitted_at and submitted_at < since_ts:
+                    reached_older = True
+                    continue
+                problem = item.get("problem") or {}
+                display_id = problem.get("displayId") or problem.get("id") or ""
+                problem_id = f"P{display_id}" if display_id else ""
+                title = str(item.get("problemTitle") or problem_id)
+                remote_id = str(item.get("id") or "")
+                if not remote_id or not submitted_at:
+                    continue
+                submissions.append(
+                    {
+                        "remote_id": remote_id,
+                        "problem_id": problem_id,
+                        "problem_name": f"{problem_id} {title}".strip(),
+                        "verdict": normalize_verdict(item.get("status")),
+                        "language": str(item.get("codeLanguage") or "").upper(),
+                        "submitted_at": submitted_at,
+                        "url": f"https://loj.ac/s/{remote_id}",
+                        "raw": item,
+                    }
+                )
+
+            if reached_older or not data.get("hasSmallerId"):
+                break
+            last_id = items[-1].get("id")
+            if not last_id:
+                break
+            max_id = int(last_id) - 1
+        return submissions
 
 
 class QOJAdapter(OJAdapter):
@@ -1235,6 +1379,7 @@ ADAPTERS: dict[str, OJAdapter] = {
     "nowcoder": NowcoderAdapter(),
     "luogu": LuoguAdapter(),
     "vjudge": VJudgeAdapter(),
+    "loj": LOJAdapter(),
     "qoj": QOJAdapter(),
 }
 
@@ -1368,9 +1513,8 @@ def get_current_principal(handler) -> dict | None:
                 "type": "user",
                 "id": str(user["id"]),
                 "username": user["username"],
-                "email": user["email"],
                 "displayName": user["display_name"],
-                "verified": bool(user["verified"]),
+                "verified": True,
             }
         guest = conn.execute(
             "SELECT id, display_name FROM guests WHERE id = ?",
@@ -1716,7 +1860,6 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             """
             SELECT id, username, display_name, email
             FROM users
-            WHERE verified = 1
             ORDER BY created_at
             """
         ).fetchall()
@@ -2149,11 +2292,9 @@ class AppHandler(BaseHTTPRequestHandler):
     def handle_register(self) -> None:
         data = read_json_body(self)
         username = normalize_username(str(data.get("username") or data.get("displayName") or ""))
-        email = normalize_email(str(data.get("email") or ""))
+        email = local_account_email(username)
         display_name = str(data.get("displayName") or data.get("username") or "").strip()[:40]
         password = str(data.get("password") or "")
-        if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
-            raise ValueError("邮箱格式不正确")
         if len(password) < 8:
             raise ValueError("密码至少 8 位")
         if not display_name:
@@ -2161,30 +2302,35 @@ class AppHandler(BaseHTTPRequestHandler):
 
         with connect_db() as conn:
             existing = conn.execute(
-                "SELECT username, email FROM users WHERE username = ? OR email = ?",
-                (username, email),
+                "SELECT username FROM users WHERE username = ?",
+                (username,),
             ).fetchone()
             if existing:
-                if existing["username"] == username:
-                    raise ValueError("用户名已经被注册")
-                raise ValueError("邮箱已经被注册")
+                raise ValueError("用户名已经被注册")
             cur = conn.execute(
                 """
                 INSERT INTO users(username, email, display_name, password_hash, verified, created_at)
-                VALUES(?, ?, ?, ?, 0, ?)
+                VALUES(?, ?, ?, ?, 1, ?)
                 """,
                 (username, email, display_name, password_hash(password), utcnow()),
             )
-            token = create_verification_token(conn, cur.lastrowid)
-
-            base_url = PUBLIC_BASE_URL or f"http://{self.headers.get('Host', f'localhost:{PORT}')}"
-            verify_url = f"{base_url}/api/auth/verify?token={urllib.parse.quote(token)}"
-            sent = send_verification_email(email, display_name, verify_url)
-        response = {"ok": True, "emailSent": sent, "message": "注册成功，请先完成邮箱验证再用用户名登录。"}
-        if not sent:
-            response["verifyUrl"] = verify_url
-            response["devVerifyUrl"] = verify_url
-        return self.send_json(201, response)
+            user_id = str(cur.lastrowid)
+            token = create_session(conn, "user", user_id, days=30)
+        return self.send_json(
+            201,
+            {
+                "ok": True,
+                "message": "注册成功，已登录。",
+                "user": {
+                    "type": "user",
+                    "id": user_id,
+                    "username": username,
+                    "displayName": display_name,
+                    "verified": True,
+                },
+            },
+            extra_headers=[("Set-Cookie", cookie_header(token, 30 * 86400))],
+        )
 
     def handle_login(self) -> None:
         data = read_json_body(self)
@@ -2197,8 +2343,6 @@ class AppHandler(BaseHTTPRequestHandler):
             ).fetchone()
             if not row or not verify_password(password, row["password_hash"]):
                 return self.send_error_json(401, "用户名或密码不正确")
-            if not row["verified"]:
-                return self.send_error_json(403, "邮箱还没有验证")
             token = create_session(conn, "user", str(row["id"]), days=30)
         return self.send_json(
             200,
@@ -2208,7 +2352,6 @@ class AppHandler(BaseHTTPRequestHandler):
                     "type": "user",
                     "id": str(row["id"]),
                     "username": row["username"],
-                    "email": row["email"],
                     "displayName": row["display_name"],
                     "verified": True,
                 },

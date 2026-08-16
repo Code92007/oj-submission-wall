@@ -5,8 +5,8 @@
 ## 功能
 
 - 游客模式：不注册也能临时进入，绑定 OJ 账号后查看自己的提交墙。游客会话默认保留 7 天。
-- 账号注册：用户名 + 邮箱 + 密码注册，必须完成邮箱验证后，才能用用户名 + 密码登录。
-- OJ 绑定：支持 Codeforces、AtCoder、牛客、洛谷、VJudge、QOJ。
+- 账号注册：用户名 + 密码即可注册，注册后自动登录。
+- OJ 绑定：支持 Codeforces、AtCoder、牛客、洛谷、VJudge、LOJ、QOJ。
 - 训练监控：成员总览、今日解题、历史解题活跃天、连续训练天数、最新提交动态、参赛统计。
 - 后台同步：默认每 15 分钟同步一次注册成员，也可以在页面手动刷新。
 - 稳定缓存：历史提交页会本地缓存，平台临时不可用时仍可显示截至上次成功同步的全平台镜像。
@@ -21,14 +21,14 @@ python3 app.py
 
 打开 `http://localhost:8000`。
 
-未配置 SMTP 时，注册后页面会返回验证链接，服务日志也会打印验证链接。要真正发邮件，必须配置 SMTP。
+注册不需要邮箱验证；如果要限制访问，建议放到反向代理或内网入口后面。
 
 ## Docker 部署
 
 ```bash
 cd ~/Documents/oj-submission-wall
 cp .env.example .env
-# 修改 .env 里的 PUBLIC_BASE_URL、SMTP_*、COOKIE_SECURE
+# 修改 .env 里的 PUBLIC_BASE_URL、COOKIE_SECURE
 docker compose up -d --build
 ```
 
@@ -66,7 +66,7 @@ git pull
 docker compose up -d --build
 ```
 
-生产部署一定要在 `.env` 里配置 `PUBLIC_BASE_URL`；SMTP 可选，不配置时页面会直接给出验证链接。
+生产部署建议在 `.env` 里配置 `PUBLIC_BASE_URL`。
 
 ## 账号绑定格式
 
@@ -75,13 +75,14 @@ docker compose up -d --build
 - 牛客：填写竞赛个人页数字 ID，例如 `https://ac.nowcoder.com/acm/contest/profile/123456` 里的 `123456`。
 - 洛谷：填写用户名、数字 UID 或用户主页链接。
 - VJudge：填写 VJudge 用户名。
+- LOJ：填写 LOJ 用户名。
 - QOJ：填写 QOJ 用户名；服务端需要先配置 `QOJ_COOKIE`。
 
 ## 环境变量
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
-| `PUBLIC_BASE_URL` | 当前 Host | 邮箱验证链接使用的公网地址 |
+| `PUBLIC_BASE_URL` | 当前 Host | 应用公网地址 |
 | `PORT` | `8000` | 容器外暴露端口由 compose 的 `${PORT}` 控制 |
 | `DATA_DIR` | `/data` | SQLite 数据目录 |
 | `APP_ENV` | `production` | 运行环境标记 |
@@ -95,7 +96,6 @@ docker compose up -d --build
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent |
 | `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；配置可访问 `qoj.ac` 的登录态 Cookie 后才能同步 |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SSL` / `SMTP_TLS` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | 空 | 邮箱验证 SMTP 配置；不配置时页面返回验证链接 |
 
 ## 数据源说明
 
@@ -103,7 +103,8 @@ docker compose up -d --build
 - AtCoder 使用 AtCoder Problems 的公开 API，并按 `from_second` 分页拉取完整历史；比赛统计使用 AtCoder 官方用户参赛历史 JSON。
 - 洛谷匿名访问无法读取逐条提交；本项目使用公开个人页 activity（日历）同步公开日解题/提交数量，并把日期活动作为可点击到个人页的记录展示。
 - 牛客从竞赛个人页公开练习记录分页解析历史提交，并从公开参赛历史接口同步比赛明细。
-- VJudge 使用公开 `status/data` 提交列表；带 `contestId` 的记录会计入 VJudge 比赛。
+- VJudge 使用公开 `solveDetail2` 同步完整历史 AC 题目，并用 `status/data` 补最近提交；带 `contestId` 的记录会计入 VJudge 比赛。
+- LOJ 使用公开 `submission/querySubmission` API 分页同步公开提交。
 - QOJ 当前有 Cloudflare 校验；配置 `QOJ_COOKIE` 后从提交页同步，否则会明确提示无法精确同步。
 
 如果平台接口改版、风控或临时不可用，系统会保留上次成功同步的数据；`/api/overview` 还会写入脱敏概览镜像，数据库或接口异常时可以继续显示“数据截至 xx”的本地镜像。适配器都集中在 `app.py` 的 `OJAdapter` 子类里，后续替换接口时只需要改对应类。
@@ -111,6 +112,5 @@ docker compose up -d --build
 ## 生产建议
 
 - 放到 Nginx/Caddy 后面，开启 HTTPS，并把 `COOKIE_SECURE=true`。
-- 配置真实 SMTP 后注册邮件会自动发送。QQ 邮箱常用 `SMTP_HOST=smtp.qq.com`、`SMTP_PORT=465`、`SMTP_SSL=true`，`SMTP_PASSWORD` 填 SMTP 授权码，不是 QQ 登录密码。
 - 把 `OJ_USER_AGENT` 改成你自己的域名和联系方式。
 - 如果队员很多，建议把 `SYNC_INTERVAL_SECONDS` 调大，减少对 OJ 的请求压力。

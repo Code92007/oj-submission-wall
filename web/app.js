@@ -23,7 +23,7 @@ const el = (tag, className) => {
   return node;
 };
 
-const CONTEST_PLATFORM_ORDER = ["codeforces", "atcoder", "nowcoder", "luogu", "vjudge", "qoj", "other"];
+const CONTEST_PLATFORM_ORDER = ["codeforces", "atcoder", "nowcoder", "luogu", "vjudge", "loj", "qoj", "other"];
 const CONTEST_CATEGORY_ORDER = [
   "codeforces.div1",
   "codeforces.div1_2",
@@ -910,11 +910,11 @@ async function submitRegister(event) {
       method: "POST",
       body: {
         username: form.get("username"),
-        email: form.get("email"),
         password: form.get("password"),
       },
     });
-    showMessage(data.emailSent ? data.message : "注册成功，当前邮件没有发出，请点击验证链接完成验证。", "info", data.verifyUrl || data.devVerifyUrl);
+    await loadOverview();
+    showMessage(data.message || "注册成功，已登录。");
   } catch (error) {
     showMessage(error.message, "error");
   }
