@@ -9,6 +9,7 @@ import json
 import os
 import re
 import secrets
+import socket
 import smtplib
 import sqlite3
 import ssl
@@ -41,6 +42,8 @@ SYNC_MIN_AGE_SECONDS = int(os.environ.get("SYNC_MIN_AGE_SECONDS", "120"))
 FETCH_LOOKBACK_DAYS = int(os.environ.get("FETCH_LOOKBACK_DAYS", "3650"))
 FETCH_LIMIT = int(os.environ.get("FETCH_LIMIT", "1000"))
 HTTP_TIMEOUT_SECONDS = int(os.environ.get("HTTP_TIMEOUT_SECONDS", "15"))
+HTTP_RETRY_COUNT = int(os.environ.get("HTTP_RETRY_COUNT", "2"))
+HTTP_RETRY_BACKOFF_SECONDS = float(os.environ.get("HTTP_RETRY_BACKOFF_SECONDS", "0.8"))
 HISTORICAL_CACHE_AFTER_DAYS = int(os.environ.get("HISTORICAL_CACHE_AFTER_DAYS", "30"))
 HISTORICAL_CACHE_TTL_SECONDS = int(os.environ.get("HISTORICAL_CACHE_TTL_SECONDS", str(3650 * 86400)))
 SESSION_COOKIE = "ojwall_session"
@@ -63,6 +66,7 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 HTTP_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 SYNC_LOCK = threading.Lock()
 HTTP_STALE_HITS = threading.local()
+TRANSIENT_HTTP_STATUSES = {408, 425, 429, 500, 502, 503, 504}
 
 
 def utcnow() -> int:
@@ -177,6 +181,23 @@ def record_http_stale_hit(url: str, fetched_at: int) -> None:
 
 def http_stale_hits() -> list[dict]:
     return list(getattr(HTTP_STALE_HITS, "items", []))
+
+
+def is_transient_http_error(exc: Exception) -> bool:
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code in TRANSIENT_HTTP_STATUSES
+    if isinstance(exc, (TimeoutError, socket.timeout)):
+        return True
+    if isinstance(exc, urllib.error.URLError):
+        reason = exc.reason
+        if isinstance(reason, (TimeoutError, socket.timeout)):
+            return True
+        return "timed out" in str(reason).lower() or "temporarily unavailable" in str(reason).lower()
+    return "timed out" in str(exc).lower()
+
+
+def retry_delay(attempt: int) -> float:
+    return max(0.0, HTTP_RETRY_BACKOFF_SECONDS) * (2 ** attempt)
 
 
 def password_hash(password: str, salt: bytes | None = None, iterations: int = 210_000) -> str:
@@ -371,22 +392,32 @@ def http_get(
     }
     if headers:
         request_headers.update(headers)
-    req = urllib.request.Request(url, headers=request_headers)
-    try:
-        with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
-            content_type = resp.headers.get("content-type", "")
-            body = resp.read()
-            with contextlib.suppress(Exception):
-                write_http_cache(url, body, content_type)
-            return body, content_type
-    except Exception:
-        if allow_stale_cache:
-            stale = read_http_cache(url)
-            if stale:
-                body, content_type, fetched_at = stale
-                record_http_stale_hit(url, fetched_at)
+    attempts = max(1, HTTP_RETRY_COUNT + 1)
+    last_exc: Exception | None = None
+    for attempt in range(attempts):
+        req = urllib.request.Request(url, headers=request_headers)
+        try:
+            with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
+                content_type = resp.headers.get("content-type", "")
+                body = resp.read()
+                with contextlib.suppress(Exception):
+                    write_http_cache(url, body, content_type)
                 return body, content_type
-        raise
+        except Exception as exc:
+            last_exc = exc
+            if attempt < attempts - 1 and is_transient_http_error(exc):
+                time.sleep(retry_delay(attempt))
+                continue
+            break
+    if allow_stale_cache:
+        stale = read_http_cache(url)
+        if stale:
+            body, content_type, fetched_at = stale
+            record_http_stale_hit(url, fetched_at)
+            return body, content_type
+    if last_exc:
+        raise last_exc
+    raise RuntimeError("HTTP request failed")
 
 
 def http_get_json(
@@ -413,9 +444,22 @@ def http_post_json(url: str, payload: dict, headers: dict[str, str] | None = Non
     if headers:
         request_headers.update(headers)
     body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    req = urllib.request.Request(url, data=body, headers=request_headers, method="POST")
-    with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    attempts = max(1, HTTP_RETRY_COUNT + 1)
+    last_exc: Exception | None = None
+    for attempt in range(attempts):
+        req = urllib.request.Request(url, data=body, headers=request_headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except Exception as exc:
+            last_exc = exc
+            if attempt < attempts - 1 and is_transient_http_error(exc):
+                time.sleep(retry_delay(attempt))
+                continue
+            break
+    if last_exc:
+        raise last_exc
+    raise RuntimeError("HTTP POST request failed")
 
 
 def strip_tags(fragment: str) -> str:
@@ -1675,13 +1719,13 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         (row["owner_type"], row["owner_id"], row["platform"], row["handle"]),
     ).fetchone()
     default_since = now - FETCH_LOOKBACK_DAYS * 86400
-    since_ts = default_since if force else max(default_since, int(max_row["max_submitted_at"] or 0) - 3 * 86400)
+    previous_error = str(row["last_error"] or "")
+    needs_full_retry = "比赛记录同步失败" in previous_error
+    since_ts = default_since if force or needs_full_retry else max(default_since, int(max_row["max_submitted_at"] or 0) - 3 * 86400)
 
     try:
         reset_http_stale_hits()
         submissions = adapter.fetch_submissions(row["handle"], since_ts)
-        contests = adapter.fetch_contests(row["handle"], since_ts, submissions)
-        stale_hits = http_stale_hits()
         inserted = 0
         for item in submissions:
             remote_id = str(item.get("remote_id") or "")
@@ -1713,6 +1757,15 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
                 ),
             )
             inserted += cur.rowcount
+
+        contests = []
+        contest_error = ""
+        try:
+            contests = adapter.fetch_contests(row["handle"], since_ts, submissions)
+        except Exception as exc:
+            detail = str(exc)[:300] or exc.__class__.__name__
+            contest_error = f"比赛记录同步失败：{detail}"
+        stale_hits = http_stale_hits()
         inserted_contests = 0
         for item in contests:
             remote_id = str(item.get("remote_id") or "")
@@ -1749,6 +1802,7 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
                 ),
             )
             inserted_contests += cur.rowcount
+        warnings = []
         result = {
             "handleId": row["id"],
             "platform": row["platform"],
@@ -1760,12 +1814,18 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         }
         if stale_hits:
             cache_as_of = min(int(item.get("fetchedAt") or now) for item in stale_hits)
-            error = f"平台接口异常，使用本地缓存；缓存时间 {iso_from_ts(cache_as_of)}"
+            warnings.append(f"平台接口异常，使用本地缓存；缓存时间 {iso_from_ts(cache_as_of)}")
+            result.update({"cached": True, "cacheAsOf": iso_from_ts(cache_as_of)})
+        if contest_error:
+            warnings.append(contest_error)
+            result.update({"partial": True})
+        if warnings:
+            error = "；".join(warnings)
             conn.execute(
-                "UPDATE handles SET last_error = ? WHERE id = ?",
-                (error, row["id"]),
+                "UPDATE handles SET last_sync_at = ?, last_error = ? WHERE id = ?",
+                (now, error, row["id"]),
             )
-            result.update({"cached": True, "cacheAsOf": iso_from_ts(cache_as_of), "warning": error})
+            result.update({"warning": error})
         else:
             conn.execute(
                 "UPDATE handles SET last_sync_at = ?, last_error = NULL WHERE id = ?",

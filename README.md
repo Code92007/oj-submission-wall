@@ -91,6 +91,9 @@ docker compose up -d --build
 | `SYNC_MIN_AGE_SECONDS` | `120` | 同一账号最短同步间隔 |
 | `FETCH_LOOKBACK_DAYS` | `3650` | 首次或强制同步时回看天数 |
 | `FETCH_LIMIT` | `1000` | 支持分页的平台单页拉取数量上限 |
+| `HTTP_TIMEOUT_SECONDS` | `15` | 外部 OJ 单次请求超时时间 |
+| `HTTP_RETRY_COUNT` | `2` | 外部 OJ 超时或 5xx 时的额外重试次数 |
+| `HTTP_RETRY_BACKOFF_SECONDS` | `0.8` | 外部 OJ 重试退避基准秒数 |
 | `CACHE_DIR` | `DATA_DIR/cache` | HTTP 响应缓存和概览镜像目录 |
 | `HISTORICAL_CACHE_AFTER_DAYS` | `30` | 距今超过多少天的历史页可直接使用缓存 |
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
