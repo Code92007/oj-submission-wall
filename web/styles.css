@@ -117,6 +117,21 @@ a {
   position: sticky;
   top: 104px;
   z-index: 1;
+  max-height: calc(100vh - 124px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  padding-bottom: 12px;
+  scrollbar-gutter: stable;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
 }
 
 .panel,
@@ -1085,6 +1100,10 @@ select:focus {
 
   .sidebar {
     position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+    padding-bottom: 0;
   }
 
   .toolbar,

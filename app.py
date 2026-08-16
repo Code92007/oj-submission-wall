@@ -847,8 +847,7 @@ class LuoguAdapter(OJAdapter):
             handle = user_path.group(1)
         if not re.match(r"^[0-9A-Za-z_\-]{2,32}$", handle):
             raise ValueError("洛谷请填写用户名、数字 UID 或用户主页链接")
-        _, profile_name = self._resolve_user(handle)
-        return profile_name
+        return handle
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
         uid, profile_name = self._resolve_user(handle)
