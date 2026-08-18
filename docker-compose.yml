@@ -4,7 +4,7 @@ services:
     container_name: oj-submission-wall
     restart: unless-stopped
     ports:
-      - "${PORT:-8000}:8000"
+      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-8000}:8000"
     volumes:
       - ./data:/data
     environment:

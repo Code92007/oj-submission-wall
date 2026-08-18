@@ -68,6 +68,28 @@ docker compose up -d --build
 
 生产部署建议在 `.env` 里配置 `PUBLIC_BASE_URL`。
 
+## wannafly.cn 域名部署
+
+推荐把训练墙挂在 `https://oj-train-wall.wannafly.cn`，主域名 `wannafly.cn` 留给后续总入口。
+
+DNSPod 添加解析：
+
+| 主机记录 | 记录类型 | 记录值 |
+| --- | --- | --- |
+| `oj-train-wall` | `A` | `43.155.179.39` |
+
+服务器 `.env` 建议：
+
+```bash
+PUBLIC_BASE_URL=https://oj-train-wall.wannafly.cn
+BIND_ADDRESS=127.0.0.1
+PORT=8017
+COOKIE_SECURE=true
+OJ_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
+```
+
+应用容器只监听本机 `127.0.0.1:8017`，公网入口交给 Caddy 的 `80/443`。Caddy 配置模板见 `deploy/Caddyfile.oj-train-wall`。
+
 ## 账号绑定格式
 
 - Codeforces：填写 handle，例如 `tourist`。
@@ -83,6 +105,7 @@ docker compose up -d --build
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
 | `PUBLIC_BASE_URL` | 当前 Host | 应用公网地址 |
+| `BIND_ADDRESS` | `0.0.0.0` | 容器外端口绑定地址；反向代理部署建议设为 `127.0.0.1` |
 | `PORT` | `8000` | 容器外暴露端口由 compose 的 `${PORT}` 控制 |
 | `DATA_DIR` | `/data` | SQLite 数据目录 |
 | `APP_ENV` | `production` | 运行环境标记 |
