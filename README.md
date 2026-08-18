@@ -88,7 +88,7 @@ COOKIE_SECURE=true
 OJ_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 ```
 
-应用容器只监听本机 `127.0.0.1:8017`，公网入口交给 Caddy 的 `80/443`。Caddy 配置模板见 `deploy/Caddyfile.oj-train-wall`。
+应用容器只监听本机 `127.0.0.1:8017`，公网入口交给反向代理的 `80/443`。已有 Nginx 时使用 `deploy/nginx.oj-train-wall.conf`；没有反向代理时也可以用 `deploy/Caddyfile.oj-train-wall` 让 Caddy 自动签证书。
 
 ## 账号绑定格式
 
