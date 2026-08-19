@@ -16,6 +16,8 @@ const state = {
   wallRange: "",
   selectedMemberKey: "",
   memberGroupFilter: "",
+  binding: false,
+  handleBusy: new Set(),
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -114,6 +116,13 @@ function setBusy(value) {
   state.busy = value;
   $("#refreshBtn").disabled = value;
   $("#refreshBtn").textContent = value ? "同步中..." : "刷新同步";
+}
+
+function setHandleBusy(id, value) {
+  const key = String(id);
+  if (value) state.handleBusy.add(key);
+  else state.handleBusy.delete(key);
+  renderMyHandles();
 }
 
 function switchAuthTab(name) {
@@ -269,6 +278,7 @@ function renderMyHandles() {
   }
 
   for (const item of handles) {
+    const busy = state.handleBusy.has(String(item.id));
     const row = el("div", "handle-item");
     const main = el("div", "handle-main");
     const title = document.createElement("strong");
@@ -281,11 +291,23 @@ function renderMyHandles() {
         : "尚未同步";
     main.append(title, meta);
 
+    const actions = el("div", "handle-actions");
+    if (item.lastError) {
+      const retry = el("button", "button ghost");
+      retry.type = "button";
+      retry.textContent = busy ? "重试中..." : "重试";
+      retry.disabled = busy;
+      retry.dataset.retryHandleId = item.id;
+      actions.appendChild(retry);
+    }
+
     const remove = el("button", "button ghost danger");
     remove.type = "button";
-    remove.textContent = "移除";
+    remove.textContent = busy ? "处理中..." : "移除";
+    remove.disabled = busy;
     remove.dataset.handleId = item.id;
-    row.append(main, remove);
+    actions.appendChild(remove);
+    row.append(main, actions);
     list.appendChild(row);
   }
 }
@@ -1307,8 +1329,17 @@ async function submitProfile(event) {
 async function submitHandle(event) {
   event.preventDefault();
   clearMessage();
+  if (state.binding) return;
   const formElement = event.currentTarget;
   const form = new FormData(formElement);
+  const submitButton = formElement.querySelector('button[type="submit"]');
+  const originalText = submitButton ? submitButton.textContent : "";
+  state.binding = true;
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "绑定中...";
+  }
+  showMessage("正在绑定并同步，失败也会保留在列表里。");
   setBusy(true);
   try {
     const data = await api("/api/handles", {
@@ -1321,9 +1352,12 @@ async function submitHandle(event) {
     formElement.reset();
     updateHandleHint();
     await loadOverview();
+    const busy = (data.sync || []).filter((item) => item.busy);
     const errors = (data.sync || []).filter((item) => item.error);
     const cached = (data.sync || []).filter((item) => item.cached);
-    if (errors.length) {
+    if (busy.length) {
+      showMessage("绑定已保存，后台正在同步其他账号，稍后可以点重试。", "error");
+    } else if (errors.length) {
       showMessage(`${errors.length} 个绑定已保存，但同步提交记录失败；错误原因会显示在绑定列表里。`, "error");
     } else if (cached.length) {
       const oldest = cached
@@ -1331,10 +1365,17 @@ async function submitHandle(event) {
         .filter(Boolean)
         .sort()[0];
       showMessage(`绑定已保存，当前使用本地缓存，缓存时间 ${oldest ? formatDateTime(oldest) : "未知"}。`, "error");
+    } else {
+      showMessage("绑定并同步完成。");
     }
   } catch (error) {
     showMessage(error.message, "error");
   } finally {
+    state.binding = false;
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText || "绑定并同步";
+    }
     setBusy(false);
   }
 }
@@ -1381,11 +1422,46 @@ async function logout() {
 
 async function removeHandle(id) {
   clearMessage();
+  if (state.handleBusy.has(String(id))) return;
+  setHandleBusy(id, true);
   try {
     await api(`/api/handles/${encodeURIComponent(id)}`, { method: "DELETE" });
     await loadOverview();
   } catch (error) {
     showMessage(error.message, "error");
+  } finally {
+    setHandleBusy(id, false);
+  }
+}
+
+async function retryHandle(id) {
+  clearMessage();
+  if (state.handleBusy.has(String(id))) return;
+  setHandleBusy(id, true);
+  try {
+    const data = await api(`/api/handles/${encodeURIComponent(id)}/sync`, {
+      method: "POST",
+      body: {},
+    });
+    state.overview = data;
+    state.user = data.user;
+    renderAll();
+    const result = data.result || {};
+    if (result.busy) {
+      showMessage("已有同步任务在跑，稍后再试一次。", "error");
+    } else if (result.error) {
+      showMessage(`重试失败：${result.error}`, "error");
+    } else if (result.warning) {
+      showMessage(`重试完成，但有警告：${result.warning}`, "error");
+    } else if (result.cached) {
+      showMessage(`重试完成，当前使用本地缓存，缓存时间 ${result.cacheAsOf ? formatDateTime(result.cacheAsOf) : "未知"}。`, "error");
+    } else {
+      showMessage("重试同步完成。");
+    }
+  } catch (error) {
+    showMessage(error.message, "error");
+  } finally {
+    setHandleBusy(id, false);
   }
 }
 
@@ -1454,6 +1530,11 @@ function bindEvents() {
     renderFeed();
   });
   $("#myHandles").addEventListener("click", (event) => {
+    const retry = event.target.closest("button[data-retry-handle-id]");
+    if (retry) {
+      retryHandle(retry.dataset.retryHandleId);
+      return;
+    }
     const button = event.target.closest("button[data-handle-id]");
     if (button) removeHandle(button.dataset.handleId);
   });

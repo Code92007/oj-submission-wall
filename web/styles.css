@@ -918,6 +918,13 @@ select:focus {
   text-overflow: ellipsis;
 }
 
+.handle-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
 .feed {
   max-height: min(640px, calc(100vh - 184px));
   overflow: auto;

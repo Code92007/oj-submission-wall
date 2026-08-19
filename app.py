@@ -940,7 +940,8 @@ class LuoguAdapter(OJAdapter):
         params = urllib.parse.urlencode({"keyword": handle})
         data = http_get_json(
             f"https://www.luogu.com.cn/api/user/search?{params}",
-            headers=self._headers(),
+            headers=self._json_headers(),
+            cache_ttl_seconds=24 * 3600,
         )
         users = self._search_users(data)
         exact = None
@@ -961,14 +962,46 @@ class LuoguAdapter(OJAdapter):
         return self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
 
     @staticmethod
-    def _headers(referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
+    def _browser_headers(referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
         return {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36 OJSubmissionWall/1.0",
-            "Accept": "application/json,text/plain,*/*",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
             "Referer": referer,
-            "x-lentille-request": "content-only",
+            "Origin": "https://www.luogu.com.cn",
+            "Sec-CH-UA": '"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"',
+            "Sec-CH-UA-Mobile": "?0",
+            "Sec-CH-UA-Platform": '"Windows"',
+            "Sec-Fetch-Site": "same-origin",
         }
+
+    @classmethod
+    def _json_headers(cls, referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
+        headers = cls._browser_headers(referer)
+        headers.update(
+            {
+                "Accept": "application/json,text/plain,*/*",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+            }
+        )
+        return headers
+
+    @classmethod
+    def _headers(cls, referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
+        headers = cls._browser_headers(referer)
+        headers.update(
+            {
+                "Accept": "application/json,text/plain,*/*",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+            }
+        )
+        headers.update(
+            {
+                "x-lentille-request": "content-only",
+            }
+        )
+        return headers
 
     @classmethod
     def _parse_luogu_payload(cls, page: str) -> dict:
@@ -1942,7 +1975,8 @@ def get_handle_rows(conn: sqlite3.Connection, principal: dict | None = None, inc
 
 def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = False) -> dict:
     now = utcnow()
-    if not force and row["last_sync_at"] and now - int(row["last_sync_at"]) < SYNC_MIN_AGE_SECONDS:
+    has_error = bool(row["last_error"])
+    if not force and not has_error and row["last_sync_at"] and now - int(row["last_sync_at"]) < SYNC_MIN_AGE_SECONDS:
         return {"handleId": row["id"], "platform": row["platform"], "handle": row["handle"], "skipped": True}
 
     adapter = ADAPTERS[row["platform"]]
@@ -2097,6 +2131,29 @@ def sync_targets(principal: dict | None = None, force: bool = False, include_gue
     finally:
         SYNC_LOCK.release()
     return results
+
+
+def get_owned_handle_row(conn: sqlite3.Connection, principal: dict, handle_id: int) -> sqlite3.Row | None:
+    return conn.execute(
+        """
+        SELECT * FROM handles
+        WHERE id = ? AND owner_type = ? AND owner_id = ? AND active = 1
+        """,
+        (handle_id, principal["type"], str(principal["id"])),
+    ).fetchone()
+
+
+def sync_one_handle(principal: dict, handle_id: int, force: bool = True) -> dict:
+    if not SYNC_LOCK.acquire(blocking=False):
+        return {"handleId": handle_id, "busy": True}
+    try:
+        with connect_db() as conn:
+            row = get_owned_handle_row(conn, principal, handle_id)
+            if not row:
+                raise ValueError("没有找到这个账号绑定，可能已经移除")
+            return sync_handle_row(conn, row, force=force)
+    finally:
+        SYNC_LOCK.release()
 
 
 def background_sync_loop() -> None:
@@ -2605,6 +2662,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.handle_guest()
             if parsed.path == "/api/handles":
                 return self.handle_add_handle()
+            if re.match(r"^/api/handles/\d+/sync$", parsed.path):
+                return self.handle_sync_handle(parsed)
             if parsed.path in {"/api/me/team", "/api/me/profile"}:
                 return self.handle_update_profile()
             if parsed.path == "/api/sync":
@@ -2825,8 +2884,10 @@ class AppHandler(BaseHTTPRequestHandler):
         handle = str(data.get("handle") or "")
         with connect_db() as conn:
             row = add_or_restore_handle(conn, principal, platform, handle)
-        sync_result = sync_targets(principal=principal, force=True, include_guests=False)
-        return self.send_json(201, {"ok": True, "handle": handle_to_json(row), "sync": sync_result})
+        sync_result = sync_one_handle(principal, int(row["id"]), force=True)
+        with connect_db() as conn:
+            refreshed = get_owned_handle_row(conn, principal, int(row["id"])) or row
+        return self.send_json(201, {"ok": True, "handle": handle_to_json(refreshed), "sync": [sync_result]})
 
     def handle_delete_handle(self, parsed) -> None:
         principal = get_current_principal(self)
@@ -2850,6 +2911,16 @@ class AppHandler(BaseHTTPRequestHandler):
             if cursor.rowcount <= 0:
                 return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
         return self.send_json(200, {"ok": True})
+
+    def handle_sync_handle(self, parsed) -> None:
+        principal = get_current_principal(self)
+        if not principal:
+            return self.send_error_json(401, "请先登录或进入游客模式")
+        path_match = re.match(r"^/api/handles/(\d+)/sync$", parsed.path)
+        if not path_match:
+            raise ValueError("缺少账号绑定 ID")
+        result = sync_one_handle(principal, int(path_match.group(1)), force=True)
+        return self.send_json(200, {"ok": True, "result": result, **build_overview(principal)})
 
     def handle_sync(self) -> None:
         principal = get_current_principal(self)
