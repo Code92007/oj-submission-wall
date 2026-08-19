@@ -1358,10 +1358,13 @@ async function submitHandle(event) {
     const busy = (data.sync || []).filter((item) => item.busy);
     const errors = (data.sync || []).filter((item) => item.error);
     const cached = (data.sync || []).filter((item) => item.cached);
+    const warnings = (data.sync || []).filter((item) => item.warning);
     if (busy.length) {
       showMessage("绑定已保存，后台正在同步其他账号，稍后可以点重试。", "error");
     } else if (errors.length) {
       showMessage(`${errors.length} 个绑定已保存，但同步提交记录失败；错误原因会显示在绑定列表里。`, "error");
+    } else if (warnings.length) {
+      showMessage(`${warnings.length} 个绑定已保存，但同步使用了缓存或降级数据；详情会显示在绑定列表里。`, "error");
     } else if (cached.length) {
       const oldest = cached
         .map((item) => item.cacheAsOf)

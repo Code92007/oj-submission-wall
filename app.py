@@ -65,6 +65,25 @@ LUOGU_CF_CLEARANCE = os.environ.get("LUOGU_CF_CLEARANCE", "").strip()
 LUOGU_COOKIE = os.environ.get("LUOGU_COOKIE", "").strip()
 LUOGU_PROXY_URL = os.environ.get("LUOGU_PROXY_URL", "").strip()
 LUOGU_PROXY_TOKEN = os.environ.get("LUOGU_PROXY_TOKEN", "").strip()
+LUOGU_THIRD_PARTY_FALLBACK = os.environ.get("LUOGU_THIRD_PARTY_FALLBACK", "true").lower() not in {
+    "0",
+    "false",
+    "no",
+    "off",
+}
+DEFAULT_LUOGU_FALLBACK_URLS = (
+    "https://api.jerryz.com.cn/practice?id={uid}",
+    "https://api.jerryz.com.cn/api/practice?id={uid}",
+    "https://api.jerryz.com.cn/shields?id={uid}",
+    "https://api.jerryz.com.cn/api/shields?id={uid}",
+    "https://luogu.wao3.cn/api/practice?id={uid}",
+    "https://luogu.wao3.cn/api/shield?id={uid}",
+)
+LUOGU_FALLBACK_URLS = tuple(
+    item.strip()
+    for item in os.environ.get("LUOGU_FALLBACK_URLS", "").split(",")
+    if item.strip()
+) or DEFAULT_LUOGU_FALLBACK_URLS
 SMTP_PLACEHOLDERS = {
     "smtp.example.com",
     "noreply@example.com",
@@ -1134,6 +1153,16 @@ class LuoguAdapter(OJAdapter):
 
     def __init__(self):
         self._profile_stats: dict[str, dict] = {}
+        self._previous_stats: dict[str, dict] = {}
+
+    def set_previous_stats(self, handle: str, stats_json: str | None) -> None:
+        stats = {}
+        if stats_json:
+            with contextlib.suppress(Exception):
+                parsed = json.loads(stats_json)
+                if isinstance(parsed, dict):
+                    stats = parsed
+        self._previous_stats[handle] = stats
 
     def normalize_handle(self, handle: str) -> str:
         handle = handle.strip()
@@ -1148,17 +1177,23 @@ class LuoguAdapter(OJAdapter):
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
         self._profile_stats[handle] = {}
-        uid, profile_name = self._resolve_user(handle)
-        profile_url = f"https://www.luogu.com.cn/user/{uid}"
-        context = self._fetch_profile_context(uid)
-        data = self._context_data(context)
-        user = data.get("user") if isinstance(data.get("user"), dict) else {}
-        profile_name = str(user.get("name") or profile_name)
-        practice_data = {}
-        with contextlib.suppress(Exception):
-            practice_data = self._context_data(self._fetch_profile_context(uid, "/practice"))
-        self._profile_stats[handle] = self._extract_profile_stats(uid, profile_name, data, practice_data)
-        daily_counts = self._daily_counts(data)
+        uid = ""
+        profile_name = handle
+        try:
+            uid, profile_name = self._resolve_user(handle)
+            profile_url = f"https://www.luogu.com.cn/user/{uid}"
+            context = self._fetch_profile_context(uid)
+            data = self._context_data(context)
+            user = data.get("user") if isinstance(data.get("user"), dict) else {}
+            profile_name = str(user.get("name") or profile_name)
+            practice_data = {}
+            with contextlib.suppress(Exception):
+                practice_data = self._context_data(self._fetch_profile_context(uid, "/practice"))
+            self._profile_stats[handle] = self._extract_profile_stats(uid, profile_name, data, practice_data)
+            daily_counts = self._daily_counts(data)
+        except Exception as exc:
+            self._profile_stats[handle] = self._fetch_fallback_profile_stats(handle, uid, profile_name, exc)
+            return []
 
         submissions = []
         for date_key, counts in sorted(daily_counts.items()):
@@ -1216,6 +1251,169 @@ class LuoguAdapter(OJAdapter):
 
     def fetch_profile_stats(self, handle: str, submissions: list[dict]) -> dict:
         return self._profile_stats.pop(handle, {})
+
+    def _fetch_fallback_profile_stats(self, handle: str, uid: str, profile_name: str, source_exc: Exception) -> dict:
+        if not LUOGU_THIRD_PARTY_FALLBACK:
+            raise source_exc
+
+        previous = self._previous_stats.get(handle) or {}
+        uid = str(uid or previous.get("uid") or (handle if handle.isdigit() else "")).strip()
+        if not uid:
+            raise RuntimeError(
+                f"{source_exc}；第三方降级统计需要洛谷数字 UID，请用数字 UID 重新绑定后重试"
+            ) from source_exc
+
+        profile_name = str(previous.get("name") or profile_name or handle)
+        errors = []
+        for template in LUOGU_FALLBACK_URLS:
+            try:
+                url = template.format(
+                    uid=urllib.parse.quote(uid, safe=""),
+                    handle=urllib.parse.quote(handle, safe=""),
+                    name=urllib.parse.quote(profile_name, safe=""),
+                )
+            except Exception as exc:
+                errors.append(f"{template}: {exc}")
+                continue
+
+            try:
+                body, _ = http_get(
+                    url,
+                    headers={
+                        "User-Agent": LUOGU_USER_AGENT,
+                        "Accept": "image/svg+xml,application/json,text/plain,*/*;q=0.8",
+                        "Referer": "https://www.luogu.com.cn/",
+                    },
+                    cache_ttl_seconds=12 * 3600,
+                    allow_stale_cache=True,
+                )
+                stats = self._extract_third_party_profile_stats(body, uid)
+                stats.update(
+                    {
+                        "uid": uid,
+                        "name": profile_name,
+                        "ratingContests": previous.get("ratingContests") or [],
+                        "solvedProblems": [],
+                        "source": "luogu-third-party-fallback",
+                        "fallbackSource": url,
+                        "fallbackSyncedAt": utcnow(),
+                        "_fallback": True,
+                        "_warning": (
+                            "洛谷主源失败，已使用第三方公开统计源降级；"
+                            "仅更新总题数/难度分布，逐题、日期和比赛记录沿用本地缓存"
+                        ),
+                    }
+                )
+                return stats
+            except Exception as exc:
+                detail = str(exc).strip() or exc.__class__.__name__
+                errors.append(f"{url}: {detail}")
+
+        fallback_detail = "；".join(errors[:2]) if errors else "没有配置可用的第三方源"
+        raise RuntimeError(f"{source_exc}；第三方降级统计也失败：{fallback_detail}") from source_exc
+
+    @classmethod
+    def _extract_third_party_profile_stats(cls, body: bytes, uid: str) -> dict:
+        text = body.decode("utf-8", errors="ignore").strip()
+        json_stats = cls._extract_third_party_json_stats(text)
+        if json_stats:
+            return json_stats
+
+        plain = cls._plain_card_text(text)
+        error_markers = [
+            "FUNCTION_INVOCATION_FAILED",
+            "server error",
+            "数据获取异常",
+            "无法获取练习数据",
+            "不是一个合法uid",
+            "隐私保护",
+        ]
+        has_error = any(marker.lower() in plain.lower() for marker in error_markers)
+
+        passed_sum = cls._extract_labeled_count(plain, r"已通过")
+        unpassed = cls._extract_labeled_count(plain, r"未通过")
+        if passed_sum is None:
+            passed_sum = cls._extract_labeled_count(plain, r"通过题数")
+
+        labels = [
+            "暂无评定",
+            "入门",
+            "普及-",
+            "普及",
+            "普及+/提高-",
+            "提高",
+            "提高+/省选-",
+            "省选/NOI-",
+            "NOI/NOI+/CTS",
+        ]
+        difficulty_counts: dict[str, int] = {}
+        for index, label in enumerate(labels):
+            count = cls._extract_labeled_count(plain, re.escape(label))
+            if count is not None:
+                difficulty_counts[str(index)] = count
+
+        if passed_sum is None and difficulty_counts:
+            passed_sum = sum(difficulty_counts.values())
+        if passed_sum is None:
+            if has_error:
+                raise RuntimeError(plain[:180] or "第三方接口返回错误")
+            raise RuntimeError("第三方接口没有返回可用的洛谷通过题数")
+
+        stats = {
+            "allTimeAccepted": int(passed_sum),
+            "allTimeTried": int(passed_sum + max(0, unpassed or 0)),
+            "difficultyCounts": difficulty_counts,
+        }
+        return stats
+
+    @staticmethod
+    def _extract_third_party_json_stats(text: str) -> dict:
+        with contextlib.suppress(Exception):
+            data = json.loads(text)
+            if not isinstance(data, dict):
+                return {}
+            current_data = data.get("currentData") if isinstance(data.get("currentData"), dict) else data
+            user = current_data.get("user") if isinstance(current_data.get("user"), dict) else {}
+            passed = current_data.get("passed") or current_data.get("passedProblems")
+            submitted = current_data.get("submitted") or current_data.get("submittedProblems")
+            difficulty_counts: dict[str, int] = {}
+            solved_count = int(user.get("passedProblemCount") or 0)
+            if isinstance(passed, list):
+                solved_count = max(solved_count, len(passed))
+                for item in passed:
+                    if isinstance(item, dict):
+                        difficulty = str(item.get("difficulty") if item.get("difficulty") is not None else "unknown")
+                        difficulty_counts[difficulty] = difficulty_counts.get(difficulty, 0) + 1
+            tried_count = int(user.get("submittedProblemCount") or 0)
+            if isinstance(submitted, list):
+                tried_count = max(tried_count, len(submitted))
+            if solved_count:
+                return {
+                    "allTimeAccepted": solved_count,
+                    "allTimeTried": max(tried_count, solved_count),
+                    "difficultyCounts": difficulty_counts,
+                }
+        return {}
+
+    @staticmethod
+    def _plain_card_text(text: str) -> str:
+        text = html.unescape(text)
+        text = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", text, flags=re.I | re.S)
+        text = re.sub(r"<[^>]+>", " ", text)
+        text = re.sub(r"\s+", " ", text)
+        return text.strip()
+
+    @staticmethod
+    def _extract_labeled_count(text: str, label_pattern: str) -> int | None:
+        patterns = [
+            rf"{label_pattern}\s*[:：]?\s*([0-9][0-9,]*)\s*题?",
+            rf"{label_pattern}\s+([0-9][0-9,]*)\s*题?",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, text, flags=re.I)
+            if match:
+                return int(match.group(1).replace(",", ""))
+        return None
 
     def _resolve_user(self, handle: str) -> tuple[str, str]:
         if handle.isdigit():
@@ -2324,13 +2522,34 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
     previous_error = str(row["last_error"] or "")
     needs_full_retry = "比赛记录同步失败" in previous_error
     since_ts = default_since if force or needs_full_retry else max(default_since, int(max_row["max_submitted_at"] or 0) - 3 * 86400)
+    previous_stats_json = row["stats_json"] if "stats_json" in row.keys() else None
+    previous_profile_stats = {}
+    if previous_stats_json:
+        with contextlib.suppress(Exception):
+            parsed_stats = json.loads(previous_stats_json)
+            if isinstance(parsed_stats, dict):
+                previous_profile_stats = parsed_stats
 
     try:
         reset_http_stale_hits()
+        if hasattr(adapter, "set_previous_stats"):
+            adapter.set_previous_stats(row["handle"], previous_stats_json)
         submissions = adapter.fetch_submissions(row["handle"], since_ts)
         profile_stats = adapter.fetch_profile_stats(row["handle"], submissions)
-        previous_stats_json = row["stats_json"] if "stats_json" in row.keys() else None
-        stats_json = json.dumps(profile_stats, ensure_ascii=False) if profile_stats else previous_stats_json
+        profile_warning = ""
+        profile_is_fallback = False
+        if isinstance(profile_stats, dict):
+            profile_warning = str(profile_stats.pop("_warning", "") or "")
+            profile_is_fallback = bool(profile_stats.pop("_fallback", False))
+        use_previous_exact_stats = (
+            profile_is_fallback
+            and bool(previous_stats_json)
+            and previous_profile_stats.get("source") != "luogu-third-party-fallback"
+        )
+        if profile_stats and not use_previous_exact_stats:
+            stats_json = json.dumps(profile_stats, ensure_ascii=False)
+        else:
+            stats_json = previous_stats_json
         inserted = 0
         for item in submissions:
             remote_id = str(item.get("remote_id") or "")
@@ -2424,11 +2643,17 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         if contest_error:
             warnings.append(contest_error)
             result.update({"partial": True})
+        if profile_warning:
+            warnings.append(profile_warning)
+            result.update({"partial": True, "fallback": profile_is_fallback})
+            if use_previous_exact_stats and row["last_sync_at"]:
+                result.update({"cached": True, "cacheAsOf": iso_from_ts(int(row["last_sync_at"]))})
         if warnings:
             error = "；".join(warnings)
+            update_sync_at = int(row["last_sync_at"] or now) if use_previous_exact_stats else now
             conn.execute(
                 "UPDATE handles SET last_sync_at = ?, last_error = ?, stats_json = ? WHERE id = ?",
-                (now, error, stats_json, row["id"]),
+                (update_sync_at, error, stats_json, row["id"]),
             )
             result.update({"warning": error})
         else:

@@ -89,6 +89,8 @@ OJ_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 LUOGU_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 # 无代理时，可选填服务器同出口浏览器拿到的 Cloudflare 放行票据。
 LUOGU_CF_CLEARANCE=
+# 主源 403/超时时，尝试第三方公开统计卡片兜底总题数。
+LUOGU_THIRD_PARTY_FALLBACK=true
 ```
 
 应用容器只监听本机 `127.0.0.1:8017`，公网入口交给反向代理的 `80/443`。已有 Nginx 时使用 `deploy/nginx.oj-train-wall.conf`；没有反向代理时也可以用 `deploy/Caddyfile.oj-train-wall` 让 Caddy 自动签证书。
@@ -130,6 +132,8 @@ LUOGU_CF_CLEARANCE=
 | `LUOGU_COOKIE` | 空 | 可选：管理员自己的洛谷 Cookie；公开部署不建议收集用户 Cookie |
 | `LUOGU_PROXY_URL` | 空 | 可选：洛谷海外 403 时，把洛谷请求转发到国内出口的私有代理 |
 | `LUOGU_PROXY_TOKEN` | 空 | 可选：访问洛谷私有代理的 Bearer token |
+| `LUOGU_THIRD_PARTY_FALLBACK` | `true` | 洛谷主源失败时，是否尝试第三方公开统计源兜底 |
+| `LUOGU_FALLBACK_URLS` | 内置 Jerry/wao3 卡片接口 | 可选：逗号分隔的洛谷降级 URL 模板，支持 `{uid}`、`{handle}`、`{name}` |
 | `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；公开部署不建议收集用户登录态，留空时会提示无法精确同步 |
 
 ### 洛谷海外 403 处理
@@ -143,6 +147,7 @@ LUOGU_CF_CLEARANCE=
 ```bash
 LUOGU_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 LUOGU_CF_CLEARANCE=只填cf_clearance这个cookie的值
+LUOGU_THIRD_PARTY_FALLBACK=true
 ```
 
 如果服务器在海外机房，洛谷可能直接返回 `HTTP 403`。这不是绑定的账号错了，而是出口 IP 被洛谷风控拦截。稳定做法是把 `deploy/luogu_proxy.py` 部署在一个能正常访问洛谷的国内出口上，并且只暴露给主站使用：
@@ -162,11 +167,13 @@ LUOGU_PROXY_TOKEN=同一段随机长密码
 
 代理脚本只允许转发 `https://www.luogu.com.cn` / `https://luogu.com.cn`，并要求 Bearer token；不要把它无鉴权公开到公网。
 
+如果没有国内代理，主站会在洛谷主源 403、超时或验证码时尝试第三方公开统计卡片接口，例如 `api.jerryz.com.cn` / `luogu.wao3.cn`。这些源不是洛谷官方接口，只能兜底总通过题数和部分难度分布，不能提供逐题、日期和比赛记录；已有精确缓存时会优先保留缓存，不会被降级数据覆盖。绑定时填写数字 UID 成功率更高。
+
 ## 数据源说明
 
 - Codeforces 使用官方 `user.status` API，并分页拉取完整 10 年提交；比赛统计使用 `contest.list` 的主站 + Gym 名称，且只统计非 `PRACTICE` 的参赛/虚拟/打星记录。
 - AtCoder 使用 AtCoder Problems 的公开 API，并按 `from_second` 分页拉取完整历史；比赛统计使用 AtCoder 官方用户参赛历史 JSON。
-- 洛谷匿名访问无法读取逐条提交；本项目优先读取公开个人页 activity（日历）和练习页 `passed` 题目集合，首尔等海外出口 403 时可配置私有国内代理。
+- 洛谷匿名访问无法读取逐条提交；本项目优先读取公开个人页 activity（日历）和练习页 `passed` 题目集合，首尔等海外出口 403 时可配置私有国内代理；没有代理时会尝试第三方公开统计卡片兜底总题数，并保留上次成功缓存。
 - 牛客从竞赛个人页公开练习记录分页解析历史提交，并从公开参赛历史接口同步比赛明细。
 - VJudge 使用公开 `solveDetail2` 同步完整历史 AC 题目，并用 `status/data` 补最近提交；带 `contestId` 的记录会计入 VJudge 比赛。
 - LOJ 使用公开 `submission/querySubmission` API 分页同步公开提交。
