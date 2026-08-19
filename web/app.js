@@ -674,22 +674,42 @@ function renderWall(days, range, todayString, dateRange) {
   const lower = bounds.lower;
   const upper = bounds.upper;
   const visibleUpper = bounds.visibleUpper;
+  const shape = wallShape(range);
   const start = new Date(lower);
-  start.setUTCDate(start.getUTCDate() - start.getUTCDay());
-  const weekCount = Math.ceil(((upper - start) / 86400000 + 1) / 7);
+  if (!shape.compact) {
+    start.setUTCDate(start.getUTCDate() - start.getUTCDay());
+  }
+  const columnCount = Math.ceil(((upper - start) / 86400000 + 1) / shape.rows);
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   let lastMonth = -1;
+  let lastYear = -1;
 
-  months.style.gridTemplateColumns = `repeat(${weekCount}, var(--wall-cell))`;
-  for (let week = 0; week < weekCount; week += 1) {
-    for (let day = 0; day < 7; day += 1) {
+  activity.classList.toggle("compact-wall", shape.compact);
+  months.style.gridTemplateColumns = `repeat(${columnCount}, var(--wall-cell))`;
+  weekdays.style.gridTemplateRows = `repeat(${shape.rows}, var(--wall-cell))`;
+  wall.style.gridTemplateRows = `repeat(${shape.rows}, var(--wall-cell))`;
+
+  for (let column = 0; column < columnCount; column += 1) {
+    if (shape.compact) {
       const date = new Date(start);
-      date.setUTCDate(start.getUTCDate() + week * 7 + day);
+      date.setUTCDate(start.getUTCDate() + column * shape.rows);
+      if (date <= upper && (column === 0 || date.getUTCFullYear() !== lastYear)) {
+        const label = document.createElement("span");
+        label.textContent = String(date.getUTCFullYear());
+        label.style.gridColumn = String(column + 1);
+        months.appendChild(label);
+        lastYear = date.getUTCFullYear();
+      }
+      continue;
+    }
+    for (let day = 0; day < shape.rows; day += 1) {
+      const date = new Date(start);
+      date.setUTCDate(start.getUTCDate() + column * shape.rows + day);
       if (date < lower || date > upper) continue;
       if (date.getUTCMonth() !== lastMonth && date.getUTCDate() <= 7) {
         const label = document.createElement("span");
         label.textContent = monthNames[date.getUTCMonth()];
-        label.style.gridColumn = String(week + 1);
+        label.style.gridColumn = String(column + 1);
         months.appendChild(label);
         lastMonth = date.getUTCMonth();
         break;
@@ -697,13 +717,16 @@ function renderWall(days, range, todayString, dateRange) {
     }
   }
 
-  for (const label of ["", "Mon", "", "Wed", "", "Fri", ""]) {
+  const weekdayLabels = shape.compact
+    ? Array.from({ length: shape.rows }, (_, index) => ({ 0: "1", 6: "7", 13: "14", 20: "21", 27: "28" }[index] || ""))
+    : ["", "Mon", "", "Wed", "", "Fri", ""];
+  for (const label of weekdayLabels) {
     const item = document.createElement("span");
     item.textContent = label;
     weekdays.appendChild(item);
   }
 
-  for (let i = 0; i < weekCount * 7; i += 1) {
+  for (let i = 0; i < columnCount * shape.rows; i += 1) {
     const date = new Date(start);
     date.setUTCDate(start.getUTCDate() + i);
     const key = toDateKey(date);
@@ -719,6 +742,13 @@ function renderWall(days, range, todayString, dateRange) {
   body.append(weekdays, wall);
   activity.append(months, body);
   return activity;
+}
+
+function wallShape(range) {
+  if (range === "all") {
+    return { rows: 28, compact: true };
+  }
+  return { rows: 7, compact: false };
 }
 
 function renderActivityStats(days, stats, range) {

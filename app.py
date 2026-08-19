@@ -284,6 +284,7 @@ def init_db() -> None:
                 created_at INTEGER NOT NULL,
                 last_sync_at INTEGER,
                 last_error TEXT,
+                stats_json TEXT,
                 UNIQUE(owner_type, owner_id, platform, handle)
             );
 
@@ -374,6 +375,10 @@ def migrate_db(conn: sqlite3.Connection) -> None:
         (GUEST_TEAM_NAME,),
     )
     conn.execute("UPDATE guests SET real_name = '' WHERE real_name IS NULL")
+
+    handle_columns = {row["name"] for row in conn.execute("PRAGMA table_info(handles)").fetchall()}
+    if "stats_json" not in handle_columns:
+        conn.execute("ALTER TABLE handles ADD COLUMN stats_json TEXT")
 
 
 def http_get(
@@ -648,6 +653,9 @@ class OJAdapter:
     def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
         return []
 
+    def fetch_profile_stats(self, handle: str, submissions: list[dict]) -> dict:
+        return {}
+
 
 def codeforces_contest_lookup() -> dict[int, dict]:
     lookup: dict[int, dict] = {}
@@ -838,7 +846,10 @@ class AtCoderAdapter(OJAdapter):
 class LuoguAdapter(OJAdapter):
     key = "luogu"
     label = "洛谷"
-    handle_hint = "洛谷用户名或数字 UID，例如 Yzm007；也可粘贴用户主页链接"
+    handle_hint = "洛谷用户名或数字 UID，例如 Yzm007 / 135160；UID 更稳定"
+
+    def __init__(self):
+        self._profile_stats: dict[str, dict] = {}
 
     def normalize_handle(self, handle: str) -> str:
         handle = handle.strip()
@@ -852,15 +863,18 @@ class LuoguAdapter(OJAdapter):
         return handle
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
+        self._profile_stats[handle] = {}
         uid, profile_name = self._resolve_user(handle)
         profile_url = f"https://www.luogu.com.cn/user/{uid}"
         context = self._fetch_profile_context(uid)
-        data = context.get("data") or {}
+        data = self._context_data(context)
         user = data.get("user") if isinstance(data.get("user"), dict) else {}
         profile_name = str(user.get("name") or profile_name)
-        daily_counts = data.get("dailyCounts") or {}
-        if not isinstance(daily_counts, dict):
-            daily_counts = {}
+        practice_data = {}
+        with contextlib.suppress(Exception):
+            practice_data = self._context_data(self._fetch_profile_context(uid, "/practice"))
+        self._profile_stats[handle] = self._extract_profile_stats(uid, profile_name, data, practice_data)
+        daily_counts = self._daily_counts(data)
 
         submissions = []
         for date_key, counts in sorted(daily_counts.items()):
@@ -892,18 +906,43 @@ class LuoguAdapter(OJAdapter):
                 )
         return submissions
 
+    def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
+        stats = self._profile_stats.get(handle) or {}
+        contests = []
+        for item in stats.get("ratingContests") or []:
+            contest = item.get("contest") if isinstance(item, dict) else {}
+            if not isinstance(contest, dict):
+                continue
+            contest_id = str(contest.get("id") or "")
+            participated_at = int(contest.get("endTime") or item.get("time") or 0)
+            if not contest_id or not participated_at or participated_at < since_ts:
+                continue
+            name = str(contest.get("name") or f"洛谷比赛 {contest_id}")
+            contests.append(
+                {
+                    "remote_id": contest_id,
+                    "contest_name": name,
+                    "category": classify_contest(self.key, name, contest_id, item),
+                    "participated_at": participated_at,
+                    "url": f"https://www.luogu.com.cn/contest/{contest_id}",
+                    "raw": item,
+                }
+            )
+        return contests
+
+    def fetch_profile_stats(self, handle: str, submissions: list[dict]) -> dict:
+        return self._profile_stats.pop(handle, {})
+
     def _resolve_user(self, handle: str) -> tuple[str, str]:
         if handle.isdigit():
-            context = self._fetch_profile_context(handle)
-            data = context.get("data") or {}
-            user = data.get("user") if isinstance(data.get("user"), dict) else {}
-            return str(user.get("uid") or handle), str(user.get("name") or handle)
+            return handle, handle
 
         params = urllib.parse.urlencode({"keyword": handle})
-        data = http_get_json(f"https://www.luogu.com.cn/api/user/search?{params}")
-        users = data.get("users") if isinstance(data, dict) else []
-        if not isinstance(users, list):
-            users = []
+        data = http_get_json(
+            f"https://www.luogu.com.cn/api/user/search?{params}",
+            headers=self._headers(),
+        )
+        users = self._search_users(data)
         exact = None
         for user in users:
             if str(user.get("name") or "").lower() == handle.lower():
@@ -914,26 +953,126 @@ class LuoguAdapter(OJAdapter):
             raise ValueError(f"没有找到洛谷用户：{handle}")
         return str(selected["uid"]), str(selected.get("name") or handle)
 
-    def _fetch_profile_context(self, uid: str) -> dict:
+    def _fetch_profile_context(self, uid: str, path_suffix: str = "") -> dict:
         body, _ = http_get(
-            f"https://www.luogu.com.cn/user/{uid}",
-            headers={
-                "Referer": "https://www.luogu.com.cn/",
-                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            },
+            f"https://www.luogu.com.cn/user/{uid}{path_suffix}",
+            headers=self._headers(f"https://www.luogu.com.cn/user/{uid}"),
         )
-        return self._parse_lentille_context(body.decode("utf-8", errors="ignore"))
+        return self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
 
     @staticmethod
-    def _parse_lentille_context(page: str) -> dict:
+    def _headers(referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
+        return {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36 OJSubmissionWall/1.0",
+            "Accept": "application/json,text/plain,*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Referer": referer,
+            "x-lentille-request": "content-only",
+        }
+
+    @classmethod
+    def _parse_luogu_payload(cls, page: str) -> dict:
+        text = page.strip()
+        for candidate in [text, html.unescape(text)]:
+            with contextlib.suppress(json.JSONDecodeError):
+                data = json.loads(candidate)
+                if isinstance(data, dict):
+                    return data
+
         match = re.search(
             r'<script id="lentille-context" type="application/json">(.*?)</script>',
             page,
             flags=re.S,
         )
-        if not match:
-            raise RuntimeError("洛谷公开个人页没有返回 activity 数据")
-        return json.loads(html.unescape(match.group(1)))
+        if match:
+            return json.loads(html.unescape(match.group(1)))
+
+        for match in re.finditer(r"decodeURIComponent\((\"(?:[^\"\\]|\\.)*\")\)", page, flags=re.S):
+            with contextlib.suppress(Exception):
+                encoded = json.loads(match.group(1))
+                decoded = urllib.parse.unquote(encoded)
+                data = json.loads(decoded)
+                if isinstance(data, dict):
+                    return data
+
+        limited_markers = ["验证码", "访问频繁", "禁止访问", "forbidden", "captcha", "challenge"]
+        if any(marker in page.lower() for marker in limited_markers):
+            raise RuntimeError("洛谷触发反爬或验证码，已保留本地缓存，稍后会自动重试")
+        raise RuntimeError("洛谷公开页没有返回可解析的数据")
+
+    @staticmethod
+    def _context_data(context: dict) -> dict:
+        data = context.get("data") if isinstance(context, dict) else {}
+        if not isinstance(data, dict):
+            data = {}
+        current_data = data.get("currentData")
+        if isinstance(current_data, dict):
+            data = current_data
+        elif isinstance(context.get("currentData"), dict):
+            data = context["currentData"]
+        return data
+
+    @staticmethod
+    def _daily_counts(data: dict) -> dict:
+        daily_counts = data.get("dailyCounts") if isinstance(data, dict) else {}
+        return daily_counts if isinstance(daily_counts, dict) else {}
+
+    @staticmethod
+    def _extract_profile_stats(uid: str, profile_name: str, data: dict, practice_data: dict) -> dict:
+        user = data.get("user") if isinstance(data.get("user"), dict) else {}
+        practice_user = practice_data.get("user") if isinstance(practice_data.get("user"), dict) else {}
+        passed = practice_data.get("passed")
+        submitted = practice_data.get("submitted")
+        passed_items = passed if isinstance(passed, list) else []
+        submitted_items = submitted if isinstance(submitted, list) else []
+        solved_ids = {
+            str(item.get("pid") or item.get("id") or "")
+            for item in passed_items
+            if isinstance(item, dict) and (item.get("pid") or item.get("id"))
+        }
+        submitted_ids = {
+            str(item.get("pid") or item.get("id") or "")
+            for item in submitted_items
+            if isinstance(item, dict) and (item.get("pid") or item.get("id"))
+        }
+        difficulty_counts: dict[str, int] = {}
+        for item in passed_items:
+            if not isinstance(item, dict):
+                continue
+            difficulty = str(item.get("difficulty") if item.get("difficulty") is not None else "unknown")
+            difficulty_counts[difficulty] = difficulty_counts.get(difficulty, 0) + 1
+
+        solved_count = len(solved_ids) or int(practice_user.get("passedProblemCount") or user.get("passedProblemCount") or 0)
+        submitted_count = len(submitted_ids) or int(practice_user.get("submittedProblemCount") or user.get("submittedProblemCount") or 0)
+        return {
+            "uid": uid,
+            "name": str(practice_user.get("name") or user.get("name") or profile_name),
+            "allTimeAccepted": solved_count,
+            "allTimeTried": submitted_count,
+            "difficultyCounts": difficulty_counts,
+            "ratingContests": practice_data.get("elo") if isinstance(practice_data.get("elo"), list) else data.get("elo") or [],
+            "source": "luogu-profile",
+        }
+
+    @classmethod
+    def _search_users(cls, data) -> list[dict]:
+        users: list[dict] = []
+
+        def visit(value) -> None:
+            if isinstance(value, dict):
+                if value.get("uid") and value.get("name"):
+                    users.append(value)
+                for child in value.values():
+                    visit(child)
+            elif isinstance(value, list):
+                for child in value:
+                    visit(child)
+
+        visit(data)
+        unique = {}
+        for user in users:
+            unique[str(user.get("uid"))] = user
+        return list(unique.values())
 
     @staticmethod
     def _date_to_ts(date_key: str) -> int | None:
@@ -959,19 +1098,90 @@ class LuoguAdapter(OJAdapter):
 class NowcoderAdapter(OJAdapter):
     key = "nowcoder"
     label = "牛客"
-    handle_hint = "牛客竞赛个人页数字 ID，例如 profile/123456 的 123456"
+    handle_hint = "牛客竞赛个人 ID；可追加团队 ID，例如 2959795+307927467"
 
     def normalize_handle(self, handle: str) -> str:
-        match = re.search(r"(\d+)", handle.strip())
-        if not match:
-            raise ValueError("牛客请填写竞赛个人页数字 ID 或 profile 链接")
-        return match.group(1)
+        ids = self._extract_ids(handle)
+        if not ids:
+            raise ValueError("牛客请填写竞赛个人页数字 ID、团队 ID 或 profile/team 链接")
+        return "+".join(ids)
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
         submissions = []
+        source_ids = self._submission_source_ids(handle)
+        primary_id = source_ids[0]
+        for source_id in source_ids:
+            try:
+                submissions.extend(self._fetch_practice_source(source_id, since_ts, primary_id))
+            except Exception:
+                if source_id == primary_id and not submissions:
+                    raise
+        return submissions
+
+    def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
+        contests = {}
+        for source_id in self._submission_source_ids(handle):
+            for finished in ["true", "false"]:
+                page_no = 1
+                while True:
+                    params = urllib.parse.urlencode(
+                        {
+                            "uid": source_id,
+                            "page": page_no,
+                            "pageSize": 100,
+                            "onlyJoinedFilter": "true",
+                            "searchContestName": "",
+                            "onlyRatingFilter": "false",
+                            "contestEndFilter": finished,
+                        }
+                    )
+                    try:
+                        data = http_get_json(
+                            f"https://ac.nowcoder.com/acm-heavy/acm/contest/profile/contest-joined-history?{params}",
+                            headers=self._headers(f"https://ac.nowcoder.com/acm/contest/profile/{source_id}"),
+                        )
+                    except Exception:
+                        break
+                    if int(data.get("code") or 0) != 0:
+                        break
+                    payload = data.get("data") or {}
+                    items = payload.get("dataList") or []
+                    if not isinstance(items, list) or not items:
+                        break
+
+                    reached_older = False
+                    for item in items:
+                        contest_id = str(item.get("contestId") or "")
+                        start_ms = int(item.get("startTime") or 0)
+                        participated_at = start_ms // 1000 if start_ms > 10_000_000_000 else start_ms
+                        if not contest_id or not participated_at:
+                            continue
+                        if participated_at < since_ts:
+                            reached_older = True
+                            continue
+                        name = str(item.get("contestName") or f"牛客比赛 {contest_id}")
+                        raw = {**item, "nowcoderSourceId": source_id}
+                        contests[contest_id] = {
+                            "remote_id": contest_id,
+                            "contest_name": name,
+                            "category": classify_contest(self.key, name, contest_id, raw),
+                            "participated_at": participated_at,
+                            "url": f"https://ac.nowcoder.com/acm/contest/{contest_id}",
+                            "raw": raw,
+                        }
+
+                    page_info = payload.get("pageInfo") or {}
+                    page_count = int(page_info.get("pageCount") or page_no)
+                    if reached_older or page_no >= page_count:
+                        break
+                    page_no += 1
+        return list(contests.values())
+
+    def _fetch_practice_source(self, source_id: str, since_ts: int, primary_id: str) -> list[dict]:
+        submissions = []
         page_no = 1
         last_page = None
-        page_size = 100
+        page_size = 200
         while True:
             params = urllib.parse.urlencode(
                 {
@@ -983,16 +1193,13 @@ class NowcoderAdapter(OJAdapter):
                     "page": page_no,
                 }
             )
-            url = f"https://ac.nowcoder.com/acm/contest/profile/{handle}/practice-coding?{params}"
+            url = f"https://ac.nowcoder.com/acm/contest/profile/{source_id}/practice-coding?{params}"
             body, _ = http_get(
                 url,
-                headers={
-                    "Referer": f"https://ac.nowcoder.com/acm/contest/profile/{handle}",
-                    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-                },
+                headers=self._headers(f"https://ac.nowcoder.com/acm/contest/profile/{source_id}"),
             )
             page = body.decode("utf-8", errors="ignore")
-            page_submissions, reached_older = self._parse_practice_page(page, since_ts)
+            page_submissions, reached_older = self._parse_practice_page(page, since_ts, source_id, primary_id)
             submissions.extend(page_submissions)
             last_page = last_page or self._last_page(page)
             if reached_older or page_no >= last_page:
@@ -1000,58 +1207,13 @@ class NowcoderAdapter(OJAdapter):
             page_no += 1
         return submissions
 
-    def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
-        contests = {}
-        for finished in ["true", "false"]:
-            page_no = 1
-            while True:
-                params = urllib.parse.urlencode(
-                    {
-                        "uid": handle,
-                        "page": page_no,
-                        "pageSize": 100,
-                        "onlyJoinedFilter": "true",
-                        "searchContestName": "",
-                        "onlyRatingFilter": "false",
-                        "contestEndFilter": finished,
-                    }
-                )
-                data = http_get_json(f"https://ac.nowcoder.com/acm-heavy/acm/contest/profile/contest-joined-history?{params}")
-                if int(data.get("code") or 0) != 0:
-                    raise RuntimeError(data.get("msg") or "牛客参赛记录返回失败")
-                payload = data.get("data") or {}
-                items = payload.get("dataList") or []
-                if not isinstance(items, list) or not items:
-                    break
-
-                reached_older = False
-                for item in items:
-                    contest_id = str(item.get("contestId") or "")
-                    start_ms = int(item.get("startTime") or 0)
-                    participated_at = start_ms // 1000 if start_ms > 10_000_000_000 else start_ms
-                    if not contest_id or not participated_at:
-                        continue
-                    if participated_at < since_ts:
-                        reached_older = True
-                        continue
-                    name = str(item.get("contestName") or f"牛客比赛 {contest_id}")
-                    contests[contest_id] = {
-                        "remote_id": contest_id,
-                        "contest_name": name,
-                        "category": classify_contest(self.key, name, contest_id, item),
-                        "participated_at": participated_at,
-                        "url": f"https://ac.nowcoder.com/acm/contest/{contest_id}",
-                        "raw": item,
-                    }
-
-                page_info = payload.get("pageInfo") or {}
-                page_count = int(page_info.get("pageCount") or page_no)
-                if reached_older or page_no >= page_count:
-                    break
-                page_no += 1
-        return list(contests.values())
-
-    def _parse_practice_page(self, page: str, since_ts: int) -> tuple[list[dict], bool]:
+    def _parse_practice_page(
+        self,
+        page: str,
+        since_ts: int,
+        source_id: str | None = None,
+        primary_id: str | None = None,
+    ) -> tuple[list[dict], bool]:
         rows = re.findall(r"<tr\b[^>]*>(.*?)</tr>", page, flags=re.I | re.S)
         submissions = []
         reached_older = False
@@ -1069,7 +1231,10 @@ class NowcoderAdapter(OJAdapter):
             if not id_match:
                 id_match = re.search(r"/(?:submission|view-submission)[^\"']*?([0-9]{5,})", row)
             problem_match = re.search(r"/acm/problem/([0-9A-Za-z_\\-]+)[^>]*>(.*?)</a>", row, flags=re.I | re.S)
-            remote_id = id_match.group(1) if id_match else hashlib.sha1(text.encode("utf-8")).hexdigest()
+            original_remote_id = id_match.group(1) if id_match else hashlib.sha1(text.encode("utf-8")).hexdigest()
+            remote_id = original_remote_id
+            if source_id and primary_id and source_id != primary_id:
+                remote_id = f"{source_id}-{original_remote_id}"
             problem_id = problem_match.group(1) if problem_match else ""
             problem_name = strip_tags(problem_match.group(2)) if problem_match else self._guess_problem_name(text)
             verdict = "AC" if re.search(r"答案正确|通过|Accepted|AC\b", text, flags=re.I) else self._guess_verdict(text)
@@ -1081,11 +1246,81 @@ class NowcoderAdapter(OJAdapter):
                     "verdict": verdict,
                     "language": self._guess_language(text),
                     "submitted_at": submitted_at,
-                    "url": f"https://ac.nowcoder.com/acm/contest/view-submission?submissionId={remote_id}" if remote_id.isdigit() else None,
-                    "raw": {"text": text},
+                    "url": f"https://ac.nowcoder.com/acm/contest/view-submission?submissionId={original_remote_id}&uid={source_id}" if original_remote_id.isdigit() else None,
+                    "raw": {"text": text, "nowcoderSourceId": source_id or primary_id or ""},
                 }
             )
         return submissions, reached_older
+
+    @classmethod
+    def _submission_source_ids(cls, handle: str) -> list[str]:
+        ids = cls._extract_ids(handle)
+        if not ids:
+            return []
+        primary_id = ids[0]
+        for team_id in cls._discover_team_ids(primary_id):
+            if team_id not in ids:
+                ids.append(team_id)
+        return ids[:8]
+
+    @staticmethod
+    def _headers(referer: str) -> dict[str, str]:
+        return {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36 OJSubmissionWall/1.0",
+            "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Referer": referer,
+        }
+
+    @classmethod
+    def _discover_team_ids(cls, user_id: str) -> list[str]:
+        params = urllib.parse.urlencode({"uid": user_id})
+        try:
+            data = http_get_json(
+                f"https://ac.nowcoder.com/acm/contest/profile/user-team-list?{params}",
+                headers=cls._headers(f"https://ac.nowcoder.com/acm/contest/profile/{user_id}/join-index"),
+                cache_ttl_seconds=86400,
+            )
+        except Exception:
+            return []
+        team_ids: list[str] = []
+
+        def visit(value) -> None:
+            if isinstance(value, dict):
+                team_id = value.get("teamId")
+                if team_id:
+                    team_ids.append(str(team_id))
+                for child in value.values():
+                    visit(child)
+            elif isinstance(value, list):
+                for child in value:
+                    visit(child)
+
+        visit(data)
+        unique = []
+        for team_id in team_ids:
+            if team_id != user_id and team_id not in unique:
+                unique.append(team_id)
+        return unique
+
+    @staticmethod
+    def _extract_ids(handle: str) -> list[str]:
+        text = handle.strip()
+        ids: list[str] = []
+        for pattern in [
+            r"/acm/contest/profile/(\d+)",
+            r"/acm/team/view\?id=(\d+)",
+            r"(?:^|[+,\s;])(\d{2,})(?=$|[+,\s;])",
+        ]:
+            for match in re.finditer(pattern, text):
+                value = match.group(1)
+                if value not in ids:
+                    ids.append(value)
+        if not ids:
+            for value in re.findall(r"\d{3,}", text):
+                if value not in ids:
+                    ids.append(value)
+        return ids[:8]
 
     @staticmethod
     def _last_page(page: str) -> int:
@@ -1727,6 +1962,9 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
     try:
         reset_http_stale_hits()
         submissions = adapter.fetch_submissions(row["handle"], since_ts)
+        profile_stats = adapter.fetch_profile_stats(row["handle"], submissions)
+        previous_stats_json = row["stats_json"] if "stats_json" in row.keys() else None
+        stats_json = json.dumps(profile_stats, ensure_ascii=False) if profile_stats else previous_stats_json
         inserted = 0
         for item in submissions:
             remote_id = str(item.get("remote_id") or "")
@@ -1823,14 +2061,14 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         if warnings:
             error = "；".join(warnings)
             conn.execute(
-                "UPDATE handles SET last_sync_at = ?, last_error = ? WHERE id = ?",
-                (now, error, row["id"]),
+                "UPDATE handles SET last_sync_at = ?, last_error = ?, stats_json = ? WHERE id = ?",
+                (now, error, stats_json, row["id"]),
             )
             result.update({"warning": error})
         else:
             conn.execute(
-                "UPDATE handles SET last_sync_at = ?, last_error = NULL WHERE id = ?",
-                (now, row["id"]),
+                "UPDATE handles SET last_sync_at = ?, last_error = NULL, stats_json = ? WHERE id = ?",
+                (now, stats_json, row["id"]),
             )
         return result
     except Exception as exc:
@@ -2013,6 +2251,8 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "contests": {"items": [], "total": 0, "byCategory": [], "byPlatform": []},
                 "_all_days": {},
                 "_solved_keys": set(),
+                "_handle_stats": [],
+                "_handle_solved_counts": {},
                 "_real_name": row["real_name"] or "",
             }
 
@@ -2044,6 +2284,8 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "contests": {"items": [], "total": 0, "byCategory": [], "byPlatform": []},
                 "_all_days": {},
                 "_solved_keys": set(),
+                "_handle_stats": [],
+                "_handle_solved_counts": {},
                 "_real_name": principal.get("realName") or "",
             }
 
@@ -2053,6 +2295,13 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             if key not in owners:
                 continue
             owners[key]["handles"].append(handle_to_json(row))
+            if row["stats_json"]:
+                with contextlib.suppress(Exception):
+                    stats = json.loads(row["stats_json"])
+                    if isinstance(stats, dict):
+                        stats["_platform"] = row["platform"]
+                        stats["_handle"] = row["handle"]
+                        owners[key]["_handle_stats"].append(stats)
 
         sub_rows = conn.execute(
             """
@@ -2074,6 +2323,9 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             if is_new_solve:
                 all_day["accepted"] += 1
                 owners[key]["_solved_keys"].add(solved_key)
+                handle_key = "\x1f".join([str(row["platform"]), str(row["handle"])])
+                handle_counts = owners[key]["_handle_solved_counts"]
+                handle_counts[handle_key] = handle_counts.get(handle_key, 0) + 1
 
             day = owners[key]["days"].setdefault(date_key, {"accepted": 0, "total": 0})
             day["total"] += 1
@@ -2094,6 +2346,13 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             owner["stats"]["maxStreakAllTime"] = max_streak(all_days)
             owner["stats"]["maxStreakYear"] = max_streak(all_days, start_date, today_date)
             owner["stats"]["maxStreakMonth"] = max_streak(all_days, month_start_date, today_date)
+            handle_solved_counts = owner.pop("_handle_solved_counts", {})
+            for handle_stats in owner.pop("_handle_stats", []):
+                with contextlib.suppress(Exception):
+                    all_time_accepted = int(handle_stats.get("allTimeAccepted") or 0)
+                    handle_key = "\x1f".join([str(handle_stats.get("_platform") or ""), str(handle_stats.get("_handle") or "")])
+                    known_accepted = int(handle_solved_counts.get(handle_key, 0) or 0)
+                    owner["stats"]["allTimeAccepted"] += max(0, all_time_accepted - known_accepted)
 
         contest_rows = conn.execute(
             """

@@ -688,6 +688,11 @@ select:focus {
   min-width: 100%;
 }
 
+.activity-wall.compact-wall {
+  --wall-cell: 8px;
+  --wall-gap: 3px;
+}
+
 .wall-months {
   min-height: 22px;
   margin-left: 36px;
@@ -716,6 +721,17 @@ select:focus {
   font-size: 12px;
   line-height: var(--wall-cell);
   text-align: right;
+}
+
+.compact-wall .wall-months {
+  min-height: 18px;
+  margin-left: 32px;
+  font-size: 11px;
+}
+
+.compact-wall .wall-weekdays {
+  width: 24px;
+  font-size: 10px;
 }
 
 .wall {
