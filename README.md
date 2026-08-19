@@ -86,6 +86,7 @@ BIND_ADDRESS=127.0.0.1
 PORT=8017
 COOKIE_SECURE=true
 OJ_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
+LUOGU_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 ```
 
 应用容器只监听本机 `127.0.0.1:8017`，公网入口交给反向代理的 `80/443`。已有 Nginx 时使用 `deploy/nginx.oj-train-wall.conf`；没有反向代理时也可以用 `deploy/Caddyfile.oj-train-wall` 让 Caddy 自动签证书。
@@ -117,21 +118,45 @@ OJ_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 | `HTTP_TIMEOUT_SECONDS` | `15` | 外部 OJ 单次请求超时时间 |
 | `HTTP_RETRY_COUNT` | `2` | 外部 OJ 超时或 5xx 时的额外重试次数 |
 | `HTTP_RETRY_BACKOFF_SECONDS` | `0.8` | 外部 OJ 重试退避基准秒数 |
+| `DISPLAY_TZ_OFFSET_HOURS` | `8` | 榜单日期、连续天数和提交时间展示的时区偏移 |
 | `CACHE_DIR` | `DATA_DIR/cache` | HTTP 响应缓存和概览镜像目录 |
 | `HISTORICAL_CACHE_AFTER_DAYS` | `30` | 距今超过多少天的历史页可直接使用缓存 |
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent |
-| `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；配置可访问 `qoj.ac` 的登录态 Cookie 后才能同步 |
+| `LUOGU_USER_AGENT` | `OJSubmissionWall/1.0` | 洛谷请求的 User-Agent |
+| `LUOGU_COOKIE` | 空 | 可选：管理员自己的洛谷 Cookie；公开部署不建议收集用户 Cookie |
+| `LUOGU_PROXY_URL` | 空 | 可选：洛谷海外 403 时，把洛谷请求转发到国内出口的私有代理 |
+| `LUOGU_PROXY_TOKEN` | 空 | 可选：访问洛谷私有代理的 Bearer token |
+| `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；公开部署不建议收集用户登录态，留空时会提示无法精确同步 |
+
+### 洛谷海外 403 代理
+
+如果服务器在海外机房，洛谷可能直接返回 `HTTP 403`。这不是绑定的账号错了，而是出口 IP 被洛谷风控拦截。稳定做法是把 `deploy/luogu_proxy.py` 部署在一个能正常访问洛谷的国内出口上，并且只暴露给主站使用：
+
+```bash
+cd /root/oj-submission-wall
+export LUOGU_PROXY_TOKEN='换成一段随机长密码'
+HOST=127.0.0.1 PORT=8787 python3 deploy/luogu_proxy.py
+```
+
+主站 `.env` 里配置：
+
+```bash
+LUOGU_PROXY_URL=https://你的国内代理域名/
+LUOGU_PROXY_TOKEN=同一段随机长密码
+```
+
+代理脚本只允许转发 `https://www.luogu.com.cn` / `https://luogu.com.cn`，并要求 Bearer token；不要把它无鉴权公开到公网。
 
 ## 数据源说明
 
 - Codeforces 使用官方 `user.status` API，并分页拉取完整 10 年提交；比赛统计使用 `contest.list` 的主站 + Gym 名称，且只统计非 `PRACTICE` 的参赛/虚拟/打星记录。
 - AtCoder 使用 AtCoder Problems 的公开 API，并按 `from_second` 分页拉取完整历史；比赛统计使用 AtCoder 官方用户参赛历史 JSON。
-- 洛谷匿名访问无法读取逐条提交；本项目使用公开个人页 activity（日历）同步公开日解题/提交数量，并把日期活动作为可点击到个人页的记录展示。
+- 洛谷匿名访问无法读取逐条提交；本项目优先读取公开个人页 activity（日历）和练习页 `passed` 题目集合，首尔等海外出口 403 时可配置私有国内代理。
 - 牛客从竞赛个人页公开练习记录分页解析历史提交，并从公开参赛历史接口同步比赛明细。
 - VJudge 使用公开 `solveDetail2` 同步完整历史 AC 题目，并用 `status/data` 补最近提交；带 `contestId` 的记录会计入 VJudge 比赛。
 - LOJ 使用公开 `submission/querySubmission` API 分页同步公开提交。
-- QOJ 当前有 Cloudflare 校验；配置 `QOJ_COOKIE` 后从提交页同步，否则会明确提示无法精确同步。
+- QOJ 当前有 Cloudflare 校验；公开部署不建议向用户索要登录态。未配置管理员侧专用 Cookie 时会明确提示无法精确同步。
 
 如果平台接口改版、风控或临时不可用，系统会保留上次成功同步的数据；`/api/overview` 还会写入脱敏概览镜像，数据库或接口异常时可以继续显示“数据截至 xx”的本地镜像。适配器都集中在 `app.py` 的 `OJAdapter` 子类里，后续替换接口时只需要改对应类。
 

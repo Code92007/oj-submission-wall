@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+import base64
 import contextlib
 import datetime as dt
 import hashlib
@@ -45,6 +46,8 @@ FETCH_LIMIT = int(os.environ.get("FETCH_LIMIT", "1000"))
 HTTP_TIMEOUT_SECONDS = int(os.environ.get("HTTP_TIMEOUT_SECONDS", "15"))
 HTTP_RETRY_COUNT = int(os.environ.get("HTTP_RETRY_COUNT", "2"))
 HTTP_RETRY_BACKOFF_SECONDS = float(os.environ.get("HTTP_RETRY_BACKOFF_SECONDS", "0.8"))
+DISPLAY_TZ_OFFSET_HOURS = int(os.environ.get("DISPLAY_TZ_OFFSET_HOURS", "8"))
+DISPLAY_TZ = dt.timezone(dt.timedelta(hours=DISPLAY_TZ_OFFSET_HOURS), f"UTC{DISPLAY_TZ_OFFSET_HOURS:+03d}:00")
 HISTORICAL_CACHE_AFTER_DAYS = int(os.environ.get("HISTORICAL_CACHE_AFTER_DAYS", "30"))
 HISTORICAL_CACHE_TTL_SECONDS = int(os.environ.get("HISTORICAL_CACHE_TTL_SECONDS", str(3650 * 86400)))
 SESSION_COOKIE = "ojwall_session"
@@ -58,6 +61,8 @@ LUOGU_USER_AGENT = os.environ.get(
     "LUOGU_USER_AGENT",
     f"OJSubmissionWall/1.0 (+{PUBLIC_BASE_URL or 'https://oj-train-wall.wannafly.cn'})",
 )
+LUOGU_PROXY_URL = os.environ.get("LUOGU_PROXY_URL", "").strip()
+LUOGU_PROXY_TOKEN = os.environ.get("LUOGU_PROXY_TOKEN", "").strip()
 SMTP_PLACEHOLDERS = {
     "smtp.example.com",
     "noreply@example.com",
@@ -79,7 +84,7 @@ def utcnow() -> int:
 
 
 def utc_date_from_ts(ts: int) -> str:
-    return dt.datetime.fromtimestamp(int(ts), dt.timezone.utc).date().isoformat()
+    return dt.datetime.fromtimestamp(int(ts), DISPLAY_TZ).date().isoformat()
 
 
 def iso_from_ts(ts: int | None) -> str | None:
@@ -170,6 +175,10 @@ def write_http_cache(url: str, body: bytes, content_type: str) -> None:
     )
     os.replace(tmp_body, body_path)
     os.replace(tmp_meta, meta_path)
+
+
+def has_cookie_header(headers: dict[str, str] | None) -> bool:
+    return any(str(key).lower() == "cookie" and str(value).strip() for key, value in (headers or {}).items())
 
 
 def reset_http_stale_hits() -> None:
@@ -390,8 +399,10 @@ def http_get(
     headers: dict[str, str] | None = None,
     cache_ttl_seconds: int | None = None,
     allow_stale_cache: bool = True,
+    cache_write: bool = True,
 ) -> tuple[bytes, str]:
-    cached = read_http_cache(url, cache_ttl_seconds) if cache_ttl_seconds is not None else None
+    use_cache = not has_cookie_header(headers)
+    cached = read_http_cache(url, cache_ttl_seconds) if use_cache and cache_ttl_seconds is not None else None
     if cached:
         body, content_type, _ = cached
         return body, content_type
@@ -412,7 +423,8 @@ def http_get(
                 content_type = resp.headers.get("content-type", "")
                 body = resp.read()
                 with contextlib.suppress(Exception):
-                    write_http_cache(url, body, content_type)
+                    if cache_write and use_cache:
+                        write_http_cache(url, body, content_type)
                 return body, content_type
         except Exception as exc:
             last_exc = exc
@@ -420,7 +432,7 @@ def http_get(
                 time.sleep(retry_delay(attempt))
                 continue
             break
-    if allow_stale_cache:
+    if allow_stale_cache and use_cache:
         stale = read_http_cache(url)
         if stale:
             body, content_type, fetched_at = stale
@@ -429,6 +441,113 @@ def http_get(
     if last_exc:
         raise last_exc
     raise RuntimeError("HTTP request failed")
+
+
+def proxy_http_get(
+    url: str,
+    headers: dict[str, str] | None,
+    proxy_url: str,
+    proxy_token: str,
+    cache_ttl_seconds: int | None = None,
+    allow_stale_cache: bool = True,
+    cache_write: bool = True,
+) -> tuple[bytes, str]:
+    if not proxy_url:
+        return http_get(
+            url,
+            headers=headers,
+            cache_ttl_seconds=cache_ttl_seconds,
+            allow_stale_cache=allow_stale_cache,
+            cache_write=cache_write,
+        )
+
+    use_cache = not has_cookie_header(headers)
+    cached = read_http_cache(url, cache_ttl_seconds) if use_cache and cache_ttl_seconds is not None else None
+    if cached:
+        body, content_type, _ = cached
+        return body, content_type
+
+    request_headers = {"Accept": "application/json"}
+    if proxy_token:
+        request_headers["Authorization"] = f"Bearer {proxy_token}"
+
+    try:
+        data = http_post_json(
+            proxy_url,
+            {"url": url, "headers": headers or {}},
+            headers=request_headers,
+        )
+        if not isinstance(data, dict):
+            raise RuntimeError("代理返回格式异常")
+        status = int(data.get("status") or 200)
+        if not data.get("ok") or status >= 400:
+            detail = str(data.get("error") or data.get("message") or "").strip()
+            raise RuntimeError(detail or f"代理请求失败：HTTP {status}")
+        content_type = str(data.get("contentType") or data.get("content_type") or "")
+        if data.get("bodyBase64") is not None:
+            body = base64.b64decode(str(data.get("bodyBase64") or ""))
+        else:
+            body = str(data.get("body") or "").encode("utf-8")
+        with contextlib.suppress(Exception):
+            if cache_write and use_cache:
+                write_http_cache(url, body, content_type)
+        return body, content_type
+    except Exception as exc:
+        if allow_stale_cache and use_cache:
+            stale = read_http_cache(url)
+            if stale:
+                body, content_type, fetched_at = stale
+                record_http_stale_hit(url, fetched_at)
+                return body, content_type
+        raise exc
+
+
+def proxy_http_get_json(
+    url: str,
+    headers: dict[str, str] | None,
+    proxy_url: str,
+    proxy_token: str,
+    cache_ttl_seconds: int | None = None,
+    allow_stale_cache: bool = True,
+):
+    body, _ = proxy_http_get(
+        url,
+        headers=headers,
+        proxy_url=proxy_url,
+        proxy_token=proxy_token,
+        cache_ttl_seconds=cache_ttl_seconds,
+        allow_stale_cache=allow_stale_cache,
+    )
+    return json.loads(body.decode("utf-8"))
+
+
+def normalize_cookie_header(value: str, default_name: str) -> str:
+    value = str(value or "").strip()
+    if not value:
+        return ""
+    if re.search(r"(^|;)\s*[A-Za-z0-9_\-.]+=", value):
+        return value
+    return f"{default_name}={value}"
+
+
+def parse_datetime_text(value: str, source_tz: dt.tzinfo = dt.timezone.utc) -> int | None:
+    value = value.strip()
+    patterns = [
+        ("%Y-%m-%d %H:%M:%S", r"20\d\d-\d\d-\d\d\s+\d\d:\d\d:\d\d"),
+        ("%Y-%m-%d %H:%M", r"20\d\d-\d\d-\d\d\s+\d\d:\d\d"),
+        ("%Y/%m/%d %H:%M:%S", r"20\d\d/\d\d/\d\d\s+\d\d:\d\d:\d\d"),
+        ("%Y/%m/%d %H:%M", r"20\d\d/\d\d/\d\d\s+\d\d:\d\d"),
+    ]
+    for fmt, pattern in patterns:
+        match = re.search(pattern, value)
+        if not match:
+            continue
+        try:
+            parsed = dt.datetime.strptime(match.group(0), fmt)
+            return int(parsed.replace(tzinfo=source_tz).timestamp())
+        except ValueError:
+            pass
+    return None
 
 
 def http_get_json(
@@ -479,26 +598,6 @@ def strip_tags(fragment: str) -> str:
     text = re.sub(r"<[^>]+>", " ", text)
     text = html.unescape(text)
     return re.sub(r"\s+", " ", text).strip()
-
-
-def parse_datetime_text(value: str) -> int | None:
-    value = value.strip()
-    patterns = [
-        ("%Y-%m-%d %H:%M:%S", r"20\d\d-\d\d-\d\d\s+\d\d:\d\d:\d\d"),
-        ("%Y-%m-%d %H:%M", r"20\d\d-\d\d-\d\d\s+\d\d:\d\d"),
-        ("%Y/%m/%d %H:%M:%S", r"20\d\d/\d\d/\d\d\s+\d\d:\d\d:\d\d"),
-        ("%Y/%m/%d %H:%M", r"20\d\d/\d\d/\d\d\s+\d\d:\d\d"),
-    ]
-    for fmt, pattern in patterns:
-        match = re.search(pattern, value)
-        if not match:
-            continue
-        try:
-            parsed = dt.datetime.strptime(match.group(0), fmt)
-            return int(parsed.replace(tzinfo=dt.timezone.utc).timestamp())
-        except ValueError:
-            pass
-    return None
 
 
 def parse_iso_datetime(value: str) -> int | None:
@@ -638,6 +737,172 @@ def classify_contest(platform: str, name: str = "", remote_id: str = "", raw: di
             return "qoj.ucup"
         return "qoj.contest"
     return "other"
+
+
+def normalize_problem_code(value: str) -> str:
+    return re.sub(r"\s+", "", str(value or "").strip())
+
+
+def normalize_problem_text_key(value: str) -> str:
+    text = strip_tags(str(value or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    text = re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "-", text).strip("-")
+    return text[:160] or "unknown"
+
+
+def source_oj_key(value: str) -> str:
+    text = re.sub(r"[^0-9a-z]+", "", str(value or "").lower())
+    aliases = {
+        "cf": "codeforces",
+        "codeforce": "codeforces",
+        "codeforces": "codeforces",
+        "codeforcesgym": "codeforces",
+        "gym": "codeforces",
+        "vjudge": "vjudge",
+        "vj": "vjudge",
+        "at": "atcoder",
+        "atcoder": "atcoder",
+        "atcoderjp": "atcoder",
+        "lg": "luogu",
+        "luogu": "luogu",
+        "loj": "loj",
+        "libreoj": "loj",
+        "qoj": "qoj",
+        "hdu": "hdu",
+        "poj": "poj",
+        "zoj": "zoj",
+        "uva": "uva",
+        "spoj": "spoj",
+        "lightoj": "lightoj",
+    }
+    return aliases.get(text, text or "unknown")
+
+
+def codeforces_problem_code(value: str) -> str:
+    code = normalize_problem_code(value).upper()
+    code = re.sub(r"^(?:CODEFORCES|CF)[-_]?", "", code)
+    match = re.match(r"^0*([1-9][0-9]{0,6})([A-Z][0-9A-Z]*)$", code)
+    if not match:
+        return ""
+    return f"{int(match.group(1))}{match.group(2)}"
+
+
+def source_problem_key(source: str, problem_code: str) -> str:
+    oj = source_oj_key(source)
+    code = normalize_problem_code(problem_code)
+    if not code:
+        return ""
+    if oj == "codeforces":
+        cf_code = codeforces_problem_code(code)
+        return f"codeforces:{cf_code}" if cf_code else f"codeforces:{code.upper()}"
+    if oj == "atcoder":
+        return f"atcoder:{code.lower()}"
+    if oj == "luogu":
+        return luogu_problem_key(code)
+    if oj in {"loj", "qoj"}:
+        return f"{oj}:{code.upper()}"
+    return f"{oj}:{code.upper()}"
+
+
+def luogu_problem_key(pid: str, problem_type: str = "") -> str:
+    code = normalize_problem_code(pid).upper()
+    kind = str(problem_type or "").strip().upper()
+    if not code:
+        return ""
+    if kind == "CF" or code.startswith("CF"):
+        return source_problem_key("codeforces", code)
+    if code.startswith("AT_"):
+        return source_problem_key("atcoder", code[3:])
+    return f"luogu:{code}"
+
+
+def split_source_problem_id(problem_id: str) -> tuple[str, str] | None:
+    text = normalize_problem_code(problem_id)
+    match = re.match(r"^([A-Za-z][0-9A-Za-z]*?)[-_](.+)$", text)
+    if not match:
+        return None
+    return match.group(1), match.group(2)
+
+
+def raw_json_dict(row: sqlite3.Row) -> dict:
+    if "raw_json" not in row.keys():
+        return {}
+    try:
+        value = row["raw_json"]
+    except Exception:
+        return {}
+    if not value:
+        return {}
+    with contextlib.suppress(Exception):
+        data = json.loads(value)
+        if isinstance(data, dict):
+            return data
+    return {}
+
+
+def is_activity_placeholder(row: sqlite3.Row, raw: dict | None = None) -> bool:
+    raw = raw if raw is not None else raw_json_dict(row)
+    problem_id = str(row["problem_id"] or "")
+    return bool(row["platform"] == "luogu" and raw.get("syntheticFromProfile") and problem_id.startswith("luogu-activity-"))
+
+
+def canonical_problem_key(
+    platform: str,
+    problem_id: str = "",
+    problem_name: str = "",
+    remote_id: str = "",
+    raw: dict | None = None,
+) -> str:
+    platform = str(platform or "").lower()
+    problem_id = str(problem_id or "")
+    problem_name = str(problem_name or "")
+    remote_id = str(remote_id or "")
+    raw = raw or {}
+
+    if platform == "codeforces":
+        problem = raw.get("problem") if isinstance(raw.get("problem"), dict) else {}
+        contest_id = raw.get("contestId") or problem.get("contestId")
+        index = problem.get("index")
+        if contest_id and index:
+            key = source_problem_key("codeforces", f"{contest_id}{index}")
+            if key:
+                return key
+        key = source_problem_key("codeforces", problem_id)
+        if key:
+            return key
+
+    if platform == "atcoder":
+        problem = raw.get("problem_id") or problem_id
+        if problem:
+            return source_problem_key("atcoder", str(problem))
+
+    if platform == "vjudge":
+        source = raw.get("oj") or raw.get("OJId") or raw.get("ojName")
+        number = raw.get("probNum") or raw.get("problemNum") or raw.get("pid")
+        if source and number:
+            key = source_problem_key(str(source), str(number))
+            if key:
+                return key
+        split = split_source_problem_id(problem_id)
+        if split:
+            key = source_problem_key(split[0], split[1])
+            if key:
+                return key
+
+    if platform == "luogu":
+        raw_pid = raw.get("pid") if isinstance(raw, dict) else ""
+        raw_type = raw.get("type") if isinstance(raw, dict) else ""
+        if raw_pid:
+            return luogu_problem_key(str(raw_pid), str(raw_type or ""))
+        if problem_id.startswith("luogu-activity-"):
+            return f"luogu-activity:{problem_id}"
+        return luogu_problem_key(problem_id)
+
+    if platform in {"loj", "qoj"} and problem_id:
+        return source_problem_key(platform, problem_id)
+
+    fallback = problem_id or problem_name or remote_id
+    return f"{platform}:{normalize_problem_text_key(fallback)}"
 
 
 class OJAdapter:
@@ -942,7 +1207,7 @@ class LuoguAdapter(OJAdapter):
             return handle, handle
 
         params = urllib.parse.urlencode({"keyword": handle})
-        data = http_get_json(
+        data = self._fetch_json(
             f"https://www.luogu.com.cn/api/user/search?{params}",
             headers=self._json_headers(),
             cache_ttl_seconds=24 * 3600,
@@ -959,11 +1224,39 @@ class LuoguAdapter(OJAdapter):
         return str(selected["uid"]), str(selected.get("name") or handle)
 
     def _fetch_profile_context(self, uid: str, path_suffix: str = "") -> dict:
-        body, _ = http_get(
+        body, _ = self._fetch_url(
             f"https://www.luogu.com.cn/user/{uid}{path_suffix}",
             headers=self._headers(f"https://www.luogu.com.cn/user/{uid}"),
         )
         return self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
+
+    def _fetch_json(self, url: str, headers: dict[str, str], cache_ttl_seconds: int | None = None):
+        body, _ = self._fetch_url(url, headers=headers, cache_ttl_seconds=cache_ttl_seconds)
+        return json.loads(body.decode("utf-8"))
+
+    @staticmethod
+    def _fetch_url(
+        url: str,
+        headers: dict[str, str],
+        cache_ttl_seconds: int | None = None,
+    ) -> tuple[bytes, str]:
+        try:
+            return proxy_http_get(
+                url,
+                headers=headers,
+                proxy_url=LUOGU_PROXY_URL,
+                proxy_token=LUOGU_PROXY_TOKEN,
+                cache_ttl_seconds=cache_ttl_seconds,
+                allow_stale_cache=True,
+            )
+        except urllib.error.HTTPError as exc:
+            if exc.code == 403 and not LUOGU_PROXY_URL:
+                raise RuntimeError("洛谷 HTTP 403：当前服务器出口被拦截，请配置 LUOGU_PROXY_URL 走国内代理") from exc
+            raise
+        except Exception as exc:
+            if "403" in str(exc) and not LUOGU_PROXY_URL:
+                raise RuntimeError("洛谷 HTTP 403：当前服务器出口被拦截，请配置 LUOGU_PROXY_URL 走国内代理") from exc
+            raise
 
     @staticmethod
     def _browser_headers(referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
@@ -972,7 +1265,7 @@ class LuoguAdapter(OJAdapter):
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
             "Referer": referer,
         }
-        cookie = os.environ.get("LUOGU_COOKIE", "").strip()
+        cookie = normalize_cookie_header(os.environ.get("LUOGU_COOKIE", "").strip(), "__client_id")
         if cookie:
             headers["Cookie"] = cookie
         return headers
@@ -1064,11 +1357,26 @@ class LuoguAdapter(OJAdapter):
         submitted = practice_data.get("submitted")
         passed_items = passed if isinstance(passed, list) else []
         submitted_items = submitted if isinstance(submitted, list) else []
-        solved_ids = {
-            str(item.get("pid") or item.get("id") or "")
-            for item in passed_items
-            if isinstance(item, dict) and (item.get("pid") or item.get("id"))
-        }
+        solved_problem_keys: set[str] = set()
+        solved_problems: list[dict] = []
+        for item in passed_items:
+            if not isinstance(item, dict):
+                continue
+            pid = str(item.get("pid") or item.get("id") or "")
+            if not pid:
+                continue
+            problem_type = str(item.get("type") or "")
+            canonical_key = luogu_problem_key(pid, problem_type)
+            if canonical_key:
+                solved_problem_keys.add(canonical_key)
+            solved_problems.append(
+                {
+                    "problemId": pid,
+                    "source": problem_type or "luogu",
+                    "name": str(item.get("name") or pid),
+                    "canonicalKey": canonical_key,
+                }
+            )
         submitted_ids = {
             str(item.get("pid") or item.get("id") or "")
             for item in submitted_items
@@ -1081,7 +1389,7 @@ class LuoguAdapter(OJAdapter):
             difficulty = str(item.get("difficulty") if item.get("difficulty") is not None else "unknown")
             difficulty_counts[difficulty] = difficulty_counts.get(difficulty, 0) + 1
 
-        solved_count = len(solved_ids) or int(practice_user.get("passedProblemCount") or user.get("passedProblemCount") or 0)
+        solved_count = len(solved_problem_keys) or int(practice_user.get("passedProblemCount") or user.get("passedProblemCount") or 0)
         submitted_count = len(submitted_ids) or int(practice_user.get("submittedProblemCount") or user.get("submittedProblemCount") or 0)
         return {
             "uid": uid,
@@ -1090,6 +1398,7 @@ class LuoguAdapter(OJAdapter):
             "allTimeTried": submitted_count,
             "difficultyCounts": difficulty_counts,
             "ratingContests": practice_data.get("elo") if isinstance(practice_data.get("elo"), list) else data.get("elo") or [],
+            "solvedProblems": solved_problems,
             "source": "luogu-profile",
         }
 
@@ -1260,7 +1569,7 @@ class NowcoderAdapter(OJAdapter):
             text = strip_tags(row)
             if not re.search(r"20\d\d[-/]\d\d[-/]\d\d", text):
                 continue
-            submitted_at = parse_datetime_text(text)
+            submitted_at = parse_datetime_text(text, DISPLAY_TZ)
             if not submitted_at:
                 continue
             if submitted_at < since_ts:
@@ -1597,7 +1906,7 @@ class LOJAdapter(OJAdapter):
 class QOJAdapter(OJAdapter):
     key = "qoj"
     label = "QOJ"
-    handle_hint = "QOJ 用户名；服务端需配置 QOJ_COOKIE"
+    handle_hint = "QOJ 用户名；Cloudflare 下需管理员配置专用 Cookie，公开站不建议收集用户登录态"
 
     def normalize_handle(self, handle: str) -> str:
         handle = handle.strip()
@@ -1606,9 +1915,9 @@ class QOJAdapter(OJAdapter):
         return handle
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
-        cookie = os.environ.get("QOJ_COOKIE", "").strip()
+        cookie = normalize_cookie_header(os.environ.get("QOJ_COOKIE", "").strip(), "UOJSESSID")
         if not cookie:
-            raise RuntimeError("QOJ 需要配置 QOJ_COOKIE 后才能精确同步；qoj.ac 当前有 Cloudflare 校验")
+            raise RuntimeError("QOJ 当前有 Cloudflare 校验；公开部署不建议收集用户登录态，未配置管理员专用 Cookie 时无法精确同步")
 
         submissions = []
         seen = set()
@@ -2184,10 +2493,13 @@ def handle_to_json(row: sqlite3.Row) -> dict:
 
 
 def solved_problem_key(row: sqlite3.Row) -> str:
-    problem_id = str(row["problem_id"] or row["problem_name"] or row["remote_id"] or "")
-    if row["platform"] == "luogu" and problem_id.startswith("luogu-activity-"):
-        problem_id = str(row["remote_id"] or problem_id)
-    return "\x1f".join([str(row["platform"]), str(row["handle"]), problem_id])
+    return canonical_problem_key(
+        str(row["platform"]),
+        str(row["problem_id"] or ""),
+        str(row["problem_name"] or ""),
+        str(row["remote_id"] or ""),
+        raw_json_dict(row),
+    )
 
 
 def build_mirror_meta(conn: sqlite3.Connection, now: int) -> dict:
@@ -2269,11 +2581,11 @@ def build_overview(principal: dict | None, days: int = 365) -> dict:
 
 
 def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
-    days = max(7, min(days, 370))
+    days = max(7, min(days, 3650))
     now = utcnow()
     start_ts = now - (days - 1) * 86400
-    today_date = dt.datetime.fromtimestamp(now, dt.timezone.utc).date()
-    start_date = dt.datetime.fromtimestamp(start_ts, dt.timezone.utc).date()
+    today_date = dt.datetime.fromtimestamp(now, DISPLAY_TZ).date()
+    start_date = dt.datetime.fromtimestamp(start_ts, DISPLAY_TZ).date()
     month_start_date = today_date - dt.timedelta(days=29)
     with connect_db() as conn:
         owners: dict[tuple[str, str], dict] = {}
@@ -2368,7 +2680,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
 
         sub_rows = conn.execute(
             """
-            SELECT owner_type, owner_id, platform, handle, remote_id, problem_id, problem_name, verdict, submitted_at
+            SELECT owner_type, owner_id, platform, handle, remote_id, problem_id, problem_name, verdict, submitted_at, raw_json
             FROM submissions
             ORDER BY submitted_at
             """
@@ -2381,19 +2693,22 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             all_day = owners[key]["_all_days"].setdefault(date_key, {"accepted": 0, "total": 0})
             all_day["total"] += 1
             is_accepted = normalize_verdict(row["verdict"]) == "AC"
+            is_activity = is_activity_placeholder(row)
             solved_key = solved_problem_key(row)
-            is_new_solve = is_accepted and solved_key not in owners[key]["_solved_keys"]
+            is_new_solve = is_accepted and not is_activity and solved_key not in owners[key]["_solved_keys"]
             if is_new_solve:
                 all_day["accepted"] += 1
                 owners[key]["_solved_keys"].add(solved_key)
                 handle_key = "\x1f".join([str(row["platform"]), str(row["handle"])])
                 handle_counts = owners[key]["_handle_solved_counts"]
                 handle_counts[handle_key] = handle_counts.get(handle_key, 0) + 1
+            elif is_accepted and is_activity:
+                all_day["accepted"] += 1
 
             day = owners[key]["days"].setdefault(date_key, {"accepted": 0, "total": 0})
             day["total"] += 1
             owners[key]["stats"]["total"] += 1
-            if is_new_solve:
+            if is_new_solve or (is_accepted and is_activity):
                 day["accepted"] += 1
                 owners[key]["stats"]["accepted"] += 1
 
@@ -2401,9 +2716,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             active_dates = [date_key for date_key, counts in owner["days"].items() if counts.get("accepted", 0) > 0]
             owner["stats"]["activeDays"] = len(active_dates)
             all_days = owner.pop("_all_days")
-            owner.pop("_solved_keys", None)
             owner["stats"]["streak"] = current_streak(all_days)
-            owner["stats"]["allTimeAccepted"] = accepted_since(all_days)
             owner["stats"]["lastYearAccepted"] = accepted_since(all_days, start_date)
             owner["stats"]["lastMonthAccepted"] = accepted_since(all_days, month_start_date)
             owner["stats"]["maxStreakAllTime"] = max_streak(all_days)
@@ -2412,10 +2725,16 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             handle_solved_counts = owner.pop("_handle_solved_counts", {})
             for handle_stats in owner.pop("_handle_stats", []):
                 with contextlib.suppress(Exception):
-                    all_time_accepted = int(handle_stats.get("allTimeAccepted") or 0)
-                    handle_key = "\x1f".join([str(handle_stats.get("_platform") or ""), str(handle_stats.get("_handle") or "")])
-                    known_accepted = int(handle_solved_counts.get(handle_key, 0) or 0)
-                    owner["stats"]["allTimeAccepted"] += max(0, all_time_accepted - known_accepted)
+                    profile_keys = profile_solved_problem_keys(handle_stats)
+                    if profile_keys:
+                        owner["_solved_keys"].update(profile_keys)
+                    else:
+                        all_time_accepted = int(handle_stats.get("allTimeAccepted") or 0)
+                        handle_key = "\x1f".join([str(handle_stats.get("_platform") or ""), str(handle_stats.get("_handle") or "")])
+                        known_accepted = int(handle_solved_counts.get(handle_key, 0) or 0)
+                        owner["stats"]["allTimeAccepted"] += max(0, all_time_accepted - known_accepted)
+            owner["stats"]["allTimeAccepted"] += len(owner["_solved_keys"])
+            owner.pop("_solved_keys", None)
 
         contest_rows = conn.execute(
             """
@@ -2476,7 +2795,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
 
 def current_streak(day_counts: dict[str, dict]) -> int:
     streak = 0
-    cursor = dt.datetime.now(dt.timezone.utc).date()
+    cursor = dt.datetime.now(DISPLAY_TZ).date()
     while True:
         key = cursor.isoformat()
         if day_counts.get(key, {}).get("accepted", 0) <= 0:
@@ -2524,6 +2843,23 @@ def accepted_since(day_counts: dict[str, dict], start_date: dt.date | None = Non
             continue
         total += int(counts.get("accepted", 0) or 0)
     return total
+
+
+def profile_solved_problem_keys(handle_stats: dict) -> set[str]:
+    keys: set[str] = set()
+    for item in handle_stats.get("solvedProblems") or []:
+        if not isinstance(item, dict):
+            continue
+        canonical_key = str(item.get("canonicalKey") or "")
+        if canonical_key:
+            keys.add(canonical_key)
+            continue
+        platform = str(item.get("source") or item.get("platform") or handle_stats.get("_platform") or "")
+        problem_id = str(item.get("problemId") or item.get("pid") or "")
+        key = canonical_problem_key(platform, problem_id, str(item.get("name") or ""), "", item)
+        if key:
+            keys.add(key)
+    return keys
 
 
 def summarize_contests(items: list[dict]) -> dict:

@@ -64,6 +64,7 @@ const CONTEST_CATEGORY_ORDER = [
 ];
 const CONTEST_PLATFORM_RANK = new Map(CONTEST_PLATFORM_ORDER.map((key, index) => [key, index]));
 const CONTEST_CATEGORY_RANK = new Map(CONTEST_CATEGORY_ORDER.map((key, index) => [key, index]));
+const DISPLAY_TIME_ZONE = "Asia/Shanghai";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -142,7 +143,7 @@ async function loadSession() {
 }
 
 async function loadOverview() {
-  const data = await api("/api/overview?days=365");
+  const data = await api("/api/overview?days=3650");
   state.overview = data;
   state.user = data.user;
   if (data.platforms) state.platforms = data.platforms;
@@ -1226,6 +1227,7 @@ function formatDateTime(value) {
   if (!value) return "";
   const date = new Date(value);
   return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: DISPLAY_TIME_ZONE,
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
@@ -1237,6 +1239,7 @@ function formatFullDateTime(value) {
   if (!value) return "";
   const date = new Date(value);
   return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: DISPLAY_TIME_ZONE,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
