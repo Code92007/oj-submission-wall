@@ -87,6 +87,8 @@ PORT=8017
 COOKIE_SECURE=true
 OJ_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 LUOGU_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
+# 无代理时，可选填服务器同出口浏览器拿到的 Cloudflare 放行票据。
+LUOGU_CF_CLEARANCE=
 ```
 
 应用容器只监听本机 `127.0.0.1:8017`，公网入口交给反向代理的 `80/443`。已有 Nginx 时使用 `deploy/nginx.oj-train-wall.conf`；没有反向代理时也可以用 `deploy/Caddyfile.oj-train-wall` 让 Caddy 自动签证书。
@@ -124,12 +126,24 @@ LUOGU_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent |
 | `LUOGU_USER_AGENT` | `OJSubmissionWall/1.0` | 洛谷请求的 User-Agent |
+| `LUOGU_CF_CLEARANCE` | 空 | 可选：服务器同出口浏览器合法通过 Cloudflare 后拿到的 `cf_clearance` 值，不是登录态 |
 | `LUOGU_COOKIE` | 空 | 可选：管理员自己的洛谷 Cookie；公开部署不建议收集用户 Cookie |
 | `LUOGU_PROXY_URL` | 空 | 可选：洛谷海外 403 时，把洛谷请求转发到国内出口的私有代理 |
 | `LUOGU_PROXY_TOKEN` | 空 | 可选：访问洛谷私有代理的 Bearer token |
 | `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；公开部署不建议收集用户登录态，留空时会提示无法精确同步 |
 
-### 洛谷海外 403 代理
+### 洛谷海外 403 处理
+
+洛谷如果返回 `HTTP 403`，优先确认能否换成数字 UID 绑定；如果个人页本身也被拦，说明是服务器出口被 Cloudflare/洛谷风控挡住了。
+
+无代理时可以尝试只配置 Cloudflare 放行票据，不配置登录 Cookie。要点是：`cf_clearance` 必须来自“服务器同出口”的合法浏览器会话；从你本机热点拿到的值通常不能直接给首尔服务器用。这是应急方案，票据会过期，也不保证能覆盖所有洛谷风控场景。
+
+主站 `.env` 示例：
+
+```bash
+LUOGU_USER_AGENT=OJSubmissionWall/1.0 (+https://oj-train-wall.wannafly.cn)
+LUOGU_CF_CLEARANCE=只填cf_clearance这个cookie的值
+```
 
 如果服务器在海外机房，洛谷可能直接返回 `HTTP 403`。这不是绑定的账号错了，而是出口 IP 被洛谷风控拦截。稳定做法是把 `deploy/luogu_proxy.py` 部署在一个能正常访问洛谷的国内出口上，并且只暴露给主站使用：
 

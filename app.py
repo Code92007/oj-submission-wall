@@ -61,6 +61,8 @@ LUOGU_USER_AGENT = os.environ.get(
     "LUOGU_USER_AGENT",
     f"OJSubmissionWall/1.0 (+{PUBLIC_BASE_URL or 'https://oj-train-wall.wannafly.cn'})",
 )
+LUOGU_CF_CLEARANCE = os.environ.get("LUOGU_CF_CLEARANCE", "").strip()
+LUOGU_COOKIE = os.environ.get("LUOGU_COOKIE", "").strip()
 LUOGU_PROXY_URL = os.environ.get("LUOGU_PROXY_URL", "").strip()
 LUOGU_PROXY_TOKEN = os.environ.get("LUOGU_PROXY_TOKEN", "").strip()
 SMTP_PLACEHOLDERS = {
@@ -528,6 +530,19 @@ def normalize_cookie_header(value: str, default_name: str) -> str:
     if re.search(r"(^|;)\s*[A-Za-z0-9_\-.]+=", value):
         return value
     return f"{default_name}={value}"
+
+
+def luogu_cookie_header() -> str:
+    parts = []
+    clearance = normalize_cookie_header(LUOGU_CF_CLEARANCE, "cf_clearance")
+    if clearance:
+        parts.append(clearance)
+    if LUOGU_COOKIE:
+        if re.search(r"(^|;)\s*[A-Za-z0-9_\-.]+=", LUOGU_COOKIE):
+            parts.append(LUOGU_COOKIE)
+        else:
+            parts.append(f"cf_clearance={LUOGU_COOKIE}")
+    return "; ".join(parts)
 
 
 def parse_datetime_text(value: str, source_tz: dt.tzinfo = dt.timezone.utc) -> int | None:
@@ -1224,8 +1239,10 @@ class LuoguAdapter(OJAdapter):
         return str(selected["uid"]), str(selected.get("name") or handle)
 
     def _fetch_profile_context(self, uid: str, path_suffix: str = "") -> dict:
+        path = f"/user/{uid}{path_suffix}"
+        separator = "&" if "?" in path else "?"
         body, _ = self._fetch_url(
-            f"https://www.luogu.com.cn/user/{uid}{path_suffix}",
+            f"https://www.luogu.com.cn{path}{separator}_contentOnly=1",
             headers=self._headers(f"https://www.luogu.com.cn/user/{uid}"),
         )
         return self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
@@ -1251,11 +1268,11 @@ class LuoguAdapter(OJAdapter):
             )
         except urllib.error.HTTPError as exc:
             if exc.code == 403 and not LUOGU_PROXY_URL:
-                raise RuntimeError("洛谷 HTTP 403：当前服务器出口被拦截，请配置 LUOGU_PROXY_URL 走国内代理") from exc
+                raise RuntimeError("洛谷 HTTP 403：当前服务器出口被拦截，请配置 LUOGU_CF_CLEARANCE 或 LUOGU_PROXY_URL") from exc
             raise
         except Exception as exc:
             if "403" in str(exc) and not LUOGU_PROXY_URL:
-                raise RuntimeError("洛谷 HTTP 403：当前服务器出口被拦截，请配置 LUOGU_PROXY_URL 走国内代理") from exc
+                raise RuntimeError("洛谷 HTTP 403：当前服务器出口被拦截，请配置 LUOGU_CF_CLEARANCE 或 LUOGU_PROXY_URL") from exc
             raise
 
     @staticmethod
@@ -1265,7 +1282,7 @@ class LuoguAdapter(OJAdapter):
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
             "Referer": referer,
         }
-        cookie = normalize_cookie_header(os.environ.get("LUOGU_COOKIE", "").strip(), "__client_id")
+        cookie = luogu_cookie_header()
         if cookie:
             headers["Cookie"] = cookie
         return headers
