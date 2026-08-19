@@ -54,6 +54,10 @@ USER_AGENT = os.environ.get(
     "OJ_USER_AGENT",
     "OJSubmissionWall/1.0 (+https://github.com/your-name/oj-submission-wall)",
 )
+LUOGU_USER_AGENT = os.environ.get(
+    "LUOGU_USER_AGENT",
+    f"OJSubmissionWall/1.0 (+{PUBLIC_BASE_URL or 'https://oj-train-wall.wannafly.cn'})",
+)
 SMTP_PLACEHOLDERS = {
     "smtp.example.com",
     "noreply@example.com",
@@ -963,16 +967,15 @@ class LuoguAdapter(OJAdapter):
 
     @staticmethod
     def _browser_headers(referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
-        return {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+        headers = {
+            "User-Agent": LUOGU_USER_AGENT,
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
             "Referer": referer,
-            "Origin": "https://www.luogu.com.cn",
-            "Sec-CH-UA": '"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"',
-            "Sec-CH-UA-Mobile": "?0",
-            "Sec-CH-UA-Platform": '"Windows"',
-            "Sec-Fetch-Site": "same-origin",
         }
+        cookie = os.environ.get("LUOGU_COOKIE", "").strip()
+        if cookie:
+            headers["Cookie"] = cookie
+        return headers
 
     @classmethod
     def _json_headers(cls, referer: str = "https://www.luogu.com.cn/") -> dict[str, str]:
@@ -980,6 +983,7 @@ class LuoguAdapter(OJAdapter):
         headers.update(
             {
                 "Accept": "application/json,text/plain,*/*",
+                "X-Requested-With": "XMLHttpRequest",
                 "Sec-Fetch-Dest": "empty",
                 "Sec-Fetch-Mode": "cors",
             }
@@ -992,6 +996,7 @@ class LuoguAdapter(OJAdapter):
         headers.update(
             {
                 "Accept": "application/json,text/plain,*/*",
+                "X-Requested-With": "XMLHttpRequest",
                 "Sec-Fetch-Dest": "empty",
                 "Sec-Fetch-Mode": "cors",
             }
@@ -999,6 +1004,7 @@ class LuoguAdapter(OJAdapter):
         headers.update(
             {
                 "x-lentille-request": "content-only",
+                "x-luogu-type": "content-only",
             }
         )
         return headers
