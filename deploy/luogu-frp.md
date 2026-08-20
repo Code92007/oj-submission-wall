@@ -37,7 +37,7 @@ LUOGU_PROXY_TOKEN=替换成洛谷代理token
 端口约定：
 
 ```text
-首尔机公网 IP: 43.155.179.39
+首尔机公网 IP: <你的服务器公网 IP>
 frps 控制端口: 7000
 frp 洛谷代理远端端口: 18787
 国内机本地洛谷代理端口: 8787
@@ -166,7 +166,7 @@ curl -sS http://127.0.0.1:8787/ \
 ```bash
 mkdir -p /etc/frp
 cat > /etc/frp/frpc.toml <<'EOF'
-serverAddr = "43.155.179.39"
+serverAddr = "<你的服务器公网 IP>"
 serverPort = 7000
 
 auth.method = "token"

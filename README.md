@@ -76,7 +76,7 @@ DNSPod 添加解析：
 
 | 主机记录 | 记录类型 | 记录值 |
 | --- | --- | --- |
-| `oj-train-wall` | `A` | `43.155.179.39` |
+| `oj-train-wall` | `A` | `<你的服务器公网 IP>` |
 
 服务器 `.env` 建议：
 
@@ -174,6 +174,16 @@ LUOGU_PROXY_TOKEN=同一段随机长密码
 代理脚本只允许转发 `https://www.luogu.com.cn` / `https://luogu.com.cn`，并要求 Bearer token；不要把它无鉴权公开到公网。
 
 洛谷逐条记录会通过 `record/list?_contentOnly=1` 分页同步并写入本地 `submissions` 表。日常同步只抓最近页；历史存量通过 `LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC` 逐轮回填，已经落库的提交不会重复插入。若想临时集中补历史，可以短时间调大回填页数；补完后建议恢复保守值。
+
+也可以在服务器上启动一个慢速历史回填命令，让它一直补到最后一页。这个命令不会阻塞网页请求，遇到洛谷某页失败会保存已抓到的页面并暂停该账号，下次重跑会从游标继续：
+
+```bash
+docker compose exec -T oj-submission-wall python app.py luogu-backfill \
+  --pages-per-round 20 \
+  --recent-pages 1 \
+  --sleep-min 0.8 \
+  --sleep-max 2.0
+```
 
 如果没有国内代理，主站会在洛谷主源 403、超时或验证码时尝试第三方公开统计卡片接口，例如 `api.jerryz.com.cn` / `luogu.wao3.cn`。这些源不是洛谷官方接口，只能兜底总通过题数和部分难度分布，不能提供逐题、日期和比赛记录；已有精确缓存时会优先保留缓存，不会被降级数据覆盖。用户可以填写洛谷用户名，服务端会尽量自动解析成数字 UID；如果服务器出口连用户名搜索也被洛谷拦截，则需要配置 `LUOGU_CF_CLEARANCE` 或 `LUOGU_PROXY_URL` 后再自动重试。
 

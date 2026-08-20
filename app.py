@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import base64
+import argparse
 import contextlib
 import datetime as dt
 import hashlib
@@ -15,6 +16,7 @@ import socket
 import smtplib
 import sqlite3
 import ssl
+import sys
 import threading
 import time
 import traceback
@@ -1266,7 +1268,11 @@ class LuoguAdapter(OJAdapter):
                 record_submissions, record_sync = self._fetch_record_submissions(handle, uid, profile_name, since_ts)
                 if record_sync:
                     self._profile_stats[handle]["recordSync"] = record_sync
-                if record_submissions:
+                if record_sync.get("lastError"):
+                    self._profile_stats[handle]["_warning"] = (
+                        "洛谷记录页部分同步失败，已保存本轮已抓到页面，下次会从失败页附近继续"
+                    )
+                if record_submissions or record_sync.get("historyComplete") or record_sync.get("source"):
                     self._profile_stats[handle]["source"] = "luogu-profile+record-list"
                     return record_submissions
             except Exception as exc:
@@ -1279,6 +1285,8 @@ class LuoguAdapter(OJAdapter):
                 }
                 if previous_record_sync:
                     self._profile_stats[handle]["_warning"] = "洛谷记录页同步失败，已保留本地历史记录并继续使用缓存"
+                    self._profile_stats[handle]["source"] = "luogu-profile+record-list"
+                    return []
 
         submissions = []
         for date_key, counts in sorted(daily_counts.items()):
@@ -1329,6 +1337,7 @@ class LuoguAdapter(OJAdapter):
         newest_seen = previous_newest
         oldest_seen = previous_oldest or 0
         request_index = 0
+        fetch_error = ""
 
         def fetch_page(page_no: int) -> tuple[list[dict], dict]:
             nonlocal request_index, total_count, per_page, page_count, newest_seen, oldest_seen
@@ -1362,7 +1371,11 @@ class LuoguAdapter(OJAdapter):
         recent_reached_old = False
         last_recent_page = 0
         for page_no in range(1, recent_pages + 1):
-            parsed, _ = fetch_page(page_no)
+            try:
+                parsed, _ = fetch_page(page_no)
+            except Exception as exc:
+                fetch_error = str(exc)[:240] or exc.__class__.__name__
+                break
             last_recent_page = page_no
             if not parsed:
                 history_complete = True
@@ -1383,7 +1396,11 @@ class LuoguAdapter(OJAdapter):
             if page_count and next_backfill_page > page_count:
                 history_complete = True
                 break
-            parsed, _ = fetch_page(next_backfill_page)
+            try:
+                parsed, _ = fetch_page(next_backfill_page)
+            except Exception as exc:
+                fetch_error = str(exc)[:240] or exc.__class__.__name__
+                break
             if not parsed:
                 history_complete = True
                 break
@@ -1413,6 +1430,10 @@ class LuoguAdapter(OJAdapter):
         }
         if recent_reached_old:
             sync_state["incrementalComplete"] = True
+        if fetch_error:
+            if not submissions_by_id:
+                raise RuntimeError(fetch_error)
+            sync_state.update({"partial": True, "lastError": fetch_error, "lastErrorAt": utcnow()})
         return filtered, sync_state
 
     def _fetch_record_page(self, uid: str, page_no: int) -> dict:
@@ -3971,6 +3992,107 @@ def expired_cookie_header() -> str:
     return f"{SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0"
 
 
+def luogu_record_sync_state(row: sqlite3.Row | None) -> dict:
+    if not row or "stats_json" not in row.keys() or not row["stats_json"]:
+        return {}
+    with contextlib.suppress(Exception):
+        stats = json.loads(row["stats_json"])
+        if isinstance(stats, dict) and isinstance(stats.get("recordSync"), dict):
+            return stats["recordSync"]
+    return {}
+
+
+def run_luogu_backfill_cli(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Slowly backfill Luogu record/list pages into the local database.")
+    parser.add_argument("--pages-per-round", type=int, default=20, help="history pages to fetch per handle round")
+    parser.add_argument("--recent-pages", type=int, default=1, help="latest pages to refresh per handle round")
+    parser.add_argument("--sleep-min", type=float, default=0.8, help="minimum sleep seconds between Luogu pages")
+    parser.add_argument("--sleep-max", type=float, default=2.0, help="maximum sleep seconds between Luogu pages")
+    parser.add_argument("--round-sleep", type=float, default=3.0, help="sleep seconds between handle rounds")
+    parser.add_argument("--max-rounds", type=int, default=0, help="maximum rounds per handle; 0 means until complete/error")
+    parser.add_argument("--handle-id", action="append", type=int, default=[], help="only backfill a specific handle id; repeatable")
+    args = parser.parse_args(argv)
+
+    global LUOGU_RECORD_RECENT_PAGES_PER_SYNC
+    global LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC
+    global LUOGU_RECORD_SLEEP_MIN_SECONDS
+    global LUOGU_RECORD_SLEEP_MAX_SECONDS
+    LUOGU_RECORD_RECENT_PAGES_PER_SYNC = max(0, args.recent_pages)
+    LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC = max(1, args.pages_per_round)
+    LUOGU_RECORD_SLEEP_MIN_SECONDS = max(0.0, args.sleep_min)
+    LUOGU_RECORD_SLEEP_MAX_SECONDS = max(LUOGU_RECORD_SLEEP_MIN_SECONDS, args.sleep_max)
+
+    init_db()
+    with connect_db() as conn:
+        params: list[object] = []
+        where = "active = 1 AND platform = 'luogu'"
+        if args.handle_id:
+            placeholders = ",".join("?" for _ in args.handle_id)
+            where += f" AND id IN ({placeholders})"
+            params.extend(args.handle_id)
+        rows = conn.execute(
+            f"""
+            SELECT *
+            FROM handles
+            WHERE {where}
+            ORDER BY last_sync_at, created_at
+            """,
+            params,
+        ).fetchall()
+        print(f"luogu handles: {len(rows)}", flush=True)
+
+        for initial_row in rows:
+            rounds = 0
+            while True:
+                row = conn.execute("SELECT * FROM handles WHERE id = ? AND active = 1", (initial_row["id"],)).fetchone()
+                if not row:
+                    break
+                state_before = luogu_record_sync_state(row)
+                if state_before.get("historyComplete"):
+                    print(f"done handle_id={row['id']} handle={row['handle']} history already complete", flush=True)
+                    break
+
+                rounds += 1
+                print(
+                    f"sync handle_id={row['id']} handle={row['handle']} "
+                    f"round={rounds} nextPage={state_before.get('nextBackfillPage') or '-'}",
+                    flush=True,
+                )
+                result = sync_handle_row(conn, row, force=True)
+                conn.commit()
+                refreshed = conn.execute("SELECT * FROM handles WHERE id = ?", (row["id"],)).fetchone()
+                state_after = luogu_record_sync_state(refreshed)
+                print(
+                    json.dumps(
+                        {
+                            "result": result,
+                            "recordSync": {
+                                "pagesFetched": state_after.get("pagesFetched"),
+                                "nextBackfillPage": state_after.get("nextBackfillPage"),
+                                "pageCount": state_after.get("pageCount"),
+                                "historyComplete": state_after.get("historyComplete"),
+                                "lastError": state_after.get("lastError"),
+                            },
+                        },
+                        ensure_ascii=False,
+                    ),
+                    flush=True,
+                )
+                if state_after.get("historyComplete"):
+                    print(f"done handle_id={row['id']} handle={row['handle']}", flush=True)
+                    break
+                if state_after.get("lastError") or result.get("error"):
+                    print(f"paused handle_id={row['id']} due to error; rerun later to continue", flush=True)
+                    break
+                if args.max_rounds and rounds >= args.max_rounds:
+                    print(f"paused handle_id={row['id']} after max rounds", flush=True)
+                    break
+                if args.round_sleep > 0:
+                    time.sleep(args.round_sleep)
+    clear_overview_memory_cache()
+    return 0
+
+
 def main() -> None:
     init_db()
     if SYNC_INTERVAL_SECONDS > 0:
@@ -3983,4 +4105,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "luogu-backfill":
+        raise SystemExit(run_luogu_backfill_cli(sys.argv[2:]))
     main()
