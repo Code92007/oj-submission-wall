@@ -133,7 +133,7 @@ LUOGU_THIRD_PARTY_FALLBACK=true
 | `LUOGU_COOKIE` | 空 | 可选：管理员自己的洛谷 Cookie；公开部署不建议收集用户 Cookie |
 | `LUOGU_PROXY_URL` | 空 | 可选：洛谷海外 403 时，把洛谷请求转发到国内出口的私有代理 |
 | `LUOGU_PROXY_TOKEN` | 空 | 可选：访问洛谷私有代理的 Bearer token |
-| `LUOGU_THIRD_PARTY_FALLBACK` | `true` | 洛谷主源失败时，是否尝试第三方公开统计源兜底 |
+| `LUOGU_THIRD_PARTY_FALLBACK` | `true` | 洛谷主源失败时，是否尝试第三方公开统计源兜底；第三方源通常需要数字 UID，服务端会先尽量自动解析用户名 |
 | `LUOGU_FALLBACK_URLS` | 内置 Jerry/wao3 卡片接口 | 可选：逗号分隔的洛谷降级 URL 模板，支持 `{uid}`、`{handle}`、`{name}` |
 | `QOJ_COOKIE` | 空 | QOJ 有 Cloudflare 校验；公开部署不建议收集用户登录态，留空时会提示无法精确同步 |
 
@@ -168,7 +168,7 @@ LUOGU_PROXY_TOKEN=同一段随机长密码
 
 代理脚本只允许转发 `https://www.luogu.com.cn` / `https://luogu.com.cn`，并要求 Bearer token；不要把它无鉴权公开到公网。
 
-如果没有国内代理，主站会在洛谷主源 403、超时或验证码时尝试第三方公开统计卡片接口，例如 `api.jerryz.com.cn` / `luogu.wao3.cn`。这些源不是洛谷官方接口，只能兜底总通过题数和部分难度分布，不能提供逐题、日期和比赛记录；已有精确缓存时会优先保留缓存，不会被降级数据覆盖。绑定时填写数字 UID 成功率更高。
+如果没有国内代理，主站会在洛谷主源 403、超时或验证码时尝试第三方公开统计卡片接口，例如 `api.jerryz.com.cn` / `luogu.wao3.cn`。这些源不是洛谷官方接口，只能兜底总通过题数和部分难度分布，不能提供逐题、日期和比赛记录；已有精确缓存时会优先保留缓存，不会被降级数据覆盖。用户可以填写洛谷用户名，服务端会尽量自动解析成数字 UID；如果服务器出口连用户名搜索也被洛谷拦截，则需要配置 `LUOGU_CF_CLEARANCE` 或 `LUOGU_PROXY_URL` 后再自动重试。
 
 ## 数据源说明
 

@@ -417,6 +417,38 @@ def migrate_db(conn: sqlite3.Connection) -> None:
     if "stats_json" not in handle_columns:
         conn.execute("ALTER TABLE handles ADD COLUMN stats_json TEXT")
 
+    backfill_nowcoder_submission_times(conn)
+
+
+def backfill_nowcoder_submission_times(conn: sqlite3.Connection) -> None:
+    rows = conn.execute(
+        """
+        SELECT id, submitted_at, raw_json
+        FROM submissions
+        WHERE platform = 'nowcoder'
+          AND raw_json IS NOT NULL
+          AND raw_json != ''
+        """
+    ).fetchall()
+    fixed = 0
+    for row in rows:
+        try:
+            raw = json.loads(row["raw_json"] or "{}")
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(raw, dict):
+            continue
+        text = str(raw.get("text") or "")
+        if not text:
+            continue
+        parsed_at = parse_datetime_text(text, DISPLAY_TZ)
+        if not parsed_at or int(row["submitted_at"] or 0) == parsed_at:
+            continue
+        conn.execute("UPDATE submissions SET submitted_at = ? WHERE id = ?", (parsed_at, row["id"]))
+        fixed += 1
+    if fixed:
+        print(f"Backfilled {fixed} Nowcoder submission timestamps", flush=True)
+
 
 def http_get(
     url: str,
@@ -1152,7 +1184,7 @@ class AtCoderAdapter(OJAdapter):
 class LuoguAdapter(OJAdapter):
     key = "luogu"
     label = "洛谷"
-    handle_hint = "洛谷用户名或数字 UID，例如 Yzm007 / 135160；UID 更稳定"
+    handle_hint = "洛谷用户名或数字 UID，例如 Yzm007 / 135160"
 
     def __init__(self):
         self._profile_stats: dict[str, dict] = {}
@@ -1176,7 +1208,20 @@ class LuoguAdapter(OJAdapter):
             handle = user_path.group(1)
         if not re.match(r"^[0-9A-Za-z_\-]{2,32}$", handle):
             raise ValueError("洛谷请填写用户名、数字 UID 或用户主页链接")
+        if not handle.isdigit():
+            with contextlib.suppress(Exception):
+                uid, _ = self._resolve_user(handle)
+                if uid:
+                    return uid
         return handle
+
+    def canonicalize_handle(self, handle: str) -> tuple[str, str] | None:
+        if handle.isdigit():
+            return None
+        uid, name = self._resolve_user(handle)
+        if not uid or uid == handle:
+            return None
+        return uid, name
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
         self._profile_stats[handle] = {}
@@ -1263,7 +1308,8 @@ class LuoguAdapter(OJAdapter):
         uid = str(uid or previous.get("uid") or (handle if handle.isdigit() else "")).strip()
         if not uid:
             raise RuntimeError(
-                f"{source_exc}；第三方降级统计需要洛谷数字 UID，请用数字 UID 重新绑定后重试"
+                f"{source_exc}；当前服务器无法把洛谷用户名解析成数字 UID，第三方降级统计无法继续。"
+                "服务端会在下次同步继续尝试自动解析；若仍失败，请配置 LUOGU_CF_CLEARANCE 或 LUOGU_PROXY_URL"
             ) from source_exc
 
         profile_name = str(previous.get("name") or profile_name or handle)
@@ -2513,6 +2559,7 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         return {"handleId": row["id"], "platform": row["platform"], "handle": row["handle"], "skipped": True}
 
     adapter = ADAPTERS[row["platform"]]
+    row = canonicalize_handle_row(conn, row, adapter)
     max_row = conn.execute(
         """
         SELECT MAX(submitted_at) AS max_submitted_at
@@ -2694,6 +2741,56 @@ def sync_targets(principal: dict | None = None, force: bool = False, include_gue
     return results
 
 
+def canonicalize_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, adapter: OJAdapter) -> sqlite3.Row:
+    canonicalizer = getattr(adapter, "canonicalize_handle", None)
+    if not canonicalizer:
+        return row
+    old_handle = str(row["handle"] or "")
+    try:
+        result = canonicalizer(old_handle)
+    except Exception:
+        return row
+    if not result:
+        return row
+    new_handle, display_name = result
+    new_handle = str(new_handle or "").strip()
+    if not new_handle or new_handle == old_handle:
+        return row
+
+    existing = conn.execute(
+        """
+        SELECT *
+        FROM handles
+        WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ? AND active = 1
+        """,
+        (row["owner_type"], row["owner_id"], row["platform"], new_handle),
+    ).fetchone()
+    if existing and existing["id"] != row["id"]:
+        conn.execute(
+            "UPDATE handles SET active = 0, last_error = ? WHERE id = ?",
+            (f"已自动合并到 {new_handle}", row["id"]),
+        )
+        return existing
+
+    stats = {}
+    if row["stats_json"]:
+        with contextlib.suppress(Exception):
+            parsed = json.loads(row["stats_json"])
+            if isinstance(parsed, dict):
+                stats = parsed
+    if display_name and not stats.get("name"):
+        stats["name"] = display_name
+    if row["platform"] == "luogu":
+        stats["uid"] = new_handle
+    stats_json = json.dumps(stats, ensure_ascii=False) if stats else row["stats_json"]
+    conn.execute(
+        "UPDATE handles SET handle = ?, stats_json = ? WHERE id = ?",
+        (new_handle, stats_json, row["id"]),
+    )
+    updated = conn.execute("SELECT * FROM handles WHERE id = ?", (row["id"],)).fetchone()
+    return updated or row
+
+
 def get_owned_handle_row(conn: sqlite3.Connection, principal: dict, handle_id: int) -> sqlite3.Row | None:
     return conn.execute(
         """
@@ -2730,11 +2827,21 @@ def background_sync_loop() -> None:
 
 def handle_to_json(row: sqlite3.Row) -> dict:
     adapter = ADAPTERS.get(row["platform"])
+    display_handle = str(row["handle"] or "")
+    if row["platform"] == "luogu" and row["stats_json"]:
+        with contextlib.suppress(Exception):
+            stats = json.loads(row["stats_json"])
+            if isinstance(stats, dict):
+                name = str(stats.get("name") or "").strip()
+                uid = str(stats.get("uid") or row["handle"] or "").strip()
+                if name and uid and name != uid:
+                    display_handle = f"{name} ({uid})"
     return {
         "id": row["id"],
         "platform": row["platform"],
         "platformLabel": adapter.label if adapter else row["platform"],
         "handle": row["handle"],
+        "displayHandle": display_handle,
         "lastSyncAt": iso_from_ts(row["last_sync_at"]),
         "lastError": row["last_error"],
     }

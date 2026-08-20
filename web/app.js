@@ -65,7 +65,7 @@ const CONTEST_CATEGORY_ORDER = [
 const CONTEST_PLATFORM_RANK = new Map(CONTEST_PLATFORM_ORDER.map((key, index) => [key, index]));
 const CONTEST_CATEGORY_RANK = new Map(CONTEST_CATEGORY_ORDER.map((key, index) => [key, index]));
 const DISPLAY_TIME_ZONE = "Asia/Shanghai";
-const OVERVIEW_BROWSER_CACHE_KEY = "ojwall.overview.v2";
+const OVERVIEW_BROWSER_CACHE_KEY = "ojwall.overview.v3";
 const OVERVIEW_BROWSER_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const OVERVIEW_BROWSER_CACHE_FEED_LIMIT = 500;
 
@@ -366,7 +366,7 @@ function renderMyHandles() {
     const row = el("div", "handle-item");
     const main = el("div", "handle-main");
     const title = document.createElement("strong");
-    title.textContent = `${item.platformLabel} / ${item.handle}`;
+    title.textContent = `${item.platformLabel} / ${item.displayHandle || item.handle}`;
     const meta = document.createElement("span");
     meta.textContent = item.lastError
       ? `同步异常：${item.lastError}`
@@ -585,7 +585,7 @@ function renderMemberDirectory(members) {
 
     const handles = el("td", "member-handles-cell");
     handles.textContent = member.handles?.length
-      ? member.handles.map((handle) => `${handle.platformLabel}:${handle.handle}`).join(" / ")
+      ? member.handles.map((handle) => `${handle.platformLabel}:${handle.displayHandle || handle.handle}`).join(" / ")
       : "未绑定";
     handles.title = handles.textContent;
 
@@ -746,8 +746,8 @@ function renderMemberCard(member) {
   if (member.handles?.length) {
     for (const handle of member.handles) {
       const pill = el("span", `platform-pill${handle.lastError ? " error" : ""}`);
-      pill.title = handle.lastError || handle.handle;
-      pill.textContent = `${handle.platformLabel}:${handle.handle}`;
+      pill.title = handle.lastError || handle.displayHandle || handle.handle;
+      pill.textContent = `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
       handles.appendChild(pill);
     }
   } else {
@@ -1212,7 +1212,7 @@ function filteredFeedRows() {
     if (filters.to && item.submittedDate > filters.to) return false;
     if (userQuery) {
       const realName = visibleNames.get(`${item.ownerType}:${item.ownerId}`) || "";
-      const haystack = `${item.displayName || ""} ${realName} ${item.handle || ""} ${item.ownerId || ""}`.toLowerCase();
+      const haystack = `${item.displayName || ""} ${realName} ${item.handle || ""} ${item.displayHandle || ""} ${item.ownerId || ""}`.toLowerCase();
       if (!haystack.includes(userQuery)) return false;
     }
     return true;
