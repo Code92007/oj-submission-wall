@@ -8,6 +8,7 @@ import hmac
 import html
 import json
 import os
+import random
 import re
 import secrets
 import socket
@@ -85,6 +86,16 @@ LUOGU_FALLBACK_URLS = tuple(
     for item in os.environ.get("LUOGU_FALLBACK_URLS", "").split(",")
     if item.strip()
 ) or DEFAULT_LUOGU_FALLBACK_URLS
+LUOGU_RECORD_SYNC = os.environ.get("LUOGU_RECORD_SYNC", "true").lower() not in {
+    "0",
+    "false",
+    "no",
+    "off",
+}
+LUOGU_RECORD_RECENT_PAGES_PER_SYNC = int(os.environ.get("LUOGU_RECORD_RECENT_PAGES_PER_SYNC", "3"))
+LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC = int(os.environ.get("LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC", "8"))
+LUOGU_RECORD_SLEEP_MIN_SECONDS = float(os.environ.get("LUOGU_RECORD_SLEEP_MIN_SECONDS", "0.4"))
+LUOGU_RECORD_SLEEP_MAX_SECONDS = float(os.environ.get("LUOGU_RECORD_SLEEP_MAX_SECONDS", "1.4"))
 SMTP_PLACEHOLDERS = {
     "smtp.example.com",
     "noreply@example.com",
@@ -1249,6 +1260,26 @@ class LuoguAdapter(OJAdapter):
             self._profile_stats[handle] = self._fetch_fallback_profile_stats(handle, uid, profile_name, exc)
             return []
 
+        record_submissions: list[dict] = []
+        if LUOGU_RECORD_SYNC:
+            try:
+                record_submissions, record_sync = self._fetch_record_submissions(handle, uid, profile_name, since_ts)
+                if record_sync:
+                    self._profile_stats[handle]["recordSync"] = record_sync
+                if record_submissions:
+                    self._profile_stats[handle]["source"] = "luogu-profile+record-list"
+                    return record_submissions
+            except Exception as exc:
+                previous_record_sync = (self._previous_stats.get(handle) or {}).get("recordSync") or {}
+                self._profile_stats[handle]["recordSync"] = {
+                    **previous_record_sync,
+                    "source": "luogu-record-list",
+                    "lastError": str(exc)[:240] or exc.__class__.__name__,
+                    "lastErrorAt": utcnow(),
+                }
+                if previous_record_sync:
+                    self._profile_stats[handle]["_warning"] = "洛谷记录页同步失败，已保留本地历史记录并继续使用缓存"
+
         submissions = []
         for date_key, counts in sorted(daily_counts.items()):
             submitted_at = self._date_to_ts(date_key)
@@ -1278,6 +1309,219 @@ class LuoguAdapter(OJAdapter):
                     }
                 )
         return submissions
+
+    def _fetch_record_submissions(self, handle: str, uid: str, profile_name: str, since_ts: int) -> tuple[list[dict], dict]:
+        previous = self._previous_stats.get(handle) or {}
+        previous_sync = previous.get("recordSync") if isinstance(previous.get("recordSync"), dict) else {}
+        previous_newest = int(previous_sync.get("newestSubmitTime") or 0)
+        previous_oldest = int(previous_sync.get("oldestFetchedTime") or 0)
+        history_complete = bool(previous_sync.get("historyComplete"))
+        history_since = utcnow() - FETCH_LOOKBACK_DAYS * 86400
+        incremental_since = since_ts
+        if previous_newest:
+            incremental_since = max(incremental_since, previous_newest - 3 * 86400)
+
+        submissions_by_id: dict[str, dict] = {}
+        pages_fetched: set[int] = set()
+        total_count = int(previous_sync.get("totalRecordCount") or 0)
+        per_page = int(previous_sync.get("perPage") or 20)
+        page_count = int(previous_sync.get("pageCount") or 0)
+        newest_seen = previous_newest
+        oldest_seen = previous_oldest or 0
+        request_index = 0
+
+        def fetch_page(page_no: int) -> tuple[list[dict], dict]:
+            nonlocal request_index, total_count, per_page, page_count, newest_seen, oldest_seen
+            if page_no in pages_fetched:
+                return [], {}
+            request_index += 1
+            self._record_delay(request_index)
+            data = self._fetch_record_page(uid, page_no)
+            records = data.get("records") if isinstance(data.get("records"), dict) else {}
+            items = records.get("result") if isinstance(records.get("result"), list) else []
+            if records.get("count") is not None:
+                with contextlib.suppress(Exception):
+                    total_count = int(records.get("count") or 0)
+            if records.get("perPage") is not None:
+                with contextlib.suppress(Exception):
+                    per_page = int(records.get("perPage") or per_page or 20)
+            if per_page and total_count:
+                page_count = max(1, (total_count + per_page - 1) // per_page)
+            parsed = [self._record_to_submission(uid, profile_name, item) for item in items if isinstance(item, dict)]
+            parsed = [item for item in parsed if item]
+            pages_fetched.add(page_no)
+            for item in parsed:
+                submitted_at = int(item.get("submitted_at") or 0)
+                if submitted_at:
+                    newest_seen = max(newest_seen, submitted_at)
+                    oldest_seen = submitted_at if not oldest_seen else min(oldest_seen, submitted_at)
+                    submissions_by_id[str(item["remote_id"])] = item
+            return parsed, records
+
+        recent_pages = max(0, LUOGU_RECORD_RECENT_PAGES_PER_SYNC)
+        recent_reached_old = False
+        last_recent_page = 0
+        for page_no in range(1, recent_pages + 1):
+            parsed, _ = fetch_page(page_no)
+            last_recent_page = page_no
+            if not parsed:
+                history_complete = True
+                break
+            oldest_page_ts = min(int(item.get("submitted_at") or 0) for item in parsed)
+            if oldest_page_ts < incremental_since:
+                recent_reached_old = True
+                break
+            if page_count and page_no >= page_count:
+                history_complete = True
+                break
+
+        next_backfill_page = int(previous_sync.get("nextBackfillPage") or max(2, last_recent_page + 1))
+        if next_backfill_page <= last_recent_page:
+            next_backfill_page = last_recent_page + 1
+        backfill_pages = 0 if history_complete else max(0, LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC)
+        for _ in range(backfill_pages):
+            if page_count and next_backfill_page > page_count:
+                history_complete = True
+                break
+            parsed, _ = fetch_page(next_backfill_page)
+            if not parsed:
+                history_complete = True
+                break
+            oldest_page_ts = min(int(item.get("submitted_at") or 0) for item in parsed)
+            next_backfill_page += 1
+            if oldest_page_ts < history_since:
+                history_complete = True
+                break
+
+        filtered = [
+            item
+            for item in submissions_by_id.values()
+            if int(item.get("submitted_at") or 0) >= history_since
+        ]
+        filtered.sort(key=lambda item: int(item.get("submitted_at") or 0))
+        sync_state = {
+            "source": "luogu-record-list",
+            "syncedAt": utcnow(),
+            "pagesFetched": sorted(pages_fetched),
+            "nextBackfillPage": next_backfill_page,
+            "historyComplete": bool(history_complete or recent_reached_old and not previous_sync),
+            "totalRecordCount": total_count,
+            "perPage": per_page,
+            "pageCount": page_count,
+            "newestSubmitTime": newest_seen,
+            "oldestFetchedTime": oldest_seen,
+        }
+        if recent_reached_old:
+            sync_state["incrementalComplete"] = True
+        return filtered, sync_state
+
+    def _fetch_record_page(self, uid: str, page_no: int) -> dict:
+        params = urllib.parse.urlencode({"user": uid, "page": page_no, "_contentOnly": 1})
+        referer = f"https://www.luogu.com.cn/record/list?user={urllib.parse.quote(uid, safe='')}"
+        url = f"https://www.luogu.com.cn/record/list?{params}"
+        headers = self._headers(referer)
+        headers.update(
+            {
+                "Accept": "application/json, text/plain, */*",
+                "Priority": "u=1, i",
+                "Sec-Fetch-Site": "same-origin",
+            }
+        )
+        body, _ = proxy_http_get(
+            url,
+            headers=headers,
+            proxy_url=LUOGU_PROXY_URL,
+            proxy_token=LUOGU_PROXY_TOKEN,
+            cache_ttl_seconds=None,
+            allow_stale_cache=False,
+            cache_write=False,
+        )
+        payload = self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
+        data = self._context_data(payload)
+        if not isinstance(data.get("records"), dict):
+            raise RuntimeError("洛谷记录页没有返回 records")
+        return data
+
+    @classmethod
+    def _record_to_submission(cls, uid: str, profile_name: str, item: dict) -> dict | None:
+        remote_id = str(item.get("id") or "")
+        submitted_at = int(item.get("submitTime") or 0)
+        problem = item.get("problem") if isinstance(item.get("problem"), dict) else {}
+        pid = str(problem.get("pid") or "")
+        if not remote_id or not submitted_at or not pid:
+            return None
+        problem_type = str(problem.get("type") or "")
+        problem_title = str(problem.get("title") or pid)
+        score = item.get("score")
+        full_score = problem.get("fullScore")
+        status = item.get("status")
+        verdict = cls._record_verdict(status, score, full_score)
+        language = cls._record_language(item.get("language"), bool(item.get("enableO2")))
+        return {
+            "remote_id": remote_id,
+            "problem_id": pid,
+            "problem_name": f"{pid} {problem_title}".strip(),
+            "verdict": verdict,
+            "language": language,
+            "submitted_at": submitted_at,
+            "url": f"https://www.luogu.com.cn/record/{remote_id}",
+            "raw": {
+                **item,
+                "uid": uid,
+                "name": profile_name,
+                "pid": pid,
+                "type": problem_type,
+                "source": "luogu-record-list",
+            },
+        }
+
+    @staticmethod
+    def _record_verdict(status, score, full_score) -> str:
+        with contextlib.suppress(Exception):
+            if full_score is not None and score is not None and int(score) >= int(full_score):
+                return "AC"
+        text = str(status if status is not None else "").strip()
+        if text == "12":
+            return "AC"
+        aliases = {
+            "2": "COMPILE_ERROR",
+            "3": "COMPILE_ERROR",
+            "4": "RUNTIME_ERROR",
+            "5": "TIME_LIMIT_EXCEEDED",
+            "6": "MEMORY_LIMIT_EXCEEDED",
+            "7": "WRONG_ANSWER",
+            "8": "OUTPUT_LIMIT_EXCEEDED",
+            "9": "RUNTIME_ERROR",
+            "10": "SYSTEM_ERROR",
+            "14": "WRONG_ANSWER",
+        }
+        if text in aliases:
+            return aliases[text]
+        return normalize_verdict(text or "UNKNOWN")
+
+    @staticmethod
+    def _record_language(language, enable_o2: bool) -> str:
+        aliases = {
+            "3": "C++",
+            "4": "C",
+            "7": "Python 3",
+            "8": "Java",
+            "34": "C++23",
+        }
+        value = aliases.get(str(language), f"语言 {language}" if language is not None else "")
+        if enable_o2 and value and "O2" not in value:
+            value = f"{value} O2"
+        return value
+
+    @staticmethod
+    def _record_delay(request_index: int) -> None:
+        if request_index <= 1:
+            return
+        low = max(0.0, LUOGU_RECORD_SLEEP_MIN_SECONDS)
+        high = max(low, LUOGU_RECORD_SLEEP_MAX_SECONDS)
+        if high <= 0:
+            return
+        time.sleep(random.uniform(low, high))
 
     def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
         stats = self._profile_stats.get(handle) or {}
@@ -2707,6 +2951,22 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
             result.update({"partial": True, "fallback": profile_is_fallback})
             if use_previous_exact_stats and row["last_sync_at"]:
                 result.update({"cached": True, "cacheAsOf": iso_from_ts(int(row["last_sync_at"]))})
+        has_luogu_record_list = bool(
+            row["platform"] == "luogu"
+            and any((item.get("raw") or {}).get("source") == "luogu-record-list" for item in submissions)
+        )
+        if has_luogu_record_list:
+            conn.execute(
+                """
+                DELETE FROM submissions
+                WHERE owner_type = ?
+                  AND owner_id = ?
+                  AND platform = ?
+                  AND handle = ?
+                  AND problem_id LIKE 'luogu-activity-%'
+                """,
+                (row["owner_type"], row["owner_id"], row["platform"], row["handle"]),
+            )
         if warnings:
             error = "；".join(warnings)
             update_sync_at = int(row["last_sync_at"] or now) if use_previous_exact_stats else now

@@ -7,7 +7,7 @@
 ```text
 OJ 主站 Docker 容器
   -> http://host.docker.internal:18787/
-  -> 首尔机 frps 127.0.0.1:18787
+  -> 首尔机 frps 18787
   -> FRP 隧道
   -> 国内机 127.0.0.1:8787 deploy/luogu_proxy.py
   -> https://www.luogu.com.cn
@@ -54,7 +54,7 @@ mkdir -p /etc/frp
 cat > /etc/frp/frps.toml <<'EOF'
 bindAddr = "0.0.0.0"
 bindPort = 7000
-proxyBindAddr = "127.0.0.1"
+proxyBindAddr = "0.0.0.0"
 
 auth.method = "token"
 auth.token = "替换成frp隧道token"
@@ -104,7 +104,7 @@ ss -lntp | grep -E ':7000|:18787'
 正常情况下：
 
 - `7000` 会监听在 `0.0.0.0`，给国内 frpc 连接。
-- `18787` 应该只监听在 `127.0.0.1`，不直接暴露公网。
+- `18787` 需要让 Docker 容器通过 `host.docker.internal` 访问，所以会监听在宿主机网络上；不要在腾讯云防火墙开放这个端口。
 
 ## 二、国内轻量机部署洛谷代理
 
@@ -280,4 +280,3 @@ journalctl -u frpc -n 80 --no-pager
 ```
 
 如果国内机本地代理访问洛谷也 403，那说明这台国内机出口本身也被风控，需要换出口 IP 或稍后重试。
-
