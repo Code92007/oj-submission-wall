@@ -50,6 +50,7 @@ DISPLAY_TZ_OFFSET_HOURS = int(os.environ.get("DISPLAY_TZ_OFFSET_HOURS", "8"))
 DISPLAY_TZ = dt.timezone(dt.timedelta(hours=DISPLAY_TZ_OFFSET_HOURS), f"UTC{DISPLAY_TZ_OFFSET_HOURS:+03d}:00")
 HISTORICAL_CACHE_AFTER_DAYS = int(os.environ.get("HISTORICAL_CACHE_AFTER_DAYS", "30"))
 HISTORICAL_CACHE_TTL_SECONDS = int(os.environ.get("HISTORICAL_CACHE_TTL_SECONDS", str(3650 * 86400)))
+OVERVIEW_CACHE_TTL_SECONDS = int(os.environ.get("OVERVIEW_CACHE_TTL_SECONDS", "20"))
 SESSION_COOKIE = "ojwall_session"
 DEFAULT_TEAM_NAME = "未分组"
 GUEST_TEAM_NAME = "游客"
@@ -96,6 +97,8 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 HTTP_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 SYNC_LOCK = threading.Lock()
+OVERVIEW_CACHE_LOCK = threading.Lock()
+OVERVIEW_MEMORY_CACHE: dict[tuple[str, str, str, int], tuple[int, dict]] = {}
 HTTP_STALE_HITS = threading.local()
 TRANSIENT_HTTP_STATUSES = {408, 425, 429, 500, 502, 503, 504}
 
@@ -2685,6 +2688,7 @@ def sync_targets(principal: dict | None = None, force: bool = False, include_gue
             rows = get_handle_rows(conn, principal=principal, include_guests=include_guests)
             for row in rows:
                 results.append(sync_handle_row(conn, row, force=force))
+        clear_overview_memory_cache()
     finally:
         SYNC_LOCK.release()
     return results
@@ -2708,7 +2712,9 @@ def sync_one_handle(principal: dict, handle_id: int, force: bool = True) -> dict
             row = get_owned_handle_row(conn, principal, handle_id)
             if not row:
                 raise ValueError("没有找到这个账号绑定，可能已经移除")
-            return sync_handle_row(conn, row, force=force)
+            result = sync_handle_row(conn, row, force=force)
+            clear_overview_memory_cache()
+            return result
     finally:
         SYNC_LOCK.release()
 
@@ -2815,8 +2821,54 @@ def read_overview_cache(principal: dict | None, error: Exception | None = None) 
     return data
 
 
-def build_overview(principal: dict | None, days: int = 365) -> dict:
+def overview_memory_cache_key(principal: dict | None, days: int) -> tuple[str, str, str, int]:
+    if not principal:
+        return ("anon", "", "", int(days))
+    return (
+        str(principal.get("type") or ""),
+        str(principal.get("id") or ""),
+        normalize_team_name(principal.get("teamName"), ""),
+        int(days),
+    )
+
+
+def clear_overview_memory_cache() -> None:
+    with OVERVIEW_CACHE_LOCK:
+        OVERVIEW_MEMORY_CACHE.clear()
+
+
+def read_overview_memory_cache(principal: dict | None, days: int) -> dict | None:
+    if OVERVIEW_CACHE_TTL_SECONDS <= 0:
+        return None
+    key = overview_memory_cache_key(principal, days)
+    now = utcnow()
+    with OVERVIEW_CACHE_LOCK:
+        item = OVERVIEW_MEMORY_CACHE.get(key)
+        if not item:
+            return None
+        cached_at, overview = item
+        if now - cached_at > OVERVIEW_CACHE_TTL_SECONDS:
+            OVERVIEW_MEMORY_CACHE.pop(key, None)
+            return None
+        return overview
+
+
+def write_overview_memory_cache(principal: dict | None, days: int, overview: dict) -> None:
+    if OVERVIEW_CACHE_TTL_SECONDS <= 0:
+        return
+    key = overview_memory_cache_key(principal, days)
+    with OVERVIEW_CACHE_LOCK:
+        OVERVIEW_MEMORY_CACHE[key] = (utcnow(), overview)
+
+
+def build_overview(principal: dict | None, days: int = 365, use_cache: bool = True) -> dict:
+    days = max(7, min(days, 3650))
+    if use_cache:
+        cached = read_overview_memory_cache(principal, days)
+        if cached:
+            return cached
     overview = build_overview_from_db(principal, days=days)
+    write_overview_memory_cache(principal, days, overview)
     with contextlib.suppress(Exception):
         write_overview_cache(overview)
     return overview
@@ -3354,6 +3406,7 @@ class AppHandler(BaseHTTPRequestHandler):
             )
             user_id = str(cur.lastrowid)
             token = create_session(conn, "user", user_id, days=30)
+        clear_overview_memory_cache()
         return self.send_json(
             201,
             {
@@ -3423,6 +3476,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 (guest_id, display_name, real_name, team_name, utcnow()),
             )
             token = create_session(conn, "guest", guest_id, days=7)
+        clear_overview_memory_cache()
         return self.send_json(
             201,
             {
@@ -3454,6 +3508,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 f"UPDATE {table} SET display_name = ?, real_name = ?, team_name = ? WHERE id = ?",
                 (display_name, real_name, team_name, str(principal["id"])),
             )
+        clear_overview_memory_cache()
         principal["displayName"] = display_name
         principal["realName"] = real_name
         principal["teamName"] = team_name
@@ -3494,6 +3549,7 @@ class AppHandler(BaseHTTPRequestHandler):
             )
             if cursor.rowcount <= 0:
                 return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
+        clear_overview_memory_cache()
         return self.send_json(200, {"ok": True})
 
     def handle_sync_handle(self, parsed) -> None:
@@ -3504,7 +3560,7 @@ class AppHandler(BaseHTTPRequestHandler):
         if not path_match:
             raise ValueError("缺少账号绑定 ID")
         result = sync_one_handle(principal, int(path_match.group(1)), force=True)
-        return self.send_json(200, {"ok": True, "result": result, **build_overview(principal)})
+        return self.send_json(200, {"ok": True, "result": result, **build_overview(principal, use_cache=False)})
 
     def handle_sync(self) -> None:
         principal = get_current_principal(self)
@@ -3513,7 +3569,7 @@ class AppHandler(BaseHTTPRequestHandler):
         data = read_json_body(self)
         force = bool(data.get("force"))
         results = sync_targets(principal=principal, force=force, include_guests=False)
-        return self.send_json(200, {"ok": True, "results": results, **build_overview(principal)})
+        return self.send_json(200, {"ok": True, "results": results, **build_overview(principal, use_cache=False)})
 
 
 def cookie_header(token: str, max_age: int) -> str:

@@ -65,6 +65,9 @@ const CONTEST_CATEGORY_ORDER = [
 const CONTEST_PLATFORM_RANK = new Map(CONTEST_PLATFORM_ORDER.map((key, index) => [key, index]));
 const CONTEST_CATEGORY_RANK = new Map(CONTEST_CATEGORY_ORDER.map((key, index) => [key, index]));
 const DISPLAY_TIME_ZONE = "Asia/Shanghai";
+const OVERVIEW_BROWSER_CACHE_KEY = "ojwall.overview.v2";
+const OVERVIEW_BROWSER_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+const OVERVIEW_BROWSER_CACHE_FEED_LIMIT = 500;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -142,16 +145,94 @@ async function loadSession() {
   renderPlatformSelect();
 }
 
-async function loadOverview() {
-  const data = await api("/api/overview?days=3650");
-  state.overview = data;
-  state.user = data.user;
-  if (data.platforms) state.platforms = data.platforms;
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function sanitizedOverviewForBrowserCache(data) {
+  const copy = cloneJson(data);
+  if (copy.user) copy.user.realName = "";
+  for (const member of copy.members || []) {
+    member.realName = "";
+    member.realNameVisible = false;
+  }
+  return copy;
+}
+
+function saveOverviewBrowserCache(data) {
+  if (!data || !Array.isArray(data.members)) return;
+  const snapshot = sanitizedOverviewForBrowserCache(data);
+  const payload = {
+    savedAt: Date.now(),
+    data: snapshot,
+  };
+  try {
+    localStorage.setItem(OVERVIEW_BROWSER_CACHE_KEY, JSON.stringify(payload));
+    return;
+  } catch (_) {
+    // Large teams can exceed localStorage. Keep enough feed rows for first paint.
+  }
+
+  try {
+    const slim = snapshot;
+    if (Array.isArray(slim.feed) && slim.feed.length > OVERVIEW_BROWSER_CACHE_FEED_LIMIT) {
+      slim.mirror = slim.mirror || {};
+      slim.mirror.browserPartial = true;
+      slim.mirror.fullFeedCount = slim.feed.length;
+      slim.feed = slim.feed.slice(0, OVERVIEW_BROWSER_CACHE_FEED_LIMIT);
+    }
+    localStorage.setItem(OVERVIEW_BROWSER_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), data: slim }));
+  } catch (_) {
+    localStorage.removeItem(OVERVIEW_BROWSER_CACHE_KEY);
+  }
+}
+
+function readOverviewBrowserCache() {
+  try {
+    const raw = localStorage.getItem(OVERVIEW_BROWSER_CACHE_KEY);
+    if (!raw) return null;
+    const payload = JSON.parse(raw);
+    if (!payload?.data || Date.now() - Number(payload.savedAt || 0) > OVERVIEW_BROWSER_CACHE_MAX_AGE_MS) {
+      localStorage.removeItem(OVERVIEW_BROWSER_CACHE_KEY);
+      return null;
+    }
+    const data = cloneJson(payload.data);
+    data.mirror = data.mirror || {};
+    data.mirror.browserCache = true;
+    data.mirror.servedAt = new Date(Number(payload.savedAt || Date.now())).toISOString();
+    return data;
+  } catch (_) {
+    localStorage.removeItem(OVERVIEW_BROWSER_CACHE_KEY);
+    return null;
+  }
+}
+
+function updateWallRange(data) {
   const validRanges = ["all", ...(data.availableYears || []).map(String)];
   if (!state.wallRange || !validRanges.includes(String(state.wallRange))) {
     state.wallRange = String(data.availableYears?.[0] || new Date().getFullYear());
   }
+}
+
+function applyOverviewData(data, options = {}) {
+  state.overview = data;
+  state.user = data.user;
+  if (data.platforms) state.platforms = data.platforms;
+  updateWallRange(data);
   renderAll();
+  if (options.save !== false) saveOverviewBrowserCache(data);
+}
+
+function hydrateOverviewFromBrowserCache() {
+  const cached = readOverviewBrowserCache();
+  if (!cached) return false;
+  applyOverviewData(cached, { save: false });
+  return true;
+}
+
+async function loadOverview() {
+  const data = await api("/api/overview?days=3650");
+  applyOverviewData(data);
   if (data.mirror?.fallback) {
     const asOf = data.mirror.asOf ? formatDateTime(data.mirror.asOf) : "未知时间";
     showMessage(`当前显示本地镜像，数据截至 ${asOf}。`, "error");
@@ -249,14 +330,16 @@ function renderStats() {
     return sum + (member.days?.[today]?.accepted || 0);
   }, 0);
   const contestTotal = members.reduce((sum, member) => sum + (member.contests?.total || 0), 0);
+  const mirror = overview.mirror || {};
   $("#memberCount").textContent = members.length;
   $("#todayCount").textContent = todayAccepted;
-  $("#feedCount").textContent = overview.feed?.length || 0;
+  $("#feedCount").textContent = mirror.fullFeedCount || overview.feed?.length || 0;
   $("#contestCount").textContent = contestTotal;
-  const mirror = overview.mirror || {};
   const generatedAt = mirror.generatedAt || overview.now;
   const asOf = mirror.asOf;
-  if (mirror.fallback) {
+  if (mirror.browserCache) {
+    $("#lastUpdated").textContent = `本地缓存 · ${generatedAt ? `更新于 ${formatDateTime(generatedAt)} · ` : ""}正在更新`;
+  } else if (mirror.fallback) {
     $("#lastUpdated").textContent = `本地镜像 · 数据截至 ${asOf ? formatDateTime(asOf) : "未知"} · 读取于 ${formatDateTime(mirror.servedAt || generatedAt)}`;
   } else if (asOf) {
     $("#lastUpdated").textContent = `更新于 ${formatDateTime(generatedAt)} · 数据截至 ${formatDateTime(asOf)}`;
@@ -1398,9 +1481,7 @@ async function refreshSync() {
       method: "POST",
       body: { force: true },
     });
-    state.overview = data;
-    state.user = data.user;
-    renderAll();
+    applyOverviewData(data);
     const errors = (data.results || []).filter((item) => item.error);
     const cached = (data.results || []).filter((item) => item.cached);
     if (errors.length) {
@@ -1449,9 +1530,7 @@ async function retryHandle(id) {
       method: "POST",
       body: {},
     });
-    state.overview = data;
-    state.user = data.user;
-    renderAll();
+    applyOverviewData(data);
     const result = data.result || {};
     if (result.busy) {
       showMessage("已有同步任务在跑，稍后再试一次。", "error");
@@ -1548,6 +1627,7 @@ function bindEvents() {
 
 async function init() {
   bindEvents();
+  hydrateOverviewFromBrowserCache();
   try {
     await loadSession();
     await loadOverview();

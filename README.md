@@ -126,6 +126,7 @@ LUOGU_THIRD_PARTY_FALLBACK=true
 | `CACHE_DIR` | `DATA_DIR/cache` | HTTP 响应缓存和概览镜像目录 |
 | `HISTORICAL_CACHE_AFTER_DAYS` | `30` | 距今超过多少天的历史页可直接使用缓存 |
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
+| `OVERVIEW_CACHE_TTL_SECONDS` | `20` | `/api/overview` 页面组装结果的内存缓存秒数，降低打开页面和重复刷新的等待感 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent |
 | `LUOGU_USER_AGENT` | `OJSubmissionWall/1.0` | 洛谷请求的 User-Agent |
 | `LUOGU_CF_CLEARANCE` | 空 | 可选：服务器同出口浏览器合法通过 Cloudflare 后拿到的 `cf_clearance` 值，不是登录态 |
@@ -179,7 +180,7 @@ LUOGU_PROXY_TOKEN=同一段随机长密码
 - LOJ 使用公开 `submission/querySubmission` API 分页同步公开提交。
 - QOJ 当前有 Cloudflare 校验；公开部署不建议向用户索要登录态。未配置管理员侧专用 Cookie 时会明确提示无法精确同步。
 
-如果平台接口改版、风控或临时不可用，系统会保留上次成功同步的数据；`/api/overview` 还会写入脱敏概览镜像，数据库或接口异常时可以继续显示“数据截至 xx”的本地镜像。适配器都集中在 `app.py` 的 `OJAdapter` 子类里，后续替换接口时只需要改对应类。
+如果平台接口改版、风控或临时不可用，系统会保留上次成功同步的数据；`/api/overview` 会短暂使用内存缓存加快页面打开，也会写入脱敏概览镜像，数据库或接口异常时可以继续显示“数据截至 xx”的本地镜像。前端会先显示浏览器里的上次概览，再后台刷新最新数据，避免打开页面时闪成空列表。适配器都集中在 `app.py` 的 `OJAdapter` 子类里，后续替换接口时只需要改对应类。
 
 ## 生产建议
 
