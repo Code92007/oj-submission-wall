@@ -238,6 +238,10 @@ def retry_delay(attempt: int) -> float:
     return max(0.0, HTTP_RETRY_BACKOFF_SECONDS) * (2 ** attempt)
 
 
+def is_database_locked_error(exc: Exception) -> bool:
+    return isinstance(exc, sqlite3.OperationalError) and "locked" in str(exc).lower()
+
+
 def password_hash(password: str, salt: bytes | None = None, iterations: int = 210_000) -> str:
     if salt is None:
         salt = secrets.token_bytes(16)
@@ -263,9 +267,11 @@ def verify_password(password: str, encoded: str) -> bool:
 
 
 def connect_db() -> sqlite3.Connection:
-    conn = sqlite3.connect(DB_PATH, timeout=30)
+    conn = sqlite3.connect(DB_PATH, timeout=120)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=120000")
+    with contextlib.suppress(sqlite3.OperationalError):
+        conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     return conn
 
@@ -2560,6 +2566,7 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
 
     adapter = ADAPTERS[row["platform"]]
     row = canonicalize_handle_row(conn, row, adapter)
+    conn.commit()
     max_row = conn.execute(
         """
         SELECT MAX(submitted_at) AS max_submitted_at
@@ -2600,6 +2607,16 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
             stats_json = json.dumps(profile_stats, ensure_ascii=False)
         else:
             stats_json = previous_stats_json
+
+        contests = []
+        contest_error = ""
+        try:
+            contests = adapter.fetch_contests(row["handle"], since_ts, submissions)
+        except Exception as exc:
+            detail = str(exc)[:300] or exc.__class__.__name__
+            contest_error = f"比赛记录同步失败：{detail}"
+        stale_hits = http_stale_hits()
+
         inserted = 0
         for item in submissions:
             remote_id = str(item.get("remote_id") or "")
@@ -2632,14 +2649,6 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
             )
             inserted += cur.rowcount
 
-        contests = []
-        contest_error = ""
-        try:
-            contests = adapter.fetch_contests(row["handle"], since_ts, submissions)
-        except Exception as exc:
-            detail = str(exc)[:300] or exc.__class__.__name__
-            contest_error = f"比赛记录同步失败：{detail}"
-        stale_hits = http_stale_hits()
         inserted_contests = 0
         for item in contests:
             remote_id = str(item.get("remote_id") or "")
@@ -2735,6 +2744,7 @@ def sync_targets(principal: dict | None = None, force: bool = False, include_gue
             rows = get_handle_rows(conn, principal=principal, include_guests=include_guests)
             for row in rows:
                 results.append(sync_handle_row(conn, row, force=force))
+                conn.commit()
         clear_overview_memory_cache()
     finally:
         SYNC_LOCK.release()
@@ -3646,16 +3656,21 @@ class AppHandler(BaseHTTPRequestHandler):
             handle_id = path_match.group(1)
         if not handle_id.isdigit():
             raise ValueError("缺少账号绑定 ID")
-        with connect_db() as conn:
-            cursor = conn.execute(
-                """
-                UPDATE handles SET active = 0
-                WHERE id = ? AND owner_type = ? AND owner_id = ?
-                """,
-                (int(handle_id), principal["type"], str(principal["id"])),
-            )
-            if cursor.rowcount <= 0:
-                return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
+        try:
+            with connect_db() as conn:
+                cursor = conn.execute(
+                    """
+                    UPDATE handles SET active = 0
+                    WHERE id = ? AND owner_type = ? AND owner_id = ?
+                    """,
+                    (int(handle_id), principal["type"], str(principal["id"])),
+                )
+                if cursor.rowcount <= 0:
+                    return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
+        except sqlite3.OperationalError as exc:
+            if is_database_locked_error(exc):
+                return self.send_error_json(409, "数据库正在写入同步结果，请稍后再移除")
+            raise
         clear_overview_memory_cache()
         return self.send_json(200, {"ok": True})
 
