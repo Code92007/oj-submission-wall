@@ -1328,6 +1328,7 @@ class LuoguAdapter(OJAdapter):
         incremental_since = since_ts
         if previous_newest:
             incremental_since = max(incremental_since, previous_newest - 3 * 86400)
+        record_query_user = profile_name or uid
 
         submissions_by_id: dict[str, dict] = {}
         pages_fetched: set[int] = set()
@@ -1345,7 +1346,7 @@ class LuoguAdapter(OJAdapter):
                 return [], {}
             request_index += 1
             self._record_delay(request_index)
-            data = self._fetch_record_page(uid, page_no)
+            data = self._fetch_record_page(uid, record_query_user, page_no)
             records = data.get("records") if isinstance(data.get("records"), dict) else {}
             items = records.get("result") if isinstance(records.get("result"), list) else []
             if records.get("count") is not None:
@@ -1427,6 +1428,7 @@ class LuoguAdapter(OJAdapter):
             "pageCount": page_count,
             "newestSubmitTime": newest_seen,
             "oldestFetchedTime": oldest_seen,
+            "queryUser": record_query_user,
         }
         if recent_reached_old:
             sync_state["incrementalComplete"] = True
@@ -1436,9 +1438,10 @@ class LuoguAdapter(OJAdapter):
             sync_state.update({"partial": True, "lastError": fetch_error, "lastErrorAt": utcnow()})
         return filtered, sync_state
 
-    def _fetch_record_page(self, uid: str, page_no: int) -> dict:
-        params = urllib.parse.urlencode({"user": uid, "page": page_no, "_contentOnly": 1})
-        referer = f"https://www.luogu.com.cn/record/list?user={urllib.parse.quote(uid, safe='')}"
+    def _fetch_record_page(self, uid: str, query_user: str, page_no: int) -> dict:
+        query_user = str(query_user or uid)
+        params = urllib.parse.urlencode({"user": query_user, "page": page_no, "_contentOnly": 1})
+        referer = f"https://www.luogu.com.cn/record/list?user={urllib.parse.quote(query_user, safe='')}"
         url = f"https://www.luogu.com.cn/record/list?{params}"
         headers = self._headers(referer)
         headers.update(
@@ -1460,7 +1463,7 @@ class LuoguAdapter(OJAdapter):
         payload = self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
         data = self._context_data(payload)
         if not isinstance(data.get("records"), dict):
-            raise RuntimeError("洛谷记录页没有返回 records")
+            raise RuntimeError(f"洛谷记录页没有返回 records（user={query_user}, page={page_no}）")
         return data
 
     @classmethod
