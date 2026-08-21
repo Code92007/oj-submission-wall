@@ -1534,6 +1534,14 @@ class LuoguAdapter(OJAdapter):
         payload = self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
         data = self._record_data(payload)
         if not isinstance(data.get("records"), dict):
+            template = str(payload.get("currentTemplate") or payload.get("template") or "").lower()
+            nested = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+            template = template or str(nested.get("currentTemplate") or nested.get("template") or "").lower()
+            if template == "login":
+                raise RuntimeError(
+                    f"洛谷 record/list 返回登录页（user={query_user}, page={page_no}），"
+                    "请确认国内 luogu_proxy.py 已更新并重启，代理需要保留洛谷临时 CookieJar"
+                )
             raise RuntimeError(
                 f"洛谷记录页没有返回 records（user={query_user}, page={page_no}；{self._record_payload_summary(payload)}）"
             )
