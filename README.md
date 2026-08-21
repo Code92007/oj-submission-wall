@@ -172,6 +172,7 @@ LUOGU_PROXY_TOKEN=同一段随机长密码
 ```
 
 代理脚本只允许转发 `https://www.luogu.com.cn` / `https://luogu.com.cn`，并要求 Bearer token；不要把它无鉴权公开到公网。
+如果 `record/list` 后续页仍被洛谷返回验证页，可以只在国内代理机的 systemd 环境里配置 `LUOGU_PROXY_UPSTREAM_COOKIE` / `LUOGU_PROXY_UPSTREAM_CSRF_TOKEN` 作为上游请求凭据；这些值不要提交到仓库。
 
 洛谷逐条记录会通过 `record/list?_contentOnly=1` 分页同步并写入本地 `submissions` 表。日常同步只抓最近页；历史存量通过 `LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC` 逐轮回填，已经落库的提交不会重复插入。若想临时集中补历史，可以短时间调大回填页数；补完后建议恢复保守值。
 

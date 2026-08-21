@@ -130,6 +130,9 @@ Type=simple
 Environment=HOST=127.0.0.1
 Environment=PORT=8787
 Environment=LUOGU_PROXY_TOKEN=替换成洛谷代理token
+# 可选：只有 record/list 分页仍被洛谷拦时再配置，不要公开到仓库或群里
+# Environment=LUOGU_PROXY_UPSTREAM_COOKIE=__client_id=...; C3VK=...
+# Environment=LUOGU_PROXY_UPSTREAM_CSRF_TOKEN=...
 ExecStart=/usr/bin/python3 /opt/luogu-proxy/luogu_proxy.py
 Restart=always
 RestartSec=3

@@ -1433,12 +1433,47 @@ class LuoguAdapter(OJAdapter):
         if recent_reached_old:
             sync_state["incrementalComplete"] = True
         if fetch_error:
-            if not submissions_by_id:
+            if not submissions_by_id and not pages_fetched:
                 raise RuntimeError(fetch_error)
             sync_state.update({"partial": True, "lastError": fetch_error, "lastErrorAt": utcnow()})
         return filtered, sync_state
 
     def _fetch_record_page(self, uid: str, query_user: str, page_no: int) -> dict:
+        query_user = str(query_user or uid)
+        candidates = [query_user]
+        if str(uid) and str(uid) not in candidates:
+            candidates.append(str(uid))
+
+        errors = []
+        for candidate in candidates:
+            try:
+                return self._fetch_record_page_once(uid, candidate, page_no)
+            except Exception as exc:
+                errors.append(str(exc)[:240] or exc.__class__.__name__)
+        raise RuntimeError("；".join(errors))
+
+    @staticmethod
+    def _record_payload_summary(payload: dict) -> str:
+        if not isinstance(payload, dict):
+            return f"payload={type(payload).__name__}"
+        data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+        current_data = data.get("currentData") if isinstance(data.get("currentData"), dict) else payload.get("currentData")
+        if not isinstance(current_data, dict):
+            current_data = {}
+        records = current_data.get("records")
+        parts = [
+            f"code={payload.get('code')}",
+            f"template={payload.get('currentTemplate') or data.get('currentTemplate')}",
+            f"topKeys={','.join(list(payload.keys())[:8])}",
+            f"currentDataKeys={','.join(list(current_data.keys())[:8])}",
+            f"recordsType={type(records).__name__}",
+        ]
+        message = payload.get("message") or payload.get("error") or data.get("message") or data.get("error")
+        if message:
+            parts.append(f"message={str(message)[:80]}")
+        return "，".join(parts)
+
+    def _fetch_record_page_once(self, uid: str, query_user: str, page_no: int) -> dict:
         query_user = str(query_user or uid)
         params = urllib.parse.urlencode({"user": query_user, "page": page_no, "_contentOnly": 1})
         referer = f"https://www.luogu.com.cn/record/list?user={urllib.parse.quote(query_user, safe='')}"
@@ -1463,7 +1498,9 @@ class LuoguAdapter(OJAdapter):
         payload = self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
         data = self._context_data(payload)
         if not isinstance(data.get("records"), dict):
-            raise RuntimeError(f"洛谷记录页没有返回 records（user={query_user}, page={page_no}）")
+            raise RuntimeError(
+                f"洛谷记录页没有返回 records（user={query_user}, page={page_no}；{self._record_payload_summary(payload)}）"
+            )
         return data
 
     @classmethod
@@ -1802,6 +1839,9 @@ class LuoguAdapter(OJAdapter):
             "User-Agent": LUOGU_USER_AGENT,
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
             "Referer": referer,
+            "Sec-CH-UA": '"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"',
+            "Sec-CH-UA-Mobile": "?0",
+            "Sec-CH-UA-Platform": '"macOS"',
         }
         cookie = luogu_cookie_header()
         if cookie:
@@ -4074,6 +4114,7 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
                                 "nextBackfillPage": state_after.get("nextBackfillPage"),
                                 "pageCount": state_after.get("pageCount"),
                                 "historyComplete": state_after.get("historyComplete"),
+                                "queryUser": state_after.get("queryUser"),
                                 "lastError": state_after.get("lastError"),
                             },
                         },

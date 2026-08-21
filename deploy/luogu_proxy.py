@@ -13,6 +13,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8787"))
 TOKEN = os.environ.get("LUOGU_PROXY_TOKEN", "").strip()
+UPSTREAM_COOKIE = os.environ.get("LUOGU_PROXY_UPSTREAM_COOKIE", "").strip()
+UPSTREAM_CSRF_TOKEN = os.environ.get("LUOGU_PROXY_UPSTREAM_CSRF_TOKEN", "").strip()
 TIMEOUT_SECONDS = int(os.environ.get("LUOGU_PROXY_TIMEOUT_SECONDS", "20"))
 MAX_BODY_BYTES = int(os.environ.get("LUOGU_PROXY_MAX_BODY_BYTES", str(5 * 1024 * 1024)))
 ALLOWED_HOSTS = {"www.luogu.com.cn", "luogu.com.cn"}
@@ -20,10 +22,17 @@ HEADER_ALLOWLIST = {
     "accept",
     "accept-language",
     "cookie",
+    "origin",
+    "priority",
     "referer",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform",
     "sec-fetch-dest",
     "sec-fetch-mode",
+    "sec-fetch-site",
     "user-agent",
+    "x-csrf-token",
     "x-lentille-request",
     "x-luogu-type",
     "x-requested-with",
@@ -83,6 +92,11 @@ class LuoguProxyHandler(BaseHTTPRequestHandler):
                 for key, value in raw_headers.items()
                 if str(key).lower() in HEADER_ALLOWLIST and value is not None
             }
+            header_keys = {key.lower() for key in headers}
+            if UPSTREAM_COOKIE and "cookie" not in header_keys:
+                headers["Cookie"] = UPSTREAM_COOKIE
+            if UPSTREAM_CSRF_TOKEN and "x-csrf-token" not in header_keys:
+                headers["X-CSRF-Token"] = UPSTREAM_CSRF_TOKEN
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
                 body = resp.read(MAX_BODY_BYTES + 1)
