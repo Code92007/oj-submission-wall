@@ -1463,8 +1463,9 @@ class LuoguAdapter(OJAdapter):
         records = current_data.get("records")
         parts = [
             f"code={payload.get('code')}",
-            f"template={payload.get('currentTemplate') or data.get('currentTemplate')}",
+            f"template={payload.get('currentTemplate') or payload.get('template') or data.get('currentTemplate') or data.get('template')}",
             f"topKeys={','.join(list(payload.keys())[:8])}",
+            f"dataKeys={','.join(list(data.keys())[:8])}",
             f"currentDataKeys={','.join(list(current_data.keys())[:8])}",
             f"recordsType={type(records).__name__}",
         ]
@@ -1472,6 +1473,41 @@ class LuoguAdapter(OJAdapter):
         if message:
             parts.append(f"message={str(message)[:80]}")
         return "，".join(parts)
+
+    @classmethod
+    def _record_data(cls, payload: dict) -> dict:
+        data = cls._context_data(payload)
+        if isinstance(data.get("records"), dict):
+            return data
+
+        seen: set[int] = set()
+
+        def search(value, depth: int = 0) -> dict | None:
+            if depth > 5 or not isinstance(value, dict):
+                return None
+            value_id = id(value)
+            if value_id in seen:
+                return None
+            seen.add(value_id)
+
+            records = value.get("records")
+            if isinstance(records, dict):
+                result = records.get("result")
+                if isinstance(result, list) or records.get("count") is not None or records.get("perPage") is not None:
+                    return value
+
+            preferred_keys = ["currentData", "data", "props", "page", "recordList", "RecordList"]
+            for key in preferred_keys:
+                found = search(value.get(key), depth + 1)
+                if found is not None:
+                    return found
+            for child in value.values():
+                found = search(child, depth + 1)
+                if found is not None:
+                    return found
+            return None
+
+        return search(payload) or data
 
     def _fetch_record_page_once(self, uid: str, query_user: str, page_no: int) -> dict:
         query_user = str(query_user or uid)
@@ -1496,7 +1532,7 @@ class LuoguAdapter(OJAdapter):
             cache_write=False,
         )
         payload = self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
-        data = self._context_data(payload)
+        data = self._record_data(payload)
         if not isinstance(data.get("records"), dict):
             raise RuntimeError(
                 f"洛谷记录页没有返回 records（user={query_user}, page={page_no}；{self._record_payload_summary(payload)}）"
