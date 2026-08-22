@@ -7,7 +7,7 @@
 ```text
 OJ 主站 Docker 容器
   -> http://host.docker.internal:18787/
-  -> 首尔机 frps 18787
+  -> 海外主站机 frps 18787
   -> FRP 隧道
   -> 国内机 127.0.0.1:8787 deploy/luogu_proxy.py
   -> https://www.luogu.com.cn
@@ -19,15 +19,15 @@ OJ 主站 Docker 容器
 - `deploy/luogu_proxy.py`
 - `frpc`
 
-首尔主站机需要：
+海外主站机需要：
 
 - `frps`
 - 主站 `.env` 增加 `LUOGU_PROXY_URL` / `LUOGU_PROXY_TOKEN`
-- 腾讯云防火墙只开放 `7000/tcp` 给国内机连入；`18787/tcp` 不对公网开放
+- 云厂商防火墙只开放 `7000/tcp` 给国内机连入；`18787/tcp` 不对公网开放
 
 ## 约定
 
-把下面两个 token 换成随机长字符串，不要发到群里：
+把下面两个 token 换成随机长字符串，不要公开：
 
 ```text
 FRP_TOKEN=替换成frp隧道token
@@ -37,13 +37,13 @@ LUOGU_PROXY_TOKEN=替换成洛谷代理token
 端口约定：
 
 ```text
-首尔机公网 IP: <你的服务器公网 IP>
+海外主站机公网 IP: <你的服务器公网 IP>
 frps 控制端口: 7000
 frp 洛谷代理远端端口: 18787
 国内机本地洛谷代理端口: 8787
 ```
 
-## 一、首尔主站机部署 frps
+## 一、海外主站机部署 frps
 
 下载 frp 后，把 `frps` 放到 `/usr/local/bin/frps`。如果机器架构是普通 x86_64，选 `linux_amd64` 包。
 
@@ -104,7 +104,7 @@ ss -lntp | grep -E ':7000|:18787'
 正常情况下：
 
 - `7000` 会监听在 `0.0.0.0`，给国内 frpc 连接。
-- `18787` 需要让 Docker 容器通过 `host.docker.internal` 访问，所以会监听在宿主机网络上；不要在腾讯云防火墙开放这个端口。
+- `18787` 需要让 Docker 容器通过 `host.docker.internal` 访问，所以会监听在宿主机网络上；不要在云厂商防火墙开放这个端口。
 
 ## 二、国内轻量机部署洛谷代理
 
@@ -213,9 +213,9 @@ systemctl enable --now frpc
 systemctl status frpc --no-pager
 ```
 
-## 四、首尔主站接入代理
+## 四、海外主站接入代理
 
-在 `/root/oj-submission-wall/.env` 增加或修改：
+在主站项目目录的 `.env` 增加或修改：
 
 ```bash
 LUOGU_PROXY_URL=http://host.docker.internal:18787/
@@ -225,7 +225,7 @@ LUOGU_PROXY_TOKEN=替换成洛谷代理token
 重新启动主站：
 
 ```bash
-cd /root/oj-submission-wall
+cd /path/to/oj-submission-wall
 docker compose up -d --build
 ```
 
@@ -269,7 +269,7 @@ docker compose exec oj-submission-wall sh -lc 'env | grep LUOGU_PROXY'
 docker compose logs --tail=120 oj-submission-wall | grep -iE 'luogu|403|proxy|error'
 ```
 
-如果首尔机看不到 `18787`：
+如果海外主站机看不到 `18787`：
 
 ```bash
 systemctl status frps --no-pager

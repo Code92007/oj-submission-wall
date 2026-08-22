@@ -63,7 +63,7 @@ USER_AGENT = os.environ.get(
 )
 LUOGU_USER_AGENT = os.environ.get(
     "LUOGU_USER_AGENT",
-    f"OJSubmissionWall/1.0 (+{PUBLIC_BASE_URL or 'https://oj-train-wall.wannafly.cn'})",
+    f"OJSubmissionWall/1.0 (+{PUBLIC_BASE_URL})" if PUBLIC_BASE_URL else "OJSubmissionWall/1.0",
 )
 LUOGU_CF_CLEARANCE = os.environ.get("LUOGU_CF_CLEARANCE", "").strip()
 LUOGU_COOKIE = os.environ.get("LUOGU_COOKIE", "").strip()
@@ -102,7 +102,7 @@ SMTP_PLACEHOLDERS = {
     "smtp.example.com",
     "noreply@example.com",
     "change-me",
-    "your@qq.com",
+    "your-email@example.com",
 }
 
 
@@ -1203,7 +1203,7 @@ class AtCoderAdapter(OJAdapter):
 class LuoguAdapter(OJAdapter):
     key = "luogu"
     label = "洛谷"
-    handle_hint = "洛谷用户名或数字 UID，例如 Yzm007 / 135160"
+    handle_hint = "洛谷用户名或数字 UID，例如 example_user / 123456"
 
     def __init__(self):
         self._profile_stats: dict[str, dict] = {}
@@ -2463,7 +2463,7 @@ class VJudgeAdapter(OJAdapter):
 class LOJAdapter(OJAdapter):
     key = "loj"
     label = "LOJ"
-    handle_hint = "LOJ 用户名，例如 Yzm007"
+    handle_hint = "LOJ 用户名，例如 example_user"
 
     def normalize_handle(self, handle: str) -> str:
         handle = handle.strip()
