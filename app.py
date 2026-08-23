@@ -54,6 +54,7 @@ DISPLAY_TZ = dt.timezone(dt.timedelta(hours=DISPLAY_TZ_OFFSET_HOURS), f"UTC{DISP
 HISTORICAL_CACHE_AFTER_DAYS = int(os.environ.get("HISTORICAL_CACHE_AFTER_DAYS", "30"))
 HISTORICAL_CACHE_TTL_SECONDS = int(os.environ.get("HISTORICAL_CACHE_TTL_SECONDS", str(3650 * 86400)))
 OVERVIEW_CACHE_TTL_SECONDS = int(os.environ.get("OVERVIEW_CACHE_TTL_SECONDS", "20"))
+OVERVIEW_FEED_LIMIT = int(os.environ.get("OVERVIEW_FEED_LIMIT", "1000"))
 SESSION_COOKIE = "ojwall_session"
 DEFAULT_TEAM_NAME = "未分组"
 GUEST_TEAM_NAME = "游客"
@@ -67,6 +68,7 @@ LUOGU_USER_AGENT = os.environ.get(
 )
 LUOGU_CF_CLEARANCE = os.environ.get("LUOGU_CF_CLEARANCE", "").strip()
 LUOGU_COOKIE = os.environ.get("LUOGU_COOKIE", "").strip()
+LUOGU_CSRF_TOKEN = os.environ.get("LUOGU_CSRF_TOKEN", "").strip()
 LUOGU_PROXY_URL = os.environ.get("LUOGU_PROXY_URL", "").strip()
 LUOGU_PROXY_TOKEN = os.environ.get("LUOGU_PROXY_TOKEN", "").strip()
 LUOGU_THIRD_PARTY_FALLBACK = os.environ.get("LUOGU_THIRD_PARTY_FALLBACK", "true").lower() not in {
@@ -110,9 +112,16 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 HTTP_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 SYNC_LOCK = threading.Lock()
+SYNC_QUEUE_LOCK = threading.Lock()
+SYNC_QUEUE_EVENT = threading.Event()
+SYNC_PENDING_JOBS: list[dict] = []
+SYNC_RUNNING_JOB: dict | None = None
+SYNC_LAST_FINISHED_JOB: dict | None = None
+SYNC_JOB_COUNTER = 0
 OVERVIEW_CACHE_LOCK = threading.Lock()
 OVERVIEW_MEMORY_CACHE: dict[tuple[str, str, str, int], tuple[int, dict]] = {}
 HTTP_STALE_HITS = threading.local()
+LUOGU_REQUEST_AUTH = threading.local()
 TRANSIENT_HTTP_STATUSES = {408, 425, 429, 500, 502, 503, 504}
 
 
@@ -232,6 +241,36 @@ def record_http_stale_hit(url: str, fetched_at: int) -> None:
 
 def http_stale_hits() -> list[dict]:
     return list(getattr(HTTP_STALE_HITS, "items", []))
+
+
+def current_luogu_cookie() -> str:
+    return str(getattr(LUOGU_REQUEST_AUTH, "cookie", "") or "").strip()
+
+
+def current_luogu_csrf_token() -> str:
+    return str(getattr(LUOGU_REQUEST_AUTH, "csrf_token", "") or "").strip()
+
+
+@contextlib.contextmanager
+def luogu_request_auth(auth: dict | None):
+    previous_cookie = getattr(LUOGU_REQUEST_AUTH, "cookie", None)
+    previous_csrf_token = getattr(LUOGU_REQUEST_AUTH, "csrf_token", None)
+    if auth:
+        LUOGU_REQUEST_AUTH.cookie = str(auth.get("cookie") or "").strip()
+        LUOGU_REQUEST_AUTH.csrf_token = str(auth.get("csrfToken") or auth.get("csrf_token") or "").strip()
+    try:
+        yield
+    finally:
+        if previous_cookie is None:
+            with contextlib.suppress(AttributeError):
+                del LUOGU_REQUEST_AUTH.cookie
+        else:
+            LUOGU_REQUEST_AUTH.cookie = previous_cookie
+        if previous_csrf_token is None:
+            with contextlib.suppress(AttributeError):
+                del LUOGU_REQUEST_AUTH.csrf_token
+        else:
+            LUOGU_REQUEST_AUTH.csrf_token = previous_csrf_token
 
 
 def is_transient_http_error(exc: Exception) -> bool:
@@ -610,12 +649,17 @@ def luogu_cookie_header() -> str:
     clearance = normalize_cookie_header(LUOGU_CF_CLEARANCE, "cf_clearance")
     if clearance:
         parts.append(clearance)
-    if LUOGU_COOKIE:
-        if re.search(r"(^|;)\s*[A-Za-z0-9_\-.]+=", LUOGU_COOKIE):
-            parts.append(LUOGU_COOKIE)
+    cookie = current_luogu_cookie() or LUOGU_COOKIE
+    if cookie:
+        if re.search(r"(^|;)\s*[A-Za-z0-9_\-.]+=", cookie):
+            parts.append(cookie)
         else:
-            parts.append(f"cf_clearance={LUOGU_COOKIE}")
+            parts.append(f"cf_clearance={cookie}")
     return "; ".join(parts)
+
+
+def luogu_csrf_token() -> str:
+    return current_luogu_csrf_token() or LUOGU_CSRF_TOKEN
 
 
 def parse_datetime_text(value: str, source_tz: dt.tzinfo = dt.timezone.utc) -> int | None:
@@ -1890,6 +1934,9 @@ class LuoguAdapter(OJAdapter):
         cookie = luogu_cookie_header()
         if cookie:
             headers["Cookie"] = cookie
+        csrf_token = luogu_csrf_token()
+        if csrf_token:
+            headers["X-CSRF-Token"] = csrf_token
         return headers
 
     @classmethod
@@ -2870,6 +2917,23 @@ def read_json_body(handler) -> dict:
     return data
 
 
+def luogu_auth_from_payload(handler, data: dict) -> dict | None:
+    cookie = str(
+        data.get("luoguCookie")
+        or data.get("luogu_cookie")
+        or handler.headers.get("X-Luogu-Cookie", "")
+        or ""
+    ).strip()
+    csrf_token = str(
+        data.get("luoguCsrfToken")
+        or data.get("luogu_csrf_token")
+        or data.get("luoguCsrf")
+        or handler.headers.get("X-Luogu-CSRF-Token", "")
+        or ""
+    ).strip()
+    return compact_luogu_auth({"cookie": cookie, "csrfToken": csrf_token})
+
+
 def add_or_restore_handle(conn: sqlite3.Connection, principal: dict, platform: str, handle: str) -> sqlite3.Row:
     if platform not in ADAPTERS:
         raise ValueError("暂不支持该 OJ")
@@ -2910,7 +2974,7 @@ def get_handle_rows(conn: sqlite3.Connection, principal: dict | None = None, inc
     ).fetchall()
 
 
-def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = False) -> dict:
+def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = False, full: bool = False) -> dict:
     now = utcnow()
     has_error = bool(row["last_error"])
     if not force and not has_error and row["last_sync_at"] and now - int(row["last_sync_at"]) < SYNC_MIN_AGE_SECONDS:
@@ -2930,7 +2994,13 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
     default_since = now - FETCH_LOOKBACK_DAYS * 86400
     previous_error = str(row["last_error"] or "")
     needs_full_retry = "比赛记录同步失败" in previous_error
-    since_ts = default_since if force or needs_full_retry else max(default_since, int(max_row["max_submitted_at"] or 0) - 3 * 86400)
+    newest_local_submission_at = int(max_row["max_submitted_at"] or 0)
+    incremental_since = (
+        max(default_since, newest_local_submission_at - 3 * 86400)
+        if newest_local_submission_at
+        else default_since
+    )
+    since_ts = default_since if full or (force and needs_full_retry) else incremental_since
     previous_stats_json = row["stats_json"] if "stats_json" in row.keys() else None
     previous_profile_stats = {}
     if previous_stats_json:
@@ -3103,16 +3173,23 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         }
 
 
-def sync_targets(principal: dict | None = None, force: bool = False, include_guests: bool = False) -> list[dict]:
+def sync_targets(
+    principal: dict | None = None,
+    force: bool = False,
+    include_guests: bool = False,
+    full: bool = False,
+    luogu_auth: dict | None = None,
+) -> list[dict]:
     results: list[dict] = []
     if not SYNC_LOCK.acquire(blocking=False):
         return [{"busy": True}]
     try:
-        with connect_db() as conn:
-            rows = get_handle_rows(conn, principal=principal, include_guests=include_guests)
-            for row in rows:
-                results.append(sync_handle_row(conn, row, force=force))
-                conn.commit()
+        with luogu_request_auth(luogu_auth):
+            with connect_db() as conn:
+                rows = get_handle_rows(conn, principal=principal, include_guests=include_guests)
+                for row in rows:
+                    results.append(sync_handle_row(conn, row, force=force, full=full))
+                    conn.commit()
         clear_overview_memory_cache()
     finally:
         SYNC_LOCK.release()
@@ -3179,31 +3256,262 @@ def get_owned_handle_row(conn: sqlite3.Connection, principal: dict, handle_id: i
     ).fetchone()
 
 
-def sync_one_handle(principal: dict, handle_id: int, force: bool = True) -> dict:
+def sync_one_handle(
+    principal: dict,
+    handle_id: int,
+    force: bool = True,
+    full: bool = False,
+    luogu_auth: dict | None = None,
+) -> dict:
     if not SYNC_LOCK.acquire(blocking=False):
         return {"handleId": handle_id, "busy": True}
     try:
-        with connect_db() as conn:
-            row = get_owned_handle_row(conn, principal, handle_id)
-            if not row:
-                raise ValueError("没有找到这个账号绑定，可能已经移除")
-            result = sync_handle_row(conn, row, force=force)
-            clear_overview_memory_cache()
-            return result
+        with luogu_request_auth(luogu_auth):
+            with connect_db() as conn:
+                row = get_owned_handle_row(conn, principal, handle_id)
+                if not row:
+                    raise ValueError("没有找到这个账号绑定，可能已经移除")
+                result = sync_handle_row(conn, row, force=force, full=full)
+                clear_overview_memory_cache()
+                return result
     finally:
         SYNC_LOCK.release()
 
 
+def public_sync_job(job: dict | None) -> dict | None:
+    if not job:
+        return None
+    payload = {
+        "id": job.get("id"),
+        "scope": job.get("scope"),
+        "handleId": job.get("handle_id"),
+        "force": bool(job.get("force")),
+        "full": bool(job.get("full")),
+        "queuedAt": iso_from_ts(job.get("queued_at")),
+        "startedAt": iso_from_ts(job.get("started_at")),
+        "finishedAt": iso_from_ts(job.get("finished_at")),
+    }
+    if job.get("error"):
+        payload["error"] = str(job.get("error"))[:300]
+    if job.get("result_count") is not None:
+        payload["resultCount"] = int(job.get("result_count") or 0)
+    principal = job.get("principal") if isinstance(job.get("principal"), dict) else None
+    if principal:
+        payload["principalType"] = principal.get("type")
+        payload["principalId"] = str(principal.get("id") or "")
+    return payload
+
+
+def sync_job_key(
+    principal: dict | None,
+    handle_id: int | None,
+    include_guests: bool = False,
+) -> tuple:
+    if handle_id is not None:
+        return ("handle", int(handle_id))
+    if principal:
+        principal_type = str(principal.get("type") or "")
+        principal_id = "" if principal_type == "user" else str(principal.get("id") or "")
+        return ("principal", principal_type, principal_id)
+    return ("scheduled", bool(include_guests))
+
+
+def compact_luogu_auth(auth: dict | None) -> dict | None:
+    if not auth:
+        return None
+    cookie = str(auth.get("cookie") or "").strip()
+    csrf_token = str(auth.get("csrfToken") or auth.get("csrf_token") or "").strip()
+    if not cookie and not csrf_token:
+        return None
+    return {"cookie": cookie, "csrfToken": csrf_token}
+
+
+def enqueue_sync_job(
+    principal: dict | None = None,
+    handle_id: int | None = None,
+    force: bool = False,
+    include_guests: bool = False,
+    full: bool = False,
+    luogu_auth: dict | None = None,
+) -> dict:
+    global SYNC_JOB_COUNTER
+    job_key = sync_job_key(principal, handle_id, include_guests)
+    auth = compact_luogu_auth(luogu_auth)
+    now = utcnow()
+    with SYNC_QUEUE_LOCK:
+        for job in SYNC_PENDING_JOBS:
+            if job.get("key") != job_key:
+                continue
+            job["force"] = bool(job.get("force") or force)
+            job["full"] = bool(job.get("full") or full)
+            job["queued_at"] = now
+            if auth:
+                job["luogu_auth"] = auth
+            SYNC_QUEUE_EVENT.set()
+            clear_overview_memory_cache()
+            return {"queued": True, "alreadyQueued": True, "job": public_sync_job(job)}
+
+        SYNC_JOB_COUNTER += 1
+        job = {
+            "id": SYNC_JOB_COUNTER,
+            "key": job_key,
+            "scope": "handle" if handle_id is not None else ("principal" if principal else "scheduled"),
+            "principal": dict(principal) if principal else None,
+            "handle_id": int(handle_id) if handle_id is not None else None,
+            "force": bool(force),
+            "full": bool(full),
+            "include_guests": bool(include_guests),
+            "luogu_auth": auth,
+            "queued_at": now,
+        }
+        SYNC_PENDING_JOBS.append(job)
+        SYNC_QUEUE_EVENT.set()
+    clear_overview_memory_cache()
+    return {"queued": True, "job": public_sync_job(job)}
+
+
+def pop_next_sync_job(timeout: float | None) -> dict | None:
+    with SYNC_QUEUE_LOCK:
+        if SYNC_PENDING_JOBS:
+            job = SYNC_PENDING_JOBS.pop(0)
+            if not SYNC_PENDING_JOBS:
+                SYNC_QUEUE_EVENT.clear()
+            return job
+
+    if timeout is not None and timeout <= 0:
+        return None
+    SYNC_QUEUE_EVENT.wait(timeout)
+
+    with SYNC_QUEUE_LOCK:
+        if not SYNC_PENDING_JOBS:
+            SYNC_QUEUE_EVENT.clear()
+            return None
+        job = SYNC_PENDING_JOBS.pop(0)
+        if not SYNC_PENDING_JOBS:
+            SYNC_QUEUE_EVENT.clear()
+        return job
+
+
+def sync_job_matches_handle(job: dict, row: sqlite3.Row) -> bool:
+    handle_id = job.get("handle_id")
+    if handle_id is not None:
+        return int(row["id"]) == int(handle_id)
+    principal = job.get("principal") if isinstance(job.get("principal"), dict) else None
+    if principal:
+        if principal.get("type") == "guest":
+            return row["owner_type"] == "user" or (
+                row["owner_type"] == "guest" and str(row["owner_id"]) == str(principal.get("id"))
+            )
+        return row["owner_type"] == "user"
+    return row["owner_type"] == "user" or bool(job.get("include_guests"))
+
+
+def sync_status_snapshot() -> dict:
+    with SYNC_QUEUE_LOCK:
+        pending = [public_sync_job(job) for job in SYNC_PENDING_JOBS]
+        running = public_sync_job(SYNC_RUNNING_JOB)
+        last_finished = public_sync_job(SYNC_LAST_FINISHED_JOB)
+        pending_internal = [dict(job) for job in SYNC_PENDING_JOBS]
+        running_internal = dict(SYNC_RUNNING_JOB) if SYNC_RUNNING_JOB else None
+    return {
+        "pending": len(pending),
+        "running": bool(running),
+        "pendingJobs": pending,
+        "runningJob": running,
+        "lastFinishedJob": last_finished,
+        "_pendingInternal": pending_internal,
+        "_runningInternal": running_internal,
+    }
+
+
+def sync_status_for_handle(row: sqlite3.Row, snapshot: dict | None) -> str:
+    if not snapshot:
+        return ""
+    running = snapshot.get("_runningInternal")
+    if isinstance(running, dict) and sync_job_matches_handle(running, row):
+        return "running"
+    for job in snapshot.get("_pendingInternal") or []:
+        if isinstance(job, dict) and sync_job_matches_handle(job, row):
+            return "queued"
+    return ""
+
+
+def execute_sync_job(job: dict) -> None:
+    global SYNC_RUNNING_JOB
+    global SYNC_LAST_FINISHED_JOB
+    job["started_at"] = utcnow()
+    with SYNC_QUEUE_LOCK:
+        SYNC_RUNNING_JOB = job
+    clear_overview_memory_cache()
+    try:
+        if job.get("handle_id") is not None:
+            result = sync_one_handle(
+                job["principal"],
+                int(job["handle_id"]),
+                force=bool(job.get("force")),
+                full=bool(job.get("full")),
+                luogu_auth=job.get("luogu_auth"),
+            )
+            job["result_count"] = 1
+            if result.get("error"):
+                job["error"] = result.get("error")
+        else:
+            results = sync_targets(
+                principal=job.get("principal"),
+                force=bool(job.get("force")),
+                include_guests=bool(job.get("include_guests")),
+                full=bool(job.get("full")),
+                luogu_auth=job.get("luogu_auth"),
+            )
+            job["result_count"] = len(results)
+            errors = [str(item.get("error")) for item in results if isinstance(item, dict) and item.get("error")]
+            if errors:
+                job["error"] = "；".join(errors[:3])[:300]
+    except Exception as exc:
+        traceback.print_exc()
+        job["error"] = str(exc)[:300] or exc.__class__.__name__
+    finally:
+        job["finished_at"] = utcnow()
+        job.pop("luogu_auth", None)
+        with SYNC_QUEUE_LOCK:
+            SYNC_LAST_FINISHED_JOB = dict(job)
+            SYNC_RUNNING_JOB = None
+        clear_overview_memory_cache()
+
+
 def background_sync_loop() -> None:
+    next_scheduled_at = time.time()
     while True:
         try:
-            sync_targets(principal=None, force=False, include_guests=False)
+            if SYNC_INTERVAL_SECONDS > 0:
+                timeout = max(0.0, next_scheduled_at - time.time())
+            else:
+                timeout = None
+            job = pop_next_sync_job(timeout)
+            if job:
+                execute_sync_job(job)
+                continue
+            if SYNC_INTERVAL_SECONDS <= 0:
+                continue
+            execute_sync_job(
+                {
+                    "id": None,
+                    "key": sync_job_key(None, None, False),
+                    "scope": "scheduled",
+                    "principal": None,
+                    "handle_id": None,
+                    "force": False,
+                    "full": False,
+                    "include_guests": False,
+                    "queued_at": utcnow(),
+                }
+            )
+            next_scheduled_at = time.time() + max(60, SYNC_INTERVAL_SECONDS)
         except Exception:
             traceback.print_exc()
-        time.sleep(max(60, SYNC_INTERVAL_SECONDS))
 
 
-def handle_to_json(row: sqlite3.Row) -> dict:
+def handle_to_json(row: sqlite3.Row, sync_snapshot: dict | None = None) -> dict:
     adapter = ADAPTERS.get(row["platform"])
     display_handle = str(row["handle"] or "")
     if row["platform"] == "luogu" and row["stats_json"]:
@@ -3222,6 +3530,7 @@ def handle_to_json(row: sqlite3.Row) -> dict:
         "displayHandle": display_handle,
         "lastSyncAt": iso_from_ts(row["last_sync_at"]),
         "lastError": row["last_error"],
+        "syncStatus": sync_status_for_handle(row, sync_snapshot),
     }
 
 
@@ -3276,7 +3585,9 @@ def write_overview_cache(overview: dict) -> None:
         member["isCurrent"] = False
         member["realName"] = ""
         member["realNameVisible"] = False
-    payload.setdefault("mirror", {})["cachedAt"] = iso_from_ts(utcnow())
+    mirror = payload.setdefault("mirror", {})
+    mirror.pop("sync", None)
+    mirror["cachedAt"] = iso_from_ts(utcnow())
     tmp_path = OVERVIEW_CACHE_PATH.with_name(f"{OVERVIEW_CACHE_PATH.name}.{threading.get_ident()}.tmp")
     tmp_path.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), "utf-8")
     os.replace(tmp_path, OVERVIEW_CACHE_PATH)
@@ -3301,6 +3612,14 @@ def read_overview_cache(principal: dict | None, error: Exception | None = None) 
     mirror = data.setdefault("mirror", {})
     mirror["fallback"] = True
     mirror["servedAt"] = iso_from_ts(utcnow())
+    sync_snapshot = sync_status_snapshot()
+    mirror["sync"] = {
+        "pending": sync_snapshot.get("pending", 0),
+        "running": bool(sync_snapshot.get("running")),
+        "pendingJobs": sync_snapshot.get("pendingJobs", []),
+        "runningJob": sync_snapshot.get("runningJob"),
+        "lastFinishedJob": sync_snapshot.get("lastFinishedJob"),
+    }
     if error:
         mirror["error"] = str(error)[:300] or error.__class__.__name__
     return data
@@ -3362,6 +3681,7 @@ def build_overview(principal: dict | None, days: int = 365, use_cache: bool = Tr
 def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
     days = max(7, min(days, 3650))
     now = utcnow()
+    sync_snapshot = sync_status_snapshot()
     start_ts = now - (days - 1) * 86400
     today_date = dt.datetime.fromtimestamp(now, DISPLAY_TZ).date()
     start_date = dt.datetime.fromtimestamp(start_ts, DISPLAY_TZ).date()
@@ -3448,7 +3768,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             key = (row["owner_type"], row["owner_id"])
             if key not in owners:
                 continue
-            owners[key]["handles"].append(handle_to_json(row))
+            owners[key]["handles"].append(handle_to_json(row, sync_snapshot))
             if row["stats_json"]:
                 with contextlib.suppress(Exception):
                     stats = json.loads(row["stats_json"])
@@ -3536,13 +3856,22 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             owner["realName"] = owner.get("_real_name", "") if owner["realNameVisible"] else ""
             owner.pop("_real_name", None)
 
-        feed_rows = conn.execute(
-            """
+        feed_total = sum(
+            1
+            for row in sub_rows
+            if (row["owner_type"], row["owner_id"]) in owners
+        )
+        feed_limit = max(0, OVERVIEW_FEED_LIMIT)
+        feed_sql = """
             SELECT *
             FROM submissions
             ORDER BY submitted_at DESC
-            """
-        ).fetchall()
+        """
+        feed_params: tuple[object, ...] = ()
+        if feed_limit:
+            feed_sql += " LIMIT ?"
+            feed_params = (feed_limit,)
+        feed_rows = conn.execute(feed_sql, feed_params).fetchall()
         feed = []
         for row in feed_rows:
             key = (row["owner_type"], row["owner_id"])
@@ -3556,6 +3885,18 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             for date in owner["days"].keys()
         ]
         available_years = sorted({date[:4] for date in date_values}, reverse=True)
+        mirror = build_mirror_meta(conn, now)
+        mirror["sync"] = {
+            "pending": sync_snapshot.get("pending", 0),
+            "running": bool(sync_snapshot.get("running")),
+            "pendingJobs": sync_snapshot.get("pendingJobs", []),
+            "runningJob": sync_snapshot.get("runningJob"),
+            "lastFinishedJob": sync_snapshot.get("lastFinishedJob"),
+        }
+        if feed_limit:
+            mirror["feedLimit"] = feed_limit
+            if feed_total > len(feed):
+                mirror["fullFeedCount"] = feed_total
         return {
             "now": iso_from_ts(now),
             "today": today_date.isoformat(),
@@ -3564,7 +3905,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "max": max(date_values) if date_values else today_date.isoformat(),
             },
             "availableYears": available_years or [today_date.strftime("%Y")],
-            "mirror": build_mirror_meta(conn, now),
+            "mirror": mirror,
             "platforms": platform_meta(),
             "user": principal,
             "members": list(owners.values()),
@@ -4006,12 +4347,27 @@ class AppHandler(BaseHTTPRequestHandler):
         data = read_json_body(self)
         platform = str(data.get("platform") or "").strip().lower()
         handle = str(data.get("handle") or "")
+        luogu_auth = luogu_auth_from_payload(self, data)
         with connect_db() as conn:
             row = add_or_restore_handle(conn, principal, platform, handle)
-        sync_result = sync_one_handle(principal, int(row["id"]), force=True)
+        queue_result = enqueue_sync_job(
+            principal=principal,
+            handle_id=int(row["id"]),
+            force=True,
+            full=False,
+            luogu_auth=luogu_auth,
+        )
         with connect_db() as conn:
             refreshed = get_owned_handle_row(conn, principal, int(row["id"])) or row
-        return self.send_json(201, {"ok": True, "handle": handle_to_json(refreshed), "sync": [sync_result]})
+        return self.send_json(
+            202,
+            {
+                "ok": True,
+                "handle": handle_to_json(refreshed, sync_status_snapshot()),
+                "sync": [queue_result],
+                **build_overview(principal, use_cache=False),
+            },
+        )
 
     def handle_delete_handle(self, parsed) -> None:
         principal = get_current_principal(self)
@@ -4049,8 +4405,15 @@ class AppHandler(BaseHTTPRequestHandler):
         path_match = re.match(r"^/api/handles/(\d+)/sync$", parsed.path)
         if not path_match:
             raise ValueError("缺少账号绑定 ID")
-        result = sync_one_handle(principal, int(path_match.group(1)), force=True)
-        return self.send_json(200, {"ok": True, "result": result, **build_overview(principal, use_cache=False)})
+        data = read_json_body(self)
+        result = enqueue_sync_job(
+            principal=principal,
+            handle_id=int(path_match.group(1)),
+            force=True,
+            full=bool(data.get("full")),
+            luogu_auth=luogu_auth_from_payload(self, data),
+        )
+        return self.send_json(202, {"ok": True, "result": result, **build_overview(principal, use_cache=False)})
 
     def handle_sync(self) -> None:
         principal = get_current_principal(self)
@@ -4058,8 +4421,14 @@ class AppHandler(BaseHTTPRequestHandler):
             return self.send_error_json(401, "请先登录或进入游客模式")
         data = read_json_body(self)
         force = bool(data.get("force"))
-        results = sync_targets(principal=principal, force=force, include_guests=False)
-        return self.send_json(200, {"ok": True, "results": results, **build_overview(principal, use_cache=False)})
+        result = enqueue_sync_job(
+            principal=principal,
+            force=force,
+            include_guests=False,
+            full=bool(data.get("full")),
+            luogu_auth=luogu_auth_from_payload(self, data),
+        )
+        return self.send_json(202, {"ok": True, "results": [result], **build_overview(principal, use_cache=False)})
 
 
 def cookie_header(token: str, max_age: int) -> str:
@@ -4098,6 +4467,8 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
     parser.add_argument("--round-sleep", type=float, default=3.0, help="sleep seconds between handle rounds")
     parser.add_argument("--max-rounds", type=int, default=0, help="maximum rounds per handle; 0 means until complete/error")
     parser.add_argument("--handle-id", action="append", type=int, default=[], help="only backfill a specific handle id; repeatable")
+    parser.add_argument("--luogu-cookie", default="", help="temporary Luogu Cookie header for this backfill run")
+    parser.add_argument("--luogu-csrf-token", default="", help="temporary Luogu CSRF token for this backfill run")
     args = parser.parse_args(argv)
 
     global LUOGU_RECORD_RECENT_PAGES_PER_SYNC
@@ -4109,8 +4480,10 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
     LUOGU_RECORD_SLEEP_MIN_SECONDS = max(0.0, args.sleep_min)
     LUOGU_RECORD_SLEEP_MAX_SECONDS = max(LUOGU_RECORD_SLEEP_MIN_SECONDS, args.sleep_max)
 
+    auth = compact_luogu_auth({"cookie": args.luogu_cookie, "csrfToken": args.luogu_csrf_token})
+
     init_db()
-    with connect_db() as conn:
+    with luogu_request_auth(auth), connect_db() as conn:
         params: list[object] = []
         where = "active = 1 AND platform = 'luogu'"
         if args.handle_id:
@@ -4145,7 +4518,7 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
                     f"round={rounds} nextPage={state_before.get('nextBackfillPage') or '-'}",
                     flush=True,
                 )
-                result = sync_handle_row(conn, row, force=True)
+                result = sync_handle_row(conn, row, force=True, full=True)
                 conn.commit()
                 refreshed = conn.execute("SELECT * FROM handles WHERE id = ?", (row["id"],)).fetchone()
                 state_after = luogu_record_sync_state(refreshed)
@@ -4183,9 +4556,8 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
 
 def main() -> None:
     init_db()
-    if SYNC_INTERVAL_SECONDS > 0:
-        thread = threading.Thread(target=background_sync_loop, daemon=True)
-        thread.start()
+    thread = threading.Thread(target=background_sync_loop, daemon=True)
+    thread.start()
     server = ThreadingHTTPServer((HOST, PORT), AppHandler)
     print(f"{APP_NAME} listening on http://{HOST}:{PORT}", flush=True)
     print(f"SQLite database: {DB_PATH}", flush=True)

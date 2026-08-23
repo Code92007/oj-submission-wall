@@ -123,10 +123,12 @@ docker compose up -d --build
 | `HISTORICAL_CACHE_AFTER_DAYS` | `30` | 距今超过多少天的历史页可直接使用缓存 |
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OVERVIEW_CACHE_TTL_SECONDS` | `20` | `/api/overview` 页面组装结果的内存缓存秒数 |
+| `OVERVIEW_FEED_LIMIT` | `1000` | `/api/overview` 返回的最近提交明细条数上限，统计仍基于库内全量历史记录 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent，生产环境建议包含你的站点地址 |
 | `LUOGU_USER_AGENT` | `OJSubmissionWall/1.0` | 洛谷请求的 User-Agent，生产环境建议包含你的站点地址 |
 | `LUOGU_CF_CLEARANCE` | 空 | 可选：服务器同出口浏览器合法通过 Cloudflare 后拿到的 `cf_clearance` 值，不是登录态 |
 | `LUOGU_COOKIE` | 空 | 可选：管理员自己的洛谷 Cookie；公开部署不建议收集用户 Cookie |
+| `LUOGU_CSRF_TOKEN` | 空 | 可选：和 `LUOGU_COOKIE` 配套的洛谷 CSRF token，会由主站随代理请求头动态透传 |
 | `LUOGU_PROXY_URL` | 空 | 可选：洛谷海外 403 时，把洛谷请求转发到可信的国内出口代理 |
 | `LUOGU_PROXY_TOKEN` | 空 | 可选：访问洛谷私有代理的 Bearer token |
 | `LUOGU_THIRD_PARTY_FALLBACK` | `true` | 洛谷主源失败时，是否尝试第三方公开统计源兜底 |
@@ -147,6 +149,10 @@ docker compose up -d --build
 3. 如果你需要更精确的洛谷逐条提交记录，可以部署一个只代理洛谷请求的国内出口。
 
 国内出口代理脚本是 [deploy/luogu_proxy.py](deploy/luogu_proxy.py)，FRP 连接示例见 [deploy/luogu-frp.md](deploy/luogu-frp.md)。代理只允许访问 `https://www.luogu.com.cn` / `https://luogu.com.cn`，并要求 Bearer token。不要把代理无鉴权暴露到公网，也不要把 Cookie、token 或服务器 IP 提交到仓库。
+
+如果国内代理由别人维护，不需要把洛谷小号 Cookie 写进代理服务。把 Cookie/CSRF 留在海外主站即可：配置 `LUOGU_COOKIE` / `LUOGU_CSRF_TOKEN`，或在触发同步时通过 JSON 字段 `luoguCookie`、`luoguCsrfToken`，也可以用请求头 `X-Luogu-Cookie`、`X-Luogu-CSRF-Token` 临时传入。主站只会把它们作为本次同步任务的请求头转发给国内代理，不写入数据库。
+
+页面渲染只读取本地 SQLite 中的历史提交记录；绑定账号、重试、刷新同步都会先进入后台队列，接口立即返回。后台线程按 `SYNC_INTERVAL_SECONDS` 定期做增量同步，并用每个绑定的 `last_sync_at` 记录最后成功更新时间。
 
 慢速回填洛谷历史记录：
 

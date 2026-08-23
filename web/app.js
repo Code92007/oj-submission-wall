@@ -18,6 +18,7 @@ const state = {
   memberGroupFilter: "",
   binding: false,
   handleBusy: new Set(),
+  overviewPollTimer: null,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -119,7 +120,7 @@ function clearMessage() {
 function setBusy(value) {
   state.busy = value;
   $("#refreshBtn").disabled = value;
-  $("#refreshBtn").textContent = value ? "同步中..." : "刷新同步";
+  $("#refreshBtn").textContent = value ? "提交中..." : "刷新同步";
 }
 
 function setHandleBusy(id, value) {
@@ -152,9 +153,13 @@ function cloneJson(value) {
 function sanitizedOverviewForBrowserCache(data) {
   const copy = cloneJson(data);
   if (copy.user) copy.user.realName = "";
+  if (copy.mirror) delete copy.mirror.sync;
   for (const member of copy.members || []) {
     member.realName = "";
     member.realNameVisible = false;
+    for (const handle of member.handles || []) {
+      handle.syncStatus = "";
+    }
   }
   return copy;
 }
@@ -221,6 +226,26 @@ function applyOverviewData(data, options = {}) {
   updateWallRange(data);
   renderAll();
   if (options.save !== false) saveOverviewBrowserCache(data);
+}
+
+function hasActiveSync(data = state.overview) {
+  const sync = data?.mirror?.sync || {};
+  return Boolean(sync.running || Number(sync.pending || 0) > 0);
+}
+
+function scheduleOverviewPoll(delay = 1600, remaining = 8) {
+  if (state.overviewPollTimer) clearTimeout(state.overviewPollTimer);
+  if (remaining <= 0) return;
+  state.overviewPollTimer = setTimeout(async () => {
+    try {
+      await loadOverview();
+    } catch (_) {
+      return;
+    }
+    if (hasActiveSync()) {
+      scheduleOverviewPoll(Math.min(Math.round(delay * 1.5), 8000), remaining - 1);
+    }
+  }, delay);
 }
 
 function hydrateOverviewFromBrowserCache() {
@@ -337,14 +362,21 @@ function renderStats() {
   $("#contestCount").textContent = contestTotal;
   const generatedAt = mirror.generatedAt || overview.now;
   const asOf = mirror.asOf;
+  const sync = mirror.sync || {};
+  const syncText = sync.running
+    ? "后台同步中"
+    : Number(sync.pending || 0) > 0
+      ? `${Number(sync.pending || 0)} 个同步任务排队`
+      : "";
+  const syncSuffix = syncText ? ` · ${syncText}` : "";
   if (mirror.browserCache) {
-    $("#lastUpdated").textContent = `本地缓存 · ${generatedAt ? `更新于 ${formatDateTime(generatedAt)} · ` : ""}正在更新`;
+    $("#lastUpdated").textContent = `本地缓存 · ${generatedAt ? `更新于 ${formatDateTime(generatedAt)} · ` : ""}正在更新${syncSuffix}`;
   } else if (mirror.fallback) {
-    $("#lastUpdated").textContent = `本地镜像 · 数据截至 ${asOf ? formatDateTime(asOf) : "未知"} · 读取于 ${formatDateTime(mirror.servedAt || generatedAt)}`;
+    $("#lastUpdated").textContent = `本地镜像 · 数据截至 ${asOf ? formatDateTime(asOf) : "未知"} · 读取于 ${formatDateTime(mirror.servedAt || generatedAt)}${syncSuffix}`;
   } else if (asOf) {
-    $("#lastUpdated").textContent = `更新于 ${formatDateTime(generatedAt)} · 数据截至 ${formatDateTime(asOf)}`;
+    $("#lastUpdated").textContent = `更新于 ${formatDateTime(generatedAt)} · 数据截至 ${formatDateTime(asOf)}${syncSuffix}`;
   } else {
-    $("#lastUpdated").textContent = generatedAt ? `更新于 ${formatDateTime(generatedAt)}` : "等待同步";
+    $("#lastUpdated").textContent = generatedAt ? `更新于 ${formatDateTime(generatedAt)}${syncSuffix}` : `等待同步${syncSuffix}`;
   }
 }
 
@@ -362,17 +394,24 @@ function renderMyHandles() {
   }
 
   for (const item of handles) {
-    const busy = state.handleBusy.has(String(item.id));
+    const syncStatus = item.syncStatus || "";
+    const busy = state.handleBusy.has(String(item.id)) || syncStatus === "queued" || syncStatus === "running";
     const row = el("div", "handle-item");
     const main = el("div", "handle-main");
     const title = document.createElement("strong");
     title.textContent = `${item.platformLabel} / ${item.displayHandle || item.handle}`;
     const meta = document.createElement("span");
-    meta.textContent = item.lastError
-      ? `同步异常：${item.lastError}`
-      : item.lastSyncAt
-        ? `上次同步 ${formatDateTime(item.lastSyncAt)}`
-        : "尚未同步";
+    if (syncStatus === "running") {
+      meta.textContent = "正在后台同步";
+    } else if (syncStatus === "queued") {
+      meta.textContent = "等待后台同步";
+    } else {
+      meta.textContent = item.lastError
+        ? `同步异常：${item.lastError}`
+        : item.lastSyncAt
+          ? `上次同步 ${formatDateTime(item.lastSyncAt)}`
+          : "尚未同步";
+    }
     main.append(title, meta);
 
     const actions = el("div", "handle-actions");
@@ -1423,9 +1462,9 @@ async function submitHandle(event) {
   state.binding = true;
   if (submitButton) {
     submitButton.disabled = true;
-    submitButton.textContent = "绑定中...";
+    submitButton.textContent = "保存中...";
   }
-  showMessage("正在绑定并同步，失败也会保留在列表里。");
+  showMessage("正在保存绑定，提交记录会在后台同步。");
   setBusy(true);
   try {
     const data = await api("/api/handles", {
@@ -1437,33 +1476,16 @@ async function submitHandle(event) {
     });
     formElement.reset();
     updateHandleHint();
-    await loadOverview();
-    const busy = (data.sync || []).filter((item) => item.busy);
-    const errors = (data.sync || []).filter((item) => item.error);
-    const cached = (data.sync || []).filter((item) => item.cached);
-    const warnings = (data.sync || []).filter((item) => item.warning);
-    if (busy.length) {
-      showMessage("绑定已保存，后台正在同步其他账号，稍后可以点重试。", "error");
-    } else if (errors.length) {
-      showMessage(`${errors.length} 个绑定已保存，但同步提交记录失败；错误原因会显示在绑定列表里。`, "error");
-    } else if (warnings.length) {
-      showMessage(`${warnings.length} 个绑定已保存，但同步使用了缓存或降级数据；详情会显示在绑定列表里。`, "error");
-    } else if (cached.length) {
-      const oldest = cached
-        .map((item) => item.cacheAsOf)
-        .filter(Boolean)
-        .sort()[0];
-      showMessage(`绑定已保存，当前使用本地缓存，缓存时间 ${oldest ? formatDateTime(oldest) : "未知"}。`, "error");
-    } else {
-      showMessage("绑定并同步完成。");
-    }
+    applyOverviewData(data);
+    showMessage("绑定已保存，已加入后台同步队列。");
+    scheduleOverviewPoll();
   } catch (error) {
     showMessage(error.message, "error");
   } finally {
     state.binding = false;
     if (submitButton) {
       submitButton.disabled = false;
-      submitButton.textContent = originalText || "绑定并同步";
+      submitButton.textContent = originalText || "绑定账号";
     }
     setBusy(false);
   }
@@ -1482,17 +1504,9 @@ async function refreshSync() {
       body: { force: true },
     });
     applyOverviewData(data);
-    const errors = (data.results || []).filter((item) => item.error);
-    const cached = (data.results || []).filter((item) => item.cached);
-    if (errors.length) {
-      showMessage(`${errors.length} 个绑定同步失败，成员卡片里能看到错误原因。`, "error");
-    } else if (cached.length) {
-      const oldest = cached
-        .map((item) => item.cacheAsOf)
-        .filter(Boolean)
-        .sort()[0];
-      showMessage(`${cached.length} 个绑定使用了本地缓存，缓存时间 ${oldest ? formatDateTime(oldest) : "未知"}。`, "error");
-    }
+    const queued = (data.results || []).some((item) => item.queued || item.alreadyQueued);
+    showMessage(queued ? "已加入后台同步队列。" : "后台同步请求已提交。");
+    scheduleOverviewPoll();
   } catch (error) {
     showMessage(error.message, "error");
   } finally {
@@ -1532,17 +1546,8 @@ async function retryHandle(id) {
     });
     applyOverviewData(data);
     const result = data.result || {};
-    if (result.busy) {
-      showMessage("已有同步任务在跑，稍后再试一次。", "error");
-    } else if (result.error) {
-      showMessage(`重试失败：${result.error}`, "error");
-    } else if (result.warning) {
-      showMessage(`重试完成，但有警告：${result.warning}`, "error");
-    } else if (result.cached) {
-      showMessage(`重试完成，当前使用本地缓存，缓存时间 ${result.cacheAsOf ? formatDateTime(result.cacheAsOf) : "未知"}。`, "error");
-    } else {
-      showMessage("重试同步完成。");
-    }
+    showMessage(result.alreadyQueued ? "这个账号已经在同步队列里。" : "已加入后台同步队列。");
+    scheduleOverviewPoll();
   } catch (error) {
     showMessage(error.message, "error");
   } finally {

@@ -220,6 +220,18 @@ systemctl status frpc --no-pager
 ```bash
 LUOGU_PROXY_URL=http://host.docker.internal:18787/
 LUOGU_PROXY_TOKEN=替换成洛谷代理token
+# 可选：Cookie/CSRF 放在海外主站，由主站随每次代理请求动态透传
+LUOGU_COOKIE='__client_id=xxx; _uid=xxx; C3VK=xxx'
+LUOGU_CSRF_TOKEN=xxx
+```
+
+也可以不写入 `.env`，只在触发同步时临时传入：
+
+```bash
+curl -sS https://你的主站/api/sync \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: ojwall_session=你的登录态' \
+  --data '{"force":true,"luoguCookie":"__client_id=xxx; _uid=xxx; C3VK=xxx","luoguCsrfToken":"xxx"}'
 ```
 
 重新启动主站：
