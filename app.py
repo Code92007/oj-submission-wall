@@ -44,6 +44,7 @@ APP_ENV = os.environ.get("APP_ENV", "development").lower()
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "")
 SYNC_INTERVAL_SECONDS = int(os.environ.get("SYNC_INTERVAL_SECONDS", "900"))
 SYNC_MIN_AGE_SECONDS = int(os.environ.get("SYNC_MIN_AGE_SECONDS", "120"))
+SYNC_INCREMENTAL_OVERLAP_SECONDS = int(os.environ.get("SYNC_INCREMENTAL_OVERLAP_SECONDS", "7200"))
 FETCH_LOOKBACK_DAYS = int(os.environ.get("FETCH_LOOKBACK_DAYS", "3650"))
 FETCH_LIMIT = int(os.environ.get("FETCH_LIMIT", "1000"))
 HTTP_TIMEOUT_SECONDS = int(os.environ.get("HTTP_TIMEOUT_SECONDS", "15"))
@@ -96,10 +97,13 @@ LUOGU_RECORD_SYNC = os.environ.get("LUOGU_RECORD_SYNC", "true").lower() not in {
     "no",
     "off",
 }
-LUOGU_RECORD_RECENT_PAGES_PER_SYNC = int(os.environ.get("LUOGU_RECORD_RECENT_PAGES_PER_SYNC", "3"))
+LUOGU_RECORD_RECENT_PAGES_PER_SYNC = int(os.environ.get("LUOGU_RECORD_RECENT_PAGES_PER_SYNC", "10"))
 LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC = int(os.environ.get("LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC", "8"))
 LUOGU_RECORD_SLEEP_MIN_SECONDS = float(os.environ.get("LUOGU_RECORD_SLEEP_MIN_SECONDS", "0.4"))
 LUOGU_RECORD_SLEEP_MAX_SECONDS = float(os.environ.get("LUOGU_RECORD_SLEEP_MAX_SECONDS", "1.4"))
+LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS = int(
+    os.environ.get("LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS", str(SYNC_INCREMENTAL_OVERLAP_SECONDS))
+)
 SMTP_PLACEHOLDERS = {
     "smtp.example.com",
     "noreply@example.com",
@@ -1371,7 +1375,8 @@ class LuoguAdapter(OJAdapter):
         history_since = utcnow() - FETCH_LOOKBACK_DAYS * 86400
         incremental_since = since_ts
         if previous_newest:
-            incremental_since = max(incremental_since, previous_newest - 3 * 86400)
+            overlap_seconds = max(0, LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS)
+            incremental_since = max(incremental_since, previous_newest - overlap_seconds)
         record_query_user = profile_name or uid
 
         submissions_by_id: dict[str, dict] = {}
@@ -2995,8 +3000,9 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
     previous_error = str(row["last_error"] or "")
     needs_full_retry = "比赛记录同步失败" in previous_error
     newest_local_submission_at = int(max_row["max_submitted_at"] or 0)
+    overlap_seconds = max(0, SYNC_INCREMENTAL_OVERLAP_SECONDS)
     incremental_since = (
-        max(default_since, newest_local_submission_at - 3 * 86400)
+        max(default_since, newest_local_submission_at - overlap_seconds)
         if newest_local_submission_at
         else default_since
     )

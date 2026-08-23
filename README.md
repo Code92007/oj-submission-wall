@@ -119,6 +119,7 @@ docker compose up -d --build
 | `HTTP_RETRY_COUNT` | `2` | 外部 OJ 超时或 5xx 时的额外重试次数 |
 | `HTTP_RETRY_BACKOFF_SECONDS` | `0.8` | 外部 OJ 重试退避基准秒数 |
 | `DISPLAY_TZ_OFFSET_HOURS` | `8` | 榜单日期、连续天数和提交时间展示的时区偏移 |
+| `SYNC_INCREMENTAL_OVERLAP_SECONDS` | `7200` | 增量同步按最新本地提交时间戳向前重叠的秒数，用于防漏和去重 |
 | `CACHE_DIR` | `DATA_DIR/cache` | HTTP 响应缓存和概览镜像目录 |
 | `HISTORICAL_CACHE_AFTER_DAYS` | `30` | 距今超过多少天的历史页可直接使用缓存 |
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
@@ -134,10 +135,11 @@ docker compose up -d --build
 | `LUOGU_THIRD_PARTY_FALLBACK` | `true` | 洛谷主源失败时，是否尝试第三方公开统计源兜底 |
 | `LUOGU_FALLBACK_URLS` | 内置公开卡片接口 | 可选：逗号分隔的洛谷降级 URL 模板，支持 `{uid}`、`{handle}`、`{name}` |
 | `LUOGU_RECORD_SYNC` | `true` | 是否同步洛谷 `record/list` 逐条评测记录 |
-| `LUOGU_RECORD_RECENT_PAGES_PER_SYNC` | `3` | 每次同步优先抓取洛谷最新记录页数 |
+| `LUOGU_RECORD_RECENT_PAGES_PER_SYNC` | `10` | 每次增量同步最多抓取洛谷最新记录页数，遇到早于增量时间戳的页面会提前停止 |
 | `LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC` | `8` | 洛谷历史记录每次额外回填页数 |
 | `LUOGU_RECORD_SLEEP_MIN_SECONDS` | `0.4` | 洛谷记录页分页请求的最小间隔秒数 |
 | `LUOGU_RECORD_SLEEP_MAX_SECONDS` | `1.4` | 洛谷记录页分页请求的最大间隔秒数 |
+| `LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS` | `7200` | 洛谷 `record/list` 增量同步的秒级重叠窗口，默认继承通用增量窗口 |
 | `QOJ_COOKIE` | 空 | QOJ 管理员侧专用 Cookie；公开部署不建议收集用户登录态 |
 
 ## 洛谷海外访问
