@@ -15,6 +15,7 @@ const state = {
   feedPageSize: 25,
   wallRange: "",
   selectedMemberKey: "",
+  selectedHandleKeys: new Set(),
   memberGroupFilter: "",
   binding: false,
   handleBusy: new Set(),
@@ -52,6 +53,8 @@ const CONTEST_CATEGORY_ORDER = [
   "nowcoder.icpc_ccpc",
   "nowcoder.school",
   "nowcoder.seasonal",
+  "nowcoder.practice",
+  "nowcoder.challenge",
   "nowcoder.other",
   "luogu.monthly",
   "luogu.weekly",
@@ -449,7 +452,10 @@ function renderMembers() {
   let selected = null;
   if (state.selectedMemberKey) {
     selected = members.find((member) => memberKey(member) === state.selectedMemberKey);
-    if (!selected) state.selectedMemberKey = "";
+    if (!selected) {
+      state.selectedMemberKey = "";
+      state.selectedHandleKeys.clear();
+    }
   }
   container.classList.toggle("member-detail-mode", Boolean(selected));
   if (selected) {
@@ -476,6 +482,100 @@ function memberKey(member) {
 
 function memberTeam(member) {
   return member.teamName || (member.ownerType === "guest" ? "游客" : "未分组");
+}
+
+function handleSelectionKey(handle) {
+  return handleKeyFromParts(handle?.platform, handle?.handle);
+}
+
+function handleKeyFromParts(platform, handle) {
+  return `${platform || ""}\u001f${handle || ""}`;
+}
+
+function selectedHandleKeySetFor(member) {
+  const validKeys = new Set((member.handles || []).map(handleSelectionKey));
+  for (const key of [...state.selectedHandleKeys]) {
+    if (!validKeys.has(key)) state.selectedHandleKeys.delete(key);
+  }
+  return new Set(state.selectedHandleKeys);
+}
+
+function memberActivityView(member) {
+  const selectedKeys = selectedHandleKeySetFor(member);
+  const selectedHandles = (member.handles || []).filter((handle) => selectedKeys.has(handleSelectionKey(handle)));
+  if (!selectedHandles.length) {
+    return {
+      filtered: false,
+      selectedHandleKeys: selectedKeys,
+      selectedHandles: [],
+      days: member.days || {},
+      stats: member.stats || {},
+      contests: member.contests || {},
+    };
+  }
+
+  const activities = selectedHandles.map((handle) => handle.activity || {}).filter(Boolean);
+  const days = mergeActivityDays(activities.map((activity) => activity.days || {}));
+  return {
+    filtered: true,
+    selectedHandleKeys: selectedKeys,
+    selectedHandles,
+    days,
+    stats: mergeActivityStats(activities, days),
+    contests: {
+      items: activities.flatMap((activity) => activity.contests?.items || []),
+    },
+  };
+}
+
+function mergeActivityDays(dayMaps) {
+  const merged = {};
+  for (const days of dayMaps) {
+    for (const [dateKey, counts] of Object.entries(days || {})) {
+      const item = merged[dateKey] || { accepted: 0, total: 0 };
+      item.accepted += Number(counts.accepted || 0);
+      item.total += Number(counts.total || 0);
+      merged[dateKey] = item;
+    }
+  }
+  return merged;
+}
+
+function mergeActivityStats(activities, days) {
+  const activeDates = Object.entries(days || {})
+    .filter(([, counts]) => Number(counts.accepted || 0) > 0)
+    .map(([dateKey]) => dateKey);
+  return {
+    accepted: activities.reduce((sum, activity) => sum + Number(activity.stats?.accepted || 0), 0),
+    total: activities.reduce((sum, activity) => sum + Number(activity.stats?.total || 0), 0),
+    activeDays: activeDates.length,
+    streak: currentDateStreak(days, state.overview?.today),
+    allTimeAccepted: activities.reduce((sum, activity) => sum + Number(activity.stats?.allTimeAccepted || 0), 0),
+    maxStreakAllTime: maxDateStreak(activeDates),
+    contests: activities.reduce((sum, activity) => sum + Number(activity.stats?.contests || 0), 0),
+  };
+}
+
+function currentDateStreak(days, todayString) {
+  if (!todayString) return 0;
+  let streak = 0;
+  const cursor = parseUtcDate(todayString);
+  while (true) {
+    const key = toDateKey(cursor);
+    if (Number(days?.[key]?.accepted || 0) <= 0) return streak;
+    streak += 1;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+}
+
+function toggleMemberHandleFilter(key) {
+  if (!key) return;
+  if (state.selectedHandleKeys.has(key)) {
+    state.selectedHandleKeys.delete(key);
+  } else {
+    state.selectedHandleKeys.add(key);
+  }
+  renderMembers();
 }
 
 function renderTeamOverview(members) {
@@ -657,6 +757,7 @@ function renderMemberDirectory(members) {
 }
 
 function renderMemberDetail(member) {
+  const view = memberActivityView(member);
   const detail = el("div", "member-detail-view");
   const bar = el("div", "member-detail-bar");
   const back = el("button", "button ghost");
@@ -671,19 +772,20 @@ function renderMemberDetail(member) {
   meta.textContent = [
     member.realName ? `姓名：${member.realName}` : "",
     memberTeam(member),
-    `${member.handles?.length || 0} 个 OJ 账号`,
+    view.filtered ? `${view.selectedHandles.length}/${member.handles?.length || 0} 个 OJ 账号` : `${member.handles?.length || 0} 个 OJ 账号`,
   ].filter(Boolean).join(" · ");
   title.append(h3, meta);
 
   bar.append(back, title);
-  detail.append(bar, renderMemberCard(member), renderMemberSubmissions(member));
+  detail.append(bar, renderMemberCard(member, view), renderMemberSubmissions(member, view));
   return detail;
 }
 
-function renderMemberSubmissions(member) {
+function renderMemberSubmissions(member, view = memberActivityView(member)) {
   const section = el("section", "member-submissions");
   const rows = (state.overview?.feed || [])
     .filter((item) => item.ownerType === member.ownerType && String(item.ownerId) === String(member.ownerId))
+    .filter((item) => !view.filtered || view.selectedHandleKeys.has(handleKeyFromParts(item.platform, item.handle)))
     .slice(0, 50);
 
   const head = el("div", "section-head");
@@ -696,7 +798,7 @@ function renderMemberSubmissions(member) {
 
   if (!rows.length) {
     const empty = el("div", "empty-state compact");
-    empty.textContent = "这个成员还没有提交记录";
+    empty.textContent = view.filtered ? "选中的账号还没有最近提交记录" : "这个成员还没有提交记录";
     section.appendChild(empty);
     return section;
   }
@@ -761,7 +863,7 @@ function renderMemberSubmissions(member) {
   return section;
 }
 
-function renderMemberCard(member) {
+function renderMemberCard(member, view = memberActivityView(member)) {
   const card = el("article", "member-card");
   const head = el("div", "member-head");
   const identity = el("div");
@@ -784,8 +886,15 @@ function renderMemberCard(member) {
   const handles = el("div", "member-handles");
   if (member.handles?.length) {
     for (const handle of member.handles) {
-      const pill = el("span", `platform-pill${handle.lastError ? " error" : ""}`);
-      pill.title = handle.lastError || handle.displayHandle || handle.handle;
+      const selected = view.selectedHandleKeys.has(handleSelectionKey(handle));
+      const pill = el(
+        "button",
+        `platform-pill handle-filter-pill${selected ? " active" : ""}${view.filtered && !selected ? " inactive" : ""}${handle.lastError ? " error" : ""}`,
+      );
+      pill.type = "button";
+      pill.dataset.memberHandleKey = handleSelectionKey(handle);
+      pill.setAttribute("aria-pressed", selected ? "true" : "false");
+      pill.title = handle.lastError || `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
       pill.textContent = `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
       handles.appendChild(pill);
     }
@@ -798,12 +907,12 @@ function renderMemberCard(member) {
 
   head.appendChild(identity);
   const wallWrap = el("div", "wall-wrap");
-  wallWrap.appendChild(renderWall(member.days || {}, state.wallRange, state.overview.today, state.overview.dateRange));
+  wallWrap.appendChild(renderWall(view.days || {}, state.wallRange, state.overview.today, state.overview.dateRange));
   card.append(
     head,
     wallWrap,
-    renderActivityStats(member.days || {}, member.stats || {}, state.wallRange),
-    renderContestStats(member.contests || {}, state.wallRange),
+    renderActivityStats(view.days || {}, view.stats || {}, state.wallRange),
+    renderContestStats(view.contests || {}, state.wallRange),
   );
   return card;
 }
@@ -1575,7 +1684,13 @@ function bindEvents() {
     const back = event.target.closest("[data-back-members]");
     if (back) {
       state.selectedMemberKey = "";
+      state.selectedHandleKeys.clear();
       renderMembers();
+      return;
+    }
+    const handle = event.target.closest("[data-member-handle-key]");
+    if (handle) {
+      toggleMemberHandleFilter(handle.dataset.memberHandleKey);
       return;
     }
     const team = event.target.closest("[data-team-filter]");
@@ -1586,6 +1701,7 @@ function bindEvents() {
     }
     const row = event.target.closest("[data-member-key]");
     if (row) {
+      if (state.selectedMemberKey !== row.dataset.memberKey) state.selectedHandleKeys.clear();
       state.selectedMemberKey = row.dataset.memberKey;
       renderMembers();
     }
@@ -1595,6 +1711,7 @@ function bindEvents() {
     const row = event.target.closest("[data-member-key]");
     if (!row) return;
     event.preventDefault();
+    if (state.selectedMemberKey !== row.dataset.memberKey) state.selectedHandleKeys.clear();
     state.selectedMemberKey = row.dataset.memberKey;
     renderMembers();
   });

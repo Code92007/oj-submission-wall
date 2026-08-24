@@ -785,6 +785,8 @@ CONTEST_CATEGORY_LABELS = {
     "nowcoder.icpc_ccpc": "牛客 ICPC/CCPC",
     "nowcoder.school": "牛客校赛/同步赛",
     "nowcoder.seasonal": "牛客寒暑假",
+    "nowcoder.practice": "牛客练习赛",
+    "nowcoder.challenge": "牛客挑战赛",
     "nowcoder.other": "牛客其他",
     "luogu.monthly": "洛谷月赛",
     "luogu.weekly": "洛谷周赛",
@@ -841,6 +843,7 @@ def classify_contest(platform: str, name: str = "", remote_id: str = "", raw: di
             return "atcoder.ahc"
         return "atcoder.other"
     if platform == "nowcoder":
+        compact_name = re.sub(r"\s+", "", name)
         if "多校" in name:
             return "nowcoder.multi_school"
         if "小白月赛" in name:
@@ -855,6 +858,10 @@ def classify_contest(platform: str, name: str = "", remote_id: str = "", raw: di
             return "nowcoder.school"
         if any(token in name for token in ["寒假", "暑假"]):
             return "nowcoder.seasonal"
+        if "牛客练习赛" in compact_name:
+            return "nowcoder.practice"
+        if "牛客挑战赛" in compact_name or "wannafly挑战赛" in lower:
+            return "nowcoder.challenge"
         return "nowcoder.other"
     if platform == "luogu":
         if "月赛" in name:
@@ -3218,21 +3225,48 @@ def canonicalize_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, adapter:
     if not new_handle or new_handle == old_handle:
         return row
 
+    stats_json = canonicalized_handle_stats_json(row, new_handle, display_name)
     existing = conn.execute(
         """
         SELECT *
         FROM handles
-        WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ? AND active = 1
+        WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ?
         """,
         (row["owner_type"], row["owner_id"], row["platform"], new_handle),
     ).fetchone()
     if existing and existing["id"] != row["id"]:
+        migrate_handle_history(conn, row, new_handle)
+        conn.execute(
+            """
+            UPDATE handles
+            SET active = 1,
+                last_error = NULL,
+                stats_json = COALESCE(stats_json, ?),
+                last_sync_at = CASE
+                    WHEN COALESCE(last_sync_at, 0) >= COALESCE(?, 0) THEN last_sync_at
+                    ELSE ?
+                END
+            WHERE id = ?
+            """,
+            (stats_json, row["last_sync_at"], row["last_sync_at"], existing["id"]),
+        )
         conn.execute(
             "UPDATE handles SET active = 0, last_error = ? WHERE id = ?",
             (f"已自动合并到 {new_handle}", row["id"]),
         )
-        return existing
+        refreshed = conn.execute("SELECT * FROM handles WHERE id = ?", (existing["id"],)).fetchone()
+        return refreshed or existing
 
+    migrate_handle_history(conn, row, new_handle)
+    conn.execute(
+        "UPDATE handles SET handle = ?, stats_json = ? WHERE id = ?",
+        (new_handle, stats_json, row["id"]),
+    )
+    updated = conn.execute("SELECT * FROM handles WHERE id = ?", (row["id"],)).fetchone()
+    return updated or row
+
+
+def canonicalized_handle_stats_json(row: sqlite3.Row, new_handle: str, display_name: str) -> str | None:
     stats = {}
     if row["stats_json"]:
         with contextlib.suppress(Exception):
@@ -3243,13 +3277,39 @@ def canonicalize_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, adapter:
         stats["name"] = display_name
     if row["platform"] == "luogu":
         stats["uid"] = new_handle
-    stats_json = json.dumps(stats, ensure_ascii=False) if stats else row["stats_json"]
-    conn.execute(
-        "UPDATE handles SET handle = ?, stats_json = ? WHERE id = ?",
-        (new_handle, stats_json, row["id"]),
-    )
-    updated = conn.execute("SELECT * FROM handles WHERE id = ?", (row["id"],)).fetchone()
-    return updated or row
+    return json.dumps(stats, ensure_ascii=False) if stats else row["stats_json"]
+
+
+def migrate_handle_history(conn: sqlite3.Connection, row: sqlite3.Row, new_handle: str) -> None:
+    old_handle = str(row["handle"] or "")
+    if not old_handle or old_handle == new_handle:
+        return
+    params = (row["owner_type"], row["owner_id"], row["platform"], old_handle, new_handle)
+    for table in ["submissions", "contests"]:
+        conn.execute(
+            f"""
+            DELETE FROM {table}
+            WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ?
+              AND EXISTS (
+                SELECT 1
+                FROM {table} AS target
+                WHERE target.owner_type = {table}.owner_type
+                  AND target.owner_id = {table}.owner_id
+                  AND target.platform = {table}.platform
+                  AND target.handle = ?
+                  AND target.remote_id = {table}.remote_id
+              )
+            """,
+            params,
+        )
+        conn.execute(
+            f"""
+            UPDATE {table}
+            SET handle = ?
+            WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ?
+            """,
+            (new_handle, row["owner_type"], row["owner_id"], row["platform"], old_handle),
+        )
 
 
 def get_owned_handle_row(conn: sqlite3.Connection, principal: dict, handle_id: int) -> sqlite3.Row | None:
@@ -3671,6 +3731,98 @@ def write_overview_memory_cache(principal: dict | None, days: int, overview: dic
         OVERVIEW_MEMORY_CACHE[key] = (utcnow(), overview)
 
 
+def empty_activity_stats() -> dict:
+    return {
+        "accepted": 0,
+        "total": 0,
+        "activeDays": 0,
+        "streak": 0,
+        "allTimeAccepted": 0,
+        "lastYearAccepted": 0,
+        "lastMonthAccepted": 0,
+        "maxStreakAllTime": 0,
+        "maxStreakYear": 0,
+        "maxStreakMonth": 0,
+        "contests": 0,
+    }
+
+
+def empty_contest_activity() -> dict:
+    return {"items": [], "total": 0, "byCategory": [], "byPlatform": []}
+
+
+def empty_activity() -> dict:
+    return {
+        "days": {},
+        "stats": empty_activity_stats(),
+        "contests": empty_contest_activity(),
+        "_all_days": {},
+        "_solved_keys": set(),
+        "_handle_stats": [],
+        "_handle_solved_counts": {},
+    }
+
+
+def handle_activity_key(platform: str, handle: str) -> str:
+    return "\x1f".join([str(platform or ""), str(handle or "")])
+
+
+def add_submission_to_activity(activity: dict, row: sqlite3.Row) -> None:
+    date_key = utc_date_from_ts(row["submitted_at"])
+    all_day = activity["_all_days"].setdefault(date_key, {"accepted": 0, "total": 0})
+    all_day["total"] += 1
+    is_accepted = normalize_verdict(row["verdict"]) == "AC"
+    is_activity = is_activity_placeholder(row)
+    solved_key = solved_problem_key(row)
+    is_new_solve = is_accepted and not is_activity and solved_key not in activity["_solved_keys"]
+    if is_new_solve:
+        all_day["accepted"] += 1
+        activity["_solved_keys"].add(solved_key)
+        key = handle_activity_key(row["platform"], row["handle"])
+        handle_counts = activity["_handle_solved_counts"]
+        handle_counts[key] = handle_counts.get(key, 0) + 1
+    elif is_accepted and is_activity:
+        all_day["accepted"] += 1
+
+    day = activity["days"].setdefault(date_key, {"accepted": 0, "total": 0})
+    day["total"] += 1
+    activity["stats"]["total"] += 1
+    if is_new_solve or (is_accepted and is_activity):
+        day["accepted"] += 1
+        activity["stats"]["accepted"] += 1
+
+
+def finalize_submission_activity(activity: dict, start_date: dt.date, month_start_date: dt.date, today_date: dt.date) -> None:
+    active_dates = [date_key for date_key, counts in activity["days"].items() if counts.get("accepted", 0) > 0]
+    activity["stats"]["activeDays"] = len(active_dates)
+    all_days = activity.pop("_all_days")
+    activity["stats"]["streak"] = current_streak(all_days)
+    activity["stats"]["lastYearAccepted"] = accepted_since(all_days, start_date)
+    activity["stats"]["lastMonthAccepted"] = accepted_since(all_days, month_start_date)
+    activity["stats"]["maxStreakAllTime"] = max_streak(all_days)
+    activity["stats"]["maxStreakYear"] = max_streak(all_days, start_date, today_date)
+    activity["stats"]["maxStreakMonth"] = max_streak(all_days, month_start_date, today_date)
+    handle_solved_counts = activity.pop("_handle_solved_counts", {})
+    for handle_stats in activity.pop("_handle_stats", []):
+        with contextlib.suppress(Exception):
+            profile_keys = profile_solved_problem_keys(handle_stats)
+            if profile_keys:
+                activity["_solved_keys"].update(profile_keys)
+            else:
+                all_time_accepted = int(handle_stats.get("allTimeAccepted") or 0)
+                key = handle_activity_key(handle_stats.get("_platform") or "", handle_stats.get("_handle") or "")
+                known_accepted = int(handle_solved_counts.get(key, 0) or 0)
+                activity["stats"]["allTimeAccepted"] += max(0, all_time_accepted - known_accepted)
+    activity["stats"]["allTimeAccepted"] += len(activity["_solved_keys"])
+    activity.pop("_solved_keys", None)
+
+
+def finalize_contest_activity(activity: dict) -> None:
+    contest_summary = summarize_contests(activity["contests"]["items"])
+    activity["contests"].update(contest_summary)
+    activity["stats"]["contests"] = contest_summary["total"]
+
+
 def build_overview(principal: dict | None, days: int = 365, use_cache: bool = True) -> dict:
     days = max(7, min(days, 3650))
     if use_cache:
@@ -3714,25 +3866,8 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "realName": "",
                 "realNameVisible": False,
                 "handles": [],
-                "days": {},
-                "stats": {
-                    "accepted": 0,
-                    "total": 0,
-                    "activeDays": 0,
-                    "streak": 0,
-                    "allTimeAccepted": 0,
-                    "lastYearAccepted": 0,
-                    "lastMonthAccepted": 0,
-                    "maxStreakAllTime": 0,
-                    "maxStreakYear": 0,
-                    "maxStreakMonth": 0,
-                    "contests": 0,
-                },
-                "contests": {"items": [], "total": 0, "byCategory": [], "byPlatform": []},
-                "_all_days": {},
-                "_solved_keys": set(),
-                "_handle_stats": [],
-                "_handle_solved_counts": {},
+                **empty_activity(),
+                "_handle_activities": {},
                 "_real_name": row["real_name"] or "",
             }
 
@@ -3747,25 +3882,8 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                 "realName": "",
                 "realNameVisible": False,
                 "handles": [],
-                "days": {},
-                "stats": {
-                    "accepted": 0,
-                    "total": 0,
-                    "activeDays": 0,
-                    "streak": 0,
-                    "allTimeAccepted": 0,
-                    "lastYearAccepted": 0,
-                    "lastMonthAccepted": 0,
-                    "maxStreakAllTime": 0,
-                    "maxStreakYear": 0,
-                    "maxStreakMonth": 0,
-                    "contests": 0,
-                },
-                "contests": {"items": [], "total": 0, "byCategory": [], "byPlatform": []},
-                "_all_days": {},
-                "_solved_keys": set(),
-                "_handle_stats": [],
-                "_handle_solved_counts": {},
+                **empty_activity(),
+                "_handle_activities": {},
                 "_real_name": principal.get("realName") or "",
             }
 
@@ -3774,7 +3892,10 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             key = (row["owner_type"], row["owner_id"])
             if key not in owners:
                 continue
-            owners[key]["handles"].append(handle_to_json(row, sync_snapshot))
+            handle_json = handle_to_json(row, sync_snapshot)
+            handle_json["activity"] = empty_activity()
+            owners[key]["handles"].append(handle_json)
+            owners[key]["_handle_activities"][handle_activity_key(row["platform"], row["handle"])] = handle_json["activity"]
             if row["stats_json"]:
                 with contextlib.suppress(Exception):
                     stats = json.loads(row["stats_json"])
@@ -3782,6 +3903,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                         stats["_platform"] = row["platform"]
                         stats["_handle"] = row["handle"]
                         owners[key]["_handle_stats"].append(stats)
+                        handle_json["activity"]["_handle_stats"].append(dict(stats))
 
         sub_rows = conn.execute(
             """
@@ -3794,52 +3916,15 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             key = (row["owner_type"], row["owner_id"])
             if key not in owners:
                 continue
-            date_key = utc_date_from_ts(row["submitted_at"])
-            all_day = owners[key]["_all_days"].setdefault(date_key, {"accepted": 0, "total": 0})
-            all_day["total"] += 1
-            is_accepted = normalize_verdict(row["verdict"]) == "AC"
-            is_activity = is_activity_placeholder(row)
-            solved_key = solved_problem_key(row)
-            is_new_solve = is_accepted and not is_activity and solved_key not in owners[key]["_solved_keys"]
-            if is_new_solve:
-                all_day["accepted"] += 1
-                owners[key]["_solved_keys"].add(solved_key)
-                handle_key = "\x1f".join([str(row["platform"]), str(row["handle"])])
-                handle_counts = owners[key]["_handle_solved_counts"]
-                handle_counts[handle_key] = handle_counts.get(handle_key, 0) + 1
-            elif is_accepted and is_activity:
-                all_day["accepted"] += 1
-
-            day = owners[key]["days"].setdefault(date_key, {"accepted": 0, "total": 0})
-            day["total"] += 1
-            owners[key]["stats"]["total"] += 1
-            if is_new_solve or (is_accepted and is_activity):
-                day["accepted"] += 1
-                owners[key]["stats"]["accepted"] += 1
+            add_submission_to_activity(owners[key], row)
+            handle_activity = owners[key]["_handle_activities"].get(handle_activity_key(row["platform"], row["handle"]))
+            if handle_activity:
+                add_submission_to_activity(handle_activity, row)
 
         for owner in owners.values():
-            active_dates = [date_key for date_key, counts in owner["days"].items() if counts.get("accepted", 0) > 0]
-            owner["stats"]["activeDays"] = len(active_dates)
-            all_days = owner.pop("_all_days")
-            owner["stats"]["streak"] = current_streak(all_days)
-            owner["stats"]["lastYearAccepted"] = accepted_since(all_days, start_date)
-            owner["stats"]["lastMonthAccepted"] = accepted_since(all_days, month_start_date)
-            owner["stats"]["maxStreakAllTime"] = max_streak(all_days)
-            owner["stats"]["maxStreakYear"] = max_streak(all_days, start_date, today_date)
-            owner["stats"]["maxStreakMonth"] = max_streak(all_days, month_start_date, today_date)
-            handle_solved_counts = owner.pop("_handle_solved_counts", {})
-            for handle_stats in owner.pop("_handle_stats", []):
-                with contextlib.suppress(Exception):
-                    profile_keys = profile_solved_problem_keys(handle_stats)
-                    if profile_keys:
-                        owner["_solved_keys"].update(profile_keys)
-                    else:
-                        all_time_accepted = int(handle_stats.get("allTimeAccepted") or 0)
-                        handle_key = "\x1f".join([str(handle_stats.get("_platform") or ""), str(handle_stats.get("_handle") or "")])
-                        known_accepted = int(handle_solved_counts.get(handle_key, 0) or 0)
-                        owner["stats"]["allTimeAccepted"] += max(0, all_time_accepted - known_accepted)
-            owner["stats"]["allTimeAccepted"] += len(owner["_solved_keys"])
-            owner.pop("_solved_keys", None)
+            finalize_submission_activity(owner, start_date, month_start_date, today_date)
+            for handle_activity in owner["_handle_activities"].values():
+                finalize_submission_activity(handle_activity, start_date, month_start_date, today_date)
 
         contest_rows = conn.execute(
             """
@@ -3852,14 +3937,19 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             key = (row["owner_type"], row["owner_id"])
             if key not in owners:
                 continue
-            owners[key]["contests"]["items"].append(contest_to_json(row))
+            item = contest_to_json(row)
+            owners[key]["contests"]["items"].append(item)
+            handle_activity = owners[key]["_handle_activities"].get(handle_activity_key(row["platform"], row["handle"]))
+            if handle_activity:
+                handle_activity["contests"]["items"].append(item)
 
         for owner in owners.values():
-            contest_summary = summarize_contests(owner["contests"]["items"])
-            owner["contests"].update(contest_summary)
-            owner["stats"]["contests"] = contest_summary["total"]
+            finalize_contest_activity(owner)
+            for handle_activity in owner["_handle_activities"].values():
+                finalize_contest_activity(handle_activity)
             owner["realNameVisible"] = can_view_real_name(principal, owner)
             owner["realName"] = owner.get("_real_name", "") if owner["realNameVisible"] else ""
+            owner.pop("_handle_activities", None)
             owner.pop("_real_name", None)
 
         feed_total = sum(
@@ -4014,7 +4104,7 @@ def summarize_contests(items: list[dict]) -> dict:
 
 def contest_to_json(row: sqlite3.Row) -> dict:
     adapter = ADAPTERS.get(row["platform"])
-    category = row["category"] or "other"
+    category = classify_contest(row["platform"], row["contest_name"], row["remote_id"], raw_json_dict(row))
     return {
         "id": row["id"],
         "platform": row["platform"],
