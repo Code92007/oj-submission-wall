@@ -62,6 +62,7 @@ BATTLE_MEMORY_CACHE_LIMIT = max(8, int(os.environ.get("BATTLE_MEMORY_CACHE_LIMIT
 BATTLE_INITIAL_RATING = 1500
 BATTLE_DUEL_K_FACTOR = 16
 BATTLE_ABSOLUTE_K_FACTOR = 24
+BATTLE_DUEL_DIRECTION_LIMIT = 0.8
 BATTLE_MIN_RATING = 800
 BATTLE_MAX_RATING = 2400
 SESSION_COOKIE = "ojwall_session"
@@ -4774,6 +4775,11 @@ def battle_in_contest_solve(row: sqlite3.Row, entry: dict) -> dict | None:
 
 
 def battle_absolute_rating_change(result: dict) -> tuple[float, str | None]:
+    rating_delta = battle_optional_number(result.get("ratingDelta"))
+    if result.get("rated") and rating_delta is not None:
+        signal = max(-1.0, min(1.0, float(rating_delta) / 200))
+        return BATTLE_ABSOLUTE_K_FACTOR * signal, "official-rating"
+
     rank = battle_optional_int(result.get("rank"), positive=True)
     participants = battle_optional_int(result.get("participants"), positive=True)
     if rank is not None and participants is not None and rank <= participants:
@@ -4781,7 +4787,6 @@ def battle_absolute_rating_change(result: dict) -> tuple[float, str | None]:
         signal = 1 - 2 * rank_percentile
         return BATTLE_ABSOLUTE_K_FACTOR * signal, "rank-percentile"
 
-    rating_delta = battle_optional_number(result.get("ratingDelta"))
     if rating_delta is not None:
         signal = max(-1.0, min(1.0, float(rating_delta) / 200))
         return BATTLE_ABSOLUTE_K_FACTOR * signal, "official-rating"
@@ -4792,6 +4797,8 @@ def battle_elo_timeline(shared_contests: list[dict]) -> dict:
     current = [float(BATTLE_INITIAL_RATING), float(BATTLE_INITIAL_RATING)]
     points = []
     for contest in sorted(shared_contests, key=lambda item: (item["participatedAt"], item["platform"], item["remoteId"])):
+        if contest.get("sameTeam"):
+            continue
         left_result = contest["leftResult"]
         right_result = contest["rightResult"]
         if left_result.get("rank") is None or right_result.get("rank") is None:
@@ -4805,18 +4812,19 @@ def battle_elo_timeline(shared_contests: list[dict]) -> dict:
 
         left_absolute, left_absolute_source = battle_absolute_rating_change(left_result)
         right_absolute, right_absolute_source = battle_absolute_rating_change(right_result)
+        if left_absolute < 0 and right_absolute < 0:
+            if duel_change > 0:
+                duel_change = min(duel_change, -left_absolute * BATTLE_DUEL_DIRECTION_LIMIT)
+            elif duel_change < 0:
+                duel_change = max(duel_change, right_absolute * BATTLE_DUEL_DIRECTION_LIMIT)
+        elif left_absolute > 0 and right_absolute > 0:
+            if duel_change > 0:
+                duel_change = min(duel_change, right_absolute * BATTLE_DUEL_DIRECTION_LIMIT)
+            elif duel_change < 0:
+                duel_change = max(duel_change, -left_absolute * BATTLE_DUEL_DIRECTION_LIMIT)
         previous = list(current)
-        if contest.get("sameTeam"):
-            shared_absolute = (left_absolute + right_absolute) / 2
-            minimum_change = max(BATTLE_MIN_RATING - current[0], BATTLE_MIN_RATING - current[1])
-            maximum_change = min(BATTLE_MAX_RATING - current[0], BATTLE_MAX_RATING - current[1])
-            shared_absolute = max(minimum_change, min(maximum_change, shared_absolute))
-            left_absolute = right_absolute = shared_absolute
-            current[0] += shared_absolute
-            current[1] += shared_absolute
-        else:
-            current[0] = max(BATTLE_MIN_RATING, min(BATTLE_MAX_RATING, current[0] + left_absolute + duel_change))
-            current[1] = max(BATTLE_MIN_RATING, min(BATTLE_MAX_RATING, current[1] + right_absolute - duel_change))
+        current[0] = max(BATTLE_MIN_RATING, min(BATTLE_MAX_RATING, current[0] + left_absolute + duel_change))
+        current[1] = max(BATTLE_MIN_RATING, min(BATTLE_MAX_RATING, current[1] + right_absolute - duel_change))
         points.append(
             {
                 "platform": contest["platform"],

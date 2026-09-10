@@ -906,7 +906,7 @@ function renderBattleTimeline(data) {
       const absoluteChange = point[`${side}AbsoluteChange`];
       const changeText = change == null
         ? ""
-        : ` · 本场 ${change >= 0 ? "+" : ""}${change}（绝对表现 ${absoluteChange >= 0 ? "+" : ""}${absoluteChange}${point.sameTeam ? "，同队不计相对胜负" : ""}）`;
+        : ` · 本场 ${change >= 0 ? "+" : ""}${change}（绝对表现 ${absoluteChange >= 0 ? "+" : ""}${absoluteChange}）`;
       title.textContent = `${point.participatedDate} · ${point.contestName} · 指数 ${point[key]}${changeText}`;
       circle.appendChild(title);
       svg.appendChild(circle);
@@ -922,7 +922,7 @@ function renderBattleTimeline(data) {
   chartWrap.appendChild(svg);
   section.append(legend, chartWrap);
   const note = el("p", "battle-data-note");
-  note.textContent = "双方从 1500 起步：名次百分位或官方 Rating 变化决定各自独立涨跌，再叠加较小的相对胜负分。两人发挥差时可以一起掉分；同队成绩只更新绝对表现，不会让双方指数收敛。";
+  note.textContent = "双方从 1500 起步：优先按官方 Rating 变化决定各自涨跌，无 Rating 时使用名次百分位，再叠加较小的相对胜负分；同队成绩保留在列表中，但不进入折线或指数计算。";
   section.appendChild(note);
   return section;
 }

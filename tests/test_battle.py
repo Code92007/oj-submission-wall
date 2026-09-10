@@ -230,7 +230,7 @@ class BattleOverviewTest(unittest.TestCase):
         self.assertEqual(nowcoder["speed"]["problems"], 0)
         self.assertIsNone(contests[("vjudge", "3000")]["winner"])
 
-    def test_same_nowcoder_team_updates_absolute_performance_without_duel(self):
+    def test_same_nowcoder_team_is_excluded_from_timeline_and_duels(self):
         first_start = self.now - 2 * 86400
         second_start = self.now - 86400
         for owner_id, rank, team_id in [(1, 100, "alice-team"), (2, 300, "bob-team")]:
@@ -271,12 +271,8 @@ class BattleOverviewTest(unittest.TestCase):
         self.assertEqual(result["headToHead"]["rankedContests"], 1)
         self.assertEqual(result["headToHead"]["sameTeamContests"], 1)
         self.assertEqual(result["headToHead"]["ties"], 0)
-        self.assertEqual([point["winner"] for point in result["timeline"]["points"]], ["left", "same-team"])
-        same_team_point = result["timeline"]["points"][1]
-        self.assertTrue(same_team_point["sameTeam"])
-        self.assertEqual(same_team_point["duelChange"], 0)
-        self.assertEqual(same_team_point["leftChange"], same_team_point["rightChange"])
-        self.assertLess(same_team_point["leftChange"], 0)
+        self.assertEqual([point["winner"] for point in result["timeline"]["points"]], ["left"])
+        self.assertNotIn("shared-team", {point["remoteId"] for point in result["timeline"]["points"]})
         match = next(item for item in result["sharedContests"] if item["remoteId"] == "shared-team")
         self.assertTrue(match["sameTeam"])
         self.assertEqual(match["speed"]["problems"], 0)
@@ -310,6 +306,39 @@ class BattleOverviewTest(unittest.TestCase):
         self.assertLess(point["rightChange"], 0)
         self.assertLess(result["timeline"]["leftRating"], result["timeline"]["initialRating"])
         self.assertLess(result["timeline"]["rightRating"], result["timeline"]["initialRating"])
+
+    def test_official_rating_drop_overrides_positive_rank_percentile(self):
+        start = self.now - 86400
+        for owner_id, rank, rating_delta, team_id in [
+            (1, 320, -54, "alice-team"),
+            (2, 377, -93, "bob-team"),
+        ]:
+            self.add_contest(
+                owner_id,
+                "nowcoder",
+                "rated-drop",
+                start,
+                {
+                    "contestId": "rated-drop",
+                    "rank": rank,
+                    "canShowRank": True,
+                    "userCount": 1447,
+                    "teamId": team_id,
+                    "rating": 1800 + rating_delta,
+                    "changeValue": rating_delta,
+                    "ratingStatus": "YES",
+                    "startTime": start * 1000,
+                    "endTime": (start + 7200) * 1000,
+                },
+            )
+
+        result = app.build_battle(None, "user:1", "user:2", "30")
+
+        point = result["timeline"]["points"][0]
+        self.assertEqual(point["leftAbsoluteSource"], "official-rating")
+        self.assertEqual(point["rightAbsoluteSource"], "official-rating")
+        self.assertLess(point["leftChange"], 0)
+        self.assertLess(point["rightChange"], 0)
 
     def test_range_filters_contests_instead_of_daily_problem_activity(self):
         self.add_codeforces_match(self.now - 60 * 86400)
