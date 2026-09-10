@@ -56,6 +56,7 @@ HISTORICAL_CACHE_AFTER_DAYS = int(os.environ.get("HISTORICAL_CACHE_AFTER_DAYS", 
 HISTORICAL_CACHE_TTL_SECONDS = int(os.environ.get("HISTORICAL_CACHE_TTL_SECONDS", str(3650 * 86400)))
 OVERVIEW_CACHE_TTL_SECONDS = int(os.environ.get("OVERVIEW_CACHE_TTL_SECONDS", "20"))
 OVERVIEW_FEED_LIMIT = int(os.environ.get("OVERVIEW_FEED_LIMIT", "1000"))
+BATTLE_MEMORY_CACHE_LIMIT = max(8, int(os.environ.get("BATTLE_MEMORY_CACHE_LIMIT", "128")))
 SESSION_COOKIE = "ojwall_session"
 DEFAULT_TEAM_NAME = "未分组"
 GUEST_TEAM_NAME = "游客"
@@ -124,6 +125,7 @@ SYNC_LAST_FINISHED_JOB: dict | None = None
 SYNC_JOB_COUNTER = 0
 OVERVIEW_CACHE_LOCK = threading.Lock()
 OVERVIEW_MEMORY_CACHE: dict[tuple[str, str, str, int], tuple[int, dict]] = {}
+BATTLE_MEMORY_CACHE: dict[tuple[str, ...], tuple[int, dict]] = {}
 HTTP_STALE_HITS = threading.local()
 LUOGU_REQUEST_AUTH = threading.local()
 TRANSIENT_HTTP_STATUSES = {408, 425, 429, 500, 502, 503, 504}
@@ -3705,6 +3707,7 @@ def overview_memory_cache_key(principal: dict | None, days: int) -> tuple[str, s
 def clear_overview_memory_cache() -> None:
     with OVERVIEW_CACHE_LOCK:
         OVERVIEW_MEMORY_CACHE.clear()
+        BATTLE_MEMORY_CACHE.clear()
 
 
 def read_overview_memory_cache(principal: dict | None, days: int) -> dict | None:
@@ -4141,6 +4144,458 @@ def submission_to_json(conn: sqlite3.Connection, row: sqlite3.Row) -> dict:
     }
 
 
+def battle_range(range_key: str, now: int | None = None) -> dict:
+    now = now or utcnow()
+    today = dt.datetime.fromtimestamp(now, DISPLAY_TZ).date()
+    ranges = {
+        "30": (29, "近 30 天"),
+        "90": (89, "近 90 天"),
+        "365": (364, "近 365 天"),
+    }
+    if range_key == "all":
+        start_date = None
+        label = "全部历史"
+    elif range_key == "year":
+        start_date = dt.date(today.year, 1, 1)
+        label = f"{today.year} 年"
+    elif range_key in ranges:
+        offset, label = ranges[range_key]
+        start_date = today - dt.timedelta(days=offset)
+    else:
+        raise ValueError("不支持的对战时间范围")
+    return {
+        "key": range_key,
+        "label": label,
+        "from": start_date.isoformat() if start_date else None,
+        "to": today.isoformat(),
+    }
+
+
+def visible_battle_owners(conn: sqlite3.Connection, principal: dict | None) -> dict[str, dict]:
+    owners = {}
+    rows = conn.execute(
+        "SELECT id, username, display_name, real_name, team_name FROM users ORDER BY created_at"
+    ).fetchall()
+    for row in rows:
+        owner = {
+            "ownerType": "user",
+            "ownerId": str(row["id"]),
+            "username": row["username"],
+            "displayName": row["display_name"],
+            "teamName": row["team_name"] or DEFAULT_TEAM_NAME,
+            "isCurrent": bool(principal and principal["type"] == "user" and principal["id"] == str(row["id"])),
+            "realName": "",
+            "realNameVisible": False,
+            "_real_name": row["real_name"] or "",
+            "handles": [],
+        }
+        owners[f"user:{row['id']}"] = owner
+
+    if principal and principal["type"] == "guest":
+        owner = {
+            "ownerType": "guest",
+            "ownerId": str(principal["id"]),
+            "displayName": principal["displayName"],
+            "teamName": principal.get("teamName") or GUEST_TEAM_NAME,
+            "isCurrent": True,
+            "realName": "",
+            "realNameVisible": False,
+            "_real_name": principal.get("realName") or "",
+            "handles": [],
+        }
+        owners[f"guest:{principal['id']}"] = owner
+
+    for owner in owners.values():
+        owner["realNameVisible"] = can_view_real_name(principal, owner)
+        owner["realName"] = owner["_real_name"] if owner["realNameVisible"] else ""
+        owner.pop("_real_name", None)
+    return owners
+
+
+def battle_row_in_range(date_key: str, selected_range: dict) -> bool:
+    start_date = selected_range.get("from")
+    end_date = selected_range.get("to")
+    return bool((not start_date or date_key >= start_date) and (not end_date or date_key <= end_date))
+
+
+def battle_timestamp_bounds(selected_range: dict) -> tuple[int | None, int]:
+    start_date = dt.date.fromisoformat(selected_range["from"]) if selected_range.get("from") else None
+    end_date = dt.date.fromisoformat(selected_range["to"]) + dt.timedelta(days=1)
+    start_timestamp = (
+        int(dt.datetime.combine(start_date, dt.time.min, tzinfo=DISPLAY_TZ).timestamp())
+        if start_date
+        else None
+    )
+    end_timestamp = int(dt.datetime.combine(end_date, dt.time.min, tzinfo=DISPLAY_TZ).timestamp())
+    return start_timestamp, end_timestamp
+
+
+def battle_problem_from_row(row: sqlite3.Row) -> dict:
+    platform = str(row["platform"] or "")
+    adapter = ADAPTERS.get(platform)
+    return {
+        "key": solved_problem_key(row),
+        "platform": platform,
+        "platformLabel": adapter.label if adapter else platform,
+        "handle": row["handle"],
+        "problemId": row["problem_id"],
+        "problemName": row["problem_name"],
+        "solvedAtTimestamp": int(row["submitted_at"]),
+        "solvedAt": iso_from_ts(row["submitted_at"]),
+        "solvedDate": utc_date_from_ts(row["submitted_at"]),
+        "url": row["url"],
+    }
+
+
+def battle_contest_key(row: sqlite3.Row) -> tuple[str, str]:
+    remote_id = str(row["remote_id"] or "").strip()
+    if remote_id:
+        return str(row["platform"] or ""), remote_id
+    fallback = f"{normalize_problem_text_key(row['contest_name'])}:{utc_date_from_ts(row['participated_at'])}"
+    return str(row["platform"] or ""), fallback
+
+
+def battle_union_rows(
+    conn: sqlite3.Connection,
+    table: str,
+    columns: str,
+    owner_tuples: list[tuple[str, str]],
+    extra_where: str = "",
+    extra_params: tuple[object, ...] = (),
+    order_by: str = "",
+) -> list[sqlite3.Row]:
+    selects = []
+    params: list[object] = []
+    for owner_type, owner_id in owner_tuples:
+        selects.append(
+            f"SELECT {columns} FROM {table} WHERE owner_type = ? AND owner_id = ? {extra_where}"
+        )
+        params.extend((owner_type, owner_id, *extra_params))
+    query = " UNION ALL ".join(selects)
+    if order_by:
+        query = f"SELECT * FROM ({query}) ORDER BY {order_by}"
+    return conn.execute(query, tuple(params)).fetchall()
+
+
+def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, range_key: str = "365") -> dict:
+    selected_range = battle_range(range_key)
+    start_timestamp, end_timestamp = battle_timestamp_bounds(selected_range)
+    with connect_db() as conn:
+        owners = visible_battle_owners(conn, principal)
+        if left_key not in owners or right_key not in owners:
+            raise ValueError("选择的成员不存在或当前不可见")
+        if left_key == right_key:
+            raise ValueError("请选择两名不同的成员")
+
+        selected_keys = [left_key, right_key]
+        selected_owners = [owners[key] for key in selected_keys]
+        owner_tuples = [(owner["ownerType"], owner["ownerId"]) for owner in selected_owners]
+
+        handle_rows = battle_union_rows(
+            conn,
+            "handles",
+            "*",
+            owner_tuples,
+            extra_where="AND active = 1",
+            order_by="created_at",
+        )
+        handle_profiles: dict[str, list[tuple[str, str, dict]]] = {key: [] for key in selected_keys}
+        for row in handle_rows:
+            key = f"{row['owner_type']}:{row['owner_id']}"
+            if key in owners:
+                item = handle_to_json(row)
+                item.pop("lastError", None)
+                item.pop("syncStatus", None)
+                owners[key]["handles"].append(item)
+                if row["stats_json"]:
+                    with contextlib.suppress(Exception):
+                        stats = json.loads(row["stats_json"])
+                        if isinstance(stats, dict):
+                            handle_profiles[key].append((row["platform"], row["handle"], stats))
+
+        count_range_sql = "submitted_at < ?"
+        count_extra_params: tuple[object, ...] = (end_timestamp,)
+        if start_timestamp is not None:
+            count_range_sql = "submitted_at >= ? AND submitted_at < ?"
+            count_extra_params = (start_timestamp, end_timestamp)
+        count_rows = battle_union_rows(
+            conn,
+            "submissions",
+            "owner_type, owner_id, COUNT(*) AS total",
+            owner_tuples,
+            extra_where=f"AND {count_range_sql}",
+            extra_params=count_extra_params,
+        )
+        period_submissions = {key: 0 for key in selected_keys}
+        for row in count_rows:
+            key = f"{row['owner_type']}:{row['owner_id']}"
+            if key in period_submissions:
+                period_submissions[key] = int(row["total"] or 0)
+
+        submission_rows = battle_union_rows(
+            conn,
+            "submissions",
+            "owner_type, owner_id, platform, handle, remote_id, problem_id, problem_name, verdict, submitted_at, url, raw_json",
+            owner_tuples,
+            extra_where="""AND (
+                UPPER(TRIM(COALESCE(verdict, ''))) IN ('AC', 'OK', 'ACCEPTED')
+                OR TRIM(COALESCE(verdict, '')) IN ('答案正确', '通过', '12')
+            )""",
+            order_by="submitted_at",
+        )
+        first_solves = {key: {} for key in selected_keys}
+        placeholder_days = {key: set() for key in selected_keys}
+        for row in submission_rows:
+            key = f"{row['owner_type']}:{row['owner_id']}"
+            if key not in first_solves:
+                continue
+            date_key = utc_date_from_ts(row["submitted_at"])
+            if normalize_verdict(row["verdict"]) != "AC":
+                continue
+            if is_activity_placeholder(row):
+                if battle_row_in_range(date_key, selected_range):
+                    placeholder_days[key].add(date_key)
+                continue
+            problem = battle_problem_from_row(row)
+            if problem["key"] and problem["key"] not in first_solves[key]:
+                first_solves[key][problem["key"]] = problem
+
+        period_solves = {
+            key: {
+                problem_key: problem
+                for problem_key, problem in first_solves[key].items()
+                if battle_row_in_range(problem["solvedDate"], selected_range)
+            }
+            for key in selected_keys
+        }
+
+        profile_problem_platforms: dict[str, dict[str, str]] = {key: {} for key in selected_keys}
+        profile_fallback_counts: dict[str, dict[str, int]] = {key: {} for key in selected_keys}
+        known_handle_counts: dict[str, dict[tuple[str, str], int]] = {key: {} for key in selected_keys}
+        for key, problems in first_solves.items():
+            for problem in problems.values():
+                handle_key = (problem["platform"], str(problem["handle"] or ""))
+                counts = known_handle_counts[key]
+                counts[handle_key] = counts.get(handle_key, 0) + 1
+        for key, profiles in handle_profiles.items():
+            for platform, handle, stats in profiles:
+                problem_keys = profile_solved_problem_keys({**stats, "_platform": platform})
+                if problem_keys:
+                    for problem_key in problem_keys:
+                        profile_problem_platforms[key].setdefault(problem_key, platform)
+                    continue
+                all_time_accepted = int(stats.get("allTimeAccepted") or 0)
+                known_count = known_handle_counts[key].get((platform, handle), 0)
+                extra = max(0, all_time_accepted - known_count)
+                if extra:
+                    profile_fallback_counts[key][platform] = profile_fallback_counts[key].get(platform, 0) + extra
+
+        comparison_problem_keys = {key: set(period_solves[key]) for key in selected_keys}
+        profile_only_counts = {key: 0 for key in selected_keys}
+        if range_key == "all":
+            for key in selected_keys:
+                timed_keys = set(period_solves[key])
+                profile_keys = set(profile_problem_platforms[key])
+                comparison_problem_keys[key].update(profile_keys)
+                profile_only_counts[key] = len(profile_keys - timed_keys) + sum(profile_fallback_counts[key].values())
+
+        contest_range_sql = "participated_at < ?"
+        contest_extra_params: tuple[object, ...] = (end_timestamp,)
+        if start_timestamp is not None:
+            contest_range_sql = "participated_at >= ? AND participated_at < ?"
+            contest_extra_params = (start_timestamp, end_timestamp)
+        contest_rows = battle_union_rows(
+            conn,
+            "contests",
+            "*",
+            owner_tuples,
+            extra_where=f"AND {contest_range_sql}",
+            extra_params=contest_extra_params,
+            order_by="participated_at DESC",
+        )
+        period_contests: dict[str, dict[tuple[str, str], dict]] = {key: {} for key in selected_keys}
+        for row in contest_rows:
+            key = f"{row['owner_type']}:{row['owner_id']}"
+            if key not in period_contests:
+                continue
+            date_key = utc_date_from_ts(row["participated_at"])
+            if not battle_row_in_range(date_key, selected_range):
+                continue
+            contest_key = battle_contest_key(row)
+            period_contests[key].setdefault(contest_key, contest_to_json(row))
+
+        left_solves = period_solves[left_key]
+        right_solves = period_solves[right_key]
+        common_keys = set(left_solves) & set(right_solves)
+        known_common_keys = comparison_problem_keys[left_key] & comparison_problem_keys[right_key]
+        common_problems = []
+        left_wins = 0
+        right_wins = 0
+        ties = 0
+        for problem_key in common_keys:
+            left = left_solves[problem_key]
+            right = right_solves[problem_key]
+            if left["solvedAtTimestamp"] < right["solvedAtTimestamp"]:
+                winner = "left"
+                left_wins += 1
+            elif right["solvedAtTimestamp"] < left["solvedAtTimestamp"]:
+                winner = "right"
+                right_wins += 1
+            else:
+                winner = "tie"
+                ties += 1
+            source_platform = problem_key.split(":", 1)[0]
+            display_platform = source_platform if source_platform in ADAPTERS else left["platform"]
+            adapter = ADAPTERS.get(display_platform)
+            common_problems.append(
+                {
+                    "key": problem_key,
+                    "platform": display_platform,
+                    "platformLabel": adapter.label if adapter else left["platformLabel"],
+                    "problemId": left["problemId"] or right["problemId"],
+                    "problemName": left["problemName"] or right["problemName"],
+                    "winner": winner,
+                    "deltaSeconds": abs(left["solvedAtTimestamp"] - right["solvedAtTimestamp"]),
+                    "left": {name: value for name, value in left.items() if name != "solvedAtTimestamp"},
+                    "right": {name: value for name, value in right.items() if name != "solvedAtTimestamp"},
+                }
+            )
+        common_problems.sort(
+            key=lambda item: max(
+                left_solves[item["key"]]["solvedAtTimestamp"],
+                right_solves[item["key"]]["solvedAtTimestamp"],
+            ),
+            reverse=True,
+        )
+
+        shared_contest_keys = set(period_contests[left_key]) & set(period_contests[right_key])
+        shared_contests = []
+        for contest_key in shared_contest_keys:
+            left = period_contests[left_key][contest_key]
+            right = period_contests[right_key][contest_key]
+            shared_contests.append(
+                {
+                    **left,
+                    "leftHandle": left.get("handle") or "",
+                    "rightHandle": right.get("handle") or "",
+                }
+            )
+        shared_contests.sort(key=lambda item: item.get("participatedAt") or "", reverse=True)
+
+        platform_rank = {key: index for index, key in enumerate(ADAPTERS)}
+        players = []
+        for key, owner in zip(selected_keys, selected_owners):
+            solves = period_solves[key]
+            counts: dict[str, int] = {}
+            for problem in solves.values():
+                platform = problem["platform"]
+                counts[platform] = counts.get(platform, 0) + 1
+            if range_key == "all":
+                timed_keys = set(solves)
+                for problem_key, platform in profile_problem_platforms[key].items():
+                    if problem_key not in timed_keys:
+                        counts[platform] = counts.get(platform, 0) + 1
+                for platform, extra in profile_fallback_counts[key].items():
+                    counts[platform] = counts.get(platform, 0) + extra
+            by_platform = [
+                {
+                    "platform": platform,
+                    "platformLabel": ADAPTERS[platform].label if platform in ADAPTERS else platform,
+                    "solved": solved,
+                }
+                for platform, solved in counts.items()
+            ]
+            by_platform.sort(key=lambda item: (platform_rank.get(item["platform"], 999), item["platformLabel"]))
+            active_days = placeholder_days[key] | {problem["solvedDate"] for problem in solves.values()}
+            players.append(
+                {
+                    **owner,
+                    "stats": {
+                        "solved": len(comparison_problem_keys[key]) + (
+                            sum(profile_fallback_counts[key].values()) if range_key == "all" else 0
+                        ),
+                        "timedSolved": len(solves),
+                        "profileOnlySolved": profile_only_counts[key],
+                        "activeDays": len(active_days),
+                        "submissions": period_submissions[key],
+                        "contests": len(period_contests[key]),
+                    },
+                    "byPlatform": by_platform,
+                }
+            )
+
+        return {
+            "range": selected_range,
+            "players": players,
+            "headToHead": {
+                "leftWins": left_wins,
+                "rightWins": right_wins,
+                "ties": ties,
+                "commonSolved": len(common_keys),
+                "knownCommonSolved": len(known_common_keys),
+                "unrankedCommonSolved": len(known_common_keys - common_keys),
+                "leftOnly": len(comparison_problem_keys[left_key] - comparison_problem_keys[right_key]),
+                "rightOnly": len(comparison_problem_keys[right_key] - comparison_problem_keys[left_key]),
+                "sharedContests": len(shared_contest_keys),
+            },
+            "commonProblems": common_problems[:100],
+            "commonProblemLimit": 100,
+            "sharedContests": shared_contests[:50],
+            "sharedContestLimit": 50,
+        }
+
+
+def battle_memory_cache_key(
+    principal: dict | None,
+    left_key: str,
+    right_key: str,
+    range_key: str,
+) -> tuple[str, ...]:
+    return (
+        str(DB_PATH),
+        str(principal.get("type") if principal else "anon"),
+        str(principal.get("id") if principal else ""),
+        normalize_team_name(principal.get("teamName"), "") if principal else "",
+        left_key,
+        right_key,
+        range_key,
+    )
+
+
+def prune_battle_memory_cache(now: int) -> None:
+    expired_keys = [
+        key
+        for key, (cached_at, _) in BATTLE_MEMORY_CACHE.items()
+        if now - cached_at > OVERVIEW_CACHE_TTL_SECONDS
+    ]
+    for key in expired_keys:
+        BATTLE_MEMORY_CACHE.pop(key, None)
+    while len(BATTLE_MEMORY_CACHE) > BATTLE_MEMORY_CACHE_LIMIT:
+        oldest_key = min(BATTLE_MEMORY_CACHE, key=lambda item: BATTLE_MEMORY_CACHE[item][0])
+        BATTLE_MEMORY_CACHE.pop(oldest_key, None)
+
+
+def build_battle(principal: dict | None, left_key: str, right_key: str, range_key: str = "365") -> dict:
+    key = battle_memory_cache_key(principal, left_key, right_key, range_key)
+    now = utcnow()
+    if OVERVIEW_CACHE_TTL_SECONDS > 0:
+        with OVERVIEW_CACHE_LOCK:
+            prune_battle_memory_cache(now)
+            cached = BATTLE_MEMORY_CACHE.get(key)
+            if cached and now - cached[0] <= OVERVIEW_CACHE_TTL_SECONDS:
+                BATTLE_MEMORY_CACHE[key] = (now, cached[1])
+                return cached[1]
+
+    battle = build_battle_from_db(principal, left_key, right_key, range_key)
+    if OVERVIEW_CACHE_TTL_SECONDS > 0:
+        with OVERVIEW_CACHE_LOCK:
+            if key not in BATTLE_MEMORY_CACHE and len(BATTLE_MEMORY_CACHE) >= BATTLE_MEMORY_CACHE_LIMIT:
+                oldest_key = min(BATTLE_MEMORY_CACHE, key=lambda item: BATTLE_MEMORY_CACHE[item][0])
+                BATTLE_MEMORY_CACHE.pop(oldest_key, None)
+            BATTLE_MEMORY_CACHE[key] = (now, battle)
+    return battle
+
+
 class AppHandler(BaseHTTPRequestHandler):
     server_version = "OJWall/1.0"
 
@@ -4196,6 +4651,19 @@ class AppHandler(BaseHTTPRequestHandler):
                         return self.send_json(200, {"ok": True, **cached})
                     raise
                 return self.send_json(200, {"ok": True, **overview})
+            if path == "/api/battle":
+                params = urllib.parse.parse_qs(parsed.query)
+                left_key = str(params.get("left", [""])[0])
+                right_key = str(params.get("right", [""])[0])
+                range_key = str(params.get("range", ["365"])[0])
+                if not left_key or not right_key:
+                    return self.send_error_json(400, "请选择两名成员")
+                principal = get_current_principal(self)
+                try:
+                    battle = build_battle(principal, left_key, right_key, range_key)
+                except ValueError as exc:
+                    return self.send_error_json(400, str(exc))
+                return self.send_json(200, {"ok": True, **battle})
             if path == "/api/auth/verify":
                 return self.handle_verify(parsed)
             if path == "/" or path == "/index.html":

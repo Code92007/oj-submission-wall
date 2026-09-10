@@ -14,6 +14,7 @@ OJ Submission Wall 是一个给算法训练队、社团或小团队使用的做�
 - 支持按年或近 10 年查看训练绿墙。
 - 支持最新提交列表、平台/用户/语言/状态/时间范围筛选和分页。
 - 支持比赛统计，按平台和常见比赛类型聚合。
+- 支持双人对战，比较时间范围内的解题、活跃天数、参赛记录和共同题首次 AC 先后。
 - 支持本地 SQLite 持久化和 HTTP 缓存，平台接口临时失败时保留上次成功数据。
 - 无前端构建依赖，后端只使用 Python 标准库，适合 Docker 轻量部署。
 
@@ -124,6 +125,7 @@ docker compose up -d --build
 | `HISTORICAL_CACHE_AFTER_DAYS` | `30` | 距今超过多少天的历史页可直接使用缓存 |
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OVERVIEW_CACHE_TTL_SECONDS` | `20` | `/api/overview` 页面组装结果的内存缓存秒数 |
+| `BATTLE_MEMORY_CACHE_LIMIT` | `128` | 双人对战短缓存的最大组合数，防止成员组合过多占用内存 |
 | `OVERVIEW_FEED_LIMIT` | `1000` | `/api/overview` 返回的最近提交明细条数上限，统计仍基于库内全量历史记录 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent，生产环境建议包含你的站点地址 |
 | `LUOGU_USER_AGENT` | `OJSubmissionWall/1.0` | 洛谷请求的 User-Agent，生产环境建议包含你的站点地址 |

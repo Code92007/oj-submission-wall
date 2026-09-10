@@ -20,6 +20,14 @@ const state = {
   binding: false,
   handleBusy: new Set(),
   overviewPollTimer: null,
+  mainView: "overview",
+  battleLeftKey: "",
+  battleRightKey: "",
+  battleRange: "365",
+  battle: null,
+  battleLoading: false,
+  battleError: "",
+  battleRequestId: 0,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -229,6 +237,9 @@ function applyOverviewData(data, options = {}) {
   updateWallRange(data);
   renderAll();
   if (options.save !== false) saveOverviewBrowserCache(data);
+  if (state.mainView === "battle" && state.battleLeftKey && state.battleRightKey) {
+    loadBattle();
+  }
 }
 
 function hasActiveSync(data = state.overview) {
@@ -316,6 +327,7 @@ function renderAll() {
   renderMyHandles();
   renderMembers();
   renderFeed();
+  renderMainView();
 }
 
 function renderProfileForm() {
@@ -478,6 +490,481 @@ function sortedMembers(members) {
 
 function memberKey(member) {
   return `${member.ownerType}:${member.ownerId}`;
+}
+
+function battleMemberLabel(member) {
+  const current = member.isCurrent ? "（我）" : "";
+  return `${member.displayName}${current} · ${memberTeam(member)}`;
+}
+
+function ensureBattlePlayers() {
+  const members = sortedMembers([...(state.overview?.members || [])]);
+  const keys = new Set(members.map(memberKey));
+  if (!keys.has(state.battleLeftKey)) {
+    const preferred = members.find((member) => member.isCurrent) || members[0];
+    state.battleLeftKey = preferred ? memberKey(preferred) : "";
+  }
+  if (!keys.has(state.battleRightKey) || state.battleRightKey === state.battleLeftKey) {
+    const opponent = members.find((member) => memberKey(member) !== state.battleLeftKey);
+    state.battleRightKey = opponent ? memberKey(opponent) : "";
+  }
+  return members;
+}
+
+function renderBattleSelect(select, members, selectedKey) {
+  select.innerHTML = "";
+  if (!members.length) {
+    const option = document.createElement("option");
+    option.textContent = "暂无成员";
+    select.appendChild(option);
+    select.disabled = true;
+    return;
+  }
+  for (const member of members) {
+    const option = document.createElement("option");
+    option.value = memberKey(member);
+    option.textContent = battleMemberLabel(member);
+    select.appendChild(option);
+  }
+  select.value = selectedKey;
+  select.disabled = members.length < 2;
+}
+
+function renderBattleControls() {
+  const members = ensureBattlePlayers();
+  renderBattleSelect($("#battleLeftSelect"), members, state.battleLeftKey);
+  renderBattleSelect($("#battleRightSelect"), members, state.battleRightKey);
+  $("#battleRangeSelect").value = state.battleRange;
+  $("#battleSwapBtn").disabled = members.length < 2;
+}
+
+function battleSignature() {
+  return `${state.battleLeftKey}|${state.battleRightKey}|${state.battleRange}`;
+}
+
+function renderMainView() {
+  const battleActive = state.mainView === "battle";
+  $("#overviewTab").classList.toggle("active", !battleActive);
+  $("#overviewTab").setAttribute("aria-selected", battleActive ? "false" : "true");
+  $("#overviewTab").tabIndex = battleActive ? -1 : 0;
+  $("#battleTab").classList.toggle("active", battleActive);
+  $("#battleTab").setAttribute("aria-selected", battleActive ? "true" : "false");
+  $("#battleTab").tabIndex = battleActive ? 0 : -1;
+  $("#overviewView").classList.toggle("hidden", battleActive);
+  $("#battleView").classList.toggle("hidden", !battleActive);
+  $("#feedPanel").classList.toggle("hidden", battleActive);
+  if (battleActive) {
+    renderBattleControls();
+    renderBattleContent();
+  }
+}
+
+function switchMainView(view) {
+  state.mainView = view === "battle" ? "battle" : "overview";
+  clearMessage();
+  renderMainView();
+  if (state.mainView === "battle" && state.battleLeftKey && state.battleRightKey) {
+    loadBattle();
+  }
+}
+
+function selectBattlePlayer(side, value) {
+  const otherSide = side === "left" ? "right" : "left";
+  const ownKey = side === "left" ? "battleLeftKey" : "battleRightKey";
+  const otherKey = otherSide === "left" ? "battleLeftKey" : "battleRightKey";
+  const previous = state[ownKey];
+  state[ownKey] = value;
+  if (state[ownKey] === state[otherKey]) {
+    state[otherKey] = previous;
+  }
+  state.battle = null;
+  loadBattle();
+}
+
+function swapBattlePlayers() {
+  [state.battleLeftKey, state.battleRightKey] = [state.battleRightKey, state.battleLeftKey];
+  state.battle = null;
+  loadBattle();
+}
+
+async function loadBattle() {
+  renderBattleControls();
+  if (!state.battleLeftKey || !state.battleRightKey || state.battleLeftKey === state.battleRightKey) {
+    state.battle = null;
+    renderBattleContent();
+    return;
+  }
+
+  const requestId = ++state.battleRequestId;
+  const signature = battleSignature();
+  state.battleLoading = true;
+  state.battleError = "";
+  renderBattleContent();
+  const params = new URLSearchParams({
+    left: state.battleLeftKey,
+    right: state.battleRightKey,
+    range: state.battleRange,
+  });
+  try {
+    const data = await api(`/api/battle?${params}`);
+    if (requestId !== state.battleRequestId) return;
+    data.signature = signature;
+    state.battle = data;
+  } catch (error) {
+    if (requestId !== state.battleRequestId) return;
+    state.battle = null;
+    state.battleError = error.message;
+  } finally {
+    if (requestId === state.battleRequestId) {
+      state.battleLoading = false;
+      renderBattleContent();
+    }
+  }
+}
+
+function battleEmpty(text, error = false) {
+  const empty = el("div", `empty-state battle-empty${error ? " error" : ""}`);
+  empty.textContent = text;
+  return empty;
+}
+
+function renderBattleContent() {
+  const container = $("#battleContent");
+  container.innerHTML = "";
+  const members = state.overview?.members || [];
+  if (members.length < 2) {
+    container.appendChild(battleEmpty("至少需要两名成员才能开始对战"));
+    return;
+  }
+  if (state.battleLoading) {
+    container.appendChild(battleEmpty("正在生成对战数据..."));
+    return;
+  }
+  if (state.battleError) {
+    container.appendChild(battleEmpty(state.battleError, true));
+    return;
+  }
+  if (!state.battle || state.battle.signature !== battleSignature()) {
+    container.appendChild(battleEmpty("选择两名成员后开始对战"));
+    return;
+  }
+
+  const data = state.battle;
+  container.append(
+    renderBattleScoreboard(data),
+    renderBattleMetrics(data),
+    renderBattlePlatforms(data),
+    renderCommonProblems(data),
+    renderSharedContests(data),
+  );
+}
+
+function playerInitials(name) {
+  return Array.from(String(name || "?"))
+    .filter((character) => character.trim())
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function renderBattlePlayer(player, side, leading) {
+  const panel = el("div", `battle-player ${side}${leading ? " leading" : ""}`);
+  const avatar = el("div", "battle-avatar");
+  avatar.textContent = playerInitials(player.displayName);
+  avatar.setAttribute("aria-hidden", "true");
+  const identity = el("div", "battle-player-identity");
+  const name = document.createElement("h3");
+  name.textContent = player.displayName;
+  const meta = document.createElement("p");
+  meta.textContent = [player.realName || "", player.teamName || "未分组"].filter(Boolean).join(" · ");
+  const handles = el("div", "battle-handles");
+  if (player.handles?.length) {
+    for (const handle of player.handles) {
+      const pill = el("span", "platform-pill");
+      pill.textContent = `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
+      handles.appendChild(pill);
+    }
+  } else {
+    const pill = el("span", "platform-pill");
+    pill.textContent = "未绑定 OJ";
+    handles.appendChild(pill);
+  }
+  identity.append(name, meta, handles);
+  panel.append(avatar, identity);
+  return panel;
+}
+
+function renderBattleScoreboard(data) {
+  const [left, right] = data.players;
+  const score = data.headToHead;
+  const leftLeading = score.leftWins > score.rightWins;
+  const rightLeading = score.rightWins > score.leftWins;
+  const section = el("section", "battle-scoreboard");
+  const scoreCenter = el("div", "battle-score-center");
+  const label = document.createElement("span");
+  label.textContent = "共同题先解出";
+  const value = document.createElement("strong");
+  value.textContent = `${score.leftWins} : ${score.rightWins}`;
+  const summary = document.createElement("p");
+  if (!score.commonSolved && score.knownCommonSolved) {
+    summary.textContent = `${score.knownCommonSolved} 题缺少首次 AC 时间`;
+  } else if (!score.commonSolved) {
+    summary.textContent = "当前范围内暂无可比较的共同题";
+  } else if (leftLeading) {
+    summary.textContent = `${left.displayName} 领先 · ${score.ties} 题同时解出`;
+  } else if (rightLeading) {
+    summary.textContent = `${right.displayName} 领先 · ${score.ties} 题同时解出`;
+  } else {
+    summary.textContent = `暂时打平 · ${score.ties} 题同时解出`;
+  }
+  scoreCenter.append(label, value, summary);
+  section.append(
+    renderBattlePlayer(left, "left", leftLeading),
+    scoreCenter,
+    renderBattlePlayer(right, "right", rightLeading),
+  );
+  return section;
+}
+
+function comparisonValue(value, suffix) {
+  return `${Number(value || 0)}${suffix}`;
+}
+
+function renderBattleMetricRow(label, leftValue, rightValue, suffix = "") {
+  const row = el("div", "battle-metric-row");
+  const left = el("div", `battle-metric-value${leftValue > rightValue ? " leading" : ""}`);
+  const leftStrong = document.createElement("strong");
+  leftStrong.textContent = comparisonValue(leftValue, suffix);
+  left.appendChild(leftStrong);
+  if (leftValue > rightValue) {
+    const mark = document.createElement("span");
+    mark.textContent = "领先";
+    left.appendChild(mark);
+  }
+  const name = document.createElement("span");
+  name.className = "battle-metric-label";
+  name.textContent = label;
+  const right = el("div", `battle-metric-value right${rightValue > leftValue ? " leading" : ""}`);
+  const rightStrong = document.createElement("strong");
+  rightStrong.textContent = comparisonValue(rightValue, suffix);
+  right.appendChild(rightStrong);
+  if (rightValue > leftValue) {
+    const mark = document.createElement("span");
+    mark.textContent = "领先";
+    right.appendChild(mark);
+  }
+  row.append(left, name, right);
+  return row;
+}
+
+function battleSectionHead(titleText, metaText) {
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  title.textContent = titleText;
+  const meta = document.createElement("span");
+  meta.textContent = metaText;
+  head.append(title, meta);
+  return head;
+}
+
+function renderBattleMetrics(data) {
+  const [left, right] = data.players;
+  const score = data.headToHead;
+  const section = el("section", "battle-section battle-metrics");
+  section.appendChild(battleSectionHead("核心数据", data.range.label));
+  const grid = el("div", "battle-metric-grid");
+  grid.append(
+    renderBattleMetricRow("解题", left.stats.solved, right.stats.solved, " 题"),
+    renderBattleMetricRow("活跃", left.stats.activeDays, right.stats.activeDays, " 天"),
+    renderBattleMetricRow("参赛", left.stats.contests, right.stats.contests, " 场"),
+    renderBattleMetricRow("提交", left.stats.submissions, right.stats.submissions, " 次"),
+    renderBattleMetricRow("独立解出", score.leftOnly, score.rightOnly, " 题"),
+  );
+  section.appendChild(grid);
+  if (left.stats.profileOnlySolved || right.stats.profileOnlySolved) {
+    const note = el("p", "battle-data-note");
+    note.textContent = "历史解题已合并个人页题集；先后比分只统计有首次 AC 时间的共同题。";
+    section.appendChild(note);
+  }
+  return section;
+}
+
+function renderBattlePlatforms(data) {
+  const [left, right] = data.players;
+  const leftPlatforms = new Map((left.byPlatform || []).map((item) => [item.platform, item]));
+  const rightPlatforms = new Map((right.byPlatform || []).map((item) => [item.platform, item]));
+  const platformKeys = [...new Set([...leftPlatforms.keys(), ...rightPlatforms.keys()])];
+  const section = el("section", "battle-section battle-platforms");
+  section.appendChild(battleSectionHead("平台解题", `${platformKeys.length} 个平台`));
+  if (!platformKeys.length) {
+    section.appendChild(battleEmpty("当前范围内还没有可比较的解题记录"));
+    return section;
+  }
+  const max = Math.max(
+    1,
+    ...platformKeys.flatMap((key) => [leftPlatforms.get(key)?.solved || 0, rightPlatforms.get(key)?.solved || 0]),
+  );
+  const rows = el("div", "battle-platform-rows");
+  for (const key of platformKeys) {
+    const leftItem = leftPlatforms.get(key);
+    const rightItem = rightPlatforms.get(key);
+    const leftCount = Number(leftItem?.solved || 0);
+    const rightCount = Number(rightItem?.solved || 0);
+    const row = el("div", "battle-platform-row");
+    const leftBar = el("div", "battle-bar-side left");
+    const leftNumber = document.createElement("strong");
+    leftNumber.textContent = leftCount;
+    const leftTrack = el("span", "battle-bar-track");
+    const leftFill = el("i", "battle-bar-fill");
+    leftFill.style.width = `${(leftCount / max) * 100}%`;
+    leftTrack.appendChild(leftFill);
+    leftBar.append(leftNumber, leftTrack);
+    const platform = document.createElement("span");
+    platform.className = "battle-platform-label";
+    platform.textContent = leftItem?.platformLabel || rightItem?.platformLabel || key;
+    const rightBar = el("div", "battle-bar-side right");
+    const rightTrack = el("span", "battle-bar-track");
+    const rightFill = el("i", "battle-bar-fill");
+    rightFill.style.width = `${(rightCount / max) * 100}%`;
+    rightTrack.appendChild(rightFill);
+    const rightNumber = document.createElement("strong");
+    rightNumber.textContent = rightCount;
+    rightBar.append(rightTrack, rightNumber);
+    row.append(leftBar, platform, rightBar);
+    rows.appendChild(row);
+  }
+  section.appendChild(rows);
+  return section;
+}
+
+function formatDuration(seconds) {
+  const value = Math.max(0, Number(seconds || 0));
+  if (value < 60) return `${value} 秒`;
+  if (value < 3600) return `${Math.floor(value / 60)} 分钟`;
+  if (value < 86400) return `${Math.floor(value / 3600)} 小时`;
+  return `${Math.floor(value / 86400)} 天`;
+}
+
+function renderCommonProblems(data) {
+  const [left, right] = data.players;
+  const score = data.headToHead;
+  const section = el("section", "battle-section");
+  const shown = data.commonProblems?.length || 0;
+  const limited = shown < score.commonSolved ? ` · 显示最近 ${shown} 题` : "";
+  const untimed = score.unrankedCommonSolved ? ` · ${score.unrankedCommonSolved} 题缺时间` : "";
+  section.appendChild(battleSectionHead("共同题先后", `${score.commonSolved} 题可比较${untimed}${limited}`));
+  if (!shown) {
+    section.appendChild(battleEmpty("当前范围内暂无可比较先后的共同题"));
+    return section;
+  }
+  const wrap = el("div", "battle-table-wrap");
+  const table = el("table", "battle-table common-problem-table");
+  const head = document.createElement("thead");
+  head.innerHTML = `
+    <tr>
+      <th class="battle-platform-column">平台</th>
+      <th>题目</th>
+      <th class="battle-time-column">${escapeHtml(left.displayName)} 首次 AC</th>
+      <th class="battle-time-column">${escapeHtml(right.displayName)} 首次 AC</th>
+      <th class="battle-result-column">先解出</th>
+    </tr>
+  `;
+  const body = document.createElement("tbody");
+  for (const item of data.commonProblems) {
+    const row = document.createElement("tr");
+    const platform = el("td", "battle-platform-column");
+    const badge = el("span", "platform-badge");
+    badge.textContent = item.platformLabel || item.platform;
+    platform.appendChild(badge);
+    const problem = el("td", "problem-cell");
+    const url = item.left?.url || item.right?.url;
+    const link = document.createElement(url ? "a" : "span");
+    link.className = "submission-link";
+    link.textContent = item.problemName || item.problemId || item.key;
+    link.title = link.textContent;
+    if (url) {
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+    }
+    problem.appendChild(link);
+    const leftTime = el("td", "battle-time-column");
+    leftTime.textContent = formatFullDateTime(item.left.solvedAt);
+    const rightTime = el("td", "battle-time-column");
+    rightTime.textContent = formatFullDateTime(item.right.solvedAt);
+    const result = el("td", "battle-result-column");
+    const resultPill = el("span", `battle-result-pill ${item.winner}`);
+    if (item.winner === "left") {
+      resultPill.textContent = `${left.displayName} · 早 ${formatDuration(item.deltaSeconds)}`;
+    } else if (item.winner === "right") {
+      resultPill.textContent = `${right.displayName} · 早 ${formatDuration(item.deltaSeconds)}`;
+    } else {
+      resultPill.textContent = "同时";
+    }
+    result.appendChild(resultPill);
+    row.append(platform, problem, leftTime, rightTime, result);
+    body.appendChild(row);
+  }
+  table.append(head, body);
+  wrap.appendChild(table);
+  section.appendChild(wrap);
+  return section;
+}
+
+function renderSharedContests(data) {
+  const [left, right] = data.players;
+  const total = data.headToHead.sharedContests;
+  const shown = data.sharedContests?.length || 0;
+  const limited = shown < total ? ` · 显示最近 ${shown} 场` : "";
+  const section = el("section", "battle-section");
+  section.appendChild(battleSectionHead("共同参赛", `${total} 场${limited}`));
+  if (!shown) {
+    section.appendChild(battleEmpty("当前范围内暂无共同参赛记录"));
+    return section;
+  }
+  const wrap = el("div", "battle-table-wrap");
+  const table = el("table", "battle-table shared-contest-table");
+  const head = document.createElement("thead");
+  head.innerHTML = `
+    <tr>
+      <th class="battle-platform-column">平台</th>
+      <th>比赛</th>
+      <th class="battle-date-column">参赛日期</th>
+      <th>${escapeHtml(left.displayName)} 账号</th>
+      <th>${escapeHtml(right.displayName)} 账号</th>
+    </tr>
+  `;
+  const body = document.createElement("tbody");
+  for (const item of data.sharedContests) {
+    const row = document.createElement("tr");
+    const platform = el("td", "battle-platform-column");
+    const badge = el("span", "platform-badge");
+    badge.textContent = item.platformLabel || item.platform;
+    platform.appendChild(badge);
+    const contest = el("td", "problem-cell");
+    const link = document.createElement(item.url ? "a" : "span");
+    link.className = "submission-link";
+    link.textContent = item.contestName || "未命名比赛";
+    link.title = link.textContent;
+    if (item.url) {
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+    }
+    contest.appendChild(link);
+    const date = el("td", "battle-date-column");
+    date.textContent = item.participatedDate || "-";
+    const leftHandle = document.createElement("td");
+    leftHandle.textContent = item.leftHandle || "-";
+    const rightHandle = document.createElement("td");
+    rightHandle.textContent = item.rightHandle || "-";
+    row.append(platform, contest, date, leftHandle, rightHandle);
+    body.appendChild(row);
+  }
+  table.append(head, body);
+  wrap.appendChild(table);
+  section.appendChild(wrap);
+  return section;
 }
 
 function memberTeam(member) {
@@ -1665,6 +2152,23 @@ async function retryHandle(id) {
 }
 
 function bindEvents() {
+  $("#overviewTab").addEventListener("click", () => switchMainView("overview"));
+  $("#battleTab").addEventListener("click", () => switchMainView("battle"));
+  $(".main-view-tabs").addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault();
+    const nextView = state.mainView === "overview" ? "battle" : "overview";
+    switchMainView(nextView);
+    $(`#${nextView}Tab`).focus();
+  });
+  $("#battleLeftSelect").addEventListener("change", (event) => selectBattlePlayer("left", event.currentTarget.value));
+  $("#battleRightSelect").addEventListener("change", (event) => selectBattlePlayer("right", event.currentTarget.value));
+  $("#battleSwapBtn").addEventListener("click", swapBattlePlayers);
+  $("#battleRangeSelect").addEventListener("change", (event) => {
+    state.battleRange = event.currentTarget.value;
+    state.battle = null;
+    loadBattle();
+  });
   $("#guestTab").addEventListener("click", () => switchAuthTab("guest"));
   $("#loginTab").addEventListener("click", () => switchAuthTab("login"));
   $("#registerTab").addEventListener("click", () => switchAuthTab("register"));
