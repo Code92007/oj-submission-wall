@@ -706,16 +706,19 @@ function renderBattleScoreboard(data) {
   const value = document.createElement("strong");
   value.textContent = `${score.leftWins} : ${score.rightWins}`;
   const summary = document.createElement("p");
+  const sameTeamSuffix = score.sameTeamContests ? ` · ${score.sameTeamContests} 场同队不计胜负` : "";
   if (!score.sharedContests) {
     summary.textContent = "当前范围内暂无共同参赛";
   } else if (!score.rankedContests) {
-    summary.textContent = `${score.sharedContests} 场共同参赛 · 暂无双方名次`;
+    summary.textContent = score.sameTeamContests
+      ? `${score.sameTeamContests} 场同队成绩 · 不计相互胜负`
+      : `${score.sharedContests} 场共同参赛 · 暂无双方名次`;
   } else if (leftLeading) {
-    summary.textContent = `${left.displayName} 领先 · ${score.rankedContests} 场可判胜`;
+    summary.textContent = `${left.displayName} 领先 · ${score.rankedContests} 场可判胜${sameTeamSuffix}`;
   } else if (rightLeading) {
-    summary.textContent = `${right.displayName} 领先 · ${score.rankedContests} 场可判胜`;
+    summary.textContent = `${right.displayName} 领先 · ${score.rankedContests} 场可判胜${sameTeamSuffix}`;
   } else {
-    summary.textContent = `暂时打平 · ${score.rankedContests} 场可判胜`;
+    summary.textContent = `暂时打平 · ${score.rankedContests} 场可判胜${sameTeamSuffix}`;
   }
   scoreCenter.append(label, value, summary);
   section.append(
@@ -778,7 +781,7 @@ function renderBattleMetrics(data) {
     renderBattleMetricRow("Rated 参赛", left.stats.ratedContests, right.stats.ratedContests, " 场"),
     renderBattleMetricRow("共同赛胜场", score.leftWins, score.rightWins, " 场"),
     renderBattleMetricRow("比赛内抢先", score.leftSpeedWins, score.rightSpeedWins, " 题"),
-    renderBattleMetricRow("对战指数", left.stats.duelRating, right.stats.duelRating),
+    renderBattleMetricRow("综合表现指数", left.stats.duelRating, right.stats.duelRating),
   );
   section.appendChild(grid);
   const note = el("p", "battle-data-note");
@@ -811,7 +814,8 @@ function renderBattlePlatforms(data) {
     leftBar.append(leftNumber, leftTrack);
     const platform = document.createElement("span");
     platform.className = "battle-platform-label";
-    platform.textContent = `${item.platformLabel} · ${item.ranked}/${item.shared} 场可判胜`;
+    const teamMeta = item.sameTeamContests ? ` · ${item.sameTeamContests} 场同队` : "";
+    platform.textContent = `${item.platformLabel} · ${item.ranked}/${item.shared} 场可判胜${teamMeta}`;
     const rightBar = el("div", "battle-bar-side right");
     const rightTrack = el("span", "battle-bar-track");
     const rightFill = el("i", "battle-bar-fill");
@@ -838,9 +842,12 @@ function renderBattleTimeline(data) {
   const timeline = data.timeline || {};
   const points = timeline.points || [];
   const section = el("section", "battle-section battle-timeline-section");
-  section.appendChild(battleSectionHead("对战指数趋势", `${points.length} 场按有效名次更新 · K=${timeline.kFactor || 32}`));
+  section.appendChild(battleSectionHead(
+    "综合表现趋势",
+    `${points.length} 场有效表现 · 相对权重 ${timeline.duelKFactor || 16} · 排名权重 ${timeline.absoluteKFactor || 24}`,
+  ));
   if (!points.length) {
-    section.appendChild(battleEmpty("还没有双方都具备官方名次的共同比赛"));
+    section.appendChild(battleEmpty("还没有双方都具备有效名次的共同比赛"));
     return section;
   }
 
@@ -861,7 +868,7 @@ function renderBattleTimeline(data) {
   const height = 286;
   const plot = { left: 54, right: 20, top: 24, bottom: 42 };
   const samples = [
-    { leftRating: timeline.initialRating || 1500, rightRating: timeline.initialRating || 1500, participatedDate: "起点", contestName: "对战指数起点" },
+    { leftRating: timeline.initialRating || 1500, rightRating: timeline.initialRating || 1500, participatedDate: "起点", contestName: "综合表现起点" },
     ...points,
   ];
   const ratings = samples.flatMap((point) => [point.leftRating, point.rightRating]);
@@ -874,7 +881,7 @@ function renderBattleTimeline(data) {
     class: "battle-chart",
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
-    "aria-label": `${left.displayName} 与 ${right.displayName} 的共同比赛对战指数折线图`,
+    "aria-label": `${left.displayName} 与 ${right.displayName} 的共同比赛综合表现指数折线图`,
   });
 
   for (let index = 0; index <= 4; index += 1) {
@@ -895,7 +902,12 @@ function renderBattleTimeline(data) {
     samples.forEach((point, index) => {
       const circle = battleSvgElement("circle", { class: `battle-chart-point ${side}`, cx: x(index), cy: y(point[key]), r: 4 });
       const title = battleSvgElement("title");
-      title.textContent = `${point.participatedDate} · ${point.contestName} · ${point[key]}`;
+      const change = point[`${side}Change`];
+      const absoluteChange = point[`${side}AbsoluteChange`];
+      const changeText = change == null
+        ? ""
+        : ` · 本场 ${change >= 0 ? "+" : ""}${change}（绝对表现 ${absoluteChange >= 0 ? "+" : ""}${absoluteChange}${point.sameTeam ? "，同队不计相对胜负" : ""}）`;
+      title.textContent = `${point.participatedDate} · ${point.contestName} · 指数 ${point[key]}${changeText}`;
       circle.appendChild(title);
       svg.appendChild(circle);
     });
@@ -910,7 +922,7 @@ function renderBattleTimeline(data) {
   chartWrap.appendChild(svg);
   section.append(legend, chartWrap);
   const note = el("p", "battle-data-note");
-  note.textContent = "双方从 1500 起步，每场按正式或 VP 等价名次判定胜负并更新指数；它表示这两人之间的交锋走势，不等同于各平台官方 Rating。";
+  note.textContent = "双方从 1500 起步：名次百分位或官方 Rating 变化决定各自独立涨跌，再叠加较小的相对胜负分。两人发挥差时可以一起掉分；同队成绩只更新绝对表现，不会让双方指数收敛。";
   section.appendChild(note);
   return section;
 }
@@ -949,6 +961,10 @@ function renderContestResult(result) {
 
 function renderContestSpeed(item, leftName, rightName) {
   const cell = el("div", "battle-speed-result");
+  if (item.sameTeam) {
+    cell.textContent = "同队提交，无法区分个人";
+    return cell;
+  }
   if (!item.speed?.problems) {
     cell.textContent = "暂无比赛内提交时间";
     return cell;
@@ -980,7 +996,8 @@ function renderSharedContests(data) {
   const shown = data.sharedContests?.length || 0;
   const limited = shown < total ? ` · 显示最近 ${shown} 场` : "";
   const section = el("section", "battle-section");
-  section.appendChild(battleSectionHead("逐场交锋", `${data.headToHead.rankedContests} 场可判胜 · ${data.headToHead.unrankedContests} 场缺名次${limited}`));
+  const sameTeamMeta = data.headToHead.sameTeamContests ? ` · ${data.headToHead.sameTeamContests} 场同队成绩` : "";
+  section.appendChild(battleSectionHead("逐场交锋", `${data.headToHead.rankedContests} 场可判胜${sameTeamMeta} · ${data.headToHead.unrankedContests} 场缺名次${limited}`));
   if (!shown) {
     section.appendChild(battleEmpty("当前范围内暂无共同正式参赛记录"));
     return section;
@@ -1031,6 +1048,7 @@ function renderSharedContests(data) {
     if (item.winner === "left") resultPill.textContent = left.displayName;
     else if (item.winner === "right") resultPill.textContent = right.displayName;
     else if (item.winner === "tie") resultPill.textContent = "名次相同";
+    else if (item.winner === "same-team") resultPill.textContent = "同队成绩";
     else resultPill.textContent = "不计比分";
     result.appendChild(resultPill);
     row.append(platform, contest, leftRank, rightRank, speed, result);
@@ -1063,7 +1081,15 @@ function renderSharedContests(data) {
     leftResult.append(leftName, renderContestResult(item.leftResult));
     const outcome = el("div", "outcome");
     const resultPill = el("span", `battle-result-pill ${item.winner || "unranked"}`);
-    resultPill.textContent = item.winner === "left" ? left.displayName : item.winner === "right" ? right.displayName : item.winner === "tie" ? "名次相同" : "不计比分";
+    resultPill.textContent = item.winner === "left"
+      ? left.displayName
+      : item.winner === "right"
+        ? right.displayName
+        : item.winner === "tie"
+          ? "名次相同"
+          : item.winner === "same-team"
+            ? "同队成绩"
+            : "不计比分";
     outcome.appendChild(resultPill);
     const rightResult = el("div", "right");
     const rightName = document.createElement("span");

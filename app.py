@@ -59,6 +59,11 @@ HISTORICAL_CACHE_TTL_SECONDS = int(os.environ.get("HISTORICAL_CACHE_TTL_SECONDS"
 OVERVIEW_CACHE_TTL_SECONDS = int(os.environ.get("OVERVIEW_CACHE_TTL_SECONDS", "20"))
 OVERVIEW_FEED_LIMIT = int(os.environ.get("OVERVIEW_FEED_LIMIT", "1000"))
 BATTLE_MEMORY_CACHE_LIMIT = max(8, int(os.environ.get("BATTLE_MEMORY_CACHE_LIMIT", "128")))
+BATTLE_INITIAL_RATING = 1500
+BATTLE_DUEL_K_FACTOR = 16
+BATTLE_ABSOLUTE_K_FACTOR = 24
+BATTLE_MIN_RATING = 800
+BATTLE_MAX_RATING = 2400
 SESSION_COOKIE = "ojwall_session"
 DEFAULT_TEAM_NAME = "未分组"
 GUEST_TEAM_NAME = "游客"
@@ -4593,6 +4598,7 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
     rated = False
     participant_type = None
     rank_kind = None
+    participant_key = None
     start_timestamp = None
     end_timestamp = None
     duration_seconds = None
@@ -4653,6 +4659,9 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
         duration_seconds = battle_optional_int(raw.get("contestDuration"), positive=True)
         if duration_seconds and duration_seconds > 10 * 86400:
             duration_seconds //= 1000
+        participant_id = raw.get("teamId") or raw.get("nowcoderSourceId")
+        if participant_id:
+            participant_key = f"nowcoder:{participant_id}"
     else:
         rank = battle_optional_int(raw.get("rank") or raw.get("ranking") or raw.get("place"), positive=True)
         score = battle_optional_number(raw.get("score") or raw.get("totalScore"))
@@ -4688,6 +4697,7 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
         "_startTimestamp": start_timestamp,
         "_endTimestamp": end_timestamp,
         "_durationSeconds": duration_seconds,
+        "_participantKey": participant_key,
     }
 
 
@@ -4699,6 +4709,7 @@ def battle_contest_entry(row: sqlite3.Row) -> dict:
         "_startTimestamp": result["_startTimestamp"],
         "_endTimestamp": result["_endTimestamp"],
         "_durationSeconds": result["_durationSeconds"],
+        "_participantKey": result["_participantKey"],
     }
 
 
@@ -4762,17 +4773,50 @@ def battle_in_contest_solve(row: sqlite3.Row, entry: dict) -> dict | None:
     }
 
 
+def battle_absolute_rating_change(result: dict) -> tuple[float, str | None]:
+    rank = battle_optional_int(result.get("rank"), positive=True)
+    participants = battle_optional_int(result.get("participants"), positive=True)
+    if rank is not None and participants is not None and rank <= participants:
+        rank_percentile = (rank - 0.5) / participants
+        signal = 1 - 2 * rank_percentile
+        return BATTLE_ABSOLUTE_K_FACTOR * signal, "rank-percentile"
+
+    rating_delta = battle_optional_number(result.get("ratingDelta"))
+    if rating_delta is not None:
+        signal = max(-1.0, min(1.0, float(rating_delta) / 200))
+        return BATTLE_ABSOLUTE_K_FACTOR * signal, "official-rating"
+    return 0.0, None
+
+
 def battle_elo_timeline(shared_contests: list[dict]) -> dict:
-    current = [1500.0, 1500.0]
+    current = [float(BATTLE_INITIAL_RATING), float(BATTLE_INITIAL_RATING)]
     points = []
     for contest in sorted(shared_contests, key=lambda item: (item["participatedAt"], item["platform"], item["remoteId"])):
-        if contest["winner"] not in {"left", "right", "tie"}:
+        left_result = contest["leftResult"]
+        right_result = contest["rightResult"]
+        if left_result.get("rank") is None or right_result.get("rank") is None:
             continue
-        expected_left = 1 / (1 + 10 ** ((current[1] - current[0]) / 400))
-        actual_left = 1.0 if contest["winner"] == "left" else 0.0 if contest["winner"] == "right" else 0.5
-        change = 32 * (actual_left - expected_left)
-        current[0] += change
-        current[1] -= change
+
+        duel_change = 0.0
+        if not contest.get("sameTeam") and contest["winner"] in {"left", "right", "tie"}:
+            expected_left = 1 / (1 + 10 ** ((current[1] - current[0]) / 400))
+            actual_left = 1.0 if contest["winner"] == "left" else 0.0 if contest["winner"] == "right" else 0.5
+            duel_change = BATTLE_DUEL_K_FACTOR * (actual_left - expected_left)
+
+        left_absolute, left_absolute_source = battle_absolute_rating_change(left_result)
+        right_absolute, right_absolute_source = battle_absolute_rating_change(right_result)
+        previous = list(current)
+        if contest.get("sameTeam"):
+            shared_absolute = (left_absolute + right_absolute) / 2
+            minimum_change = max(BATTLE_MIN_RATING - current[0], BATTLE_MIN_RATING - current[1])
+            maximum_change = min(BATTLE_MAX_RATING - current[0], BATTLE_MAX_RATING - current[1])
+            shared_absolute = max(minimum_change, min(maximum_change, shared_absolute))
+            left_absolute = right_absolute = shared_absolute
+            current[0] += shared_absolute
+            current[1] += shared_absolute
+        else:
+            current[0] = max(BATTLE_MIN_RATING, min(BATTLE_MAX_RATING, current[0] + left_absolute + duel_change))
+            current[1] = max(BATTLE_MIN_RATING, min(BATTLE_MAX_RATING, current[1] + right_absolute - duel_change))
         points.append(
             {
                 "platform": contest["platform"],
@@ -4782,15 +4826,25 @@ def battle_elo_timeline(shared_contests: list[dict]) -> dict:
                 "participatedAt": contest["participatedAt"],
                 "participatedDate": contest["participatedDate"],
                 "winner": contest["winner"],
-                "leftRank": contest["leftResult"].get("rank"),
-                "rightRank": contest["rightResult"].get("rank"),
+                "sameTeam": bool(contest.get("sameTeam")),
+                "leftRank": left_result.get("rank"),
+                "rightRank": right_result.get("rank"),
                 "leftRating": round(current[0]),
                 "rightRating": round(current[1]),
+                "leftChange": round(current[0] - previous[0], 1),
+                "rightChange": round(current[1] - previous[1], 1),
+                "leftAbsoluteChange": round(left_absolute, 1),
+                "rightAbsoluteChange": round(right_absolute, 1),
+                "leftAbsoluteSource": left_absolute_source,
+                "rightAbsoluteSource": right_absolute_source,
+                "duelChange": round(duel_change, 1),
             }
         )
     return {
-        "initialRating": 1500,
-        "kFactor": 32,
+        "initialRating": BATTLE_INITIAL_RATING,
+        "kFactor": BATTLE_DUEL_K_FACTOR,
+        "duelKFactor": BATTLE_DUEL_K_FACTOR,
+        "absoluteKFactor": BATTLE_ABSOLUTE_K_FACTOR,
         "leftRating": round(current[0]),
         "rightRating": round(current[1]),
         "points": points,
@@ -4906,13 +4960,19 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
         right_wins = 0
         ties = 0
         ranked_contests = 0
+        same_team_contests = 0
         speed_totals = {"left": 0, "right": 0, "tie": 0}
         platform_results: dict[str, dict] = {}
         for contest_key, (left, right) in shared_entries.items():
             left_result = left["result"]
             right_result = right["result"]
+            participant_key = left.get("_participantKey")
+            same_team = bool(participant_key and participant_key == right.get("_participantKey"))
             winner = None
-            if left_result.get("rank") is not None and right_result.get("rank") is not None:
+            if same_team:
+                same_team_contests += 1
+                winner = "same-team"
+            elif left_result.get("rank") is not None and right_result.get("rank") is not None:
                 ranked_contests += 1
                 if left_result["rank"] < right_result["rank"]:
                     winner = "left"
@@ -4928,7 +4988,8 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
             right_solves = contest_solves[right_key][contest_key]
             problem_duels = []
             contest_speed = {"left": 0, "right": 0, "tie": 0}
-            for problem_key in set(left_solves) | set(right_solves):
+            problem_keys = set() if same_team else set(left_solves) | set(right_solves)
+            for problem_key in problem_keys:
                 left_solve = left_solves.get(problem_key)
                 right_solve = right_solves.get(problem_key)
                 if left_solve and not right_solve:
@@ -4980,10 +5041,13 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
                     "leftWins": 0,
                     "rightWins": 0,
                     "ties": 0,
+                    "sameTeamContests": 0,
                 },
             )
             platform_item["shared"] += 1
-            if winner:
+            if same_team:
+                platform_item["sameTeamContests"] += 1
+            elif winner:
                 platform_item["ranked"] += 1
                 if winner == "left":
                     platform_item["leftWins"] += 1
@@ -5008,6 +5072,7 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
                     "leftResult": left_result,
                     "rightResult": right_result,
                     "winner": winner,
+                    "sameTeam": same_team,
                     "speed": {
                         "leftWins": contest_speed["left"],
                         "rightWins": contest_speed["right"],
@@ -5054,7 +5119,8 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
                 "rightWins": right_wins,
                 "ties": ties,
                 "rankedContests": ranked_contests,
-                "unrankedContests": len(shared_keys) - ranked_contests,
+                "sameTeamContests": same_team_contests,
+                "unrankedContests": len(shared_keys) - ranked_contests - same_team_contests,
                 "sharedContests": len(shared_keys),
                 "leftSpeedWins": speed_totals["left"],
                 "rightSpeedWins": speed_totals["right"],

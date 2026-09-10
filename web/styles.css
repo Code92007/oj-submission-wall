@@ -875,6 +875,12 @@ select:focus {
   color: #0f766e;
 }
 
+.battle-result-pill.same-team {
+  border: 1px solid #cfd9cb;
+  background: #f0f4ed;
+  color: #52634f;
+}
+
 .battle-result-pill.unranked {
   border: 1px solid var(--line);
   background: #f8faf7;
