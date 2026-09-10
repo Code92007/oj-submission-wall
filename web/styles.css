@@ -598,6 +598,85 @@ select:focus {
   line-height: 1.5;
 }
 
+.battle-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.battle-chart-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.battle-chart-legend i {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--battle-left);
+}
+
+.battle-chart-legend .right i {
+  background: var(--battle-right);
+}
+
+.battle-chart-legend strong {
+  font-size: 13px;
+}
+
+.battle-chart-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.battle-chart {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  aspect-ratio: 840 / 286;
+}
+
+.battle-chart-grid {
+  stroke: #dfe5dc;
+  stroke-width: 1;
+}
+
+.battle-chart-axis {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.battle-chart-axis.date {
+  font-size: 10px;
+}
+
+.battle-chart-line {
+  fill: none;
+  stroke: var(--battle-left);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.battle-chart-line.right {
+  stroke: var(--battle-right);
+}
+
+.battle-chart-point {
+  fill: #fff;
+  stroke: var(--battle-left);
+  stroke-width: 3;
+}
+
+.battle-chart-point.right {
+  stroke: var(--battle-right);
+}
+
 .battle-metric-row {
   min-height: 58px;
   display: grid;
@@ -723,7 +802,7 @@ select:focus {
 
 .battle-table {
   width: 100%;
-  min-width: 820px;
+  min-width: 1080px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -760,6 +839,14 @@ select:focus {
   white-space: nowrap;
 }
 
+.battle-rank-column {
+  width: 178px;
+}
+
+.battle-speed-column {
+  width: 184px;
+}
+
 .battle-result-column {
   width: 170px;
 }
@@ -786,6 +873,76 @@ select:focus {
 .battle-result-pill.right {
   background: #ddf5f0;
   color: #0f766e;
+}
+
+.battle-result-pill.unranked {
+  border: 1px solid var(--line);
+  background: #f8faf7;
+}
+
+.battle-contest-date {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.battle-rank-result {
+  display: grid;
+  gap: 4px;
+}
+
+.battle-rank-result strong {
+  font-size: 16px;
+}
+
+.battle-rank-result span,
+.battle-speed-result {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.battle-speed-result > strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.battle-speed-result details {
+  margin-top: 4px;
+}
+
+.battle-speed-result summary {
+  color: var(--brand-dark);
+  cursor: pointer;
+}
+
+.battle-problem-duels {
+  min-width: 156px;
+  display: grid;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.battle-problem-duel {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.battle-problem-duel.left {
+  border-left: 2px solid var(--battle-left);
+}
+
+.battle-problem-duel.right {
+  border-left: 2px solid var(--battle-right);
+}
+
+.battle-contest-mobile-list {
+  display: none;
 }
 
 .battle-empty {
@@ -1769,5 +1926,110 @@ select:focus {
   .battle-bar-side,
   .battle-bar-side.right {
     gap: 5px;
+  }
+
+  .battle-chart {
+    min-width: 0;
+  }
+
+  .battle-chart-axis {
+    font-size: 16px;
+  }
+
+  .battle-chart-axis.date {
+    font-size: 14px;
+  }
+
+  .shared-contest-table-wrap {
+    display: none;
+  }
+
+  .battle-contest-mobile-list {
+    display: grid;
+  }
+
+  .battle-contest-mobile-item {
+    min-width: 0;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .battle-contest-mobile-item:first-child {
+    padding-top: 2px;
+  }
+
+  .battle-contest-mobile-item:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .battle-contest-mobile-head {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .battle-contest-mobile-head > a,
+  .battle-contest-mobile-head > span:nth-child(2) {
+    color: var(--brand-dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .battle-contest-mobile-head .battle-contest-date {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .battle-contest-mobile-comparison {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .battle-contest-mobile-comparison > .left,
+  .battle-contest-mobile-comparison > .right {
+    min-width: 0;
+    display: grid;
+    gap: 5px;
+  }
+
+  .battle-contest-mobile-comparison > .right {
+    text-align: right;
+  }
+
+  .battle-contest-mobile-comparison > .left > span,
+  .battle-contest-mobile-comparison > .right > span {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .battle-contest-mobile-comparison .outcome {
+    max-width: 104px;
+    text-align: center;
+  }
+
+  .battle-contest-mobile-comparison .battle-result-pill {
+    white-space: normal;
+  }
+
+  .battle-contest-mobile-speed {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .battle-contest-mobile-speed > span {
+    color: var(--muted);
+    font-size: 12px;
   }
 }

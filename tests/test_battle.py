@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import tempfile
 import time
@@ -28,37 +29,29 @@ class BattleOverviewTest(unittest.TestCase):
                     """,
                     (user_id, username, f"{username}@local.invalid", display_name, display_name, "test", self.now),
                 )
-            for handle_id, owner_id, platform, handle in [
-                (1, "1", "codeforces", "alice_cf"),
-                (2, "1", "atcoder", "alice_at"),
-                (3, "2", "vjudge", "bob_vj"),
-                (4, "2", "codeforces", "bob_cf"),
-            ]:
-                conn.execute(
-                    """
-                    INSERT INTO handles(id, owner_type, owner_id, platform, handle, active, created_at)
-                    VALUES(?, 'user', ?, ?, ?, 1, ?)
-                    """,
-                    (handle_id, owner_id, platform, handle, self.now),
-                )
+            handles = []
+            handle_id = 1
+            for owner_id, prefix in [("1", "alice"), ("2", "bob")]:
+                for platform in ["codeforces", "atcoder", "nowcoder", "vjudge"]:
+                    handles.append((handle_id, owner_id, platform, f"{prefix}_{platform}"))
+                    handle_id += 1
+            conn.executemany(
+                """
+                INSERT INTO handles(id, owner_type, owner_id, platform, handle, active, created_at)
+                VALUES(?, 'user', ?, ?, ?, 1, ?)
+                """,
+                [(handle_id, owner_id, platform, handle, self.now) for handle_id, owner_id, platform, handle in handles],
+            )
 
     def tearDown(self):
         app.clear_overview_memory_cache()
         app.DB_PATH = self.original_db_path
         self.temp_dir.cleanup()
 
-    def add_submission(
-        self,
-        owner_id,
-        platform,
-        handle,
-        remote_id,
-        problem_id,
-        days_ago,
-        verdict="AC",
-        raw=None,
-    ):
-        submitted_at = self.now - days_ago * 86400
+    def handle(self, owner_id, platform):
+        return f"{'alice' if str(owner_id) == '1' else 'bob'}_{platform}"
+
+    def add_submission(self, owner_id, platform, remote_id, problem_id, submitted_at, raw, verdict="AC"):
         with app.connect_db() as conn:
             conn.execute(
                 """
@@ -71,19 +64,19 @@ class BattleOverviewTest(unittest.TestCase):
                 (
                     str(owner_id),
                     platform,
-                    handle,
+                    self.handle(owner_id, platform),
                     remote_id,
                     problem_id,
                     f"Problem {problem_id}",
                     verdict,
                     submitted_at,
-                    f"https://example.test/{remote_id}",
-                    json.dumps(raw or {}),
+                    f"https://example.test/submission/{remote_id}",
+                    json.dumps(raw),
                     self.now,
                 ),
             )
 
-    def add_contest(self, owner_id, platform, handle, remote_id, days_ago):
+    def add_contest(self, owner_id, platform, remote_id, participated_at, raw):
         with app.connect_db() as conn:
             conn.execute(
                 """
@@ -91,98 +84,164 @@ class BattleOverviewTest(unittest.TestCase):
                     owner_type, owner_id, platform, handle, remote_id, contest_name,
                     category, participated_at, url, raw_json, created_at
                 )
-                VALUES('user', ?, ?, ?, ?, ?, 'other', ?, ?, '{}', ?)
+                VALUES('user', ?, ?, ?, ?, ?, 'other', ?, ?, ?, ?)
                 """,
                 (
                     str(owner_id),
                     platform,
-                    handle,
+                    self.handle(owner_id, platform),
                     remote_id,
                     f"Contest {remote_id}",
-                    self.now - days_ago * 86400,
+                    participated_at,
                     f"https://example.test/contest/{remote_id}",
+                    json.dumps(raw),
                     self.now,
                 ),
             )
 
-    def test_build_battle_uses_first_ac_and_deduplicates_contests(self):
-        self.add_submission(1, "codeforces", "alice_cf", "a1", "100A", 12)
-        self.add_submission(1, "codeforces", "alice_cf", "a1-later", "100A", 2)
-        self.add_submission(2, "vjudge", "bob_vj", "b1", "CF-100A", 10, raw={"oj": "CF", "probNum": "100A"})
+    def add_codeforces_match(self, start):
+        contest = {"id": 1000, "startTimeSeconds": start, "durationSeconds": 7200, "type": "CF"}
+        for owner_id, rank, old_rating, new_rating in [(1, 120, 1500, 1530), (2, 300, 1600, 1580)]:
+            self.add_contest(
+                owner_id,
+                "codeforces",
+                "1000",
+                start,
+                {
+                    "contest": contest,
+                    "ratingChange": {
+                        "contestId": 1000,
+                        "rank": rank,
+                        "oldRating": old_rating,
+                        "newRating": new_rating,
+                    },
+                },
+            )
 
-        self.add_submission(1, "codeforces", "alice_cf", "a2", "200A", 5)
-        self.add_submission(2, "codeforces", "bob_cf", "b2", "200A", 7)
-        self.add_submission(1, "atcoder", "alice_at", "a3", "abc100_a", 4)
-        self.add_submission(2, "vjudge", "bob_vj", "b3", "AT-abc100_a", 4, raw={"oj": "AtCoder", "probNum": "abc100_a"})
-        self.add_submission(1, "codeforces", "alice_cf", "only-a", "300A", 3)
-        self.add_submission(2, "codeforces", "bob_cf", "only-b", "400A", 3)
-        self.add_submission(1, "codeforces", "alice_cf", "wa", "500A", 1, verdict="WA")
+        def cf_raw(owner_id, participant_type="CONTESTANT"):
+            return {
+                "contestId": 1000,
+                "problem": {"contestId": 1000},
+                "author": {
+                    "participantType": participant_type,
+                    "startTimeSeconds": start,
+                    "members": [{"handle": self.handle(owner_id, "codeforces")}],
+                },
+            }
 
-        self.add_contest(1, "codeforces", "alice_cf", "1000", 8)
-        self.add_contest(1, "codeforces", "alice_alt", "1000", 8)
-        self.add_contest(2, "codeforces", "bob_cf", "1000", 8)
-        self.add_contest(1, "atcoder", "alice_at", "abc100", 20)
+        self.add_submission(1, "codeforces", "cf-a1", "1000A", start + 600, cf_raw(1))
+        self.add_submission(1, "codeforces", "cf-b1", "1000B", start + 1800, cf_raw(1))
+        self.add_submission(2, "codeforces", "cf-a2", "1000A", start + 900, cf_raw(2))
+        self.add_submission(2, "codeforces", "cf-c2", "1000C", start + 1200, cf_raw(2))
+        self.add_submission(2, "codeforces", "cf-b-practice", "1000B", start + 500, cf_raw(2, "PRACTICE"))
+
+    def add_atcoder_match(self, start):
+        end = start + 7200
+        end_time = dt.datetime.fromtimestamp(end, dt.timezone.utc).isoformat()
+        metadata = {"start_epoch_second": start, "duration_second": 7200}
+        for owner_id, rank, old_rating, new_rating in [(1, 100, 1800, 1810), (2, 50, 1750, 1780)]:
+            self.add_contest(
+                owner_id,
+                "atcoder",
+                "abc999",
+                end,
+                {
+                    "id": "abc999",
+                    "Place": rank,
+                    "OldRating": old_rating,
+                    "NewRating": new_rating,
+                    "Performance": new_rating + 100,
+                    "IsRated": True,
+                    "EndTime": end_time,
+                    "contest": metadata,
+                },
+            )
+        self.add_submission(1, "atcoder", "at-a1", "abc999_a", start + 600, {"contest_id": "abc999"})
+        self.add_submission(2, "atcoder", "at-a2", "abc999_a", start + 300, {"contest_id": "abc999"})
+        self.add_submission(1, "atcoder", "at-upsolve", "abc999_b", end + 3600, {"contest_id": "abc999"})
+
+    def add_nowcoder_match(self, start):
+        for owner_id, rank, solved in [(1, 13, 6), (2, 13, 5)]:
+            self.add_contest(
+                owner_id,
+                "nowcoder",
+                "2000",
+                start,
+                {
+                    "contestId": 2000,
+                    "rank": rank,
+                    "canShowRank": True,
+                    "acceptedCount": solved,
+                    "totalScore": 100 * solved,
+                    "userCount": 500,
+                    "startTime": start * 1000,
+                    "endTime": (start + 7200) * 1000,
+                    "contestDuration": 7200 * 1000,
+                    "ratingStatus": "NO",
+                },
+            )
+
+    def test_battle_uses_official_contest_ranks_and_in_contest_speed_only(self):
+        self.add_codeforces_match(self.now - 10 * 86400)
+        self.add_atcoder_match(self.now - 6 * 86400)
+        self.add_nowcoder_match(self.now - 3 * 86400)
+        for owner_id in [1, 2]:
+            self.add_contest(owner_id, "vjudge", "3000", self.now - 86400, {"contestId": 3000})
 
         result = app.build_battle(None, "user:1", "user:2", "30")
 
-        self.assertEqual(result["headToHead"], {
-            "leftWins": 1,
-            "rightWins": 1,
-            "ties": 1,
-            "commonSolved": 3,
-            "knownCommonSolved": 3,
-            "unrankedCommonSolved": 0,
-            "leftOnly": 1,
-            "rightOnly": 1,
-            "sharedContests": 1,
-        })
-        self.assertEqual([player["stats"]["solved"] for player in result["players"]], [4, 4])
-        self.assertEqual(len(result["sharedContests"]), 1)
-        winners = {item["key"]: item["winner"] for item in result["commonProblems"]}
-        self.assertEqual(winners["codeforces:100A"], "left")
-        self.assertEqual(winners["codeforces:200A"], "right")
-        self.assertEqual(winners["atcoder:abc100_a"], "tie")
+        self.assertEqual(
+            result["headToHead"],
+            {
+                "leftWins": 1,
+                "rightWins": 1,
+                "ties": 1,
+                "rankedContests": 3,
+                "unrankedContests": 1,
+                "sharedContests": 4,
+                "leftSpeedWins": 2,
+                "rightSpeedWins": 2,
+                "speedTies": 0,
+                "speedProblems": 4,
+            },
+        )
+        self.assertNotIn("commonProblems", result)
+        self.assertEqual([player["stats"]["ratedContests"] for player in result["players"]], [2, 2])
+        self.assertEqual(len(result["timeline"]["points"]), 3)
+        self.assertEqual([point["winner"] for point in result["timeline"]["points"]], ["left", "right", "tie"])
 
-    def test_all_time_totals_include_profile_problem_sets_without_scoring_them(self):
-        self.add_submission(1, "codeforces", "alice_cf", "a1", "100A", 12)
-        self.add_submission(2, "codeforces", "bob_cf", "b1", "100A", 10)
-        alice_stats = {
-            "allTimeAccepted": 1,
-            "solvedProblems": [{"canonicalKey": "luogu:P9000"}],
-        }
-        bob_stats = {
-            "allTimeAccepted": 2,
-            "solvedProblems": [
-                {"canonicalKey": "luogu:P9000"},
-                {"canonicalKey": "luogu:P9001"},
-            ],
-        }
-        with app.connect_db() as conn:
-            conn.execute(
-                """
-                INSERT INTO handles(owner_type, owner_id, platform, handle, active, created_at, stats_json)
-                VALUES('user', '1', 'luogu', 'alice_lg', 1, ?, ?)
-                """,
-                (self.now, json.dumps(alice_stats)),
-            )
-            conn.execute(
-                """
-                INSERT INTO handles(owner_type, owner_id, platform, handle, active, created_at, stats_json)
-                VALUES('user', '2', 'luogu', 'bob_lg', 1, ?, ?)
-                """,
-                (self.now, json.dumps(bob_stats)),
-            )
+        contests = {(item["platform"], item["remoteId"]): item for item in result["sharedContests"]}
+        codeforces = contests[("codeforces", "1000")]
+        self.assertEqual(codeforces["leftResult"]["rank"], 120)
+        self.assertEqual(codeforces["rightResult"]["rank"], 300)
+        self.assertEqual(codeforces["speed"], {"leftWins": 2, "rightWins": 1, "ties": 0, "problems": 3})
+        self.assertEqual({item["problemId"] for item in codeforces["problemDuels"]}, {"1000A", "1000B", "1000C"})
 
-        all_time = app.build_battle(None, "user:1", "user:2", "all")
-        recent = app.build_battle(None, "user:1", "user:2", "30")
+        atcoder = contests[("atcoder", "abc999")]
+        self.assertEqual(atcoder["winner"], "right")
+        self.assertEqual(atcoder["speed"], {"leftWins": 0, "rightWins": 1, "ties": 0, "problems": 1})
+        self.assertNotIn("abc999_b", {item["problemId"] for item in atcoder["problemDuels"]})
 
-        self.assertEqual([player["stats"]["solved"] for player in all_time["players"]], [2, 3])
-        self.assertEqual([player["stats"]["profileOnlySolved"] for player in all_time["players"]], [1, 2])
-        self.assertEqual(all_time["headToHead"]["commonSolved"], 1)
-        self.assertEqual(all_time["headToHead"]["knownCommonSolved"], 2)
-        self.assertEqual(all_time["headToHead"]["unrankedCommonSolved"], 1)
-        self.assertEqual([player["stats"]["solved"] for player in recent["players"]], [1, 1])
-        self.assertEqual([player["stats"]["profileOnlySolved"] for player in recent["players"]], [0, 0])
+        nowcoder = contests[("nowcoder", "2000")]
+        self.assertEqual(nowcoder["winner"], "tie")
+        self.assertEqual(nowcoder["leftResult"]["solved"], 6)
+        self.assertEqual(nowcoder["speed"]["problems"], 0)
+        self.assertIsNone(contests[("vjudge", "3000")]["winner"])
+
+    def test_range_filters_contests_instead_of_daily_problem_activity(self):
+        self.add_codeforces_match(self.now - 60 * 86400)
+        self.add_submission(
+            1,
+            "codeforces",
+            "daily-ac",
+            "9999A",
+            self.now - 2 * 86400,
+            {"contestId": 9999, "author": {"participantType": "PRACTICE"}},
+        )
+        result = app.build_battle(None, "user:1", "user:2", "30")
+        self.assertEqual(result["headToHead"]["sharedContests"], 0)
+        self.assertEqual(result["headToHead"]["speedProblems"], 0)
+        self.assertEqual([player["stats"]["contests"] for player in result["players"]], [0, 0])
 
     def test_build_battle_rejects_same_or_unknown_member(self):
         with self.assertRaisesRegex(ValueError, "不同"):

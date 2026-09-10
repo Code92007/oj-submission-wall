@@ -1148,6 +1148,20 @@ class CodeforcesAdapter(OJAdapter):
 
     def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
         lookup = codeforces_contest_lookup()
+        history_floor = utcnow() - FETCH_LOOKBACK_DAYS * 86400
+        rating_changes: dict[int, dict] = {}
+        with contextlib.suppress(Exception):
+            params = urllib.parse.urlencode({"handle": handle})
+            rating_data = http_get_json(
+                f"https://codeforces.com/api/user.rating?{params}",
+                cache_ttl_seconds=6 * 3600,
+            )
+            if rating_data.get("status") == "OK":
+                rating_changes = {
+                    int(item["contestId"]): item
+                    for item in rating_data.get("result") or []
+                    if item.get("contestId") is not None
+                }
         contests = {}
         for item in submissions:
             raw = item.get("raw") or {}
@@ -1174,7 +1188,32 @@ class CodeforcesAdapter(OJAdapter):
                 "category": classify_contest(self.key, name, remote_id, contest),
                 "participated_at": start_at,
                 "url": url,
-                "raw": {"contest": contest, "source": "user.status"},
+                "raw": {
+                    "contest": contest,
+                    "ratingChange": rating_changes.get(contest_id),
+                    "source": "user.status",
+                },
+            }
+
+        for contest_id, rating_change in rating_changes.items():
+            contest = lookup.get(contest_id) or {}
+            start_at = int(contest.get("startTimeSeconds") or rating_change.get("ratingUpdateTimeSeconds") or 0)
+            if not start_at or start_at < history_floor:
+                continue
+            remote_id = str(contest_id)
+            name = str(contest.get("name") or rating_change.get("contestName") or f"Codeforces {contest_id}")
+            url = f"https://codeforces.com/gym/{contest_id}" if contest_id >= 100000 else f"https://codeforces.com/contest/{contest_id}"
+            existing = contests.get(remote_id)
+            if existing:
+                existing["raw"]["ratingChange"] = rating_change
+                continue
+            contests[remote_id] = {
+                "remote_id": remote_id,
+                "contest_name": name,
+                "category": classify_contest(self.key, name, remote_id, contest),
+                "participated_at": start_at,
+                "url": url,
+                "raw": {"contest": contest, "ratingChange": rating_change, "source": "user.rating"},
             }
         return list(contests.values())
 
@@ -1235,15 +1274,19 @@ class AtCoderAdapter(OJAdapter):
         )
         if not isinstance(data, list):
             raise RuntimeError("AtCoder 参赛历史返回格式异常")
+        history_floor = utcnow() - FETCH_LOOKBACK_DAYS * 86400
+        contest_lookup = {}
+        with contextlib.suppress(Exception):
+            contest_lookup = atcoder_contest_lookup()
         contests = []
         for item in data:
             contest_screen = str(item.get("ContestScreenName") or "")
             contest_id = contest_screen.split(".", 1)[0]
             name = str(item.get("ContestName") or item.get("ContestNameEn") or contest_id.upper())
             participated_at = parse_iso_datetime(str(item.get("EndTime") or "")) or 0
-            if not contest_id or not participated_at or participated_at < since_ts:
+            if not contest_id or not participated_at or participated_at < history_floor:
                 continue
-            raw = {**item, "id": contest_id}
+            raw = {**item, "id": contest_id, "contest": contest_lookup.get(contest_id) or {}}
             contests.append(
                 {
                     "remote_id": contest_id,
@@ -4212,12 +4255,6 @@ def visible_battle_owners(conn: sqlite3.Connection, principal: dict | None) -> d
     return owners
 
 
-def battle_row_in_range(date_key: str, selected_range: dict) -> bool:
-    start_date = selected_range.get("from")
-    end_date = selected_range.get("to")
-    return bool((not start_date or date_key >= start_date) and (not end_date or date_key <= end_date))
-
-
 def battle_timestamp_bounds(selected_range: dict) -> tuple[int | None, int]:
     start_date = dt.date.fromisoformat(selected_range["from"]) if selected_range.get("from") else None
     end_date = dt.date.fromisoformat(selected_range["to"]) + dt.timedelta(days=1)
@@ -4228,23 +4265,6 @@ def battle_timestamp_bounds(selected_range: dict) -> tuple[int | None, int]:
     )
     end_timestamp = int(dt.datetime.combine(end_date, dt.time.min, tzinfo=DISPLAY_TZ).timestamp())
     return start_timestamp, end_timestamp
-
-
-def battle_problem_from_row(row: sqlite3.Row) -> dict:
-    platform = str(row["platform"] or "")
-    adapter = ADAPTERS.get(platform)
-    return {
-        "key": solved_problem_key(row),
-        "platform": platform,
-        "platformLabel": adapter.label if adapter else platform,
-        "handle": row["handle"],
-        "problemId": row["problem_id"],
-        "problemName": row["problem_name"],
-        "solvedAtTimestamp": int(row["submitted_at"]),
-        "solvedAt": iso_from_ts(row["submitted_at"]),
-        "solvedDate": utc_date_from_ts(row["submitted_at"]),
-        "url": row["url"],
-    }
 
 
 def battle_contest_key(row: sqlite3.Row) -> tuple[str, str]:
@@ -4277,6 +4297,237 @@ def battle_union_rows(
     return conn.execute(query, tuple(params)).fetchall()
 
 
+def battle_optional_number(value) -> int | float | None:
+    if value is None or isinstance(value, bool) or str(value).strip() == "":
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if number != number or abs(number) == float("inf"):
+        return None
+    return int(number) if number.is_integer() else round(number, 2)
+
+
+def battle_optional_int(value, positive: bool = False) -> int | None:
+    number = battle_optional_number(value)
+    if number is None:
+        return None
+    result = int(number)
+    return None if positive and result <= 0 else result
+
+
+def battle_epoch_seconds(value) -> int | None:
+    timestamp = battle_optional_int(value, positive=True)
+    if timestamp is None:
+        return None
+    return timestamp // 1000 if timestamp > 10_000_000_000 else timestamp
+
+
+def battle_contest_result(row: sqlite3.Row) -> dict:
+    platform = str(row["platform"] or "")
+    raw = raw_json_dict(row)
+    rank = None
+    score = None
+    solved = None
+    participants = None
+    rating_before = None
+    rating_after = None
+    rating_delta = None
+    performance = None
+    rated = False
+    start_timestamp = None
+    end_timestamp = None
+    duration_seconds = None
+
+    if platform == "codeforces":
+        contest = raw.get("contest") if isinstance(raw.get("contest"), dict) else {}
+        rating_change = raw.get("ratingChange") if isinstance(raw.get("ratingChange"), dict) else {}
+        rank = battle_optional_int(rating_change.get("rank"), positive=True)
+        rating_before = battle_optional_int(rating_change.get("oldRating"))
+        rating_after = battle_optional_int(rating_change.get("newRating"))
+        if rating_before is not None and rating_after is not None:
+            rating_delta = rating_after - rating_before
+        rated = bool(rating_change)
+        start_timestamp = battle_epoch_seconds(contest.get("startTimeSeconds"))
+        duration_seconds = battle_optional_int(contest.get("durationSeconds"), positive=True)
+    elif platform == "atcoder":
+        contest = raw.get("contest") if isinstance(raw.get("contest"), dict) else {}
+        rank = battle_optional_int(raw.get("Place"), positive=True)
+        rating_before = battle_optional_int(raw.get("OldRating"))
+        rating_after = battle_optional_int(raw.get("NewRating"))
+        if rating_before is not None and rating_after is not None:
+            rating_delta = rating_after - rating_before
+        performance = battle_optional_int(raw.get("Performance"), positive=True)
+        rated = bool(raw.get("IsRated"))
+        start_timestamp = battle_epoch_seconds(
+            contest.get("start_epoch_second") or contest.get("startTimeSeconds")
+        )
+        duration_seconds = battle_optional_int(
+            contest.get("duration_second") or contest.get("durationSeconds"),
+            positive=True,
+        )
+        end_timestamp = parse_iso_datetime(str(raw.get("EndTime") or ""))
+    elif platform == "nowcoder":
+        if raw.get("canShowRank") is not False:
+            rank = battle_optional_int(raw.get("rank"), positive=True)
+        score = battle_optional_number(raw.get("totalScore"))
+        solved = battle_optional_int(raw.get("acceptedCount"))
+        participants = battle_optional_int(raw.get("userCount"), positive=True)
+        rating_after = battle_optional_int(raw.get("rating"))
+        rating_delta = battle_optional_int(raw.get("changeValue"))
+        if rating_after is not None and rating_delta is not None:
+            rating_before = rating_after - rating_delta
+        rating_status = str(raw.get("ratingStatus") or "").upper()
+        rating_text = str(raw.get("ratingStr") or "")
+        rated = rating_status not in {"", "NO", "NONE"} and "不计" not in rating_text
+        start_timestamp = battle_epoch_seconds(raw.get("startTime"))
+        end_timestamp = battle_epoch_seconds(raw.get("endTime"))
+        duration_seconds = battle_optional_int(raw.get("contestDuration"), positive=True)
+        if duration_seconds and duration_seconds > 10 * 86400:
+            duration_seconds //= 1000
+    else:
+        rank = battle_optional_int(raw.get("rank") or raw.get("ranking") or raw.get("place"), positive=True)
+        score = battle_optional_number(raw.get("score") or raw.get("totalScore"))
+        solved = battle_optional_int(raw.get("solved") or raw.get("acceptedCount"))
+        participants = battle_optional_int(raw.get("participants") or raw.get("userCount"), positive=True)
+        rating_before = battle_optional_int(raw.get("oldRating") or raw.get("ratingBefore"))
+        rating_after = battle_optional_int(raw.get("newRating") or raw.get("ratingAfter") or raw.get("rating"))
+        rating_delta = battle_optional_int(raw.get("ratingDelta") or raw.get("changeValue"))
+        performance = battle_optional_int(raw.get("performance"), positive=True)
+        rated = rating_before is not None or rating_after is not None
+        start_timestamp = battle_epoch_seconds(raw.get("startTime") or raw.get("startTimeSeconds"))
+        end_timestamp = battle_epoch_seconds(raw.get("endTime") or raw.get("endTimeSeconds"))
+        duration_seconds = battle_optional_int(raw.get("durationSeconds"), positive=True)
+
+    if start_timestamp and duration_seconds and not end_timestamp:
+        end_timestamp = start_timestamp + duration_seconds
+    if end_timestamp and duration_seconds and not start_timestamp:
+        start_timestamp = end_timestamp - duration_seconds
+
+    return {
+        "rank": rank,
+        "score": score,
+        "solved": solved,
+        "participants": participants,
+        "ratingBefore": rating_before,
+        "ratingAfter": rating_after,
+        "ratingDelta": rating_delta,
+        "performance": performance,
+        "rated": rated,
+        "resultAvailable": rank is not None,
+        "_startTimestamp": start_timestamp,
+        "_endTimestamp": end_timestamp,
+        "_durationSeconds": duration_seconds,
+    }
+
+
+def battle_contest_entry(row: sqlite3.Row) -> dict:
+    result = battle_contest_result(row)
+    return {
+        **contest_to_json(row),
+        "result": {key: value for key, value in result.items() if not key.startswith("_")},
+        "_startTimestamp": result["_startTimestamp"],
+        "_endTimestamp": result["_endTimestamp"],
+        "_durationSeconds": result["_durationSeconds"],
+    }
+
+
+def battle_contest_preference(entry: dict) -> tuple[int, int, int]:
+    result = entry["result"]
+    rank = result.get("rank")
+    return (
+        1 if result.get("resultAvailable") else 0,
+        -int(rank) if rank is not None else -1_000_000_000,
+        1 if entry.get("_startTimestamp") and entry.get("_endTimestamp") else 0,
+    )
+
+
+def battle_submission_contest_id(row: sqlite3.Row, raw: dict) -> str:
+    platform = str(row["platform"] or "")
+    if platform == "codeforces":
+        problem = raw.get("problem") if isinstance(raw.get("problem"), dict) else {}
+        return str(raw.get("contestId") or problem.get("contestId") or "")
+    if platform == "atcoder":
+        return str(raw.get("contest_id") or "")
+    if platform == "vjudge":
+        return str(raw.get("contestId") or "")
+    return ""
+
+
+def battle_in_contest_solve(row: sqlite3.Row, entry: dict) -> dict | None:
+    raw = raw_json_dict(row)
+    if str(row["handle"] or "") != str(entry.get("handle") or ""):
+        return None
+    if battle_submission_contest_id(row, raw) != str(entry.get("remoteId") or ""):
+        return None
+    if row["platform"] == "codeforces":
+        participant_type = str((raw.get("author") or {}).get("participantType") or "").upper()
+        if participant_type == "PRACTICE":
+            return None
+
+    submitted_at = int(row["submitted_at"] or 0)
+    start_timestamp = entry.get("_startTimestamp")
+    end_timestamp = entry.get("_endTimestamp")
+    if row["platform"] == "codeforces" and not start_timestamp:
+        start_timestamp = battle_epoch_seconds((raw.get("author") or {}).get("startTimeSeconds"))
+    if not start_timestamp or submitted_at < start_timestamp:
+        return None
+    if end_timestamp and submitted_at > end_timestamp:
+        return None
+    duration_seconds = entry.get("_durationSeconds")
+    elapsed_seconds = submitted_at - start_timestamp
+    if duration_seconds and elapsed_seconds > duration_seconds:
+        return None
+
+    problem_key = solved_problem_key(row)
+    if not problem_key:
+        return None
+    return {
+        "key": problem_key,
+        "problemId": row["problem_id"],
+        "problemName": row["problem_name"],
+        "elapsedSeconds": elapsed_seconds,
+        "solvedAt": iso_from_ts(submitted_at),
+        "url": row["url"],
+    }
+
+
+def battle_elo_timeline(shared_contests: list[dict]) -> dict:
+    current = [1500.0, 1500.0]
+    points = []
+    for contest in sorted(shared_contests, key=lambda item: (item["participatedAt"], item["platform"], item["remoteId"])):
+        if contest["winner"] not in {"left", "right", "tie"}:
+            continue
+        expected_left = 1 / (1 + 10 ** ((current[1] - current[0]) / 400))
+        actual_left = 1.0 if contest["winner"] == "left" else 0.0 if contest["winner"] == "right" else 0.5
+        change = 32 * (actual_left - expected_left)
+        current[0] += change
+        current[1] -= change
+        points.append(
+            {
+                "platform": contest["platform"],
+                "platformLabel": contest["platformLabel"],
+                "remoteId": contest["remoteId"],
+                "contestName": contest["contestName"],
+                "participatedAt": contest["participatedAt"],
+                "participatedDate": contest["participatedDate"],
+                "winner": contest["winner"],
+                "leftRank": contest["leftResult"].get("rank"),
+                "rightRank": contest["rightResult"].get("rank"),
+                "leftRating": round(current[0]),
+                "rightRating": round(current[1]),
+            }
+        )
+    return {
+        "initialRating": 1500,
+        "kFactor": 32,
+        "leftRating": round(current[0]),
+        "rightRating": round(current[1]),
+        "points": points,
+    }
+
+
 def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, range_key: str = "365") -> dict:
     selected_range = battle_range(range_key)
     start_timestamp, end_timestamp = battle_timestamp_bounds(selected_range)
@@ -4290,7 +4541,6 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
         selected_keys = [left_key, right_key]
         selected_owners = [owners[key] for key in selected_keys]
         owner_tuples = [(owner["ownerType"], owner["ownerId"]) for owner in selected_owners]
-
         handle_rows = battle_union_rows(
             conn,
             "handles",
@@ -4299,7 +4549,6 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
             extra_where="AND active = 1",
             order_by="created_at",
         )
-        handle_profiles: dict[str, list[tuple[str, str, dict]]] = {key: [] for key in selected_keys}
         for row in handle_rows:
             key = f"{row['owner_type']}:{row['owner_id']}"
             if key in owners:
@@ -4307,220 +4556,224 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
                 item.pop("lastError", None)
                 item.pop("syncStatus", None)
                 owners[key]["handles"].append(item)
-                if row["stats_json"]:
-                    with contextlib.suppress(Exception):
-                        stats = json.loads(row["stats_json"])
-                        if isinstance(stats, dict):
-                            handle_profiles[key].append((row["platform"], row["handle"], stats))
-
-        count_range_sql = "submitted_at < ?"
-        count_extra_params: tuple[object, ...] = (end_timestamp,)
-        if start_timestamp is not None:
-            count_range_sql = "submitted_at >= ? AND submitted_at < ?"
-            count_extra_params = (start_timestamp, end_timestamp)
-        count_rows = battle_union_rows(
-            conn,
-            "submissions",
-            "owner_type, owner_id, COUNT(*) AS total",
-            owner_tuples,
-            extra_where=f"AND {count_range_sql}",
-            extra_params=count_extra_params,
-        )
-        period_submissions = {key: 0 for key in selected_keys}
-        for row in count_rows:
-            key = f"{row['owner_type']}:{row['owner_id']}"
-            if key in period_submissions:
-                period_submissions[key] = int(row["total"] or 0)
-
-        submission_rows = battle_union_rows(
-            conn,
-            "submissions",
-            "owner_type, owner_id, platform, handle, remote_id, problem_id, problem_name, verdict, submitted_at, url, raw_json",
-            owner_tuples,
-            extra_where="""AND (
-                UPPER(TRIM(COALESCE(verdict, ''))) IN ('AC', 'OK', 'ACCEPTED')
-                OR TRIM(COALESCE(verdict, '')) IN ('答案正确', '通过', '12')
-            )""",
-            order_by="submitted_at",
-        )
-        first_solves = {key: {} for key in selected_keys}
-        placeholder_days = {key: set() for key in selected_keys}
-        for row in submission_rows:
-            key = f"{row['owner_type']}:{row['owner_id']}"
-            if key not in first_solves:
-                continue
-            date_key = utc_date_from_ts(row["submitted_at"])
-            if normalize_verdict(row["verdict"]) != "AC":
-                continue
-            if is_activity_placeholder(row):
-                if battle_row_in_range(date_key, selected_range):
-                    placeholder_days[key].add(date_key)
-                continue
-            problem = battle_problem_from_row(row)
-            if problem["key"] and problem["key"] not in first_solves[key]:
-                first_solves[key][problem["key"]] = problem
-
-        period_solves = {
-            key: {
-                problem_key: problem
-                for problem_key, problem in first_solves[key].items()
-                if battle_row_in_range(problem["solvedDate"], selected_range)
-            }
-            for key in selected_keys
-        }
-
-        profile_problem_platforms: dict[str, dict[str, str]] = {key: {} for key in selected_keys}
-        profile_fallback_counts: dict[str, dict[str, int]] = {key: {} for key in selected_keys}
-        known_handle_counts: dict[str, dict[tuple[str, str], int]] = {key: {} for key in selected_keys}
-        for key, problems in first_solves.items():
-            for problem in problems.values():
-                handle_key = (problem["platform"], str(problem["handle"] or ""))
-                counts = known_handle_counts[key]
-                counts[handle_key] = counts.get(handle_key, 0) + 1
-        for key, profiles in handle_profiles.items():
-            for platform, handle, stats in profiles:
-                problem_keys = profile_solved_problem_keys({**stats, "_platform": platform})
-                if problem_keys:
-                    for problem_key in problem_keys:
-                        profile_problem_platforms[key].setdefault(problem_key, platform)
-                    continue
-                all_time_accepted = int(stats.get("allTimeAccepted") or 0)
-                known_count = known_handle_counts[key].get((platform, handle), 0)
-                extra = max(0, all_time_accepted - known_count)
-                if extra:
-                    profile_fallback_counts[key][platform] = profile_fallback_counts[key].get(platform, 0) + extra
-
-        comparison_problem_keys = {key: set(period_solves[key]) for key in selected_keys}
-        profile_only_counts = {key: 0 for key in selected_keys}
-        if range_key == "all":
-            for key in selected_keys:
-                timed_keys = set(period_solves[key])
-                profile_keys = set(profile_problem_platforms[key])
-                comparison_problem_keys[key].update(profile_keys)
-                profile_only_counts[key] = len(profile_keys - timed_keys) + sum(profile_fallback_counts[key].values())
 
         contest_range_sql = "participated_at < ?"
-        contest_extra_params: tuple[object, ...] = (end_timestamp,)
+        contest_params: tuple[object, ...] = (end_timestamp,)
         if start_timestamp is not None:
             contest_range_sql = "participated_at >= ? AND participated_at < ?"
-            contest_extra_params = (start_timestamp, end_timestamp)
+            contest_params = (start_timestamp, end_timestamp)
         contest_rows = battle_union_rows(
             conn,
             "contests",
             "*",
             owner_tuples,
             extra_where=f"AND {contest_range_sql}",
-            extra_params=contest_extra_params,
+            extra_params=contest_params,
             order_by="participated_at DESC",
         )
         period_contests: dict[str, dict[tuple[str, str], dict]] = {key: {} for key in selected_keys}
         for row in contest_rows:
-            key = f"{row['owner_type']}:{row['owner_id']}"
-            if key not in period_contests:
-                continue
-            date_key = utc_date_from_ts(row["participated_at"])
-            if not battle_row_in_range(date_key, selected_range):
+            owner_key = f"{row['owner_type']}:{row['owner_id']}"
+            if owner_key not in period_contests:
                 continue
             contest_key = battle_contest_key(row)
-            period_contests[key].setdefault(contest_key, contest_to_json(row))
+            entry = battle_contest_entry(row)
+            existing = period_contests[owner_key].get(contest_key)
+            if not existing or battle_contest_preference(entry) > battle_contest_preference(existing):
+                period_contests[owner_key][contest_key] = entry
 
-        left_solves = period_solves[left_key]
-        right_solves = period_solves[right_key]
-        common_keys = set(left_solves) & set(right_solves)
-        known_common_keys = comparison_problem_keys[left_key] & comparison_problem_keys[right_key]
-        common_problems = []
+        shared_keys = set(period_contests[left_key]) & set(period_contests[right_key])
+        shared_entries = {
+            key: (period_contests[left_key][key], period_contests[right_key][key])
+            for key in shared_keys
+        }
+        contest_solves: dict[str, dict[tuple[str, str], dict[str, dict]]] = {
+            key: {contest_key: {} for contest_key in shared_keys}
+            for key in selected_keys
+        }
+
+        if shared_keys:
+            known_starts = [
+                entry.get("_startTimestamp")
+                for pair in shared_entries.values()
+                for entry in pair
+                if entry.get("_startTimestamp")
+            ]
+            submission_where = """AND (
+                UPPER(TRIM(COALESCE(verdict, ''))) IN ('AC', 'OK', 'ACCEPTED')
+                OR TRIM(COALESCE(verdict, '')) IN ('答案正确', '通过', '12')
+            ) AND submitted_at < ?"""
+            submission_params: tuple[object, ...] = (end_timestamp,)
+            lower_bound = min(known_starts) if known_starts else start_timestamp
+            if lower_bound is not None:
+                submission_where += " AND submitted_at >= ?"
+                submission_params = (end_timestamp, lower_bound)
+            submission_rows = battle_union_rows(
+                conn,
+                "submissions",
+                "owner_type, owner_id, platform, handle, remote_id, problem_id, problem_name, verdict, submitted_at, url, raw_json",
+                owner_tuples,
+                extra_where=submission_where,
+                extra_params=submission_params,
+                order_by="submitted_at",
+            )
+            for row in submission_rows:
+                owner_key = f"{row['owner_type']}:{row['owner_id']}"
+                raw = raw_json_dict(row)
+                contest_key = (str(row["platform"] or ""), battle_submission_contest_id(row, raw))
+                pair = shared_entries.get(contest_key)
+                if not pair or owner_key not in contest_solves:
+                    continue
+                entry = pair[0] if owner_key == left_key else pair[1]
+                solve = battle_in_contest_solve(row, entry)
+                if not solve:
+                    continue
+                existing = contest_solves[owner_key][contest_key].get(solve["key"])
+                if not existing or solve["elapsedSeconds"] < existing["elapsedSeconds"]:
+                    contest_solves[owner_key][contest_key][solve["key"]] = solve
+
+        shared_contests = []
         left_wins = 0
         right_wins = 0
         ties = 0
-        for problem_key in common_keys:
-            left = left_solves[problem_key]
-            right = right_solves[problem_key]
-            if left["solvedAtTimestamp"] < right["solvedAtTimestamp"]:
-                winner = "left"
-                left_wins += 1
-            elif right["solvedAtTimestamp"] < left["solvedAtTimestamp"]:
-                winner = "right"
-                right_wins += 1
-            else:
-                winner = "tie"
-                ties += 1
-            source_platform = problem_key.split(":", 1)[0]
-            display_platform = source_platform if source_platform in ADAPTERS else left["platform"]
-            adapter = ADAPTERS.get(display_platform)
-            common_problems.append(
-                {
-                    "key": problem_key,
-                    "platform": display_platform,
-                    "platformLabel": adapter.label if adapter else left["platformLabel"],
-                    "problemId": left["problemId"] or right["problemId"],
-                    "problemName": left["problemName"] or right["problemName"],
-                    "winner": winner,
-                    "deltaSeconds": abs(left["solvedAtTimestamp"] - right["solvedAtTimestamp"]),
-                    "left": {name: value for name, value in left.items() if name != "solvedAtTimestamp"},
-                    "right": {name: value for name, value in right.items() if name != "solvedAtTimestamp"},
-                }
-            )
-        common_problems.sort(
-            key=lambda item: max(
-                left_solves[item["key"]]["solvedAtTimestamp"],
-                right_solves[item["key"]]["solvedAtTimestamp"],
-            ),
-            reverse=True,
-        )
+        ranked_contests = 0
+        speed_totals = {"left": 0, "right": 0, "tie": 0}
+        platform_results: dict[str, dict] = {}
+        for contest_key, (left, right) in shared_entries.items():
+            left_result = left["result"]
+            right_result = right["result"]
+            winner = None
+            if left_result.get("rank") is not None and right_result.get("rank") is not None:
+                ranked_contests += 1
+                if left_result["rank"] < right_result["rank"]:
+                    winner = "left"
+                    left_wins += 1
+                elif right_result["rank"] < left_result["rank"]:
+                    winner = "right"
+                    right_wins += 1
+                else:
+                    winner = "tie"
+                    ties += 1
 
-        shared_contest_keys = set(period_contests[left_key]) & set(period_contests[right_key])
-        shared_contests = []
-        for contest_key in shared_contest_keys:
-            left = period_contests[left_key][contest_key]
-            right = period_contests[right_key][contest_key]
-            shared_contests.append(
-                {
-                    **left,
-                    "leftHandle": left.get("handle") or "",
-                    "rightHandle": right.get("handle") or "",
-                }
+            left_solves = contest_solves[left_key][contest_key]
+            right_solves = contest_solves[right_key][contest_key]
+            problem_duels = []
+            contest_speed = {"left": 0, "right": 0, "tie": 0}
+            for problem_key in set(left_solves) | set(right_solves):
+                left_solve = left_solves.get(problem_key)
+                right_solve = right_solves.get(problem_key)
+                if left_solve and not right_solve:
+                    problem_winner = "left"
+                elif right_solve and not left_solve:
+                    problem_winner = "right"
+                elif left_solve["elapsedSeconds"] < right_solve["elapsedSeconds"]:
+                    problem_winner = "left"
+                elif right_solve["elapsedSeconds"] < left_solve["elapsedSeconds"]:
+                    problem_winner = "right"
+                else:
+                    problem_winner = "tie"
+                contest_speed[problem_winner] += 1
+                speed_totals[problem_winner] += 1
+                source = left_solve or right_solve
+                problem_duels.append(
+                    {
+                        "key": problem_key,
+                        "problemId": source.get("problemId"),
+                        "problemName": source.get("problemName"),
+                        "winner": problem_winner,
+                        "deltaSeconds": (
+                            abs(left_solve["elapsedSeconds"] - right_solve["elapsedSeconds"])
+                            if left_solve and right_solve
+                            else None
+                        ),
+                        "left": left_solve,
+                        "right": right_solve,
+                    }
+                )
+            problem_duels.sort(
+                key=lambda item: (
+                    max(
+                        item["left"]["elapsedSeconds"] if item["left"] else -1,
+                        item["right"]["elapsedSeconds"] if item["right"] else -1,
+                    ),
+                    item["key"],
+                )
             )
-        shared_contests.sort(key=lambda item: item.get("participatedAt") or "", reverse=True)
 
-        platform_rank = {key: index for index, key in enumerate(ADAPTERS)}
-        players = []
-        for key, owner in zip(selected_keys, selected_owners):
-            solves = period_solves[key]
-            counts: dict[str, int] = {}
-            for problem in solves.values():
-                platform = problem["platform"]
-                counts[platform] = counts.get(platform, 0) + 1
-            if range_key == "all":
-                timed_keys = set(solves)
-                for problem_key, platform in profile_problem_platforms[key].items():
-                    if problem_key not in timed_keys:
-                        counts[platform] = counts.get(platform, 0) + 1
-                for platform, extra in profile_fallback_counts[key].items():
-                    counts[platform] = counts.get(platform, 0) + extra
-            by_platform = [
+            platform = left["platform"]
+            platform_item = platform_results.setdefault(
+                platform,
                 {
                     "platform": platform,
-                    "platformLabel": ADAPTERS[platform].label if platform in ADAPTERS else platform,
-                    "solved": solved,
+                    "platformLabel": left["platformLabel"],
+                    "shared": 0,
+                    "ranked": 0,
+                    "leftWins": 0,
+                    "rightWins": 0,
+                    "ties": 0,
+                },
+            )
+            platform_item["shared"] += 1
+            if winner:
+                platform_item["ranked"] += 1
+                if winner == "left":
+                    platform_item["leftWins"] += 1
+                elif winner == "right":
+                    platform_item["rightWins"] += 1
+                else:
+                    platform_item["ties"] += 1
+
+            shared_contests.append(
+                {
+                    "platform": platform,
+                    "platformLabel": left["platformLabel"],
+                    "remoteId": left["remoteId"],
+                    "contestName": left["contestName"],
+                    "category": left["category"],
+                    "categoryLabel": left["categoryLabel"],
+                    "participatedAt": left["participatedAt"],
+                    "participatedDate": left["participatedDate"],
+                    "url": left["url"],
+                    "leftHandle": left.get("handle") or "",
+                    "rightHandle": right.get("handle") or "",
+                    "leftResult": left_result,
+                    "rightResult": right_result,
+                    "winner": winner,
+                    "speed": {
+                        "leftWins": contest_speed["left"],
+                        "rightWins": contest_speed["right"],
+                        "ties": contest_speed["tie"],
+                        "problems": len(problem_duels),
+                    },
+                    "problemDuels": problem_duels,
                 }
-                for platform, solved in counts.items()
-            ]
-            by_platform.sort(key=lambda item: (platform_rank.get(item["platform"], 999), item["platformLabel"]))
-            active_days = placeholder_days[key] | {problem["solvedDate"] for problem in solves.values()}
+            )
+
+        shared_contests.sort(key=lambda item: (item["participatedAt"], item["platform"], item["remoteId"]), reverse=True)
+        timeline = battle_elo_timeline(shared_contests)
+        platform_rank = {key: index for index, key in enumerate(ADAPTERS)}
+        by_platform = sorted(
+            platform_results.values(),
+            key=lambda item: (platform_rank.get(item["platform"], 999), item["platformLabel"]),
+        )
+        player_ratings = [timeline["leftRating"], timeline["rightRating"]]
+        player_wins = [left_wins, right_wins]
+        player_speed_wins = [speed_totals["left"], speed_totals["right"]]
+        players = []
+        for index, (key, owner) in enumerate(zip(selected_keys, selected_owners)):
+            own_contests = period_contests[key].values()
             players.append(
                 {
                     **owner,
                     "stats": {
-                        "solved": len(comparison_problem_keys[key]) + (
-                            sum(profile_fallback_counts[key].values()) if range_key == "all" else 0
-                        ),
-                        "timedSolved": len(solves),
-                        "profileOnlySolved": profile_only_counts[key],
-                        "activeDays": len(active_days),
-                        "submissions": period_submissions[key],
                         "contests": len(period_contests[key]),
+                        "ratedContests": sum(1 for item in own_contests if item["result"].get("rated")),
+                        "sharedContests": len(shared_keys),
+                        "rankedSharedContests": ranked_contests,
+                        "contestWins": player_wins[index],
+                        "speedWins": player_speed_wins[index],
+                        "duelRating": player_ratings[index],
                     },
-                    "byPlatform": by_platform,
                 }
             )
 
@@ -4531,17 +4784,18 @@ def build_battle_from_db(principal: dict | None, left_key: str, right_key: str, 
                 "leftWins": left_wins,
                 "rightWins": right_wins,
                 "ties": ties,
-                "commonSolved": len(common_keys),
-                "knownCommonSolved": len(known_common_keys),
-                "unrankedCommonSolved": len(known_common_keys - common_keys),
-                "leftOnly": len(comparison_problem_keys[left_key] - comparison_problem_keys[right_key]),
-                "rightOnly": len(comparison_problem_keys[right_key] - comparison_problem_keys[left_key]),
-                "sharedContests": len(shared_contest_keys),
+                "rankedContests": ranked_contests,
+                "unrankedContests": len(shared_keys) - ranked_contests,
+                "sharedContests": len(shared_keys),
+                "leftSpeedWins": speed_totals["left"],
+                "rightSpeedWins": speed_totals["right"],
+                "speedTies": speed_totals["tie"],
+                "speedProblems": sum(speed_totals.values()),
             },
-            "commonProblems": common_problems[:100],
-            "commonProblemLimit": 100,
-            "sharedContests": shared_contests[:50],
-            "sharedContestLimit": 50,
+            "timeline": timeline,
+            "byPlatform": by_platform,
+            "sharedContests": shared_contests[:100],
+            "sharedContestLimit": 100,
         }
 
 

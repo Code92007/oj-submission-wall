@@ -653,8 +653,8 @@ function renderBattleContent() {
   container.append(
     renderBattleScoreboard(data),
     renderBattleMetrics(data),
+    renderBattleTimeline(data),
     renderBattlePlatforms(data),
-    renderCommonProblems(data),
     renderSharedContests(data),
   );
 }
@@ -702,20 +702,20 @@ function renderBattleScoreboard(data) {
   const section = el("section", "battle-scoreboard");
   const scoreCenter = el("div", "battle-score-center");
   const label = document.createElement("span");
-  label.textContent = "共同题先解出";
+  label.textContent = "共同比赛胜场";
   const value = document.createElement("strong");
   value.textContent = `${score.leftWins} : ${score.rightWins}`;
   const summary = document.createElement("p");
-  if (!score.commonSolved && score.knownCommonSolved) {
-    summary.textContent = `${score.knownCommonSolved} 题缺少首次 AC 时间`;
-  } else if (!score.commonSolved) {
-    summary.textContent = "当前范围内暂无可比较的共同题";
+  if (!score.sharedContests) {
+    summary.textContent = "当前范围内暂无共同参赛";
+  } else if (!score.rankedContests) {
+    summary.textContent = `${score.sharedContests} 场共同参赛 · 暂无双方名次`;
   } else if (leftLeading) {
-    summary.textContent = `${left.displayName} 领先 · ${score.ties} 题同时解出`;
+    summary.textContent = `${left.displayName} 领先 · ${score.rankedContests} 场可判胜`;
   } else if (rightLeading) {
-    summary.textContent = `${right.displayName} 领先 · ${score.ties} 题同时解出`;
+    summary.textContent = `${right.displayName} 领先 · ${score.rankedContests} 场可判胜`;
   } else {
-    summary.textContent = `暂时打平 · ${score.ties} 题同时解出`;
+    summary.textContent = `暂时打平 · ${score.rankedContests} 场可判胜`;
   }
   scoreCenter.append(label, value, summary);
   section.append(
@@ -774,42 +774,32 @@ function renderBattleMetrics(data) {
   section.appendChild(battleSectionHead("核心数据", data.range.label));
   const grid = el("div", "battle-metric-grid");
   grid.append(
-    renderBattleMetricRow("解题", left.stats.solved, right.stats.solved, " 题"),
-    renderBattleMetricRow("活跃", left.stats.activeDays, right.stats.activeDays, " 天"),
-    renderBattleMetricRow("参赛", left.stats.contests, right.stats.contests, " 场"),
-    renderBattleMetricRow("提交", left.stats.submissions, right.stats.submissions, " 次"),
-    renderBattleMetricRow("独立解出", score.leftOnly, score.rightOnly, " 题"),
+    renderBattleMetricRow("范围内参赛", left.stats.contests, right.stats.contests, " 场"),
+    renderBattleMetricRow("Rated 参赛", left.stats.ratedContests, right.stats.ratedContests, " 场"),
+    renderBattleMetricRow("共同赛胜场", score.leftWins, score.rightWins, " 场"),
+    renderBattleMetricRow("比赛内抢先", score.leftSpeedWins, score.rightSpeedWins, " 题"),
+    renderBattleMetricRow("对战指数", left.stats.duelRating, right.stats.duelRating),
   );
   section.appendChild(grid);
-  if (left.stats.profileOnlySolved || right.stats.profileOnlySolved) {
-    const note = el("p", "battle-data-note");
-    note.textContent = "历史解题已合并个人页题集；先后比分只统计有首次 AC 时间的共同题。";
-    section.appendChild(note);
-  }
+  const note = el("p", "battle-data-note");
+  note.textContent = "全部指标仅统计比赛记录；赛后补题、Codeforces PRACTICE 提交不参与比分或速度比较。";
+  section.appendChild(note);
   return section;
 }
 
 function renderBattlePlatforms(data) {
-  const [left, right] = data.players;
-  const leftPlatforms = new Map((left.byPlatform || []).map((item) => [item.platform, item]));
-  const rightPlatforms = new Map((right.byPlatform || []).map((item) => [item.platform, item]));
-  const platformKeys = [...new Set([...leftPlatforms.keys(), ...rightPlatforms.keys()])];
+  const platforms = data.byPlatform || [];
   const section = el("section", "battle-section battle-platforms");
-  section.appendChild(battleSectionHead("平台解题", `${platformKeys.length} 个平台`));
-  if (!platformKeys.length) {
-    section.appendChild(battleEmpty("当前范围内还没有可比较的解题记录"));
+  section.appendChild(battleSectionHead("分平台战绩", `${platforms.length} 个共同参赛平台`));
+  if (!platforms.length) {
+    section.appendChild(battleEmpty("当前范围内还没有共同参赛平台"));
     return section;
   }
-  const max = Math.max(
-    1,
-    ...platformKeys.flatMap((key) => [leftPlatforms.get(key)?.solved || 0, rightPlatforms.get(key)?.solved || 0]),
-  );
+  const max = Math.max(1, ...platforms.flatMap((item) => [item.leftWins, item.rightWins]));
   const rows = el("div", "battle-platform-rows");
-  for (const key of platformKeys) {
-    const leftItem = leftPlatforms.get(key);
-    const rightItem = rightPlatforms.get(key);
-    const leftCount = Number(leftItem?.solved || 0);
-    const rightCount = Number(rightItem?.solved || 0);
+  for (const item of platforms) {
+    const leftCount = Number(item.leftWins || 0);
+    const rightCount = Number(item.rightWins || 0);
     const row = el("div", "battle-platform-row");
     const leftBar = el("div", "battle-bar-side left");
     const leftNumber = document.createElement("strong");
@@ -821,7 +811,7 @@ function renderBattlePlatforms(data) {
     leftBar.append(leftNumber, leftTrack);
     const platform = document.createElement("span");
     platform.className = "battle-platform-label";
-    platform.textContent = leftItem?.platformLabel || rightItem?.platformLabel || key;
+    platform.textContent = `${item.platformLabel} · ${item.ranked}/${item.shared} 场可判胜`;
     const rightBar = el("div", "battle-bar-side right");
     const rightTrack = el("span", "battle-bar-track");
     const rightFill = el("i", "battle-bar-fill");
@@ -837,78 +827,149 @@ function renderBattlePlatforms(data) {
   return section;
 }
 
-function formatDuration(seconds) {
-  const value = Math.max(0, Number(seconds || 0));
-  if (value < 60) return `${value} 秒`;
-  if (value < 3600) return `${Math.floor(value / 60)} 分钟`;
-  if (value < 86400) return `${Math.floor(value / 3600)} 小时`;
-  return `${Math.floor(value / 86400)} 天`;
+function battleSvgElement(name, attributes = {}) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+  return node;
 }
 
-function renderCommonProblems(data) {
+function renderBattleTimeline(data) {
   const [left, right] = data.players;
-  const score = data.headToHead;
-  const section = el("section", "battle-section");
-  const shown = data.commonProblems?.length || 0;
-  const limited = shown < score.commonSolved ? ` · 显示最近 ${shown} 题` : "";
-  const untimed = score.unrankedCommonSolved ? ` · ${score.unrankedCommonSolved} 题缺时间` : "";
-  section.appendChild(battleSectionHead("共同题先后", `${score.commonSolved} 题可比较${untimed}${limited}`));
-  if (!shown) {
-    section.appendChild(battleEmpty("当前范围内暂无可比较先后的共同题"));
+  const timeline = data.timeline || {};
+  const points = timeline.points || [];
+  const section = el("section", "battle-section battle-timeline-section");
+  section.appendChild(battleSectionHead("对战指数趋势", `${points.length} 场按官方名次更新 · K=${timeline.kFactor || 32}`));
+  if (!points.length) {
+    section.appendChild(battleEmpty("还没有双方都具备官方名次的共同比赛"));
     return section;
   }
-  const wrap = el("div", "battle-table-wrap");
-  const table = el("table", "battle-table common-problem-table");
-  const head = document.createElement("thead");
-  head.innerHTML = `
-    <tr>
-      <th class="battle-platform-column">平台</th>
-      <th>题目</th>
-      <th class="battle-time-column">${escapeHtml(left.displayName)} 首次 AC</th>
-      <th class="battle-time-column">${escapeHtml(right.displayName)} 首次 AC</th>
-      <th class="battle-result-column">先解出</th>
-    </tr>
-  `;
-  const body = document.createElement("tbody");
-  for (const item of data.commonProblems) {
-    const row = document.createElement("tr");
-    const platform = el("td", "battle-platform-column");
-    const badge = el("span", "platform-badge");
-    badge.textContent = item.platformLabel || item.platform;
-    platform.appendChild(badge);
-    const problem = el("td", "problem-cell");
-    const url = item.left?.url || item.right?.url;
-    const link = document.createElement(url ? "a" : "span");
-    link.className = "submission-link";
-    link.textContent = item.problemName || item.problemId || item.key;
-    link.title = link.textContent;
-    if (url) {
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noreferrer";
-    }
-    problem.appendChild(link);
-    const leftTime = el("td", "battle-time-column");
-    leftTime.textContent = formatFullDateTime(item.left.solvedAt);
-    const rightTime = el("td", "battle-time-column");
-    rightTime.textContent = formatFullDateTime(item.right.solvedAt);
-    const result = el("td", "battle-result-column");
-    const resultPill = el("span", `battle-result-pill ${item.winner}`);
-    if (item.winner === "left") {
-      resultPill.textContent = `${left.displayName} · 早 ${formatDuration(item.deltaSeconds)}`;
-    } else if (item.winner === "right") {
-      resultPill.textContent = `${right.displayName} · 早 ${formatDuration(item.deltaSeconds)}`;
-    } else {
-      resultPill.textContent = "同时";
-    }
-    result.appendChild(resultPill);
-    row.append(platform, problem, leftTime, rightTime, result);
-    body.appendChild(row);
+
+  const legend = el("div", "battle-chart-legend");
+  for (const [side, player, rating] of [
+    ["left", left, timeline.leftRating],
+    ["right", right, timeline.rightRating],
+  ]) {
+    const item = el("span", side);
+    const swatch = el("i", "");
+    const label = document.createElement("strong");
+    label.textContent = `${player.displayName} ${rating}`;
+    item.append(swatch, label);
+    legend.appendChild(item);
   }
-  table.append(head, body);
-  wrap.appendChild(table);
-  section.appendChild(wrap);
+
+  const width = 840;
+  const height = 286;
+  const plot = { left: 54, right: 20, top: 24, bottom: 42 };
+  const samples = [
+    { leftRating: timeline.initialRating || 1500, rightRating: timeline.initialRating || 1500, participatedDate: "起点", contestName: "对战指数起点" },
+    ...points,
+  ];
+  const ratings = samples.flatMap((point) => [point.leftRating, point.rightRating]);
+  const minRating = Math.floor((Math.min(...ratings) - 20) / 25) * 25;
+  const maxRating = Math.ceil((Math.max(...ratings) + 20) / 25) * 25;
+  const range = Math.max(50, maxRating - minRating);
+  const x = (index) => plot.left + (index / Math.max(1, samples.length - 1)) * (width - plot.left - plot.right);
+  const y = (rating) => plot.top + ((maxRating - rating) / range) * (height - plot.top - plot.bottom);
+  const svg = battleSvgElement("svg", {
+    class: "battle-chart",
+    viewBox: `0 0 ${width} ${height}`,
+    role: "img",
+    "aria-label": `${left.displayName} 与 ${right.displayName} 的共同比赛对战指数折线图`,
+  });
+
+  for (let index = 0; index <= 4; index += 1) {
+    const rating = Math.round(maxRating - (range * index) / 4);
+    const lineY = y(rating);
+    svg.appendChild(battleSvgElement("line", { class: "battle-chart-grid", x1: plot.left, x2: width - plot.right, y1: lineY, y2: lineY }));
+    const label = battleSvgElement("text", { class: "battle-chart-axis", x: plot.left - 10, y: lineY + 4, "text-anchor": "end" });
+    label.textContent = rating;
+    svg.appendChild(label);
+  }
+
+  const linePoints = (key) => samples.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
+  svg.append(
+    battleSvgElement("polyline", { class: "battle-chart-line left", points: linePoints("leftRating") }),
+    battleSvgElement("polyline", { class: "battle-chart-line right", points: linePoints("rightRating") }),
+  );
+  for (const [side, key] of [["left", "leftRating"], ["right", "rightRating"]]) {
+    samples.forEach((point, index) => {
+      const circle = battleSvgElement("circle", { class: `battle-chart-point ${side}`, cx: x(index), cy: y(point[key]), r: 4 });
+      const title = battleSvgElement("title");
+      title.textContent = `${point.participatedDate} · ${point.contestName} · ${point[key]}`;
+      circle.appendChild(title);
+      svg.appendChild(circle);
+    });
+  }
+  const labelIndexes = [...new Set([0, Math.floor((samples.length - 1) / 2), samples.length - 1])];
+  for (const index of labelIndexes) {
+    const label = battleSvgElement("text", { class: "battle-chart-axis date", x: x(index), y: height - 12, "text-anchor": index === 0 ? "start" : index === samples.length - 1 ? "end" : "middle" });
+    label.textContent = samples[index].participatedDate;
+    svg.appendChild(label);
+  }
+  const chartWrap = el("div", "battle-chart-wrap");
+  chartWrap.appendChild(svg);
+  section.append(legend, chartWrap);
+  const note = el("p", "battle-data-note");
+  note.textContent = "双方从 1500 起步，每场仅按官方名次判定胜负并更新指数；它表示这两人之间的交锋走势，不等同于各平台官方 Rating。";
+  section.appendChild(note);
   return section;
+}
+
+function formatContestElapsed(seconds) {
+  if (seconds == null) return "-";
+  const value = Math.max(0, Math.floor(Number(seconds)));
+  const hours = Math.floor(value / 3600);
+  const minutes = Math.floor((value % 3600) / 60);
+  const secs = value % 60;
+  return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}` : `${minutes}:${String(secs).padStart(2, "0")}`;
+}
+
+function renderContestResult(result) {
+  const cell = el("div", "battle-rank-result");
+  const rank = document.createElement("strong");
+  rank.textContent = result?.rank != null ? `#${result.rank}` : "暂无名次";
+  cell.appendChild(rank);
+  const details = [];
+  if (result?.solved != null) details.push(`${result.solved} 题`);
+  if (result?.score != null) details.push(`${result.score} 分`);
+  if (result?.performance != null) details.push(`表现 ${result.performance}`);
+  if (result?.ratingAfter != null && result?.rated) {
+    const delta = Number(result.ratingDelta || 0);
+    details.push(`Rating ${result.ratingAfter} (${delta >= 0 ? "+" : ""}${delta})`);
+  }
+  if (details.length) {
+    const meta = document.createElement("span");
+    meta.textContent = details.join(" · ");
+    cell.appendChild(meta);
+  }
+  return cell;
+}
+
+function renderContestSpeed(item, leftName, rightName) {
+  const cell = el("div", "battle-speed-result");
+  if (!item.speed?.problems) {
+    cell.textContent = "暂无比赛内提交时间";
+    return cell;
+  }
+  const score = document.createElement("strong");
+  score.textContent = `${item.speed.leftWins} : ${item.speed.rightWins}`;
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = `${item.speed.problems} 题详情`;
+  const list = el("div", "battle-problem-duels");
+  for (const duel of item.problemDuels || []) {
+    const row = el("div", `battle-problem-duel ${duel.winner || ""}`);
+    const name = document.createElement("span");
+    name.textContent = duel.problemId || duel.problemName || duel.key;
+    const times = document.createElement("span");
+    times.textContent = `${formatContestElapsed(duel.left?.elapsedSeconds)} / ${formatContestElapsed(duel.right?.elapsedSeconds)}`;
+    times.title = `${leftName} / ${rightName}`;
+    row.append(name, times);
+    list.appendChild(row);
+  }
+  details.append(summary, list);
+  cell.append(score, details);
+  return cell;
 }
 
 function renderSharedContests(data) {
@@ -917,21 +978,22 @@ function renderSharedContests(data) {
   const shown = data.sharedContests?.length || 0;
   const limited = shown < total ? ` · 显示最近 ${shown} 场` : "";
   const section = el("section", "battle-section");
-  section.appendChild(battleSectionHead("共同参赛", `${total} 场${limited}`));
+  section.appendChild(battleSectionHead("逐场交锋", `${data.headToHead.rankedContests} 场可判胜 · ${data.headToHead.unrankedContests} 场缺名次${limited}`));
   if (!shown) {
-    section.appendChild(battleEmpty("当前范围内暂无共同参赛记录"));
+    section.appendChild(battleEmpty("当前范围内暂无共同正式参赛记录"));
     return section;
   }
-  const wrap = el("div", "battle-table-wrap");
+  const wrap = el("div", "battle-table-wrap shared-contest-table-wrap");
   const table = el("table", "battle-table shared-contest-table");
   const head = document.createElement("thead");
   head.innerHTML = `
     <tr>
       <th class="battle-platform-column">平台</th>
       <th>比赛</th>
-      <th class="battle-date-column">参赛日期</th>
-      <th>${escapeHtml(left.displayName)} 账号</th>
-      <th>${escapeHtml(right.displayName)} 账号</th>
+      <th class="battle-rank-column">${escapeHtml(left.displayName)} 名次</th>
+      <th class="battle-rank-column">${escapeHtml(right.displayName)} 名次</th>
+      <th class="battle-speed-column">比赛内抢先</th>
+      <th class="battle-result-column">胜负</th>
     </tr>
   `;
   const body = document.createElement("tbody");
@@ -952,18 +1014,69 @@ function renderSharedContests(data) {
       link.rel = "noreferrer";
     }
     contest.appendChild(link);
-    const date = el("td", "battle-date-column");
-    date.textContent = item.participatedDate || "-";
-    const leftHandle = document.createElement("td");
-    leftHandle.textContent = item.leftHandle || "-";
-    const rightHandle = document.createElement("td");
-    rightHandle.textContent = item.rightHandle || "-";
-    row.append(platform, contest, date, leftHandle, rightHandle);
+    const contestDate = document.createElement("span");
+    contestDate.className = "battle-contest-date";
+    contestDate.textContent = item.participatedDate || "-";
+    contest.appendChild(contestDate);
+    const leftRank = el("td", "battle-rank-column");
+    leftRank.appendChild(renderContestResult(item.leftResult));
+    const rightRank = el("td", "battle-rank-column");
+    rightRank.appendChild(renderContestResult(item.rightResult));
+    const speed = el("td", "battle-speed-column");
+    speed.appendChild(renderContestSpeed(item, left.displayName, right.displayName));
+    const result = el("td", "battle-result-column");
+    const resultPill = el("span", `battle-result-pill ${item.winner || "unranked"}`);
+    if (item.winner === "left") resultPill.textContent = left.displayName;
+    else if (item.winner === "right") resultPill.textContent = right.displayName;
+    else if (item.winner === "tie") resultPill.textContent = "名次相同";
+    else resultPill.textContent = "不计比分";
+    result.appendChild(resultPill);
+    row.append(platform, contest, leftRank, rightRank, speed, result);
     body.appendChild(row);
   }
   table.append(head, body);
   wrap.appendChild(table);
-  section.appendChild(wrap);
+  const mobileList = el("div", "battle-contest-mobile-list");
+  for (const item of data.sharedContests) {
+    const match = el("article", "battle-contest-mobile-item");
+    const heading = el("div", "battle-contest-mobile-head");
+    const badge = el("span", "platform-badge");
+    badge.textContent = item.platformLabel || item.platform;
+    const title = document.createElement(item.url ? "a" : "span");
+    title.textContent = item.contestName || "未命名比赛";
+    if (item.url) {
+      title.href = item.url;
+      title.target = "_blank";
+      title.rel = "noreferrer";
+    }
+    const date = document.createElement("span");
+    date.className = "battle-contest-date";
+    date.textContent = item.participatedDate || "-";
+    heading.append(badge, title, date);
+
+    const comparison = el("div", "battle-contest-mobile-comparison");
+    const leftResult = el("div", "left");
+    const leftName = document.createElement("span");
+    leftName.textContent = left.displayName;
+    leftResult.append(leftName, renderContestResult(item.leftResult));
+    const outcome = el("div", "outcome");
+    const resultPill = el("span", `battle-result-pill ${item.winner || "unranked"}`);
+    resultPill.textContent = item.winner === "left" ? left.displayName : item.winner === "right" ? right.displayName : item.winner === "tie" ? "名次相同" : "不计比分";
+    outcome.appendChild(resultPill);
+    const rightResult = el("div", "right");
+    const rightName = document.createElement("span");
+    rightName.textContent = right.displayName;
+    rightResult.append(rightName, renderContestResult(item.rightResult));
+    comparison.append(leftResult, outcome, rightResult);
+
+    const speed = el("div", "battle-contest-mobile-speed");
+    const speedLabel = document.createElement("span");
+    speedLabel.textContent = "比赛内抢先";
+    speed.append(speedLabel, renderContestSpeed(item, left.displayName, right.displayName));
+    match.append(heading, comparison, speed);
+    mobileList.appendChild(match);
+  }
+  section.append(wrap, mobileList);
   return section;
 }
 
