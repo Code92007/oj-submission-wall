@@ -782,7 +782,7 @@ function renderBattleMetrics(data) {
   );
   section.appendChild(grid);
   const note = el("p", "battle-data-note");
-  note.textContent = "全部指标仅统计比赛记录；赛后补题、Codeforces PRACTICE 提交不参与比分或速度比较。";
+  note.textContent = "全部指标仅统计比赛记录；Codeforces VP / 场外参赛按比赛表现换算名次，赛后 PRACTICE 补题不参与比较。";
   section.appendChild(note);
   return section;
 }
@@ -838,7 +838,7 @@ function renderBattleTimeline(data) {
   const timeline = data.timeline || {};
   const points = timeline.points || [];
   const section = el("section", "battle-section battle-timeline-section");
-  section.appendChild(battleSectionHead("对战指数趋势", `${points.length} 场按官方名次更新 · K=${timeline.kFactor || 32}`));
+  section.appendChild(battleSectionHead("对战指数趋势", `${points.length} 场按有效名次更新 · K=${timeline.kFactor || 32}`));
   if (!points.length) {
     section.appendChild(battleEmpty("还没有双方都具备官方名次的共同比赛"));
     return section;
@@ -910,7 +910,7 @@ function renderBattleTimeline(data) {
   chartWrap.appendChild(svg);
   section.append(legend, chartWrap);
   const note = el("p", "battle-data-note");
-  note.textContent = "双方从 1500 起步，每场仅按官方名次判定胜负并更新指数；它表示这两人之间的交锋走势，不等同于各平台官方 Rating。";
+  note.textContent = "双方从 1500 起步，每场按正式或 VP 等价名次判定胜负并更新指数；它表示这两人之间的交锋走势，不等同于各平台官方 Rating。";
   section.appendChild(note);
   return section;
 }
@@ -927,7 +927,9 @@ function formatContestElapsed(seconds) {
 function renderContestResult(result) {
   const cell = el("div", "battle-rank-result");
   const rank = document.createElement("strong");
-  rank.textContent = result?.rank != null ? `#${result.rank}` : "暂无名次";
+  const isVirtual = result?.rankKind === "virtual-equivalent";
+  rank.textContent = result?.rank != null ? `${isVirtual ? "VP 等价 " : ""}#${result.rank}` : "暂无名次";
+  if (isVirtual) rank.title = "根据本次 VP 的得分、罚时和公开正式榜单换算的等价名次";
   cell.appendChild(rank);
   const details = [];
   if (result?.solved != null) details.push(`${result.solved} 题`);

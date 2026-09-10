@@ -37,6 +37,7 @@ DATA_DIR = Path(os.environ.get("DATA_DIR", ROOT / "data")).resolve()
 DB_PATH = Path(os.environ.get("DATABASE_PATH", DATA_DIR / "ojwall.sqlite3")).resolve()
 CACHE_DIR = Path(os.environ.get("CACHE_DIR", DATA_DIR / "cache")).resolve()
 HTTP_CACHE_DIR = CACHE_DIR / "http"
+CODEFORCES_STANDINGS_CACHE_DIR = CACHE_DIR / "codeforces-standings"
 OVERVIEW_CACHE_PATH = CACHE_DIR / "overview.json"
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8000"))
@@ -47,6 +48,7 @@ SYNC_MIN_AGE_SECONDS = int(os.environ.get("SYNC_MIN_AGE_SECONDS", "120"))
 SYNC_INCREMENTAL_OVERLAP_SECONDS = int(os.environ.get("SYNC_INCREMENTAL_OVERLAP_SECONDS", "7200"))
 FETCH_LOOKBACK_DAYS = int(os.environ.get("FETCH_LOOKBACK_DAYS", "3650"))
 FETCH_LIMIT = int(os.environ.get("FETCH_LIMIT", "1000"))
+CODEFORCES_VP_RANKS_PER_SYNC = max(1, int(os.environ.get("CODEFORCES_VP_RANKS_PER_SYNC", "4")))
 HTTP_TIMEOUT_SECONDS = int(os.environ.get("HTTP_TIMEOUT_SECONDS", "15"))
 HTTP_RETRY_COUNT = int(os.environ.get("HTTP_RETRY_COUNT", "2"))
 HTTP_RETRY_BACKOFF_SECONDS = float(os.environ.get("HTTP_RETRY_BACKOFF_SECONDS", "0.8"))
@@ -116,6 +118,7 @@ SMTP_PLACEHOLDERS = {
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 HTTP_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+CODEFORCES_STANDINGS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 SYNC_LOCK = threading.Lock()
 SYNC_QUEUE_LOCK = threading.Lock()
 SYNC_QUEUE_EVENT = threading.Event()
@@ -124,6 +127,7 @@ SYNC_RUNNING_JOB: dict | None = None
 SYNC_LAST_FINISHED_JOB: dict | None = None
 SYNC_JOB_COUNTER = 0
 OVERVIEW_CACHE_LOCK = threading.Lock()
+CODEFORCES_STANDINGS_LOCK = threading.Lock()
 OVERVIEW_MEMORY_CACHE: dict[tuple[str, str, str, int], tuple[int, dict]] = {}
 BATTLE_MEMORY_CACHE: dict[tuple[str, ...], tuple[int, dict]] = {}
 HTTP_STALE_HITS = threading.local()
@@ -1096,6 +1100,173 @@ def atcoder_contest_lookup() -> dict[str, dict]:
     return {str(item.get("id")): item for item in data if item.get("id")}
 
 
+CODEFORCES_UNOFFICIAL_PARTICIPANT_TYPES = {"VIRTUAL", "OUT_OF_COMPETITION"}
+CODEFORCES_NON_PENALTY_VERDICTS = {"COMPILATION_ERROR", "TESTING", "SKIPPED"}
+
+
+def codeforces_standings_cache_path(contest_id: int) -> Path:
+    return CODEFORCES_STANDINGS_CACHE_DIR / f"{int(contest_id)}.json"
+
+
+def read_codeforces_standings_summary(contest_id: int) -> dict | None:
+    path = codeforces_standings_cache_path(contest_id)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text("utf-8"))
+    except Exception:
+        return None
+    if not isinstance(data, dict) or data.get("version") != 1:
+        return None
+    return data
+
+
+def infer_codeforces_icpc_penalty_minutes(rows: list[dict]) -> int:
+    candidates = []
+    for row in rows[:500]:
+        problem_results = row.get("problemResults") or []
+        solved = [item for item in problem_results if float(item.get("points") or 0) > 0]
+        rejected = sum(int(item.get("rejectedAttemptCount") or 0) for item in solved)
+        if not rejected:
+            continue
+        solve_minutes = sum(int(item.get("bestSubmissionTimeSeconds") or 0) // 60 for item in solved)
+        extra = int(row.get("penalty") or 0) - solve_minutes
+        if extra > 0 and extra % rejected == 0 and extra // rejected in {10, 20}:
+            candidates.append(extra // rejected)
+    if not candidates:
+        return 20
+    return max({value: candidates.count(value) for value in set(candidates)}, key=lambda value: candidates.count(value))
+
+
+def codeforces_standings_summary(contest_id: int) -> dict:
+    cached = read_codeforces_standings_summary(contest_id)
+    if cached:
+        return cached
+    with CODEFORCES_STANDINGS_LOCK:
+        cached = read_codeforces_standings_summary(contest_id)
+        if cached:
+            return cached
+        url = f"https://codeforces.com/api/contest.standings?contestId={int(contest_id)}"
+        body, _ = http_get(url, allow_stale_cache=False, cache_write=False)
+        payload = json.loads(body.decode("utf-8"))
+        if payload.get("status") != "OK" or not isinstance(payload.get("result"), dict):
+            raise RuntimeError(payload.get("comment") or "Codeforces standings 返回失败")
+        result = payload["result"]
+        contest = result.get("contest") if isinstance(result.get("contest"), dict) else {}
+        rows = result.get("rows") if isinstance(result.get("rows"), list) else []
+        problems = result.get("problems") if isinstance(result.get("problems"), list) else []
+        summary = {
+            "version": 1,
+            "fetchedAt": utcnow(),
+            "contest": {
+                "id": contest.get("id"),
+                "name": contest.get("name"),
+                "type": contest.get("type"),
+                "startTimeSeconds": contest.get("startTimeSeconds"),
+                "durationSeconds": contest.get("durationSeconds"),
+            },
+            "problems": [
+                {"index": item.get("index"), "points": item.get("points")}
+                for item in problems
+                if item.get("index")
+            ],
+            "rows": [
+                [float(item.get("points") or 0), int(item.get("penalty") or 0)]
+                for item in rows
+            ],
+            "icpcPenaltyMinutes": infer_codeforces_icpc_penalty_minutes(rows),
+        }
+        path = codeforces_standings_cache_path(contest_id)
+        tmp_path = path.with_name(f"{path.name}.{threading.get_ident()}.tmp")
+        tmp_path.write_text(json.dumps(summary, ensure_ascii=False, separators=(",", ":")), "utf-8")
+        os.replace(tmp_path, path)
+        return summary
+
+
+def codeforces_unofficial_result(summary: dict, submissions: list[dict]) -> dict | None:
+    raw_submissions = []
+    for item in submissions:
+        raw = item.get("raw") if isinstance(item.get("raw"), dict) else {}
+        participant_type = str((raw.get("author") or {}).get("participantType") or "").upper()
+        if participant_type not in CODEFORCES_UNOFFICIAL_PARTICIPANT_TYPES:
+            continue
+        submitted_at = int(item.get("submitted_at") or raw.get("creationTimeSeconds") or 0)
+        if submitted_at:
+            raw_submissions.append((submitted_at, participant_type, raw))
+    if not raw_submissions:
+        return None
+
+    raw_submissions.sort(key=lambda item: item[0])
+    _, participant_type, first_raw = raw_submissions[0]
+    members = (first_raw.get("author") or {}).get("members") or []
+    if len(members) > 1:
+        return None
+    contest = summary.get("contest") if isinstance(summary.get("contest"), dict) else {}
+    start_timestamp = int(
+        (first_raw.get("author") or {}).get("startTimeSeconds")
+        or contest.get("startTimeSeconds")
+        or raw_submissions[0][0]
+    )
+    duration_seconds = int(contest.get("durationSeconds") or 0)
+    end_timestamp = start_timestamp + duration_seconds if duration_seconds else None
+    attempts: dict[str, int] = {}
+    solved: dict[str, tuple[int, int]] = {}
+    for submitted_at, item_type, raw in raw_submissions:
+        if item_type != participant_type or submitted_at < start_timestamp:
+            continue
+        if end_timestamp and submitted_at > end_timestamp:
+            continue
+        problem = raw.get("problem") if isinstance(raw.get("problem"), dict) else {}
+        problem_index = str(problem.get("index") or "")
+        if not problem_index or problem_index in solved:
+            continue
+        verdict = str(raw.get("verdict") or "").upper()
+        elapsed_seconds = int(raw.get("relativeTimeSeconds") or submitted_at - start_timestamp)
+        if elapsed_seconds < 0 or (duration_seconds and elapsed_seconds > duration_seconds):
+            continue
+        if verdict == "OK":
+            solved[problem_index] = (elapsed_seconds // 60, attempts.get(problem_index, 0))
+        elif verdict not in CODEFORCES_NON_PENALTY_VERDICTS:
+            attempts[problem_index] = attempts.get(problem_index, 0) + 1
+
+    contest_type = str(contest.get("type") or "CF").upper()
+    penalty = 0
+    if contest_type == "ICPC":
+        points = float(len(solved))
+        penalty_minutes = int(summary.get("icpcPenaltyMinutes") or 20)
+        penalty = sum(minutes + wrong * penalty_minutes for minutes, wrong in solved.values())
+    else:
+        maximums = {
+            str(item.get("index") or ""): float(item.get("points") or 0)
+            for item in summary.get("problems") or []
+        }
+        points = 0.0
+        for problem_index, (minutes, wrong) in solved.items():
+            maximum = maximums.get(problem_index, 0)
+            if maximum <= 0:
+                continue
+            wrong_penalty = 0 if participant_type == "OUT_OF_COMPETITION" else 50 * wrong
+            points += max(maximum * 0.3, maximum - (maximum / 250) * minutes - wrong_penalty)
+
+    better = 0
+    for row in summary.get("rows") or []:
+        row_points = float(row[0] or 0)
+        row_penalty = int(row[1] or 0)
+        if row_points > points or (contest_type == "ICPC" and row_points == points and row_penalty < penalty):
+            better += 1
+    normalized_points = int(points) if points.is_integer() else round(points, 2)
+    return {
+        "rank": better + 1,
+        "score": normalized_points,
+        "solved": len(solved),
+        "penalty": penalty,
+        "participants": len(summary.get("rows") or []),
+        "participantType": participant_type,
+        "rankKind": "virtual-equivalent",
+        "startTimeSeconds": start_timestamp,
+    }
+
+
 class CodeforcesAdapter(OJAdapter):
     key = "codeforces"
     label = "Codeforces"
@@ -1163,17 +1334,20 @@ class CodeforcesAdapter(OJAdapter):
                     if item.get("contestId") is not None
                 }
         contests = {}
+        unofficial_submissions: dict[int, list[dict]] = {}
         for item in submissions:
             raw = item.get("raw") or {}
             problem = raw.get("problem") or {}
             contest_id = raw.get("contestId") or problem.get("contestId")
             submitted_at = int(item.get("submitted_at") or 0)
-            if not contest_id or submitted_at < since_ts:
+            if not contest_id or submitted_at < history_floor:
                 continue
             participant_type = str((raw.get("author") or {}).get("participantType") or "")
             if participant_type.upper() == "PRACTICE":
                 continue
             contest_id = int(contest_id)
+            if participant_type.upper() in CODEFORCES_UNOFFICIAL_PARTICIPANT_TYPES:
+                unofficial_submissions.setdefault(contest_id, []).append(item)
             contest = lookup.get(contest_id) or {}
             name = str(contest.get("name") or f"Codeforces {contest_id}")
             start_at = int((raw.get("author") or {}).get("startTimeSeconds") or contest.get("startTimeSeconds") or submitted_at)
@@ -1215,6 +1389,33 @@ class CodeforcesAdapter(OJAdapter):
                 "url": url,
                 "raw": {"contest": contest, "ratingChange": rating_change, "source": "user.rating"},
             }
+
+        standings_fetches = 0
+        ranked_unofficial = sorted(
+            unofficial_submissions.items(),
+            key=lambda pair: max(int(item.get("submitted_at") or 0) for item in pair[1]),
+            reverse=True,
+        )
+        for contest_id, contest_submissions in ranked_unofficial:
+            if contest_id >= 100000 or contest_id in rating_changes:
+                continue
+            remote_id = str(contest_id)
+            existing = contests.get(remote_id)
+            contest = lookup.get(contest_id) or {}
+            if not existing or str(contest.get("phase") or "").upper() != "FINISHED":
+                continue
+            has_cached_standings = read_codeforces_standings_summary(contest_id) is not None
+            if not has_cached_standings and standings_fetches >= CODEFORCES_VP_RANKS_PER_SYNC:
+                continue
+            if not has_cached_standings:
+                standings_fetches += 1
+            try:
+                summary = codeforces_standings_summary(contest_id)
+                virtual_result = codeforces_unofficial_result(summary, contest_submissions)
+            except Exception:
+                continue
+            if virtual_result:
+                existing["raw"]["virtualResult"] = virtual_result
         return list(contests.values())
 
 
@@ -3091,7 +3292,61 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         contests = []
         contest_error = ""
         try:
-            contests = adapter.fetch_contests(row["handle"], since_ts, submissions)
+            contest_submissions = submissions
+            previous_codeforces_results = {}
+            if adapter.key == "codeforces":
+                stored_submissions = conn.execute(
+                    """
+                    SELECT remote_id, submitted_at, raw_json
+                    FROM submissions
+                    WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ?
+                      AND submitted_at >= ?
+                    """,
+                    (
+                        row["owner_type"],
+                        row["owner_id"],
+                        row["platform"],
+                        row["handle"],
+                        default_since,
+                    ),
+                ).fetchall()
+                merged_submissions = {
+                    str(item.get("remote_id") or ""): item
+                    for item in submissions
+                    if item.get("remote_id")
+                }
+                for stored in stored_submissions:
+                    remote_id = str(stored["remote_id"] or "")
+                    if not remote_id or remote_id in merged_submissions:
+                        continue
+                    with contextlib.suppress(Exception):
+                        raw = json.loads(stored["raw_json"] or "{}")
+                        if isinstance(raw, dict):
+                            merged_submissions[remote_id] = {
+                                "remote_id": remote_id,
+                                "submitted_at": int(stored["submitted_at"] or 0),
+                                "raw": raw,
+                            }
+                contest_submissions = list(merged_submissions.values())
+                stored_contests = conn.execute(
+                    """
+                    SELECT remote_id, raw_json
+                    FROM contests
+                    WHERE owner_type = ? AND owner_id = ? AND platform = ? AND handle = ?
+                    """,
+                    (row["owner_type"], row["owner_id"], row["platform"], row["handle"]),
+                ).fetchall()
+                for stored in stored_contests:
+                    with contextlib.suppress(Exception):
+                        raw = json.loads(stored["raw_json"] or "{}")
+                        if isinstance(raw, dict) and isinstance(raw.get("virtualResult"), dict):
+                            previous_codeforces_results[str(stored["remote_id"])] = raw["virtualResult"]
+            contests = adapter.fetch_contests(row["handle"], since_ts, contest_submissions)
+            for item in contests:
+                raw = item.get("raw") if isinstance(item.get("raw"), dict) else {}
+                previous_result = previous_codeforces_results.get(str(item.get("remote_id") or ""))
+                if previous_result and not raw.get("ratingChange") and not raw.get("virtualResult"):
+                    raw["virtualResult"] = previous_result
         except Exception as exc:
             detail = str(exc)[:300] or exc.__class__.__name__
             contest_error = f"比赛记录同步失败：{detail}"
@@ -4336,6 +4591,8 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
     rating_delta = None
     performance = None
     rated = False
+    participant_type = None
+    rank_kind = None
     start_timestamp = None
     end_timestamp = None
     duration_seconds = None
@@ -4343,13 +4600,23 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
     if platform == "codeforces":
         contest = raw.get("contest") if isinstance(raw.get("contest"), dict) else {}
         rating_change = raw.get("ratingChange") if isinstance(raw.get("ratingChange"), dict) else {}
+        virtual_result = raw.get("virtualResult") if isinstance(raw.get("virtualResult"), dict) else {}
         rank = battle_optional_int(rating_change.get("rank"), positive=True)
         rating_before = battle_optional_int(rating_change.get("oldRating"))
         rating_after = battle_optional_int(rating_change.get("newRating"))
         if rating_before is not None and rating_after is not None:
             rating_delta = rating_after - rating_before
         rated = bool(rating_change)
-        start_timestamp = battle_epoch_seconds(contest.get("startTimeSeconds"))
+        if rank is None and virtual_result:
+            rank = battle_optional_int(virtual_result.get("rank"), positive=True)
+            score = battle_optional_number(virtual_result.get("score"))
+            solved = battle_optional_int(virtual_result.get("solved"))
+            participants = battle_optional_int(virtual_result.get("participants"), positive=True)
+            participant_type = str(virtual_result.get("participantType") or "").upper() or None
+            rank_kind = str(virtual_result.get("rankKind") or "") or None
+        start_timestamp = battle_epoch_seconds(
+            virtual_result.get("startTimeSeconds") if rank_kind == "virtual-equivalent" else None
+        ) or battle_epoch_seconds(contest.get("startTimeSeconds"))
         duration_seconds = battle_optional_int(contest.get("durationSeconds"), positive=True)
     elif platform == "atcoder":
         contest = raw.get("contest") if isinstance(raw.get("contest"), dict) else {}
@@ -4415,6 +4682,8 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
         "ratingDelta": rating_delta,
         "performance": performance,
         "rated": rated,
+        "participantType": participant_type,
+        "rankKind": rank_kind,
         "resultAvailable": rank is not None,
         "_startTimestamp": start_timestamp,
         "_endTimestamp": end_timestamp,

@@ -4,6 +4,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import app
 
@@ -242,6 +243,146 @@ class BattleOverviewTest(unittest.TestCase):
         self.assertEqual(result["headToHead"]["sharedContests"], 0)
         self.assertEqual(result["headToHead"]["speedProblems"], 0)
         self.assertEqual([player["stats"]["contests"] for player in result["players"]], [0, 0])
+
+    def test_codeforces_virtual_rank_counts_as_a_contest_result(self):
+        start = self.now - 4 * 86400
+        contest = {
+            "id": 4000,
+            "name": "Codeforces Virtual Match",
+            "phase": "FINISHED",
+            "type": "CF",
+            "startTimeSeconds": start,
+            "durationSeconds": 7200,
+        }
+        self.add_contest(
+            1,
+            "codeforces",
+            "4000",
+            start,
+            {
+                "contest": contest,
+                "ratingChange": {"contestId": 4000, "rank": 910, "oldRating": 1560, "newRating": 1631},
+            },
+        )
+        self.add_contest(
+            2,
+            "codeforces",
+            "4000",
+            start,
+            {
+                "contest": contest,
+                "virtualResult": {
+                    "rank": 350,
+                    "score": 3061,
+                    "solved": 4,
+                    "participants": 8620,
+                    "participantType": "OUT_OF_COMPETITION",
+                    "rankKind": "virtual-equivalent",
+                    "startTimeSeconds": start,
+                },
+            },
+        )
+
+        result = app.build_battle(None, "user:1", "user:2", "30")
+
+        self.assertEqual(result["headToHead"]["rankedContests"], 1)
+        self.assertEqual(result["headToHead"]["rightWins"], 1)
+        match = result["sharedContests"][0]
+        self.assertEqual(match["winner"], "right")
+        self.assertEqual(match["rightResult"]["rank"], 350)
+        self.assertEqual(match["rightResult"]["rankKind"], "virtual-equivalent")
+        self.assertEqual(match["rightResult"]["participantType"], "OUT_OF_COMPETITION")
+        self.assertFalse(match["rightResult"]["rated"])
+        self.assertEqual([player["stats"]["ratedContests"] for player in result["players"]], [1, 0])
+
+    def test_codeforces_virtual_result_uses_contest_scoring(self):
+        start = self.now - 86400
+        summary = {
+            "contest": {"type": "CF", "startTimeSeconds": start, "durationSeconds": 7200},
+            "problems": [{"index": "A", "points": 500}, {"index": "B", "points": 1000}],
+            "rows": [[1500, 0], [1350, 0], [1000, 0]],
+            "icpcPenaltyMinutes": 20,
+        }
+
+        def submission(problem, verdict, seconds, participant_type="VIRTUAL"):
+            return {
+                "submitted_at": start + seconds,
+                "raw": {
+                    "creationTimeSeconds": start + seconds,
+                    "relativeTimeSeconds": seconds,
+                    "verdict": verdict,
+                    "problem": {"index": problem},
+                    "author": {
+                        "participantType": participant_type,
+                        "startTimeSeconds": start,
+                    },
+                },
+            }
+
+        submissions = [
+            submission("A", "OK", 600),
+            submission("B", "WRONG_ANSWER", 1200),
+            submission("B", "OK", 1800),
+            submission("B", "OK", 9000, "PRACTICE"),
+        ]
+
+        virtual = app.codeforces_unofficial_result(summary, submissions)
+        self.assertEqual(virtual["rank"], 3)
+        self.assertEqual(virtual["score"], 1310)
+        self.assertEqual(virtual["solved"], 2)
+        self.assertEqual(virtual["participantType"], "VIRTUAL")
+
+        for item in submissions[:3]:
+            item["raw"]["author"]["participantType"] = "OUT_OF_COMPETITION"
+        unofficial = app.codeforces_unofficial_result(summary, submissions)
+        self.assertEqual(unofficial["rank"], 2)
+        self.assertEqual(unofficial["score"], 1360)
+
+    def test_codeforces_adapter_attaches_virtual_result(self):
+        start = self.now - 86400
+        contest = {
+            "id": 5000,
+            "name": "Codeforces VP Round",
+            "phase": "FINISHED",
+            "type": "CF",
+            "startTimeSeconds": start,
+            "durationSeconds": 7200,
+        }
+        summary = {
+            "contest": contest,
+            "problems": [{"index": "A", "points": 500}],
+            "rows": [[500, 0], [400, 0]],
+            "icpcPenaltyMinutes": 20,
+        }
+        submission = {
+            "remote_id": "vp-1",
+            "submitted_at": start + 600,
+            "raw": {
+                "contestId": 5000,
+                "creationTimeSeconds": start + 600,
+                "relativeTimeSeconds": 600,
+                "verdict": "OK",
+                "problem": {"contestId": 5000, "index": "A"},
+                "author": {"participantType": "VIRTUAL", "startTimeSeconds": start},
+            },
+        }
+        with (
+            mock.patch.object(app, "codeforces_contest_lookup", return_value={5000: contest}),
+            mock.patch.object(app, "http_get_json", return_value={"status": "OK", "result": []}),
+            mock.patch.object(app, "read_codeforces_standings_summary", return_value=summary),
+            mock.patch.object(app, "codeforces_standings_summary", return_value=summary),
+        ):
+            contests = app.CodeforcesAdapter().fetch_contests(
+                "alice_codeforces",
+                start,
+                [submission],
+            )
+
+        self.assertEqual(len(contests), 1)
+        virtual_result = contests[0]["raw"]["virtualResult"]
+        self.assertEqual(virtual_result["rank"], 2)
+        self.assertEqual(virtual_result["score"], 480)
+        self.assertEqual(virtual_result["participantType"], "VIRTUAL")
 
     def test_build_battle_rejects_same_or_unknown_member(self):
         with self.assertRaisesRegex(ValueError, "不同"):

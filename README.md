@@ -14,7 +14,7 @@ OJ Submission Wall 是一个给算法训练队、社团或小团队使用的做�
 - 支持按年或近 10 年查看训练绿墙。
 - 支持最新提交列表、平台/用户/语言/状态/时间范围筛选和分页。
 - 支持比赛统计，按平台和常见比赛类型聚合。
-- 支持双人比赛对战，按共同比赛的官方名次统计胜负、比赛内做题速度和双人 Elo 走势；赛后补题不参与比较。
+- 支持双人比赛对战，按共同比赛名次统计胜负、比赛内做题速度和双人 Elo 走势；Codeforces VP/场外参赛会换算等价名次，赛后补题不参与比较。
 - 支持本地 SQLite 持久化和 HTTP 缓存，平台接口临时失败时保留上次成功数据。
 - 无前端构建依赖，后端只使用 Python 标准库，适合 Docker 轻量部署。
 
@@ -116,6 +116,7 @@ docker compose up -d --build
 | `SYNC_MIN_AGE_SECONDS` | `120` | 同一账号最短同步间隔 |
 | `FETCH_LOOKBACK_DAYS` | `3650` | 首次或强制同步时回看天数 |
 | `FETCH_LIMIT` | `1000` | 支持分页的平台单页拉取数量上限 |
+| `CODEFORCES_VP_RANKS_PER_SYNC` | `4` | 每轮最多补齐的 Codeforces VP/场外参赛名次数；公开榜单摘要会持久缓存 |
 | `HTTP_TIMEOUT_SECONDS` | `15` | 外部 OJ 单次请求超时时间 |
 | `HTTP_RETRY_COUNT` | `2` | 外部 OJ 超时或 5xx 时的额外重试次数 |
 | `HTTP_RETRY_BACKOFF_SECONDS` | `0.8` | 外部 OJ 重试退避基准秒数 |
