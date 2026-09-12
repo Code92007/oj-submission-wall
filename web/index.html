@@ -123,7 +123,7 @@
       <section class="content">
         <div class="main-view-tabs" role="tablist" aria-label="主视图">
           <button id="overviewTab" class="main-view-tab active" type="button" role="tab" aria-selected="true" aria-controls="overviewView">队内概览</button>
-          <button id="battleTab" class="main-view-tab" type="button" role="tab" aria-selected="false" aria-controls="battleView" tabindex="-1">双人对战</button>
+          <button id="battleTab" class="main-view-tab" type="button" role="tab" aria-selected="false" aria-controls="battleView" tabindex="-1">对战排行</button>
         </div>
 
         <div id="message" class="message hidden"></div>
@@ -166,8 +166,8 @@
         <section id="battleView" class="battle-view hidden" role="tabpanel" aria-labelledby="battleTab">
           <div class="battle-header">
             <div>
-              <h2>双人对战</h2>
-              <p>只看共同比赛，用正式 / VP 名次和比赛内 AC 用时比拼</p>
+              <h2 id="battleTitle">多人排名</h2>
+              <p id="battleDescription">选择 2–5 名选手，按共同比赛循环积分排名</p>
             </div>
             <label class="battle-range-control">
               时间范围
@@ -181,7 +181,54 @@
             </label>
           </div>
 
-          <div class="battle-pickers">
+          <div id="battleModeTabs" class="segmented battle-mode-tabs" role="tablist" aria-label="对战模式">
+            <button class="segment active" type="button" role="tab" data-battle-mode="individual" aria-selected="true">多人排名</button>
+            <button class="segment" type="button" role="tab" data-battle-mode="team" aria-selected="false">3v3 对战</button>
+            <button class="segment" type="button" role="tab" data-battle-mode="duel" aria-selected="false">双人详情</button>
+          </div>
+
+          <div id="battleIndividualControls" class="competition-pickers">
+            <div class="competition-picker-head">
+              <div>
+                <strong>参赛选手</strong>
+                <span id="individualSelectionCount">已选 0 / 5 人</span>
+              </div>
+              <button id="individualRankBtn" class="button primary" type="button">生成排名</button>
+            </div>
+            <div id="individualMemberChoices" class="competition-member-choices"></div>
+          </div>
+
+          <div id="battleTeamControls" class="competition-pickers team-pickers hidden">
+            <div class="team-picker-column left">
+              <label class="team-name-label">
+                队伍 A
+                <input id="teamLeftName" maxlength="20" value="队伍 A">
+              </label>
+              <div class="team-member-selects">
+                <select data-team-side="left" data-team-slot="0" aria-label="队伍 A 队员 1"></select>
+                <select data-team-side="left" data-team-slot="1" aria-label="队伍 A 队员 2"></select>
+                <select data-team-side="left" data-team-slot="2" aria-label="队伍 A 队员 3"></select>
+              </div>
+            </div>
+            <button id="teamSwapBtn" class="button ghost battle-swap team-swap" type="button" aria-label="交换两队" title="交换两队">⇄</button>
+            <div class="team-picker-column right">
+              <label class="team-name-label">
+                队伍 B
+                <input id="teamRightName" maxlength="20" value="队伍 B">
+              </label>
+              <div class="team-member-selects">
+                <select data-team-side="right" data-team-slot="0" aria-label="队伍 B 队员 1"></select>
+                <select data-team-side="right" data-team-slot="1" aria-label="队伍 B 队员 2"></select>
+                <select data-team-side="right" data-team-slot="2" aria-label="队伍 B 队员 3"></select>
+              </div>
+            </div>
+            <div class="team-picker-actions">
+              <span id="teamSelectionCount">已选 0 / 6 人</span>
+              <button id="teamRankBtn" class="button primary" type="button">开始 3v3</button>
+            </div>
+          </div>
+
+          <div id="battleDuelControls" class="battle-pickers hidden">
             <label>
               选手 A
               <select id="battleLeftSelect"></select>

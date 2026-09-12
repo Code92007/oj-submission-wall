@@ -21,10 +21,17 @@ const state = {
   handleBusy: new Set(),
   overviewPollTimer: null,
   mainView: "overview",
+  battleMode: "individual",
   battleLeftKey: "",
   battleRightKey: "",
+  individualBattleKeys: [],
+  teamLeftKeys: [],
+  teamRightKeys: [],
+  teamLeftName: "队伍 A",
+  teamRightName: "队伍 B",
   battleRange: "365",
   battle: null,
+  competition: null,
   battleLoading: false,
   battleError: "",
   battleRequestId: 0,
@@ -237,7 +244,7 @@ function applyOverviewData(data, options = {}) {
   updateWallRange(data);
   renderAll();
   if (options.save !== false) saveOverviewBrowserCache(data);
-  if (state.mainView === "battle" && state.battleLeftKey && state.battleRightKey) {
+  if (state.mainView === "battle" && state.battleMode === "duel" && state.battleLeftKey && state.battleRightKey) {
     loadBattle();
   }
 }
@@ -508,6 +515,23 @@ function ensureBattlePlayers() {
     const opponent = members.find((member) => memberKey(member) !== state.battleLeftKey);
     state.battleRightKey = opponent ? memberKey(opponent) : "";
   }
+  state.individualBattleKeys = [...new Set(state.individualBattleKeys)].filter((key) => keys.has(key)).slice(0, 5);
+  if (!state.individualBattleKeys.length) {
+    state.individualBattleKeys = members.slice(0, 5).map(memberKey);
+  }
+
+  const selectedTeamKeys = new Set();
+  const cleanTeam = (teamKeys) => teamKeys.filter((key) => {
+    if (!keys.has(key) || selectedTeamKeys.has(key)) return false;
+    selectedTeamKeys.add(key);
+    return true;
+  }).slice(0, 3);
+  state.teamLeftKeys = cleanTeam(state.teamLeftKeys);
+  state.teamRightKeys = cleanTeam(state.teamRightKeys);
+  if (!state.teamLeftKeys.length && !state.teamRightKeys.length) {
+    state.teamLeftKeys = members.slice(0, 3).map(memberKey);
+    state.teamRightKeys = members.slice(3, 6).map(memberKey);
+  }
   return members;
 }
 
@@ -536,10 +560,91 @@ function renderBattleControls() {
   renderBattleSelect($("#battleRightSelect"), members, state.battleRightKey);
   $("#battleRangeSelect").value = state.battleRange;
   $("#battleSwapBtn").disabled = members.length < 2;
+  for (const button of document.querySelectorAll("[data-battle-mode]")) {
+    const active = button.dataset.battleMode === state.battleMode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  }
+  const modeCopy = {
+    individual: ["多人排名", "选择 2–5 名选手，按共同比赛循环积分排名"],
+    team: ["3v3 对战", "两队各选 3 人，汇总 9 组跨队交锋"],
+    duel: ["双人详情", "只看共同比赛，用正式 / VP 名次和比赛内 AC 用时比拼"],
+  };
+  [$("#battleTitle").textContent, $("#battleDescription").textContent] = modeCopy[state.battleMode];
+  $("#battleIndividualControls").classList.toggle("hidden", state.battleMode !== "individual");
+  $("#battleTeamControls").classList.toggle("hidden", state.battleMode !== "team");
+  $("#battleDuelControls").classList.toggle("hidden", state.battleMode !== "duel");
+  renderIndividualBattleControls(members);
+  renderTeamBattleControls(members);
 }
 
 function battleSignature() {
   return `${state.battleLeftKey}|${state.battleRightKey}|${state.battleRange}`;
+}
+
+function competitionSignature() {
+  if (state.battleMode === "individual") {
+    return `individual|${state.individualBattleKeys.join("|")}|${state.battleRange}`;
+  }
+  return `team|${state.teamLeftKeys.join("|")}|${state.teamRightKeys.join("|")}|${state.battleRange}`;
+}
+
+function renderIndividualBattleControls(members) {
+  const selected = new Set(state.individualBattleKeys);
+  const choices = $("#individualMemberChoices");
+  choices.innerHTML = "";
+  for (const member of members) {
+    const key = memberKey(member);
+    const label = el("label", `competition-member-choice${selected.has(key) ? " selected" : ""}`);
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = key;
+    checkbox.checked = selected.has(key);
+    checkbox.disabled = !checkbox.checked && selected.size >= 5;
+    checkbox.dataset.individualMember = key;
+    const identity = el("span", "competition-choice-identity");
+    const name = document.createElement("strong");
+    name.textContent = `${member.displayName}${member.isCurrent ? "（我）" : ""}`;
+    const team = document.createElement("span");
+    team.textContent = memberTeam(member);
+    identity.append(name, team);
+    label.append(checkbox, identity);
+    choices.appendChild(label);
+  }
+  $("#individualSelectionCount").textContent = `已选 ${selected.size} / 5 人`;
+  $("#individualRankBtn").disabled = selected.size < 2;
+}
+
+function renderTeamSelect(select, members, selectedKey, occupiedKeys) {
+  select.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "选择队员";
+  select.appendChild(placeholder);
+  for (const member of members) {
+    const key = memberKey(member);
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = battleMemberLabel(member);
+    option.disabled = key !== selectedKey && occupiedKeys.has(key);
+    select.appendChild(option);
+  }
+  select.value = selectedKey || "";
+  select.disabled = !members.length;
+}
+
+function renderTeamBattleControls(members) {
+  const occupiedKeys = new Set([...state.teamLeftKeys, ...state.teamRightKeys]);
+  for (const select of document.querySelectorAll("[data-team-side][data-team-slot]")) {
+    const keys = select.dataset.teamSide === "left" ? state.teamLeftKeys : state.teamRightKeys;
+    renderTeamSelect(select, members, keys[Number(select.dataset.teamSlot)] || "", occupiedKeys);
+  }
+  $("#teamLeftName").value = state.teamLeftName;
+  $("#teamRightName").value = state.teamRightName;
+  $("#teamSelectionCount").textContent = `已选 ${occupiedKeys.size} / 6 人`;
+  const ready = state.teamLeftKeys.length === 3 && state.teamRightKeys.length === 3 && occupiedKeys.size === 6;
+  $("#teamRankBtn").disabled = !ready;
+  $("#teamSwapBtn").disabled = !occupiedKeys.size;
 }
 
 function renderMainView() {
@@ -563,9 +668,52 @@ function switchMainView(view) {
   state.mainView = view === "battle" ? "battle" : "overview";
   clearMessage();
   renderMainView();
-  if (state.mainView === "battle" && state.battleLeftKey && state.battleRightKey) {
+  if (state.mainView === "battle" && state.battleMode === "duel" && state.battleLeftKey && state.battleRightKey) {
     loadBattle();
   }
+}
+
+function switchBattleMode(mode) {
+  if (!["individual", "team", "duel"].includes(mode) || mode === state.battleMode) return;
+  state.battleMode = mode;
+  state.battleRequestId += 1;
+  state.battleLoading = false;
+  state.battleError = "";
+  renderBattleControls();
+  renderBattleContent();
+  if (mode === "duel") loadBattle();
+}
+
+function toggleIndividualBattleMember(key, checked) {
+  const selected = new Set(state.individualBattleKeys);
+  if (checked && selected.size < 5) selected.add(key);
+  if (!checked) selected.delete(key);
+  state.individualBattleKeys = [...selected];
+  state.competition = null;
+  renderBattleControls();
+  renderBattleContent();
+}
+
+function selectTeamMember(side, slot, value) {
+  const ownKeys = side === "left" ? state.teamLeftKeys : state.teamRightKeys;
+  const previous = ownKeys[slot] || "";
+  if (value && [...state.teamLeftKeys, ...state.teamRightKeys].includes(value) && value !== previous) return;
+  const next = [...ownKeys];
+  next[slot] = value;
+  const compact = next.filter(Boolean);
+  if (side === "left") state.teamLeftKeys = compact;
+  else state.teamRightKeys = compact;
+  state.competition = null;
+  renderBattleControls();
+  renderBattleContent();
+}
+
+function swapBattleTeams() {
+  [state.teamLeftKeys, state.teamRightKeys] = [state.teamRightKeys, state.teamLeftKeys];
+  [state.teamLeftName, state.teamRightName] = [state.teamRightName, state.teamLeftName];
+  state.competition = null;
+  renderBattleControls();
+  renderBattleContent();
 }
 
 function selectBattlePlayer(side, value) {
@@ -622,6 +770,47 @@ async function loadBattle() {
   }
 }
 
+async function loadCompetition() {
+  const isIndividual = state.battleMode === "individual";
+  const valid = isIndividual
+    ? state.individualBattleKeys.length >= 2 && state.individualBattleKeys.length <= 5
+    : state.teamLeftKeys.length === 3 && state.teamRightKeys.length === 3
+      && new Set([...state.teamLeftKeys, ...state.teamRightKeys]).size === 6;
+  if (!valid) {
+    state.competition = null;
+    renderBattleContent();
+    return;
+  }
+
+  const requestId = ++state.battleRequestId;
+  const signature = competitionSignature();
+  state.battleLoading = true;
+  state.battleError = "";
+  renderBattleContent();
+  const params = new URLSearchParams({ mode: state.battleMode, range: state.battleRange });
+  if (isIndividual) {
+    for (const key of state.individualBattleKeys) params.append("member", key);
+  } else {
+    for (const key of state.teamLeftKeys) params.append("left", key);
+    for (const key of state.teamRightKeys) params.append("right", key);
+  }
+  try {
+    const data = await api(`/api/competition?${params}`);
+    if (requestId !== state.battleRequestId) return;
+    data.signature = signature;
+    state.competition = data;
+  } catch (error) {
+    if (requestId !== state.battleRequestId) return;
+    state.competition = null;
+    state.battleError = error.message;
+  } finally {
+    if (requestId === state.battleRequestId) {
+      state.battleLoading = false;
+      renderBattleContent();
+    }
+  }
+}
+
 function battleEmpty(text, error = false) {
   const empty = el("div", `empty-state battle-empty${error ? " error" : ""}`);
   empty.textContent = text;
@@ -632,8 +821,11 @@ function renderBattleContent() {
   const container = $("#battleContent");
   container.innerHTML = "";
   const members = state.overview?.members || [];
-  if (members.length < 2) {
-    container.appendChild(battleEmpty("至少需要两名成员才能开始对战"));
+  const minimumMembers = state.battleMode === "team" ? 6 : 2;
+  if (members.length < minimumMembers) {
+    container.appendChild(battleEmpty(
+      state.battleMode === "team" ? "3v3 对战至少需要 6 名成员" : "至少需要两名成员才能开始对战",
+    ));
     return;
   }
   if (state.battleLoading) {
@@ -642,6 +834,27 @@ function renderBattleContent() {
   }
   if (state.battleError) {
     container.appendChild(battleEmpty(state.battleError, true));
+    return;
+  }
+  if (state.battleMode === "individual") {
+    if (!state.competition || state.competition.signature !== competitionSignature()) {
+      container.appendChild(battleEmpty("选择 2 至 5 名选手后生成排名"));
+      return;
+    }
+    container.append(renderIndividualCompetition(state.competition), renderCompetitionPairs(state.competition));
+    return;
+  }
+  if (state.battleMode === "team") {
+    if (!state.competition || state.competition.signature !== competitionSignature()) {
+      container.appendChild(battleEmpty("为两队各选 3 名成员后开始对战"));
+      return;
+    }
+    container.append(
+      renderTeamCompetitionScoreboard(state.competition),
+      renderTeamCompetitionMetrics(state.competition),
+      renderTeamContributions(state.competition),
+      renderCompetitionPairs(state.competition),
+    );
     return;
   }
   if (!state.battle || state.battle.signature !== battleSignature()) {
@@ -657,6 +870,163 @@ function renderBattleContent() {
     renderBattlePlatforms(data),
     renderSharedContests(data),
   );
+}
+
+function competitionPlayerIdentity(player) {
+  const identity = el("div", "competition-player-identity");
+  const avatar = el("span", "competition-avatar");
+  avatar.textContent = playerInitials(player.displayName);
+  const text = el("span", "competition-player-text");
+  const name = document.createElement("strong");
+  name.textContent = player.displayName;
+  const team = document.createElement("span");
+  team.textContent = player.teamName || "未分组";
+  text.append(name, team);
+  identity.append(avatar, text);
+  return identity;
+}
+
+function renderIndividualCompetition(data) {
+  const section = el("section", "battle-section competition-ranking-section");
+  section.appendChild(battleSectionHead("个人排名", `${data.rankings.length} 人 · 胜 3 / 平 1 / 负 0`));
+  const table = el("div", "competition-ranking-table");
+  const header = el("div", "competition-ranking-row header");
+  for (const label of ["名次", "选手", "积分", "交锋", "比赛胜场", "抢先", "表现指数"]) {
+    const cell = document.createElement("span");
+    cell.textContent = label;
+    header.appendChild(cell);
+  }
+  table.appendChild(header);
+  for (const player of data.rankings) {
+    const row = el("div", `competition-ranking-row${player.rank <= 3 ? ` top-${player.rank}` : ""}`);
+    const rank = el("strong", "competition-rank");
+    rank.textContent = `#${player.rank}`;
+    const points = document.createElement("strong");
+    points.textContent = player.stats.points;
+    const matches = document.createElement("span");
+    matches.textContent = `${player.stats.matchWins}-${player.stats.matchDraws}-${player.stats.matchLosses}`;
+    const contestWins = document.createElement("span");
+    contestWins.textContent = `${player.stats.contestWins}-${player.stats.contestLosses}`;
+    const speed = document.createElement("span");
+    speed.textContent = player.stats.speedWins;
+    const rating = document.createElement("span");
+    rating.textContent = player.stats.duelRating;
+    row.append(rank, competitionPlayerIdentity(player), points, matches, contestWins, speed, rating);
+    table.appendChild(row);
+  }
+  section.appendChild(table);
+  return section;
+}
+
+function competitionPairOutcome(item) {
+  if (!item.winner) return "暂无有效名次";
+  if (item.winner === "tie") return "交锋打平";
+  return `${item.winner === "left" ? item.leftName : item.rightName} 获胜`;
+}
+
+function renderCompetitionPairs(data) {
+  const section = el("section", "battle-section competition-pairs-section");
+  const title = data.mode === "team" ? "跨队交锋" : "循环赛对阵";
+  section.appendChild(battleSectionHead(title, `${data.comparisons.length} 组对阵`));
+  const grid = el("div", "competition-pair-grid");
+  for (const item of data.comparisons) {
+    const match = el("article", `competition-pair ${item.winner || "unranked"}`);
+    const players = el("div", "competition-pair-score");
+    const left = document.createElement("span");
+    left.textContent = item.leftName;
+    const score = document.createElement("strong");
+    score.textContent = `${item.leftWins} : ${item.rightWins}`;
+    const right = document.createElement("span");
+    right.textContent = item.rightName;
+    players.append(left, score, right);
+    const meta = document.createElement("p");
+    meta.textContent = `${competitionPairOutcome(item)} · ${item.rankedContests}/${item.sharedContests} 场可判胜`;
+    match.append(players, meta);
+    grid.appendChild(match);
+  }
+  section.appendChild(grid);
+  return section;
+}
+
+function renderTeamSide(team, name, side, leading) {
+  const panel = el("div", `team-battle-side ${side}${leading ? " leading" : ""}`);
+  const title = document.createElement("h3");
+  title.textContent = name;
+  const roster = el("div", "team-battle-roster");
+  for (const member of team.members) {
+    const row = el("div", "team-battle-member");
+    row.appendChild(competitionPlayerIdentity(member));
+    const contribution = document.createElement("strong");
+    contribution.textContent = `${member.stats.points} 分`;
+    row.appendChild(contribution);
+    roster.appendChild(row);
+  }
+  panel.append(title, roster);
+  return panel;
+}
+
+function renderTeamCompetitionScoreboard(data) {
+  const [left, right] = data.teams;
+  const leftLeading = left.stats.contestWins > right.stats.contestWins;
+  const rightLeading = right.stats.contestWins > left.stats.contestWins;
+  const section = el("section", "team-battle-scoreboard");
+  const center = el("div", "battle-score-center");
+  const label = document.createElement("span");
+  label.textContent = "共同比赛胜场";
+  const score = document.createElement("strong");
+  score.textContent = `${left.stats.contestWins} : ${right.stats.contestWins}`;
+  const meta = document.createElement("p");
+  meta.textContent = `${left.stats.validPairs} 组有效跨队对阵`;
+  center.append(label, score, meta);
+  section.append(
+    renderTeamSide(left, state.teamLeftName, "left", leftLeading),
+    center,
+    renderTeamSide(right, state.teamRightName, "right", rightLeading),
+  );
+  return section;
+}
+
+function renderTeamCompetitionMetrics(data) {
+  const [left, right] = data.teams;
+  const section = el("section", "battle-section battle-metrics");
+  section.appendChild(battleSectionHead("队伍数据", data.range.label));
+  const grid = el("div", "battle-metric-grid");
+  grid.append(
+    renderBattleMetricRow("循环积分", left.stats.points, right.stats.points, " 分"),
+    renderBattleMetricRow("对阵胜场", left.stats.pairWins, right.stats.pairWins, " 组"),
+    renderBattleMetricRow("比赛胜场", left.stats.contestWins, right.stats.contestWins, " 场"),
+    renderBattleMetricRow("比赛内抢先", left.stats.speedWins, right.stats.speedWins, " 题"),
+  );
+  section.appendChild(grid);
+  return section;
+}
+
+function renderTeamContributions(data) {
+  const section = el("section", "battle-section team-contribution-section");
+  section.appendChild(battleSectionHead("队员贡献", "跨队交锋积分"));
+  const columns = el("div", "team-contribution-grid");
+  for (const [index, team] of data.teams.entries()) {
+    const column = el("div", `team-contribution-column ${team.side}`);
+    const heading = document.createElement("h4");
+    heading.textContent = index === 0 ? state.teamLeftName : state.teamRightName;
+    column.appendChild(heading);
+    const sorted = [...team.members].sort((a, b) => b.stats.points - a.stats.points || b.stats.contestWins - a.stats.contestWins);
+    for (const member of sorted) {
+      const row = el("div", "team-contribution-row");
+      row.appendChild(competitionPlayerIdentity(member));
+      const stats = el("span", "team-contribution-stats");
+      const points = document.createElement("strong");
+      points.textContent = `${member.stats.points} 分`;
+      const record = document.createElement("span");
+      record.textContent = `${member.stats.matchWins}-${member.stats.matchDraws}-${member.stats.matchLosses}`;
+      stats.append(points, record);
+      row.appendChild(stats);
+      column.appendChild(row);
+    }
+    columns.appendChild(column);
+  }
+  section.appendChild(columns);
+  return section;
 }
 
 function playerInitials(name) {
@@ -2305,10 +2675,35 @@ function bindEvents() {
   $("#battleLeftSelect").addEventListener("change", (event) => selectBattlePlayer("left", event.currentTarget.value));
   $("#battleRightSelect").addEventListener("change", (event) => selectBattlePlayer("right", event.currentTarget.value));
   $("#battleSwapBtn").addEventListener("click", swapBattlePlayers);
+  $("#battleModeTabs").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-battle-mode]");
+    if (button) switchBattleMode(button.dataset.battleMode);
+  });
+  $("#individualMemberChoices").addEventListener("change", (event) => {
+    const checkbox = event.target.closest("[data-individual-member]");
+    if (checkbox) toggleIndividualBattleMember(checkbox.value, checkbox.checked);
+  });
+  $("#individualRankBtn").addEventListener("click", loadCompetition);
+  $("#battleTeamControls").addEventListener("change", (event) => {
+    const select = event.target.closest("[data-team-side][data-team-slot]");
+    if (select) selectTeamMember(select.dataset.teamSide, Number(select.dataset.teamSlot), select.value);
+  });
+  $("#teamLeftName").addEventListener("input", (event) => {
+    state.teamLeftName = event.currentTarget.value.trim() || "队伍 A";
+    if (state.competition) renderBattleContent();
+  });
+  $("#teamRightName").addEventListener("input", (event) => {
+    state.teamRightName = event.currentTarget.value.trim() || "队伍 B";
+    if (state.competition) renderBattleContent();
+  });
+  $("#teamSwapBtn").addEventListener("click", swapBattleTeams);
+  $("#teamRankBtn").addEventListener("click", loadCompetition);
   $("#battleRangeSelect").addEventListener("change", (event) => {
     state.battleRange = event.currentTarget.value;
     state.battle = null;
-    loadBattle();
+    state.competition = null;
+    if (state.battleMode === "duel") loadBattle();
+    else renderBattleContent();
   });
   $("#guestTab").addEventListener("click", () => switchAuthTab("guest"));
   $("#loginTab").addEventListener("click", () => switchAuthTab("login"));

@@ -5193,6 +5193,249 @@ def build_battle(principal: dict | None, left_key: str, right_key: str, range_ke
     return battle
 
 
+def competition_pair_result(battle: dict) -> tuple[int, int, str | None]:
+    head_to_head = battle["headToHead"]
+    if not head_to_head["rankedContests"]:
+        return 0, 0, None
+    if head_to_head["leftWins"] > head_to_head["rightWins"]:
+        return 3, 0, "left"
+    if head_to_head["rightWins"] > head_to_head["leftWins"]:
+        return 0, 3, "right"
+    return 1, 1, "tie"
+
+
+def competition_member_record(player: dict) -> dict:
+    return {
+        **{key: value for key, value in player.items() if key != "stats"},
+        "stats": {
+            "points": 0,
+            "matchWins": 0,
+            "matchDraws": 0,
+            "matchLosses": 0,
+            "validMatches": 0,
+            "contestWins": 0,
+            "contestLosses": 0,
+            "contestTies": 0,
+            "sharedContests": 0,
+            "rankedSharedContests": 0,
+            "speedWins": 0,
+            "speedLosses": 0,
+            "contests": 0,
+            "ratedContests": 0,
+            "duelRating": BATTLE_INITIAL_RATING,
+        },
+        "_ratingDeltaTotal": 0,
+        "_ratingCount": 0,
+    }
+
+
+def add_competition_member_result(
+    record: dict,
+    player: dict,
+    own_side: str,
+    pair_points: int,
+    pair_winner: str | None,
+    battle: dict,
+) -> None:
+    stats = record["stats"]
+    player_stats = player["stats"]
+    head_to_head = battle["headToHead"]
+    other_side = "right" if own_side == "left" else "left"
+    stats["contests"] = max(stats["contests"], player_stats["contests"])
+    stats["ratedContests"] = max(stats["ratedContests"], player_stats["ratedContests"])
+    stats["sharedContests"] += head_to_head["sharedContests"]
+    stats["rankedSharedContests"] += head_to_head["rankedContests"]
+    stats["contestWins"] += head_to_head[f"{own_side}Wins"]
+    stats["contestLosses"] += head_to_head[f"{other_side}Wins"]
+    stats["contestTies"] += head_to_head["ties"]
+    stats["speedWins"] += head_to_head[f"{own_side}SpeedWins"]
+    stats["speedLosses"] += head_to_head[f"{other_side}SpeedWins"]
+    record["_ratingDeltaTotal"] += player_stats["duelRating"] - BATTLE_INITIAL_RATING
+    record["_ratingCount"] += 1
+    if pair_winner is None:
+        return
+    stats["points"] += pair_points
+    stats["validMatches"] += 1
+    if pair_winner == own_side:
+        stats["matchWins"] += 1
+    elif pair_winner == "tie":
+        stats["matchDraws"] += 1
+    else:
+        stats["matchLosses"] += 1
+
+
+def finalize_competition_members(records: dict[str, dict], include_rank: bool = True) -> list[dict]:
+    members = []
+    for record in records.values():
+        rating_count = record.pop("_ratingCount")
+        rating_delta_total = record.pop("_ratingDeltaTotal")
+        record["stats"]["duelRating"] = round(
+            BATTLE_INITIAL_RATING + (rating_delta_total / rating_count if rating_count else 0)
+        )
+        members.append(record)
+
+    members.sort(
+        key=lambda item: (
+            -item["stats"]["points"],
+            -item["stats"]["contestWins"],
+            -item["stats"]["speedWins"],
+            -item["stats"]["duelRating"],
+            item["displayName"].casefold(),
+        )
+    )
+    if include_rank:
+        previous_score = None
+        previous_rank = 0
+        for index, member in enumerate(members, start=1):
+            score = (
+                member["stats"]["points"],
+                member["stats"]["contestWins"],
+                member["stats"]["speedWins"],
+                member["stats"]["duelRating"],
+            )
+            if score != previous_score:
+                previous_rank = index
+                previous_score = score
+            member["rank"] = previous_rank
+    return members
+
+
+def build_competition(
+    principal: dict | None,
+    mode: str,
+    range_key: str = "365",
+    member_keys: list[str] | None = None,
+    left_keys: list[str] | None = None,
+    right_keys: list[str] | None = None,
+) -> dict:
+    selected_range = battle_range(range_key)
+    requested_member_keys = list(member_keys or [])
+    member_keys = list(dict.fromkeys(requested_member_keys))
+    left_keys = list(left_keys or [])
+    right_keys = list(right_keys or [])
+
+    if mode == "individual":
+        if len(member_keys) != len(requested_member_keys) or not 2 <= len(member_keys) <= 5:
+            raise ValueError("个人排名请选择 2 至 5 名不同成员")
+        pair_keys = [
+            (member_keys[left_index], member_keys[right_index])
+            for left_index in range(len(member_keys))
+            for right_index in range(left_index + 1, len(member_keys))
+        ]
+    elif mode == "team":
+        if len(left_keys) != 3 or len(right_keys) != 3:
+            raise ValueError("3v3 对战需要每队选择 3 名成员")
+        if len(set(left_keys + right_keys)) != 6:
+            raise ValueError("3v3 对战的 6 名成员不能重复")
+        pair_keys = [(left_key, right_key) for left_key in left_keys for right_key in right_keys]
+    else:
+        raise ValueError("不支持的排名模式")
+
+    member_records: dict[str, dict] = {}
+    comparisons = []
+    team_stats = [
+        {
+            "points": 0,
+            "pairWins": 0,
+            "pairDraws": 0,
+            "pairLosses": 0,
+            "validPairs": 0,
+            "contestWins": 0,
+            "contestLosses": 0,
+            "contestTies": 0,
+            "sharedContests": 0,
+            "rankedSharedContests": 0,
+            "speedWins": 0,
+            "speedLosses": 0,
+        }
+        for _ in range(2)
+    ]
+
+    for left_key, right_key in pair_keys:
+        battle = build_battle(principal, left_key, right_key, range_key)
+        left_player, right_player = battle["players"]
+        member_records.setdefault(left_key, competition_member_record(left_player))
+        member_records.setdefault(right_key, competition_member_record(right_player))
+        left_points, right_points, winner = competition_pair_result(battle)
+        add_competition_member_result(
+            member_records[left_key], left_player, "left", left_points, winner, battle
+        )
+        add_competition_member_result(
+            member_records[right_key], right_player, "right", right_points, winner, battle
+        )
+
+        head_to_head = battle["headToHead"]
+        comparisons.append(
+            {
+                "leftKey": left_key,
+                "rightKey": right_key,
+                "leftName": left_player["displayName"],
+                "rightName": right_player["displayName"],
+                "leftWins": head_to_head["leftWins"],
+                "rightWins": head_to_head["rightWins"],
+                "ties": head_to_head["ties"],
+                "rankedContests": head_to_head["rankedContests"],
+                "sharedContests": head_to_head["sharedContests"],
+                "leftSpeedWins": head_to_head["leftSpeedWins"],
+                "rightSpeedWins": head_to_head["rightSpeedWins"],
+                "winner": winner,
+            }
+        )
+
+        if mode == "team":
+            for team_index, (own_side, pair_points) in enumerate(
+                (("left", left_points), ("right", right_points))
+            ):
+                other_side = "right" if own_side == "left" else "left"
+                stats = team_stats[team_index]
+                stats["points"] += pair_points
+                stats["contestWins"] += head_to_head[f"{own_side}Wins"]
+                stats["contestLosses"] += head_to_head[f"{other_side}Wins"]
+                stats["contestTies"] += head_to_head["ties"]
+                stats["sharedContests"] += head_to_head["sharedContests"]
+                stats["rankedSharedContests"] += head_to_head["rankedContests"]
+                stats["speedWins"] += head_to_head[f"{own_side}SpeedWins"]
+                stats["speedLosses"] += head_to_head[f"{other_side}SpeedWins"]
+                if winner is not None:
+                    stats["validPairs"] += 1
+                    if winner == own_side:
+                        stats["pairWins"] += 1
+                    elif winner == "tie":
+                        stats["pairDraws"] += 1
+                    else:
+                        stats["pairLosses"] += 1
+
+    if mode == "individual":
+        return {
+            "mode": mode,
+            "range": selected_range,
+            "rankings": finalize_competition_members(member_records),
+            "comparisons": comparisons,
+        }
+
+    finalized_members = {
+        f"{member['ownerType']}:{member['ownerId']}": member
+        for member in finalize_competition_members(member_records, include_rank=False)
+    }
+    return {
+        "mode": mode,
+        "range": selected_range,
+        "teams": [
+            {
+                "side": "left",
+                "members": [finalized_members[key] for key in left_keys],
+                "stats": team_stats[0],
+            },
+            {
+                "side": "right",
+                "members": [finalized_members[key] for key in right_keys],
+                "stats": team_stats[1],
+            },
+        ],
+        "comparisons": comparisons,
+    }
+
+
 class AppHandler(BaseHTTPRequestHandler):
     server_version = "OJWall/1.0"
 
@@ -5261,6 +5504,23 @@ class AppHandler(BaseHTTPRequestHandler):
                 except ValueError as exc:
                     return self.send_error_json(400, str(exc))
                 return self.send_json(200, {"ok": True, **battle})
+            if path == "/api/competition":
+                params = urllib.parse.parse_qs(parsed.query)
+                mode = str(params.get("mode", [""])[0])
+                range_key = str(params.get("range", ["365"])[0])
+                principal = get_current_principal(self)
+                try:
+                    competition = build_competition(
+                        principal,
+                        mode,
+                        range_key=range_key,
+                        member_keys=[str(key) for key in params.get("member", [])],
+                        left_keys=[str(key) for key in params.get("left", [])],
+                        right_keys=[str(key) for key in params.get("right", [])],
+                    )
+                except ValueError as exc:
+                    return self.send_error_json(400, str(exc))
+                return self.send_json(200, {"ok": True, **competition})
             if path == "/api/auth/verify":
                 return self.handle_verify(parsed)
             if path == "/" or path == "/index.html":

@@ -22,6 +22,9 @@ class BattleOverviewTest(unittest.TestCase):
                 (1, "alice", "Alice"),
                 (2, "bob", "Bob"),
                 (3, "carol", "Carol"),
+                (4, "dave", "Dave"),
+                (5, "erin", "Erin"),
+                (6, "frank", "Frank"),
             ]:
                 conn.execute(
                     """
@@ -502,6 +505,93 @@ class BattleOverviewTest(unittest.TestCase):
             app.build_battle(None, "user:1", "guest:missing", "all")
         with self.assertRaisesRegex(ValueError, "时间范围"):
             app.build_battle(None, "user:1", "user:2", "week")
+
+    def test_individual_competition_ranks_round_robin_results(self):
+        start = self.now - 86400
+        for owner_id, rank in [(1, 10), (2, 20), (3, 30)]:
+            self.add_contest(
+                owner_id,
+                "nowcoder",
+                "ranking-round",
+                start,
+                {
+                    "contestId": "ranking-round",
+                    "rank": rank,
+                    "canShowRank": True,
+                    "userCount": 100,
+                    "teamId": f"individual-{owner_id}",
+                    "startTime": start * 1000,
+                    "endTime": (start + 7200) * 1000,
+                },
+            )
+
+        result = app.build_competition(
+            None,
+            "individual",
+            range_key="30",
+            member_keys=["user:1", "user:2", "user:3"],
+        )
+
+        self.assertEqual([item["displayName"] for item in result["rankings"]], ["Alice", "Bob", "Carol"])
+        self.assertEqual([item["rank"] for item in result["rankings"]], [1, 2, 3])
+        self.assertEqual([item["stats"]["points"] for item in result["rankings"]], [6, 3, 0])
+        self.assertEqual([item["stats"]["contestWins"] for item in result["rankings"]], [2, 1, 0])
+        self.assertEqual(len(result["comparisons"]), 3)
+
+    def test_team_competition_aggregates_all_nine_cross_team_pairs(self):
+        start = self.now - 86400
+        for owner_id, rank in enumerate([10, 20, 30, 40, 50, 60], start=1):
+            self.add_contest(
+                owner_id,
+                "nowcoder",
+                "team-round",
+                start,
+                {
+                    "contestId": "team-round",
+                    "rank": rank,
+                    "canShowRank": True,
+                    "userCount": 100,
+                    "teamId": f"team-entry-{owner_id}",
+                    "startTime": start * 1000,
+                    "endTime": (start + 7200) * 1000,
+                },
+            )
+
+        result = app.build_competition(
+            None,
+            "team",
+            range_key="30",
+            left_keys=["user:1", "user:2", "user:3"],
+            right_keys=["user:4", "user:5", "user:6"],
+        )
+
+        left, right = result["teams"]
+        self.assertEqual(len(result["comparisons"]), 9)
+        self.assertEqual(left["stats"]["pairWins"], 9)
+        self.assertEqual(left["stats"]["contestWins"], 9)
+        self.assertEqual(left["stats"]["points"], 27)
+        self.assertEqual(right["stats"]["pairLosses"], 9)
+        self.assertEqual(right["stats"]["contestWins"], 0)
+        self.assertEqual([member["displayName"] for member in left["members"]], ["Alice", "Bob", "Carol"])
+        self.assertEqual([member["stats"]["points"] for member in left["members"]], [9, 9, 9])
+
+    def test_competition_rejects_invalid_rosters(self):
+        with self.assertRaisesRegex(ValueError, "2 至 5"):
+            app.build_competition(None, "individual", member_keys=["user:1"])
+        with self.assertRaisesRegex(ValueError, "每队选择 3"):
+            app.build_competition(
+                None,
+                "team",
+                left_keys=["user:1", "user:2"],
+                right_keys=["user:4", "user:5", "user:6"],
+            )
+        with self.assertRaisesRegex(ValueError, "不能重复"):
+            app.build_competition(
+                None,
+                "team",
+                left_keys=["user:1", "user:2", "user:3"],
+                right_keys=["user:3", "user:4", "user:5"],
+            )
 
     def test_battle_cache_prunes_oldest_entries_at_the_limit(self):
         original_limit = app.BATTLE_MEMORY_CACHE_LIMIT

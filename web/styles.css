@@ -432,6 +432,404 @@ select:focus {
   width: 124px;
 }
 
+.battle-mode-tabs {
+  width: min(520px, 100%);
+  margin: 0;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.competition-pickers {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.competition-picker-head,
+.team-picker-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.competition-picker-head > div {
+  display: grid;
+  gap: 3px;
+}
+
+.competition-picker-head span,
+.team-picker-actions > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.competition-member-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.competition-member-choice {
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.competition-member-choice.selected {
+  border-color: #93b1f6;
+  background: #f2f6ff;
+}
+
+.competition-member-choice:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.competition-member-choice input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  margin: 0;
+  accent-color: var(--brand);
+}
+
+.competition-choice-identity {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.competition-choice-identity strong,
+.competition-choice-identity span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.competition-choice-identity span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.team-pickers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.team-picker-column {
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.team-picker-column.left .team-name-label {
+  color: var(--battle-left);
+}
+
+.team-picker-column.right .team-name-label {
+  color: var(--battle-right);
+}
+
+.team-name-label {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.team-name-label input {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.team-member-selects {
+  display: grid;
+  gap: 7px;
+}
+
+.team-picker-actions {
+  grid-column: 1 / -1;
+  padding-top: 2px;
+}
+
+.competition-ranking-table {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.competition-ranking-row {
+  min-width: 720px;
+  display: grid;
+  grid-template-columns: 58px minmax(190px, 1fr) 70px 82px 92px 70px 94px;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.competition-ranking-row:last-child {
+  border-bottom: 0;
+}
+
+.competition-ranking-row.header {
+  min-height: 38px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.competition-ranking-row > span:not(.competition-player-identity),
+.competition-ranking-row > strong {
+  text-align: center;
+}
+
+.competition-ranking-row.top-1 {
+  background: #fffdf3;
+}
+
+.competition-ranking-row.top-1 .competition-rank {
+  color: #a16207;
+}
+
+.competition-ranking-row.top-2 .competition-rank {
+  color: #59636c;
+}
+
+.competition-ranking-row.top-3 .competition-rank {
+  color: #9a5a26;
+}
+
+.competition-player-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.competition-avatar {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #e8efff;
+  color: var(--battle-left);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.competition-player-text {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.competition-player-text strong,
+.competition-player-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.competition-player-text span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.competition-pair-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.competition-pair {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid #aab4ae;
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.competition-pair.left {
+  border-left-color: var(--battle-left);
+}
+
+.competition-pair.right {
+  border-left-color: var(--battle-right);
+}
+
+.competition-pair.tie {
+  border-left-color: #ca8a04;
+}
+
+.competition-pair-score {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.competition-pair-score span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.competition-pair-score span:last-child {
+  text-align: right;
+}
+
+.competition-pair-score strong {
+  font-size: 17px;
+}
+
+.competition-pair p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.team-battle-scoreboard {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 176px minmax(0, 1fr);
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.team-battle-side {
+  min-width: 0;
+  padding: 16px;
+}
+
+.team-battle-side.right {
+  text-align: right;
+}
+
+.team-battle-side h3 {
+  margin: 0 0 10px;
+  color: var(--battle-left);
+  font-size: 17px;
+}
+
+.team-battle-side.right h3 {
+  color: var(--battle-right);
+}
+
+.team-battle-side.leading h3::after {
+  content: " 领先";
+  margin-left: 5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #e8efff;
+  font-size: 10px;
+}
+
+.team-battle-side.right.leading h3::after {
+  background: #ddf5f0;
+}
+
+.team-battle-roster {
+  display: grid;
+  gap: 7px;
+}
+
+.team-battle-member,
+.team-contribution-row {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.team-battle-side.right .competition-player-identity,
+.team-contribution-column.right .competition-player-identity {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.team-battle-member > strong {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.team-battle-side.right .team-battle-member {
+  flex-direction: row-reverse;
+}
+
+.team-contribution-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--line);
+}
+
+.team-contribution-column {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface);
+}
+
+.team-contribution-column h4 {
+  margin: 0;
+  color: var(--battle-left);
+}
+
+.team-contribution-column.right h4 {
+  color: var(--battle-right);
+  text-align: right;
+}
+
+.team-contribution-column.right .team-contribution-row {
+  flex-direction: row-reverse;
+}
+
+.team-contribution-stats {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.team-contribution-stats span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
 .battle-pickers {
   min-width: 0;
   display: grid;
@@ -1796,6 +2194,10 @@ select:focus {
     grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
   }
 
+  .team-battle-scoreboard {
+    grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+  }
+
   .battle-player {
     padding: 14px;
   }
@@ -1874,6 +2276,10 @@ select:focus {
     display: grid;
   }
 
+  .battle-mode-tabs {
+    width: 100%;
+  }
+
   .battle-range-control {
     width: 100%;
     justify-content: space-between;
@@ -1887,6 +2293,27 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
+  .competition-picker-head {
+    align-items: stretch;
+  }
+
+  .competition-member-choices {
+    grid-template-columns: 1fr;
+  }
+
+  .team-pickers {
+    grid-template-columns: 1fr;
+  }
+
+  .team-swap {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .team-picker-actions {
+    grid-column: auto;
+  }
+
   .battle-swap {
     justify-self: center;
     transform: rotate(90deg);
@@ -1894,6 +2321,114 @@ select:focus {
 
   .battle-scoreboard {
     grid-template-columns: 1fr;
+  }
+
+  .team-battle-scoreboard {
+    grid-template-columns: 1fr;
+  }
+
+  .team-battle-side.right {
+    text-align: left;
+  }
+
+  .team-battle-side.right .team-battle-member,
+  .team-contribution-column.right .team-contribution-row {
+    flex-direction: row;
+  }
+
+  .team-battle-side.right .competition-player-identity,
+  .team-contribution-column.right .competition-player-identity {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .team-battle-scoreboard .battle-score-center {
+    grid-row: 2;
+  }
+
+  .team-contribution-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-contribution-column.right h4 {
+    text-align: left;
+  }
+
+  .competition-ranking-table {
+    border: 0;
+    overflow: visible;
+  }
+
+  .competition-ranking-row.header {
+    display: none;
+  }
+
+  .competition-ranking-row {
+    min-width: 0;
+    grid-template-columns: 42px repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    min-height: 84px;
+    padding: 10px 8px;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+  }
+
+  .competition-ranking-row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .competition-ranking-row > :nth-child(1) {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  .competition-ranking-row > :nth-child(2) {
+    grid-column: 2 / 5;
+    grid-row: 1;
+  }
+
+  .competition-ranking-row > :nth-child(3) {
+    grid-column: 5;
+    grid-row: 1;
+    font-size: 18px;
+  }
+
+  .competition-ranking-row > :nth-child(n + 4) {
+    grid-row: 2;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .competition-ranking-row > :nth-child(4) {
+    grid-column: 2;
+  }
+
+  .competition-ranking-row > :nth-child(5) {
+    grid-column: 3;
+  }
+
+  .competition-ranking-row > :nth-child(6) {
+    grid-column: 4;
+  }
+
+  .competition-ranking-row > :nth-child(7) {
+    grid-column: 5;
+  }
+
+  .competition-ranking-row > :nth-child(4)::before {
+    content: "交锋 ";
+  }
+
+  .competition-ranking-row > :nth-child(5)::before {
+    content: "胜场 ";
+  }
+
+  .competition-ranking-row > :nth-child(6)::before {
+    content: "抢先 ";
+  }
+
+  .competition-ranking-row > :nth-child(7)::before {
+    content: "指数 ";
   }
 
   .battle-player {
