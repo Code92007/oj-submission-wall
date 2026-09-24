@@ -10,7 +10,7 @@
     <header class="topbar">
       <div>
         <h1>OJ 训练墙</h1>
-        <p id="subtitle">同步 Codeforces / AtCoder / 牛客 / 洛谷 / VJudge / LOJ / QOJ 提交记录</p>
+        <p id="subtitle">同步 Codeforces / AtCoder / 牛客 / 洛谷 / VJudge / LOJ / LeetCode 训练记录</p>
       </div>
       <div class="top-actions">
         <span id="sessionBadge" class="session-badge">加载中</span>
@@ -123,6 +123,7 @@
       <section class="content">
         <div class="main-view-tabs" role="tablist" aria-label="主视图">
           <button id="overviewTab" class="main-view-tab active" type="button" role="tab" aria-selected="true" aria-controls="overviewView">队内概览</button>
+          <button id="insightsTab" class="main-view-tab" type="button" role="tab" aria-selected="false" aria-controls="insightsView" tabindex="-1">训练洞察</button>
           <button id="battleTab" class="main-view-tab" type="button" role="tab" aria-selected="false" aria-controls="battleView" tabindex="-1">对战排行</button>
         </div>
 
@@ -161,6 +162,45 @@
           </div>
 
           <section id="members" class="member-grid"></section>
+        </section>
+
+        <section id="insightsView" class="insights-view hidden" role="tabpanel" aria-labelledby="insightsTab">
+          <div class="insights-header">
+            <div>
+              <h2>训练洞察</h2>
+              <p id="insightsUpdated">等待加载</p>
+            </div>
+            <div class="insight-export-control">
+              <select id="insightExportFormat" aria-label="图片格式">
+                <option value="png">PNG</option>
+                <option value="svg">SVG</option>
+              </select>
+              <button id="insightExportBtn" class="button primary" type="button">导出图片</button>
+            </div>
+          </div>
+          <div class="insight-controls">
+            <label>
+              成员
+              <select id="insightMemberSelect"></select>
+            </label>
+            <label>
+              平台
+              <select id="insightPlatformSelect"></select>
+            </label>
+            <label>
+              统计口径
+              <select id="insightMetricSelect"></select>
+            </label>
+            <label>
+              时间范围
+              <select id="insightRangeSelect">
+                <option value="365">近 365 天</option>
+                <option value="year">今年</option>
+                <option value="all">近 10 年</option>
+              </select>
+            </label>
+          </div>
+          <div id="insightsContent" class="insights-content" aria-live="polite"></div>
         </section>
 
         <section id="battleView" class="battle-view hidden" role="tabpanel" aria-labelledby="battleTab">

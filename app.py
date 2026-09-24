@@ -998,7 +998,11 @@ def raw_json_dict(row: sqlite3.Row) -> dict:
 def is_activity_placeholder(row: sqlite3.Row, raw: dict | None = None) -> bool:
     raw = raw if raw is not None else raw_json_dict(row)
     problem_id = str(row["problem_id"] or "")
-    return bool(row["platform"] == "luogu" and raw.get("syntheticFromProfile") and problem_id.startswith("luogu-activity-"))
+    if row["platform"] == "luogu":
+        return bool(raw.get("syntheticFromProfile") and problem_id.startswith("luogu-activity-"))
+    if row["platform"] == "leetcode":
+        return bool(raw.get("syntheticFromCalendar") and problem_id.startswith("leetcode-activity-"))
+    return False
 
 
 def canonical_problem_key(
@@ -1030,6 +1034,11 @@ def canonical_problem_key(
         problem = raw.get("problem_id") or problem_id
         if problem:
             return source_problem_key("atcoder", str(problem))
+
+    if platform == "leetcode":
+        slug = raw.get("titleSlug") or raw.get("slug") or problem_id
+        if slug:
+            return f"leetcode:{normalize_problem_text_key(str(slug))}"
 
     if platform == "vjudge":
         source = raw.get("oj") or raw.get("OJId") or raw.get("ojName")
@@ -1104,6 +1113,16 @@ def atcoder_contest_lookup() -> dict[str, dict]:
     if not isinstance(data, list):
         raise RuntimeError("AtCoder contest resource 返回格式异常")
     return {str(item.get("id")): item for item in data if item.get("id")}
+
+
+def atcoder_problem_models() -> dict[str, dict]:
+    data = http_get_json(
+        "https://kenkoooo.com/atcoder/resources/problem-models.json",
+        cache_ttl_seconds=24 * 3600,
+    )
+    if not isinstance(data, dict):
+        raise RuntimeError("AtCoder problem models 返回格式异常")
+    return data
 
 
 CODEFORCES_UNOFFICIAL_PARTICIPANT_TYPES = {"VIRTUAL", "OUT_OF_COMPETITION"}
@@ -1432,6 +1451,9 @@ class AtCoderAdapter(OJAdapter):
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
         submissions = []
+        problem_models = {}
+        with contextlib.suppress(Exception):
+            problem_models = atcoder_problem_models()
         cursor = max(0, since_ts)
         while True:
             params = urllib.parse.urlencode({"user": handle, "from_second": cursor})
@@ -1455,6 +1477,10 @@ class AtCoderAdapter(OJAdapter):
                 contest_id = item.get("contest_id") or ""
                 remote_id = str(item.get("id") or hashlib.sha1(json.dumps(item, sort_keys=True).encode()).hexdigest())
                 problem_id = item.get("problem_id") or ""
+                model = problem_models.get(str(problem_id)) or {}
+                raw = dict(item)
+                if model.get("difficulty") is not None:
+                    raw["difficulty"] = model["difficulty"]
                 url = f"https://atcoder.jp/contests/{contest_id}/submissions/{remote_id}" if contest_id else None
                 submissions.append(
                     {
@@ -1465,7 +1491,7 @@ class AtCoderAdapter(OJAdapter):
                         "language": item.get("language") or "",
                         "submitted_at": submitted_at,
                         "url": url,
-                        "raw": item,
+                        "raw": raw,
                     }
                 )
             if len(data) < 500 or latest_ts <= cursor:
@@ -2836,142 +2862,339 @@ class LOJAdapter(OJAdapter):
         return submissions
 
 
-class QOJAdapter(OJAdapter):
-    key = "qoj"
-    label = "QOJ"
-    handle_hint = "QOJ 用户名；Cloudflare 下需管理员配置专用 Cookie，公开站不建议收集用户登录态"
+LEETCODE_GLOBAL_PROFILE_QUERY = """
+query userProfileCalendar($username: String!, $year: Int) {
+  matchedUser(username: $username) {
+    username
+    submitStatsGlobal { acSubmissionNum { difficulty count submissions } }
+    userCalendar(year: $year) { activeYears streak totalActiveDays submissionCalendar }
+  }
+  recentAcSubmissionList(username: $username, limit: 20) {
+    id title titleSlug timestamp
+  }
+}
+"""
+LEETCODE_GLOBAL_RATING_QUERY = """
+query userContestRankingHistory($username: String!) {
+  userContestRankingHistory(username: $username) {
+    attended rating ranking contest { title startTime }
+  }
+}
+"""
+LEETCODE_CN_PROGRESS_QUERY = """
+query userQuestionProgress($userSlug: String!) {
+  userProfileUserQuestionProgress(userSlug: $userSlug) {
+    numAcceptedQuestions { count difficulty }
+  }
+}
+"""
+LEETCODE_CN_PROGRESS_V2_QUERY = """
+query userProfileUserQuestionProgressV2($userSlug: String!) {
+  userProfileUserQuestionProgressV2(userSlug: $userSlug) {
+    numAcceptedQuestions { count difficulty }
+  }
+}
+"""
+LEETCODE_CN_CALENDAR_QUERY = """
+query userProfileCalendar($userSlug: String!, $year: Int) {
+  userProfileCalendar(userSlug: $userSlug, year: $year) {
+    activeYears streak totalActiveDays submissionCalendar
+  }
+}
+"""
+LEETCODE_CN_RECENT_QUERY = """
+query recentACSubmissions($userSlug: String!) {
+  recentACSubmissions(userSlug: $userSlug) {
+    submissionId submitTime
+    question { questionFrontendId title titleSlug translatedTitle }
+  }
+}
+"""
+
+
+class LeetCodeAdapter(OJAdapter):
+    key = "leetcode"
+    label = "LeetCode"
+    handle_hint = "国际站用户名，或中国站 cn:用户名"
+
+    def __init__(self):
+        self._profile_stats: dict[str, dict] = {}
+        self._rating_history: dict[str, list[dict]] = {}
 
     def normalize_handle(self, handle: str) -> str:
-        handle = handle.strip()
-        if not re.match(r"^[0-9A-Za-z_\-.]{2,64}$", handle):
-            raise ValueError("QOJ 请填写用户名")
-        return handle
+        value = handle.strip()
+        is_cn = value.lower().startswith("cn:")
+        if is_cn:
+            value = value[3:].strip()
+        if value.startswith(("http://", "https://")):
+            parsed = urllib.parse.urlparse(value)
+            is_cn = parsed.netloc.lower().endswith("leetcode.cn")
+            match = re.search(r"/(?:u/)?([^/?#]+)/?", parsed.path)
+            value = urllib.parse.unquote(match.group(1)) if match else ""
+        value = value.strip().strip("/")
+        if not re.match(r"^[0-9A-Za-z_-]{1,64}$", value):
+            raise ValueError("LeetCode 请填写用户名；中国站用户名使用 cn: 前缀")
+        return f"cn:{value}" if is_cn else value
+
+    @staticmethod
+    def _site(handle: str) -> tuple[str, bool, str, str]:
+        is_cn = handle.lower().startswith("cn:")
+        user = handle[3:] if is_cn else handle
+        if is_cn:
+            return user, True, "https://leetcode.cn/graphql/", "https://leetcode.cn"
+        return user, False, "https://leetcode.com/graphql", "https://leetcode.com"
+
+    @staticmethod
+    def _graphql(endpoint: str, origin: str, query: str, variables: dict, operation: str) -> dict:
+        payload = http_post_json(
+            endpoint,
+            {"operationName": operation, "query": query, "variables": variables},
+            headers={
+                "Origin": origin,
+                "Referer": f"{origin}/",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        )
+        if not isinstance(payload, dict):
+            raise RuntimeError("LeetCode GraphQL 返回格式异常")
+        errors = payload.get("errors") or []
+        if errors and not payload.get("data"):
+            message = str((errors[0] or {}).get("message") if isinstance(errors[0], dict) else errors[0])
+            raise RuntimeError(f"LeetCode GraphQL 返回失败：{message}")
+        return payload
+
+    @staticmethod
+    def _difficulty_stats(rows: list) -> tuple[int, dict[str, int]]:
+        solved = 0
+        counts: dict[str, int] = {}
+        for row in rows or []:
+            if not isinstance(row, dict):
+                continue
+            label = str(row.get("difficulty") or "").strip()
+            count = max(0, int(row.get("count") or 0))
+            if label.lower() == "all":
+                solved = count
+            elif label:
+                counts[label.title()] = count
+        return solved or sum(counts.values()), counts
+
+    @staticmethod
+    def _calendar_rows(serialized) -> dict[int, int]:
+        if isinstance(serialized, str):
+            with contextlib.suppress(Exception):
+                serialized = json.loads(serialized)
+        rows: dict[int, int] = {}
+        if not isinstance(serialized, dict):
+            return rows
+        for timestamp, count in serialized.items():
+            with contextlib.suppress(Exception):
+                epoch = int(timestamp)
+                amount = max(0, min(int(count), 1000))
+                if epoch > 0 and amount:
+                    rows[epoch] = amount
+        return rows
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
-        cookie = normalize_cookie_header(os.environ.get("QOJ_COOKIE", "").strip(), "UOJSESSID")
-        if not cookie:
-            raise RuntimeError("QOJ 当前有 Cloudflare 校验；公开部署不建议收集用户登录态，未配置管理员专用 Cookie 时无法精确同步")
+        user, is_cn, endpoint, origin = self._site(handle)
+        current_year = dt.datetime.now(dt.timezone.utc).year
+        calendar: dict[int, int] = {}
+        recent_rows: list[dict] = []
+        active_years = {current_year}
+
+        if is_cn:
+            try:
+                progress = self._graphql(
+                    endpoint,
+                    origin,
+                    LEETCODE_CN_PROGRESS_QUERY,
+                    {"userSlug": user},
+                    "userQuestionProgress",
+                )
+                difficulty_rows = (
+                    progress.get("data", {})
+                    .get("userProfileUserQuestionProgress", {})
+                    .get("numAcceptedQuestions", [])
+                )
+            except Exception:
+                progress = self._graphql(
+                    endpoint,
+                    origin,
+                    LEETCODE_CN_PROGRESS_V2_QUERY,
+                    {"userSlug": user},
+                    "userProfileUserQuestionProgressV2",
+                )
+                difficulty_rows = (
+                    progress.get("data", {})
+                    .get("userProfileUserQuestionProgressV2", {})
+                    .get("numAcceptedQuestions", [])
+                )
+            first = self._graphql(
+                endpoint,
+                origin,
+                LEETCODE_CN_CALENDAR_QUERY,
+                {"userSlug": user, "year": current_year},
+                "userProfileCalendar",
+            )
+            calendar_node = first.get("data", {}).get("userProfileCalendar")
+            if not isinstance(calendar_node, dict):
+                raise ValueError("LeetCode 中国站用户不存在，或公开活动数据不可用")
+            active_years.update(int(year) for year in calendar_node.get("activeYears") or [] if str(year).isdigit())
+            calendar.update(self._calendar_rows(calendar_node.get("submissionCalendar")))
+            recent = self._graphql(
+                endpoint,
+                origin,
+                LEETCODE_CN_RECENT_QUERY,
+                {"userSlug": user},
+                "recentACSubmissions",
+            )
+            recent_rows = recent.get("data", {}).get("recentACSubmissions") or []
+        else:
+            first = self._graphql(
+                endpoint,
+                origin,
+                LEETCODE_GLOBAL_PROFILE_QUERY,
+                {"username": user, "year": current_year},
+                "userProfileCalendar",
+            )
+            matched = first.get("data", {}).get("matchedUser")
+            if not isinstance(matched, dict):
+                raise ValueError("LeetCode 用户不存在，或公开个人资料不可用")
+            difficulty_rows = (matched.get("submitStatsGlobal") or {}).get("acSubmissionNum") or []
+            calendar_node = matched.get("userCalendar") or {}
+            active_years.update(int(year) for year in calendar_node.get("activeYears") or [] if str(year).isdigit())
+            calendar.update(self._calendar_rows(calendar_node.get("submissionCalendar")))
+            recent_rows = first.get("data", {}).get("recentAcSubmissionList") or []
+
+        minimum_year = current_year - max(1, FETCH_LOOKBACK_DAYS // 365) - 1
+        for year in sorted(active_years):
+            if year == current_year or year < minimum_year:
+                continue
+            query = LEETCODE_CN_CALENDAR_QUERY if is_cn else LEETCODE_GLOBAL_PROFILE_QUERY
+            variables = {"userSlug" if is_cn else "username": user, "year": year}
+            payload = self._graphql(endpoint, origin, query, variables, "userProfileCalendar")
+            node = (
+                payload.get("data", {}).get("userProfileCalendar")
+                if is_cn
+                else (payload.get("data", {}).get("matchedUser") or {}).get("userCalendar")
+            )
+            if isinstance(node, dict):
+                calendar.update(self._calendar_rows(node.get("submissionCalendar")))
+            time.sleep(0.12)
+
+        solved, difficulty_counts = self._difficulty_stats(difficulty_rows)
+        self._profile_stats[handle] = {
+            "allTimeAccepted": solved,
+            "difficultyCounts": difficulty_counts,
+            "activityOnly": True,
+            "source": "leetcode-public-profile",
+        }
 
         submissions = []
-        seen = set()
-        for page_no in range(1, 201):
-            params = urllib.parse.urlencode({"submitter": handle, "page": page_no, "locale": "en"})
-            body, _ = http_get(
-                f"https://qoj.ac/submissions?{params}",
-                headers={
-                    "Cookie": cookie,
-                    "Referer": "https://qoj.ac/",
-                    "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8",
-                },
-            )
-            page = body.decode("utf-8", errors="ignore")
-            if "Just a moment" in page or "__cf_chl" in page or "challenge-platform" in page:
-                raise RuntimeError("QOJ_COOKIE 未通过 Cloudflare 校验，无法精确同步 QOJ")
-            page_submissions, reached_older = self._parse_submissions_page(page, since_ts)
-            fresh = [item for item in page_submissions if item["remote_id"] not in seen]
-            for item in fresh:
-                seen.add(item["remote_id"])
-            submissions.extend(fresh)
-            if reached_older or not fresh:
-                break
+        for epoch, count in calendar.items():
+            if epoch < since_ts:
+                continue
+            date_key = utc_date_from_ts(epoch)
+            for index in range(count):
+                submissions.append(
+                    {
+                        "remote_id": f"activity-{date_key}-{index + 1}",
+                        "problem_id": f"leetcode-activity-{date_key}-{index + 1}",
+                        "problem_name": "LeetCode 活动记录",
+                        "verdict": "ACTIVITY",
+                        "language": "",
+                        "submitted_at": epoch + min(index, 86399),
+                        "url": f"{origin}/u/{urllib.parse.quote(user)}/",
+                        "raw": {
+                            "syntheticFromCalendar": True,
+                            "activityDate": date_key,
+                            "activityCount": count,
+                        },
+                    }
+                )
+
+        for row in recent_rows:
+            if not isinstance(row, dict):
+                continue
+            question = row.get("question") if isinstance(row.get("question"), dict) else row
+            slug = str(question.get("titleSlug") or "").strip()
+            timestamp = row.get("submitTime") if is_cn else row.get("timestamp")
+            with contextlib.suppress(Exception):
+                submitted_at = int(timestamp)
+                if not slug or submitted_at < since_ts:
+                    continue
+                remote_id = str(row.get("submissionId") or row.get("id") or f"{user}-{submitted_at}-{slug}")
+                title = str(question.get("translatedTitle") or question.get("title") or slug)
+                problem_id = str(question.get("questionFrontendId") or slug)
+                submissions.append(
+                    {
+                        "remote_id": f"recent-{remote_id}",
+                        "problem_id": problem_id,
+                        "problem_name": title,
+                        "verdict": "AC",
+                        "language": "",
+                        "submitted_at": submitted_at,
+                        "url": f"{origin}/problems/{urllib.parse.quote(slug)}/",
+                        "raw": {
+                            "titleSlug": slug,
+                            "calendarCovered": True,
+                            "source": "recent-ac",
+                        },
+                    }
+                )
+
+        self._rating_history[handle] = []
+        if not is_cn:
+            with contextlib.suppress(Exception):
+                ratings = self._graphql(
+                    endpoint,
+                    origin,
+                    LEETCODE_GLOBAL_RATING_QUERY,
+                    {"username": user},
+                    "userContestRankingHistory",
+                )
+                self._rating_history[handle] = ratings.get("data", {}).get("userContestRankingHistory") or []
         return submissions
 
-    def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
-        contests = {}
-        for item in submissions:
-            raw = item.get("raw") or {}
-            contest_id = str(raw.get("contest_id") or "")
-            submitted_at = int(item.get("submitted_at") or 0)
-            if not contest_id or submitted_at < since_ts:
-                continue
-            name = str(raw.get("contest_name") or f"QOJ Contest {contest_id}")
-            contests[contest_id] = {
-                "remote_id": contest_id,
-                "contest_name": name,
-                "category": classify_contest(self.key, name, contest_id, raw),
-                "participated_at": submitted_at,
-                "url": f"https://qoj.ac/contest/{contest_id}",
-                "raw": raw,
-            }
-        return list(contests.values())
+    def fetch_profile_stats(self, handle: str, submissions: list[dict]) -> dict:
+        return self._profile_stats.pop(handle, {})
 
-    def _parse_submissions_page(self, page: str, since_ts: int) -> tuple[list[dict], bool]:
-        rows = re.findall(r"<tr\b[^>]*>(.*?)</tr>", page, flags=re.I | re.S)
-        submissions = []
-        reached_older = False
+    def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
+        _, is_cn, _, origin = self._site(handle)
+        if is_cn:
+            return []
+        rows = [row for row in self._rating_history.pop(handle, []) if isinstance(row, dict) and row.get("attended")]
+        rows.sort(key=lambda row: int((row.get("contest") or {}).get("startTime") or 0))
+        contests = []
+        previous_rating = None
         for row in rows:
-            text = strip_tags(row)
-            submitted_at = parse_datetime_text(text)
-            if not submitted_at:
+            contest = row.get("contest") or {}
+            participated_at = int(contest.get("startTime") or 0)
+            if not participated_at:
                 continue
-            if submitted_at < since_ts:
-                reached_older = True
+            new_rating = round(float(row.get("rating") or 0))
+            old_rating = previous_rating if previous_rating is not None else new_rating
+            previous_rating = new_rating
+            if participated_at < since_ts:
                 continue
-            links = re.findall(r'<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', row, flags=re.I | re.S)
-            submission_id = ""
-            problem_id = ""
-            problem_name = ""
-            contest_id = ""
-            contest_name = ""
-            for href, label in links:
-                clean_label = strip_tags(label)
-                if not submission_id:
-                    match = re.search(r"/submission[s]?/([0-9]+)", href)
-                    if match:
-                        submission_id = match.group(1)
-                match = re.search(r"/problem/([0-9A-Za-z_\-.]+)", href)
-                if match and not problem_id:
-                    problem_id = match.group(1)
-                    problem_name = clean_label or problem_id
-                match = re.search(r"/contest/([0-9A-Za-z_\-.]+)", href)
-                if match and not contest_id:
-                    contest_id = match.group(1)
-                    contest_name = clean_label or contest_id
-            remote_id = submission_id or hashlib.sha1(row.encode("utf-8")).hexdigest()
-            verdict = self._guess_verdict(text)
-            language = self._guess_language(text)
-            submissions.append(
+            name = str(contest.get("title") or "LeetCode Contest")
+            remote_id = hashlib.sha1(f"{participated_at}:{name}".encode()).hexdigest()[:20]
+            contests.append(
                 {
                     "remote_id": remote_id,
-                    "problem_id": problem_id,
-                    "problem_name": problem_name or problem_id or "QOJ Problem",
-                    "verdict": verdict,
-                    "language": language,
-                    "submitted_at": submitted_at,
-                    "url": f"https://qoj.ac/submission/{remote_id}" if submission_id else "https://qoj.ac/submissions",
+                    "contest_name": name,
+                    "category": "other",
+                    "participated_at": participated_at,
+                    "url": f"{origin}/contest/",
                     "raw": {
-                        "text": text,
-                        "contest_id": contest_id,
-                        "contest_name": contest_name,
+                        "oldRating": old_rating,
+                        "newRating": new_rating,
+                        "rank": row.get("ranking"),
+                        "rated": True,
+                        "source": "userContestRankingHistory",
                     },
                 }
             )
-        return submissions, reached_older
-
-    @staticmethod
-    def _guess_verdict(text: str) -> str:
-        aliases = [
-            ("Accepted", "AC"),
-            ("Wrong Answer", "WRONG_ANSWER"),
-            ("Runtime Error", "RUNTIME_ERROR"),
-            ("Compile Error", "COMPILATION_ERROR"),
-            ("Compilation Error", "COMPILATION_ERROR"),
-            ("Time Limit Exceeded", "TIME_LIMIT_EXCEEDED"),
-            ("Memory Limit Exceeded", "MEMORY_LIMIT_EXCEEDED"),
-            ("Output Limit Exceeded", "OUTPUT_LIMIT_EXCEEDED"),
-            ("Presentation Error", "PRESENTATION_ERROR"),
-        ]
-        for token, verdict in aliases:
-            if token.lower() in text.lower():
-                return verdict
-        return "UNKNOWN"
-
-    @staticmethod
-    def _guess_language(text: str) -> str:
-        for token in ["C++", "GNU", "Python", "PyPy", "Java", "Rust", "Go", "Kotlin", "C#"]:
-            if token.lower() in text.lower():
-                return token
-        return ""
+        return contests
 
 
 ADAPTERS: dict[str, OJAdapter] = {
@@ -2981,7 +3204,7 @@ ADAPTERS: dict[str, OJAdapter] = {
     "luogu": LuoguAdapter(),
     "vjudge": VJudgeAdapter(),
     "loj": LOJAdapter(),
-    "qoj": QOJAdapter(),
+    "leetcode": LeetCodeAdapter(),
 }
 
 
@@ -3244,7 +3467,17 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
     if not force and not has_error and row["last_sync_at"] and now - int(row["last_sync_at"]) < SYNC_MIN_AGE_SECONDS:
         return {"handleId": row["id"], "platform": row["platform"], "handle": row["handle"], "skipped": True}
 
-    adapter = ADAPTERS[row["platform"]]
+    adapter = ADAPTERS.get(row["platform"])
+    if adapter is None:
+        message = f"{row['platform']} 已停止同步；历史数据仍会保留"
+        conn.execute("UPDATE handles SET last_error = ? WHERE id = ?", (message, row["id"]))
+        return {
+            "handleId": row["id"],
+            "platform": row["platform"],
+            "handle": row["handle"],
+            "skipped": True,
+            "warning": message,
+        }
     row = canonicalize_handle_row(conn, row, adapter)
     conn.commit()
     max_row = conn.execute(
@@ -4076,19 +4309,22 @@ def handle_activity_key(platform: str, handle: str) -> str:
 
 def add_submission_to_activity(activity: dict, row: sqlite3.Row) -> None:
     date_key = utc_date_from_ts(row["submitted_at"])
-    all_day = activity["_all_days"].setdefault(date_key, {"accepted": 0, "total": 0})
-    all_day["total"] += 1
+    raw = raw_json_dict(row)
     is_accepted = normalize_verdict(row["verdict"]) == "AC"
-    is_activity = is_activity_placeholder(row)
+    is_activity = is_activity_placeholder(row, raw)
     solved_key = solved_problem_key(row)
     is_new_solve = is_accepted and not is_activity and solved_key not in activity["_solved_keys"]
     if is_new_solve:
-        all_day["accepted"] += 1
         activity["_solved_keys"].add(solved_key)
         key = handle_activity_key(row["platform"], row["handle"])
         handle_counts = activity["_handle_solved_counts"]
         handle_counts[key] = handle_counts.get(key, 0) + 1
-    elif is_accepted and is_activity:
+    if raw.get("calendarCovered"):
+        return
+
+    all_day = activity["_all_days"].setdefault(date_key, {"accepted": 0, "total": 0})
+    all_day["total"] += 1
+    if is_new_solve or (is_accepted and is_activity):
         all_day["accepted"] += 1
 
     day = activity["days"].setdefault(date_key, {"accepted": 0, "total": 0})
@@ -4262,12 +4498,14 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
         feed_total = sum(
             1
             for row in sub_rows
-            if (row["owner_type"], row["owner_id"]) in owners
+            if (row["owner_type"], row["owner_id"]) in owners and not is_activity_placeholder(row)
         )
         feed_limit = max(0, OVERVIEW_FEED_LIMIT)
         feed_sql = """
             SELECT *
             FROM submissions
+            WHERE NOT (platform = 'luogu' AND problem_id LIKE 'luogu-activity-%')
+              AND NOT (platform = 'leetcode' AND problem_id LIKE 'leetcode-activity-%')
             ORDER BY submitted_at DESC
         """
         feed_params: tuple[object, ...] = ()
@@ -4700,6 +4938,361 @@ def battle_contest_result(row: sqlite3.Row) -> dict:
         "_durationSeconds": duration_seconds,
         "_participantKey": participant_key,
     }
+
+
+INSIGHT_METRIC_KEYS = ("firstAc", "uniqueAc", "acceptedSubmissions", "activity")
+LUOGU_DIFFICULTY_LABELS = {
+    "0": "暂无评定",
+    "1": "入门",
+    "2": "普及-",
+    "3": "普及/提高-",
+    "4": "普及+/提高",
+    "5": "提高+/省选-",
+    "6": "省选/NOI-",
+    "7": "NOI/NOI+/CTSC",
+}
+
+
+def normalize_insight_difficulty(platform: str, value) -> str:
+    platform = str(platform or "").lower()
+    if value is None or isinstance(value, bool):
+        return ""
+    text = str(value).strip()
+    if not text or text.lower() in {"none", "null", "unknown", "unrated", "-"}:
+        return "未评级"
+    if platform == "luogu":
+        return LUOGU_DIFFICULTY_LABELS.get(text, text)
+    if platform == "leetcode":
+        aliases = {"easy": "Easy", "medium": "Medium", "hard": "Hard"}
+        return aliases.get(text.lower(), text)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return text
+    if platform == "atcoder" and number < 400:
+        number = 400 / (2.718281828459045 ** (1 - number / 400))
+    if platform in {"codeforces", "atcoder"}:
+        return str(max(0, int(number // 100) * 100))
+    return str(int(number) if number.is_integer() else round(number, 1))
+
+
+def submission_insight_difficulty(row: sqlite3.Row, raw: dict) -> str:
+    platform = str(row["platform"] or "")
+    value = raw.get("difficulty")
+    if platform == "codeforces":
+        problem = raw.get("problem") if isinstance(raw.get("problem"), dict) else {}
+        value = problem.get("rating") if problem.get("rating") is not None else value
+    elif platform == "luogu":
+        problem = raw.get("problem") if isinstance(raw.get("problem"), dict) else {}
+        value = problem.get("difficulty") if problem.get("difficulty") is not None else value
+    elif platform == "nowcoder":
+        value = raw.get("difficultyScore") if raw.get("difficultyScore") is not None else value
+    return normalize_insight_difficulty(platform, value)
+
+
+def insight_difficulty_sort_key(platform: str, label: str) -> tuple[int, float | str]:
+    if label == "未评级" or label == "暂无评定":
+        return (2, label)
+    if platform == "leetcode":
+        return (0, {"Easy": 0, "Medium": 1, "Hard": 2}.get(label, 99))
+    if platform == "luogu":
+        order = list(LUOGU_DIFFICULTY_LABELS.values())
+        return (0, order.index(label) if label in order else 99)
+    with contextlib.suppress(ValueError):
+        return (0, float(label))
+    return (1, label)
+
+
+def empty_insight_scope() -> dict:
+    return {
+        "daily": {},
+        "_first": set(),
+        "_unique": set(),
+        "_solved": set(),
+        "acceptedSubmissions": 0,
+    }
+
+
+def build_insights(principal: dict | None, member_key: str = "all") -> dict:
+    now = utcnow()
+    today = dt.datetime.fromtimestamp(now, DISPLAY_TZ).date()
+    earliest = today - dt.timedelta(days=3649)
+    with connect_db() as conn:
+        owners = visible_battle_owners(conn, principal)
+        if member_key != "all" and member_key not in owners:
+            raise ValueError("找不到这个成员")
+        selected_owner_keys = list(owners) if member_key == "all" else [member_key]
+        owner_tuples = [tuple(key.split(":", 1)) for key in selected_owner_keys]
+
+        members = [
+            {
+                "key": key,
+                "displayName": owner["displayName"],
+                "teamName": owner["teamName"],
+                "isCurrent": owner["isCurrent"],
+            }
+            for key, owner in owners.items()
+        ]
+        members.sort(key=lambda item: (not item["isCurrent"], item["displayName"].casefold()))
+
+        if not owner_tuples:
+            return {
+                "memberKey": member_key,
+                "members": members,
+                "today": today.isoformat(),
+                "daily": {"all": {}},
+                "summaries": {"all": {}},
+                "difficulty": [],
+                "ratings": [],
+                "platforms": [],
+            }
+
+        handle_rows = battle_union_rows(
+            conn,
+            "handles",
+            "*",
+            owner_tuples,
+            extra_where="AND active = 1",
+            order_by="created_at, id",
+        )
+        active_handles = {
+            (str(row["owner_type"]), str(row["owner_id"]), str(row["platform"]), str(row["handle"]))
+            for row in handle_rows
+        }
+        submission_rows = battle_union_rows(
+            conn,
+            "submissions",
+            "*",
+            owner_tuples,
+            order_by="submitted_at, id",
+        )
+
+        scopes: dict[str, dict] = {"all": empty_insight_scope()}
+        handle_solved: dict[tuple[str, str, str, str], set[str]] = {}
+        handle_difficulty: dict[tuple[str, str, str, str], dict[str, int]] = {}
+        difficulty_seen: set[tuple[str, str, str, str, str]] = set()
+
+        for row in submission_rows:
+            handle_key = (
+                str(row["owner_type"]),
+                str(row["owner_id"]),
+                str(row["platform"]),
+                str(row["handle"]),
+            )
+            if handle_key not in active_handles:
+                continue
+            platform = str(row["platform"] or "")
+            scopes.setdefault(platform, empty_insight_scope())
+            raw = raw_json_dict(row)
+            placeholder = is_activity_placeholder(row, raw)
+            if normalize_verdict(row["verdict"]) != "AC" and not placeholder:
+                continue
+            date_key = utc_date_from_ts(row["submitted_at"])
+            problem_key = solved_problem_key(row)
+            owner_problem_key = f"{row['owner_type']}:{row['owner_id']}:{problem_key}"
+
+            for scope_key in ("all", platform):
+                scope = scopes[scope_key]
+                metrics = scope["daily"].setdefault(
+                    date_key,
+                    {metric: 0 for metric in INSIGHT_METRIC_KEYS},
+                )
+                if placeholder:
+                    metrics["activity"] += 1
+                    continue
+
+                scope["acceptedSubmissions"] += 1
+                metrics["acceptedSubmissions"] += 1
+                unique_key = f"{owner_problem_key}:{date_key}"
+                if unique_key not in scope["_unique"]:
+                    scope["_unique"].add(unique_key)
+                    metrics["uniqueAc"] += 1
+                if owner_problem_key not in scope["_first"]:
+                    scope["_first"].add(owner_problem_key)
+                    metrics["firstAc"] += 1
+                scope["_solved"].add(owner_problem_key)
+                if not raw.get("calendarCovered"):
+                    metrics["activity"] += 1
+
+            if placeholder:
+                continue
+            handle_solved.setdefault(handle_key, set()).add(problem_key)
+            difficulty = submission_insight_difficulty(row, raw)
+            difficulty_key = (*handle_key, problem_key)
+            if difficulty and difficulty_key not in difficulty_seen:
+                difficulty_seen.add(difficulty_key)
+                counts = handle_difficulty.setdefault(handle_key, {})
+                counts[difficulty] = counts.get(difficulty, 0) + 1
+
+        career_supplements: dict[str, int] = {key: 0 for key in scopes}
+        for row in handle_rows:
+            handle_key = (
+                str(row["owner_type"]),
+                str(row["owner_id"]),
+                str(row["platform"]),
+                str(row["handle"]),
+            )
+            platform = str(row["platform"] or "")
+            scopes.setdefault(platform, empty_insight_scope())
+            career_supplements.setdefault(platform, 0)
+            stats = {}
+            with contextlib.suppress(Exception):
+                stats = json.loads(row["stats_json"] or "{}")
+            if not isinstance(stats, dict):
+                stats = {}
+            known_solved = len(handle_solved.get(handle_key, set()))
+            profile_solved = max(0, int(stats.get("allTimeAccepted") or 0))
+            supplement = max(0, profile_solved - known_solved)
+            career_supplements[platform] += supplement
+            career_supplements["all"] += supplement
+
+            counts = handle_difficulty.setdefault(handle_key, {})
+            profile_difficulty = stats.get("difficultyCounts") or {}
+            if isinstance(profile_difficulty, dict):
+                for raw_label, raw_count in profile_difficulty.items():
+                    label = normalize_insight_difficulty(platform, raw_label)
+                    with contextlib.suppress(TypeError, ValueError):
+                        counts[label] = max(counts.get(label, 0), max(0, int(raw_count)))
+
+        summaries = {}
+        serial_daily = {}
+        for scope_key, scope in scopes.items():
+            visible_daily = {
+                date_key: metrics
+                for date_key, metrics in scope["daily"].items()
+                if date_key >= earliest.isoformat()
+            }
+            serial_daily[scope_key] = dict(sorted(visible_daily.items()))
+            activity_days = {
+                date_key: {"accepted": metrics.get("activity", 0)}
+                for date_key, metrics in scope["daily"].items()
+                if metrics.get("activity", 0) > 0
+            }
+            peak_date = None
+            peak_count = 0
+            for date_key, counts in activity_days.items():
+                if counts["accepted"] > peak_count:
+                    peak_date = date_key
+                    peak_count = counts["accepted"]
+            summaries[scope_key] = {
+                "careerSolved": len(scope["_solved"]) + career_supplements.get(scope_key, 0),
+                "acceptedSubmissions": scope["acceptedSubmissions"],
+                "activeDays": len(activity_days),
+                "longestStreak": max_streak(activity_days),
+                "currentStreak": current_streak(activity_days),
+                "peakDay": peak_date,
+                "peakCount": peak_count,
+                "metricTotals": {
+                    metric: sum(day.get(metric, 0) for day in scope["daily"].values())
+                    for metric in INSIGHT_METRIC_KEYS
+                },
+            }
+
+        difficulty_platforms: dict[str, dict[str, int]] = {}
+        for handle_key, counts in handle_difficulty.items():
+            platform = handle_key[2]
+            platform_counts = difficulty_platforms.setdefault(platform, {})
+            for label, count in counts.items():
+                platform_counts[label] = platform_counts.get(label, 0) + count
+        difficulty = []
+        for platform, counts in difficulty_platforms.items():
+            buckets = [
+                {"label": label, "count": count}
+                for label, count in sorted(
+                    counts.items(),
+                    key=lambda item: insight_difficulty_sort_key(platform, item[0]),
+                )
+                if count > 0
+            ]
+            if not buckets:
+                continue
+            adapter = ADAPTERS.get(platform)
+            difficulty.append(
+                {
+                    "platform": platform,
+                    "platformLabel": adapter.label if adapter else platform,
+                    "total": sum(item["count"] for item in buckets),
+                    "buckets": buckets,
+                }
+            )
+
+        contest_rows = battle_union_rows(
+            conn,
+            "contests",
+            "*",
+            owner_tuples,
+            order_by="participated_at, id",
+        )
+        rating_groups: dict[tuple[str, str, str, str], dict] = {}
+        for row in contest_rows:
+            handle_key = (
+                str(row["owner_type"]),
+                str(row["owner_id"]),
+                str(row["platform"]),
+                str(row["handle"]),
+            )
+            if handle_key not in active_handles:
+                continue
+            result = battle_contest_result(row)
+            if result["ratingAfter"] is None:
+                continue
+            owner_key = f"{row['owner_type']}:{row['owner_id']}"
+            platform = str(row["platform"] or "")
+            adapter = ADAPTERS.get(platform)
+            group = rating_groups.setdefault(
+                handle_key,
+                {
+                    "platform": platform,
+                    "platformLabel": adapter.label if adapter else platform,
+                    "memberKey": owner_key,
+                    "memberName": owners.get(owner_key, {}).get("displayName") or owner_key,
+                    "handle": row["handle"],
+                    "points": [],
+                },
+            )
+            group["points"].append(
+                {
+                    "contestId": row["remote_id"],
+                    "contestName": row["contest_name"],
+                    "participatedAt": iso_from_ts(row["participated_at"]),
+                    "participatedDate": utc_date_from_ts(row["participated_at"]),
+                    "oldRating": result["ratingBefore"],
+                    "newRating": result["ratingAfter"],
+                    "delta": result["ratingDelta"],
+                    "rank": result["rank"],
+                    "url": row["url"],
+                }
+            )
+        ratings = [group for group in rating_groups.values() if group["points"]]
+        ratings.sort(key=lambda item: (item["platformLabel"], item["memberName"], item["handle"]))
+
+        platform_order = {key: index for index, key in enumerate(ADAPTERS)}
+        platform_keys = set(scopes) - {"all"}
+        platform_keys.update(item["platform"] for item in difficulty)
+        platform_keys.update(item["platform"] for item in ratings)
+        platforms = []
+        for platform in sorted(platform_keys, key=lambda key: (platform_order.get(key, 999), key)):
+            adapter = ADAPTERS.get(platform)
+            platforms.append({"key": platform, "label": adapter.label if adapter else platform})
+
+        return {
+            "memberKey": member_key,
+            "member": None if member_key == "all" else next((item for item in members if item["key"] == member_key), None),
+            "members": members,
+            "today": today.isoformat(),
+            "rangeStart": earliest.isoformat(),
+            "daily": serial_daily,
+            "summaries": summaries,
+            "difficulty": difficulty,
+            "ratings": ratings,
+            "platforms": platforms,
+            "metricMeta": [
+                {"key": "firstAc", "label": "First AC"},
+                {"key": "uniqueAc", "label": "Unique AC"},
+                {"key": "acceptedSubmissions", "label": "AC Submissions"},
+                {"key": "activity", "label": "Platform Activity"},
+            ],
+        }
 
 
 def battle_contest_entry(row: sqlite3.Row) -> dict:
@@ -5491,6 +6084,15 @@ class AppHandler(BaseHTTPRequestHandler):
                         return self.send_json(200, {"ok": True, **cached})
                     raise
                 return self.send_json(200, {"ok": True, **overview})
+            if path == "/api/insights":
+                params = urllib.parse.parse_qs(parsed.query)
+                member_key = str(params.get("member", ["all"])[0] or "all")
+                principal = get_current_principal(self)
+                try:
+                    insights = build_insights(principal, member_key=member_key)
+                except ValueError as exc:
+                    return self.send_error_json(400, str(exc))
+                return self.send_json(200, {"ok": True, **insights})
             if path == "/api/battle":
                 params = urllib.parse.parse_qs(parsed.query)
                 left_key = str(params.get("left", [""])[0])

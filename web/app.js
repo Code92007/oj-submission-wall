@@ -35,6 +35,14 @@ const state = {
   battleLoading: false,
   battleError: "",
   battleRequestId: 0,
+  insights: null,
+  insightMemberKey: "all",
+  insightPlatform: "all",
+  insightMetric: "firstAc",
+  insightRange: "365",
+  insightLoading: false,
+  insightError: "",
+  insightRequestId: 0,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -44,7 +52,7 @@ const el = (tag, className) => {
   return node;
 };
 
-const CONTEST_PLATFORM_ORDER = ["codeforces", "atcoder", "nowcoder", "luogu", "vjudge", "loj", "qoj", "other"];
+const CONTEST_PLATFORM_ORDER = ["codeforces", "atcoder", "nowcoder", "luogu", "vjudge", "loj", "leetcode", "qoj", "other"];
 const CONTEST_CATEGORY_ORDER = [
   "codeforces.div1",
   "codeforces.div1_2",
@@ -238,8 +246,13 @@ function updateWallRange(data) {
 }
 
 function applyOverviewData(data, options = {}) {
+  const previousGeneratedAt = state.overview?.mirror?.generatedAt || state.overview?.now;
   state.overview = data;
   state.user = data.user;
+  const nextGeneratedAt = data.mirror?.generatedAt || data.now;
+  if (previousGeneratedAt && nextGeneratedAt && previousGeneratedAt !== nextGeneratedAt) {
+    state.insights = null;
+  }
   if (data.platforms) state.platforms = data.platforms;
   updateWallRange(data);
   renderAll();
@@ -647,29 +660,536 @@ function renderTeamBattleControls(members) {
   $("#teamSwapBtn").disabled = !occupiedKeys.size;
 }
 
+function setSelectOptions(select, items, value) {
+  const signature = JSON.stringify(items);
+  if (select.dataset.signature !== signature) {
+    select.innerHTML = "";
+    for (const item of items) {
+      const option = document.createElement("option");
+      option.value = item.value;
+      option.textContent = item.label;
+      select.appendChild(option);
+    }
+    select.dataset.signature = signature;
+  }
+  select.value = items.some((item) => item.value === value) ? value : (items[0]?.value || "");
+}
+
+async function loadInsights() {
+  const requestId = ++state.insightRequestId;
+  state.insightLoading = true;
+  state.insightError = "";
+  renderInsightsView();
+  const params = new URLSearchParams({ member: state.insightMemberKey || "all" });
+  try {
+    const data = await api(`/api/insights?${params}`);
+    if (requestId !== state.insightRequestId) return;
+    state.insights = data;
+    if (state.insightPlatform !== "all" && !data.platforms?.some((item) => item.key === state.insightPlatform)) {
+      state.insightPlatform = "all";
+    }
+  } catch (error) {
+    if (requestId !== state.insightRequestId) return;
+    state.insights = null;
+    state.insightError = error.message;
+  } finally {
+    if (requestId === state.insightRequestId) {
+      state.insightLoading = false;
+      renderInsightsView();
+    }
+  }
+}
+
+function insightRangeBounds(range, todayString) {
+  const today = parseUtcDate(todayString);
+  if (range === "all") {
+    return {
+      lower: new Date(Date.UTC(today.getUTCFullYear() - 9, 0, 1)),
+      upper: new Date(Date.UTC(today.getUTCFullYear(), 11, 31)),
+      visibleUpper: today,
+      rows: 28,
+      compact: true,
+    };
+  }
+  if (range === "year") {
+    return {
+      lower: new Date(Date.UTC(today.getUTCFullYear(), 0, 1)),
+      upper: new Date(Date.UTC(today.getUTCFullYear(), 11, 31)),
+      visibleUpper: today,
+      rows: 7,
+      compact: false,
+    };
+  }
+  const lower = new Date(today);
+  lower.setUTCDate(lower.getUTCDate() - 364);
+  return { lower, upper: today, visibleUpper: today, rows: 7, compact: false };
+}
+
+function insightDaysInRange(days, range, todayString) {
+  const bounds = insightRangeBounds(range, todayString);
+  return Object.entries(days || {}).filter(([dateKey]) => {
+    const date = parseUtcDate(dateKey);
+    return date >= bounds.lower && date <= bounds.visibleUpper;
+  });
+}
+
+function currentMetricStreak(activeDateKeys, todayString) {
+  const active = new Set(activeDateKeys);
+  const cursor = parseUtcDate(todayString);
+  let streak = 0;
+  if (!active.has(toDateKey(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1);
+  while (active.has(toDateKey(cursor))) {
+    streak += 1;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+  return streak;
+}
+
+function insightRangeStats(days, metric, range, todayString) {
+  const entries = insightDaysInRange(days, range, todayString);
+  const activeDates = entries.filter(([, row]) => Number(row[metric] || 0) > 0).map(([dateKey]) => dateKey);
+  let peakDay = "";
+  let peakCount = 0;
+  let total = 0;
+  for (const [dateKey, row] of entries) {
+    const value = Number(row[metric] || 0);
+    total += value;
+    if (value > peakCount) {
+      peakDay = dateKey;
+      peakCount = value;
+    }
+  }
+  return {
+    total,
+    activeDays: activeDates.length,
+    longestStreak: maxDateStreak(activeDates),
+    currentStreak: currentMetricStreak(activeDates, todayString),
+    peakDay,
+    peakCount,
+  };
+}
+
+function renderInsightsView() {
+  const data = state.insights;
+  const overviewMembers = state.overview?.members || [];
+  const memberItems = [
+    { value: "all", label: "全队" },
+    ...overviewMembers.map((member) => ({ value: memberKey(member), label: battleMemberLabel(member) })),
+  ];
+  setSelectOptions($("#insightMemberSelect"), memberItems, state.insightMemberKey);
+
+  const platformItems = [
+    { value: "all", label: "全部平台" },
+    ...(data?.platforms || []).map((item) => ({ value: item.key, label: item.label })),
+  ];
+  setSelectOptions($("#insightPlatformSelect"), platformItems, state.insightPlatform);
+  const metricItems = (data?.metricMeta || [
+    { key: "firstAc", label: "First AC" },
+    { key: "uniqueAc", label: "Unique AC" },
+    { key: "acceptedSubmissions", label: "AC Submissions" },
+    { key: "activity", label: "Platform Activity" },
+  ]).map((item) => ({ value: item.key, label: item.label }));
+  setSelectOptions($("#insightMetricSelect"), metricItems, state.insightMetric);
+  $("#insightRangeSelect").value = state.insightRange;
+  $("#insightExportBtn").disabled = !data || state.insightLoading;
+  $("#insightsUpdated").textContent = data ? `数据截至 ${data.today}` : "等待加载";
+
+  const container = $("#insightsContent");
+  container.innerHTML = "";
+  if (state.insightLoading) {
+    container.appendChild(battleEmpty("正在整理训练数据..."));
+    return;
+  }
+  if (state.insightError) {
+    container.appendChild(battleEmpty(state.insightError, true));
+    return;
+  }
+  if (!data) {
+    container.appendChild(battleEmpty("暂无洞察数据"));
+    return;
+  }
+
+  const scope = state.insightPlatform;
+  const days = data.daily?.[scope] || {};
+  const summary = data.summaries?.[scope] || {
+    careerSolved: 0,
+    acceptedSubmissions: 0,
+  };
+  const rangeStats = insightRangeStats(days, state.insightMetric, state.insightRange, data.today);
+  container.append(
+    renderInsightSummary(summary, rangeStats),
+    renderInsightActivity(days, data.today),
+    renderInsightDifficulty(data),
+    renderInsightRatings(data),
+  );
+}
+
+function renderInsightSummary(summary, rangeStats) {
+  const metricLabel = state.insights?.metricMeta?.find((item) => item.key === state.insightMetric)?.label || state.insightMetric;
+  const panel = el("section", "insight-summary");
+  const items = [
+    [summary.careerSolved || 0, "生涯解题"],
+    [rangeStats.total, metricLabel],
+    [rangeStats.activeDays, "活跃天数"],
+    [rangeStats.longestStreak, "最长连续"],
+    [rangeStats.currentStreak, "当前连续"],
+    [rangeStats.peakCount, rangeStats.peakDay ? `峰值 · ${rangeStats.peakDay}` : "单日峰值"],
+  ];
+  for (const [value, label] of items) {
+    const item = document.createElement("div");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = value;
+    span.textContent = label;
+    item.append(strong, span);
+    panel.appendChild(item);
+  }
+  return panel;
+}
+
+function renderInsightActivity(days, todayString) {
+  const section = el("section", "insight-section insight-activity");
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  const metricLabel = state.insights?.metricMeta?.find((item) => item.key === state.insightMetric)?.label || state.insightMetric;
+  title.textContent = metricLabel;
+  const total = document.createElement("span");
+  total.textContent = `${insightRangeStats(days, state.insightMetric, state.insightRange, todayString).total} 次`;
+  head.append(title, total);
+  const wrap = el("div", "insight-wall-wrap");
+  wrap.appendChild(renderInsightWall(days, state.insightMetric, state.insightRange, todayString));
+  section.append(head, wrap);
+  return section;
+}
+
+function renderInsightWall(days, metric, range, todayString) {
+  const activity = el("div", "activity-wall insight-wall");
+  const months = el("div", "wall-months");
+  const body = el("div", "wall-body");
+  const weekdays = el("div", "wall-weekdays");
+  const wall = el("div", "wall");
+  const bounds = insightRangeBounds(range, todayString);
+  const start = new Date(bounds.lower);
+  if (!bounds.compact) start.setUTCDate(start.getUTCDate() - start.getUTCDay());
+  const columnCount = Math.ceil(((bounds.upper - start) / 86400000 + 1) / bounds.rows);
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let lastMonth = -1;
+  let lastYear = -1;
+  activity.classList.toggle("compact-wall", bounds.compact);
+  months.style.gridTemplateColumns = `repeat(${columnCount}, var(--wall-cell))`;
+  weekdays.style.gridTemplateRows = `repeat(${bounds.rows}, var(--wall-cell))`;
+  wall.style.gridTemplateRows = `repeat(${bounds.rows}, var(--wall-cell))`;
+
+  for (let column = 0; column < columnCount; column += 1) {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + column * bounds.rows);
+    if (bounds.compact) {
+      if (date <= bounds.upper && (column === 0 || date.getUTCFullYear() !== lastYear)) {
+        const label = document.createElement("span");
+        label.textContent = String(date.getUTCFullYear());
+        label.style.gridColumn = String(column + 1);
+        months.appendChild(label);
+        lastYear = date.getUTCFullYear();
+      }
+    } else if (date.getUTCMonth() !== lastMonth) {
+      const label = document.createElement("span");
+      label.textContent = monthNames[date.getUTCMonth()];
+      label.style.gridColumn = String(column + 1);
+      months.appendChild(label);
+      lastMonth = date.getUTCMonth();
+    }
+  }
+  const weekdayLabels = bounds.compact
+    ? Array.from({ length: bounds.rows }, (_, index) => ({ 0: "1", 6: "7", 13: "14", 20: "21", 27: "28" }[index] || ""))
+    : ["", "Mon", "", "Wed", "", "Fri", ""];
+  for (const text of weekdayLabels) {
+    const label = document.createElement("span");
+    label.textContent = text;
+    weekdays.appendChild(label);
+  }
+  for (let index = 0; index < columnCount * bounds.rows; index += 1) {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + index);
+    const dateKey = toDateKey(date);
+    const value = Number(days?.[dateKey]?.[metric] || 0);
+    const cell = el("div", `day-cell level-${levelFor(value)}`);
+    if (date < bounds.lower || date > bounds.visibleUpper) cell.style.visibility = "hidden";
+    cell.title = `${dateKey}：${value}`;
+    wall.appendChild(cell);
+  }
+  body.append(weekdays, wall);
+  activity.append(months, body);
+  return activity;
+}
+
+function renderInsightDifficulty(data) {
+  const section = el("section", "insight-section");
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  title.textContent = "难度分布";
+  head.appendChild(title);
+  section.appendChild(head);
+  const selected = (data.difficulty || []).filter((item) => state.insightPlatform === "all" || item.platform === state.insightPlatform);
+  if (!selected.length) {
+    section.appendChild(battleEmpty("当前范围没有可靠的难度数据"));
+    return section;
+  }
+  const grid = el("div", "difficulty-grid");
+  for (const item of selected) {
+    const chart = el("article", "difficulty-chart");
+    const chartHead = el("div", "difficulty-chart-head");
+    const name = document.createElement("strong");
+    const total = document.createElement("span");
+    name.textContent = item.platformLabel;
+    total.textContent = `${item.total} 题`;
+    chartHead.append(name, total);
+    const rows = el("div", "difficulty-bars");
+    const maximum = Math.max(1, ...item.buckets.map((bucket) => bucket.count));
+    for (const bucket of item.buckets) {
+      const row = el("div", "difficulty-row");
+      const label = document.createElement("span");
+      const track = el("div", "difficulty-track");
+      const bar = el("i", "difficulty-bar");
+      const count = document.createElement("b");
+      label.textContent = bucket.label;
+      bar.style.width = `${Math.max(2, (bucket.count / maximum) * 100)}%`;
+      count.textContent = bucket.count;
+      track.appendChild(bar);
+      row.append(label, track, count);
+      rows.appendChild(row);
+    }
+    chart.append(chartHead, rows);
+    grid.appendChild(chart);
+  }
+  section.appendChild(grid);
+  return section;
+}
+
+function insightSvgElement(name, attributes = {}) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, String(value));
+  return node;
+}
+
+function renderInsightRatings(data) {
+  const section = el("section", "insight-section");
+  const head = el("div", "section-head");
+  const title = document.createElement("h3");
+  title.textContent = "Rating 历史";
+  head.appendChild(title);
+  section.appendChild(head);
+  const series = (data.ratings || []).filter((item) => state.insightPlatform === "all" || item.platform === state.insightPlatform);
+  if (!series.length) {
+    section.appendChild(battleEmpty("当前成员没有可用的官方 Rating 历史"));
+    return section;
+  }
+  const grid = el("div", "rating-grid");
+  for (const item of series) grid.appendChild(renderInsightRatingSeries(item));
+  section.appendChild(grid);
+  return section;
+}
+
+function renderInsightRatingSeries(series) {
+  const article = el("article", "rating-series");
+  const head = el("div", "rating-series-head");
+  const identity = document.createElement("div");
+  const name = document.createElement("strong");
+  const account = document.createElement("span");
+  name.textContent = `${series.platformLabel} · ${series.memberName}`;
+  account.textContent = series.handle;
+  identity.append(name, account);
+  const points = series.points || [];
+  const current = points.at(-1)?.newRating || 0;
+  const peak = Math.max(...points.map((point) => point.newRating));
+  const summary = document.createElement("div");
+  summary.innerHTML = `<span>当前 <b>${current}</b></span><span>最高 <b>${peak}</b></span>`;
+  head.append(identity, summary);
+
+  const wrap = el("div", "rating-chart");
+  const svg = insightSvgElement("svg", { viewBox: "0 0 720 190", preserveAspectRatio: "none", role: "img" });
+  const ratings = points.map((point) => Number(point.newRating));
+  const minimum = Math.floor((Math.min(...ratings) - 50) / 100) * 100;
+  const maximum = Math.ceil((Math.max(...ratings) + 50) / 100) * 100;
+  const spread = Math.max(100, maximum - minimum);
+  const x = (index) => 20 + (points.length <= 1 ? 340 : (index / (points.length - 1)) * 680);
+  const y = (rating) => 16 + ((maximum - rating) / spread) * 150;
+  for (let index = 0; index < 4; index += 1) {
+    const lineY = 16 + index * 50;
+    svg.appendChild(insightSvgElement("line", { x1: 20, x2: 700, y1: lineY, y2: lineY, class: "rating-grid-line" }));
+  }
+  svg.appendChild(insightSvgElement("polyline", {
+    points: points.map((point, index) => `${x(index)},${y(point.newRating)}`).join(" "),
+    class: "rating-line",
+  }));
+  points.forEach((point, index) => {
+    const circle = insightSvgElement("circle", { cx: x(index), cy: y(point.newRating), r: 4, class: "rating-point" });
+    const title = insightSvgElement("title");
+    title.textContent = `${point.contestName} · ${point.newRating}${point.delta == null ? "" : ` (${point.delta >= 0 ? "+" : ""}${point.delta})`}`;
+    circle.appendChild(title);
+    if (point.url) {
+      circle.classList.add("linked");
+      circle.addEventListener("click", () => window.open(point.url, "_blank", "noopener"));
+    }
+    svg.appendChild(circle);
+  });
+  wrap.appendChild(svg);
+  const dates = el("div", "rating-chart-dates");
+  dates.innerHTML = `<span>${points[0]?.participatedDate || ""}</span><span>${points.at(-1)?.participatedDate || ""}</span>`;
+  wrap.appendChild(dates);
+  article.append(head, wrap);
+  return article;
+}
+
+function selectedInsightExportData() {
+  const data = state.insights;
+  if (!data) return null;
+  const days = data.daily?.[state.insightPlatform] || {};
+  const summary = data.summaries?.[state.insightPlatform] || { careerSolved: 0 };
+  const rangeStats = insightRangeStats(days, state.insightMetric, state.insightRange, data.today);
+  const difficulty = (data.difficulty || []).find((item) => state.insightPlatform === "all" || item.platform === state.insightPlatform);
+  const rating = (data.ratings || []).find((item) => state.insightPlatform === "all" || item.platform === state.insightPlatform);
+  const memberLabel = state.insightMemberKey === "all"
+    ? "全队"
+    : data.members?.find((item) => item.key === state.insightMemberKey)?.displayName || "成员";
+  const platformLabel = state.insightPlatform === "all"
+    ? "全部平台"
+    : data.platforms?.find((item) => item.key === state.insightPlatform)?.label || state.insightPlatform;
+  const metricLabel = data.metricMeta?.find((item) => item.key === state.insightMetric)?.label || state.insightMetric;
+  return { data, days, summary, rangeStats, difficulty, rating, memberLabel, platformLabel, metricLabel };
+}
+
+function buildInsightExportSvg() {
+  const snapshot = selectedInsightExportData();
+  if (!snapshot) return "";
+  const { data, days, summary, rangeStats, difficulty, rating, memberLabel, platformLabel, metricLabel } = snapshot;
+  const width = 1600;
+  const height = 1060;
+  const cells = [];
+  const end = parseUtcDate(data.today);
+  const start = new Date(end);
+  start.setUTCDate(start.getUTCDate() - 364 - start.getUTCDay());
+  for (let index = 0; index < 371; index += 1) {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + index);
+    const value = Number(days?.[toDateKey(date)]?.[state.insightMetric] || 0);
+    const palette = ["#edf2ea", "#bff0cf", "#72d995", "#2eae61", "#157a42"];
+    cells.push(`<rect x="${62 + Math.floor(index / 7) * 25}" y="${330 + (index % 7) * 25}" width="19" height="19" rx="2" fill="${palette[levelFor(value)]}"/>`);
+  }
+  const cards = [
+    [summary.careerSolved || 0, "生涯解题"],
+    [rangeStats.total, metricLabel],
+    [rangeStats.activeDays, "活跃天数"],
+    [rangeStats.longestStreak, "最长连续"],
+    [rangeStats.currentStreak, "当前连续"],
+    [rangeStats.peakCount, "单日峰值"],
+  ].map(([value, label], index) => {
+    const x = 60 + index * 246;
+    return `<rect x="${x}" y="150" width="222" height="112" rx="8" fill="#f6f7f2" stroke="#d9dfd7"/><text x="${x + 18}" y="200" font-size="34" font-weight="700" fill="#1b2320">${escapeHtml(value)}</text><text x="${x + 18}" y="232" font-size="17" fill="#66736d">${escapeHtml(label)}</text>`;
+  }).join("");
+  const difficultyRows = (difficulty?.buckets || []).slice(0, 12);
+  const difficultyMax = Math.max(1, ...difficultyRows.map((item) => item.count));
+  const difficultySvg = difficultyRows.map((item, index) => {
+    const y = 602 + index * 29;
+    const barWidth = (item.count / difficultyMax) * 500;
+    return `<text x="62" y="${y + 15}" font-size="15" fill="#66736d">${escapeHtml(item.label)}</text><rect x="190" y="${y}" width="500" height="18" rx="3" fill="#edf2ea"/><rect x="190" y="${y}" width="${barWidth}" height="18" rx="3" fill="#2563eb"/><text x="704" y="${y + 15}" font-size="15" fill="#1b2320">${item.count}</text>`;
+  }).join("");
+  const ratingPoints = rating?.points || [];
+  const ratingValues = ratingPoints.map((item) => Number(item.newRating));
+  const ratingMin = ratingValues.length ? Math.min(...ratingValues) - 50 : 0;
+  const ratingMax = ratingValues.length ? Math.max(...ratingValues) + 50 : 100;
+  const ratingSpread = Math.max(100, ratingMax - ratingMin);
+  const ratingPolyline = ratingPoints.map((item, index) => {
+    const x = 840 + (ratingPoints.length <= 1 ? 320 : (index / (ratingPoints.length - 1)) * 650);
+    const y = 650 + ((ratingMax - item.newRating) / ratingSpread) * 260;
+    return `${x},${y}`;
+  }).join(" ");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <rect width="1600" height="1060" fill="#ffffff"/>
+    <text x="60" y="70" font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="38" font-weight="700" fill="#1b2320">OJ 训练洞察</text>
+    <text x="60" y="112" font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="20" fill="#66736d">${escapeHtml(memberLabel)} · ${escapeHtml(platformLabel)} · ${escapeHtml(data.today)}</text>
+    <g font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">${cards}
+    <text x="60" y="304" font-size="22" font-weight="700" fill="#1b2320">${escapeHtml(metricLabel)} · 近 365 天</text>${cells.join("")}
+    <text x="60" y="560" font-size="22" font-weight="700" fill="#1b2320">难度分布${difficulty ? ` · ${escapeHtml(difficulty.platformLabel)}` : ""}</text>
+    ${difficultySvg || '<text x="60" y="610" font-size="17" fill="#66736d">暂无难度数据</text>'}
+    <text x="820" y="560" font-size="22" font-weight="700" fill="#1b2320">Rating 历史${rating ? ` · ${escapeHtml(rating.platformLabel)} / ${escapeHtml(rating.handle)}` : ""}</text>
+    <rect x="820" y="600" width="700" height="340" rx="8" fill="#f8faf7" stroke="#d9dfd7"/>
+    ${ratingPolyline ? `<polyline points="${ratingPolyline}" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>` : '<text x="860" y="680" font-size="17" fill="#66736d">暂无 Rating 数据</text>'}
+    <text x="60" y="1010" font-size="15" fill="#66736d">OJ Submission Wall · ${escapeHtml(metricLabel)}</text></g>
+  </svg>`;
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function exportInsightsImage() {
+  const svgText = buildInsightExportSvg();
+  if (!svgText) return;
+  const format = $("#insightExportFormat").value;
+  const filename = `oj-insight-${state.insightMemberKey === "all" ? "team" : "member"}-${state.insightPlatform}`;
+  if (format === "svg") {
+    downloadBlob(new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }), `${filename}.svg`);
+    showMessage("SVG 图片已导出。");
+    return;
+  }
+  const source = URL.createObjectURL(new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }));
+  try {
+    const image = new Image();
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = source;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = 1600;
+    canvas.height = 1060;
+    const context = canvas.getContext("2d");
+    context.drawImage(image, 0, 0);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("浏览器无法生成 PNG");
+    downloadBlob(blob, `${filename}.png`);
+    showMessage("PNG 图片已导出。");
+  } catch (error) {
+    showMessage(error.message || "图片导出失败", "error");
+  } finally {
+    URL.revokeObjectURL(source);
+  }
+}
+
 function renderMainView() {
-  const battleActive = state.mainView === "battle";
-  $("#overviewTab").classList.toggle("active", !battleActive);
-  $("#overviewTab").setAttribute("aria-selected", battleActive ? "false" : "true");
-  $("#overviewTab").tabIndex = battleActive ? -1 : 0;
-  $("#battleTab").classList.toggle("active", battleActive);
-  $("#battleTab").setAttribute("aria-selected", battleActive ? "true" : "false");
-  $("#battleTab").tabIndex = battleActive ? 0 : -1;
-  $("#overviewView").classList.toggle("hidden", battleActive);
-  $("#battleView").classList.toggle("hidden", !battleActive);
-  $("#feedPanel").classList.toggle("hidden", battleActive);
-  if (battleActive) {
+  const activeView = ["overview", "insights", "battle"].includes(state.mainView) ? state.mainView : "overview";
+  for (const view of ["overview", "insights", "battle"]) {
+    const active = activeView === view;
+    $(`#${view}Tab`).classList.toggle("active", active);
+    $(`#${view}Tab`).setAttribute("aria-selected", active ? "true" : "false");
+    $(`#${view}Tab`).tabIndex = active ? 0 : -1;
+    $(`#${view}View`).classList.toggle("hidden", !active);
+  }
+  $("#feedPanel").classList.toggle("hidden", activeView !== "overview");
+  if (activeView === "battle") {
     renderBattleControls();
     renderBattleContent();
+  } else if (activeView === "insights") {
+    renderInsightsView();
+    if (!state.insights && !state.insightLoading) loadInsights();
   }
 }
 
 function switchMainView(view) {
-  state.mainView = view === "battle" ? "battle" : "overview";
+  state.mainView = ["overview", "insights", "battle"].includes(view) ? view : "overview";
   clearMessage();
   renderMainView();
   if (state.mainView === "battle" && state.battleMode === "duel" && state.battleLeftKey && state.battleRightKey) {
     loadBattle();
+  } else if (state.mainView === "insights" && !state.insights && !state.insightLoading) {
+    loadInsights();
   }
 }
 
@@ -2664,14 +3184,35 @@ async function retryHandle(id) {
 
 function bindEvents() {
   $("#overviewTab").addEventListener("click", () => switchMainView("overview"));
+  $("#insightsTab").addEventListener("click", () => switchMainView("insights"));
   $("#battleTab").addEventListener("click", () => switchMainView("battle"));
   $(".main-view-tabs").addEventListener("keydown", (event) => {
     if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
     event.preventDefault();
-    const nextView = state.mainView === "overview" ? "battle" : "overview";
+    const views = ["overview", "insights", "battle"];
+    const direction = event.key === "ArrowRight" ? 1 : -1;
+    const nextView = views[(views.indexOf(state.mainView) + direction + views.length) % views.length];
     switchMainView(nextView);
     $(`#${nextView}Tab`).focus();
   });
+  $("#insightMemberSelect").addEventListener("change", (event) => {
+    state.insightMemberKey = event.currentTarget.value || "all";
+    state.insights = null;
+    loadInsights();
+  });
+  $("#insightPlatformSelect").addEventListener("change", (event) => {
+    state.insightPlatform = event.currentTarget.value || "all";
+    renderInsightsView();
+  });
+  $("#insightMetricSelect").addEventListener("change", (event) => {
+    state.insightMetric = event.currentTarget.value || "firstAc";
+    renderInsightsView();
+  });
+  $("#insightRangeSelect").addEventListener("change", (event) => {
+    state.insightRange = event.currentTarget.value || "365";
+    renderInsightsView();
+  });
+  $("#insightExportBtn").addEventListener("click", exportInsightsImage);
   $("#battleLeftSelect").addEventListener("change", (event) => selectBattlePlayer("left", event.currentTarget.value));
   $("#battleRightSelect").addEventListener("change", (event) => selectBattlePlayer("right", event.currentTarget.value));
   $("#battleSwapBtn").addEventListener("click", swapBattlePlayers);

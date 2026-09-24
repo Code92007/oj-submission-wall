@@ -10,9 +10,11 @@ OJ Submission Wall 是一个给算法训练队、社团或小团队使用的做�
 
 - 支持游客模式和用户名密码注册，注册不需要邮箱验证。
 - 支持成员昵称、真实姓名、分组管理和成员详情页。
-- 支持绑定 Codeforces、AtCoder、牛客、洛谷、VJudge、LOJ、QOJ。
+- 支持绑定 Codeforces、AtCoder、牛客、洛谷、VJudge、LOJ、LeetCode（国际站与中国站）。
 - 支持按年或近 10 年查看训练绿墙。
 - 支持最新提交列表、平台/用户/语言/状态/时间范围筛选和分页。
+- 支持 First AC、Unique AC、AC Submissions、Platform Activity 四种统计口径。
+- 支持按成员和平台查看难度分布、官方 Rating 历史，并导出 PNG / SVG 图片。
 - 支持比赛统计，按平台和常见比赛类型聚合。
 - 支持 2–5 人循环排名、3v3 队伍对战和双人详细对战；统一按共同比赛名次统计胜负和比赛内做题速度。双人指数优先采用官方 Rating 变化，无 Rating 时使用名次百分位，并结合相对胜负；同队成绩不进入指数曲线；Codeforces VP/场外参赛会换算等价名次，赛后补题不参与比较。
 - 支持本地 SQLite 持久化和 HTTP 缓存，平台接口临时失败时保留上次成功数据。
@@ -40,6 +42,7 @@ docker compose up -d --build
 ## 自部署
 
 推荐生产环境放在 Nginx 或 Caddy 后面，并使用 HTTPS。
+可直接照着 [生产服务器部署清单](deploy/production.md) 操作；下面是配置要点。
 
 1. 准备域名解析
 
@@ -93,6 +96,8 @@ git pull --ff-only
 docker compose up -d --build
 ```
 
+升级到包含“训练洞察”的版本后，建议每个成员点击一次“刷新同步”，开始拉取 LeetCode 的公开统计；AtCoder 后续同步的记录会自动带入难度元数据。
+
 ## 账号绑定格式
 
 - Codeforces：填写 handle，例如 `tourist`。
@@ -101,7 +106,10 @@ docker compose up -d --build
 - 洛谷：填写用户名、数字 UID 或用户主页链接。
 - VJudge：填写 VJudge 用户名。
 - LOJ：填写 LOJ 用户名。
-- QOJ：填写 QOJ 用户名。QOJ 有 Cloudflare 校验，默认不会要求用户提供登录态，未配置时会提示无法精确同步。
+- LeetCode 国际站：填写 `/u/` 后的用户名或个人主页链接。
+- LeetCode 中国站：填写 `cn:用户名` 或 `leetcode.cn` 个人主页链接。
+
+LeetCode 公开接口只提供完整活动日历、题量/难度汇总和近期 AC，不提供完整逐题历史。训练洞察会把这些数据分别标为 `Platform Activity` 和可验证的近期 AC，不会拼成虚假的完整提交历史。
 
 ## 环境变量
 
@@ -143,7 +151,6 @@ docker compose up -d --build
 | `LUOGU_RECORD_SLEEP_MIN_SECONDS` | `0.4` | 洛谷记录页分页请求的最小间隔秒数 |
 | `LUOGU_RECORD_SLEEP_MAX_SECONDS` | `1.4` | 洛谷记录页分页请求的最大间隔秒数 |
 | `LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS` | `7200` | 洛谷 `record/list` 增量同步的秒级重叠窗口，默认继承通用增量窗口 |
-| `QOJ_COOKIE` | 空 | QOJ 管理员侧专用 Cookie；公开部署不建议收集用户登录态 |
 
 ## 洛谷海外访问
 
@@ -179,7 +186,7 @@ docker compose exec -T oj-submission-wall python app.py luogu-backfill \
 - 牛客从公开竞赛个人页和参赛历史接口同步提交与比赛。
 - VJudge 使用公开 `solveDetail2` 和 `status/data`。
 - LOJ 使用公开 `submission/querySubmission` API。
-- QOJ 受 Cloudflare 影响，未配置管理员侧专用 Cookie 时只给出明确提示。
+- LeetCode 使用公开 GraphQL 接口；国际站同步活动、题量、难度、近期 AC 和比赛 Rating，中国站同步公开可用的活动、题量、难度和近期 AC。
 
 如果平台接口改版、风控或临时不可用，系统会保留上次成功同步的数据。前端会先显示浏览器里的上次概览，再后台刷新最新数据，避免打开页面时闪成空列表。
 
