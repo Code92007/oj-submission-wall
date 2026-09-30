@@ -2405,13 +2405,54 @@ class LuoguAdapter(OJAdapter):
 class NowcoderAdapter(OJAdapter):
     key = "nowcoder"
     label = "牛客"
-    handle_hint = "牛客竞赛个人 ID；可追加团队 ID，例如 2959795+307927467"
+    handle_hint = "牛客个人或团队 profile ID / 链接；绑定后可发现关联团队"
 
     def normalize_handle(self, handle: str) -> str:
         ids = self._extract_ids(handle)
         if not ids:
             raise ValueError("牛客请填写竞赛个人页数字 ID、团队 ID 或 profile/team 链接")
         return "+".join(ids)
+
+    def fetch_profile_stats(self, handle: str, submissions: list[dict]) -> dict:
+        histories = {}
+        for profile_id in self._extract_ids(handle):
+            data = http_get_json(
+                f"https://ac.nowcoder.com/acm/contest/rating-history?uid={profile_id}",
+                headers=self._headers(f"https://ac.nowcoder.com/acm/contest/profile/{profile_id}"),
+            )
+            if data.get("code") != 0 or not isinstance(data.get("data"), list):
+                raise RuntimeError("牛客 Rating 历史获取失败")
+            histories[profile_id] = data["data"]
+        return {"nowcoderRatingHistories": histories}
+
+    @classmethod
+    def discover_teams(cls, handle: str) -> list[dict]:
+        user_id = cls._extract_ids(handle)[0]
+        teams = {}
+        page = 1
+        while True:
+            params = urllib.parse.urlencode({"uid": user_id, "page": page, "pageSize": 100})
+            data = http_get_json(
+                f"https://ac.nowcoder.com/acm/contest/profile/user-team-list?{params}",
+                headers=cls._headers(f"https://ac.nowcoder.com/acm/contest/profile/{user_id}/join-index"),
+                cache_ttl_seconds=300,
+            )
+            if data.get("code") != 0 or not isinstance(data.get("data"), dict):
+                raise RuntimeError("牛客关联团队查询失败，请稍后重试")
+            payload = data["data"]
+            for item in payload.get("dataList") or []:
+                profile_id = str(item.get("uid") or item.get("teamId") or "")
+                if not profile_id.isdigit() or profile_id == user_id:
+                    continue
+                teams[profile_id] = {
+                    "id": profile_id,
+                    "name": str(item.get("name") or item.get("nickname") or profile_id),
+                    "url": f"https://ac.nowcoder.com/acm/contest/profile/{profile_id}",
+                }
+            if page >= int((payload.get("pageInfo") or {}).get("pageCount") or 1):
+                break
+            page += 1
+        return list(teams.values())
 
     def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
         submissions = []
@@ -2561,14 +2602,7 @@ class NowcoderAdapter(OJAdapter):
 
     @classmethod
     def _submission_source_ids(cls, handle: str) -> list[str]:
-        ids = cls._extract_ids(handle)
-        if not ids:
-            return []
-        primary_id = ids[0]
-        for team_id in cls._discover_team_ids(primary_id):
-            if team_id not in ids:
-                ids.append(team_id)
-        return ids[:8]
+        return cls._extract_ids(handle)
 
     @staticmethod
     def _headers(referer: str) -> dict[str, str]:
@@ -5224,6 +5258,39 @@ def build_insights(principal: dict | None, member_key: str = "all") -> dict:
             order_by="participated_at, id",
         )
         rating_groups: dict[tuple[str, str, str, str], dict] = {}
+        for row in handle_rows:
+            if row["platform"] != "nowcoder":
+                continue
+            stats = {}
+            with contextlib.suppress(ValueError, TypeError):
+                stats = json.loads(row["stats_json"] or "{}")
+            histories = stats.get("nowcoderRatingHistories", {}) if isinstance(stats, dict) else {}
+            for profile_id in NowcoderAdapter._extract_ids(row["handle"]):
+                owner_key = f"{row['owner_type']}:{row['owner_id']}"
+                key = (str(row["owner_type"]), str(row["owner_id"]), "nowcoder", profile_id)
+                group = rating_groups.setdefault(key, {
+                    "platform": "nowcoder", "platformLabel": "牛客",
+                    "memberKey": owner_key,
+                    "memberName": owners.get(owner_key, {}).get("displayName") or owner_key,
+                    "handle": profile_id, "points": [],
+                })
+                if group["points"]:
+                    continue
+                for item in sorted(histories.get(profile_id, []), key=lambda item: item.get("time", 0)):
+                    timestamp = battle_epoch_seconds(item.get("time"))
+                    rating = battle_optional_int(item.get("rating"))
+                    delta = battle_optional_int(item.get("changeValue"))
+                    if not timestamp or rating is None:
+                        continue
+                    group["points"].append({
+                        "contestId": str(item.get("contestId") or ""),
+                        "contestName": item.get("contestName") or "牛客比赛",
+                        "participatedAt": iso_from_ts(timestamp),
+                        "participatedDate": utc_date_from_ts(timestamp),
+                        "oldRating": rating - delta if delta is not None else None,
+                        "newRating": rating, "delta": delta, "rank": item.get("rank"),
+                        "url": f"https://ac.nowcoder.com/acm/contest/{item.get('contestId', '')}",
+                    })
         for row in contest_rows:
             handle_key = (
                 str(row["owner_type"]),
@@ -5232,6 +5299,8 @@ def build_insights(principal: dict | None, member_key: str = "all") -> dict:
                 str(row["handle"]),
             )
             if handle_key not in active_handles:
+                continue
+            if row["platform"] == "nowcoder":
                 continue
             result = battle_contest_result(row)
             if result["ratingAfter"] is None:
@@ -6084,6 +6153,22 @@ class AppHandler(BaseHTTPRequestHandler):
                         return self.send_json(200, {"ok": True, **cached})
                     raise
                 return self.send_json(200, {"ok": True, **overview})
+            if path == "/api/nowcoder/teams":
+                principal = get_current_principal(self)
+                if not principal:
+                    return self.send_error_json(401, "请先登录或进入游客模式")
+                params = urllib.parse.parse_qs(parsed.query)
+                handle = ADAPTERS["nowcoder"].normalize_handle(params.get("handle", [""])[0])
+                teams = NowcoderAdapter.discover_teams(handle)
+                with connect_db() as conn:
+                    bound = {row["handle"] for row in conn.execute(
+                        "SELECT handle FROM handles WHERE owner_type = ? AND owner_id = ? AND platform = 'nowcoder' AND active = 1",
+                        (principal["type"], str(principal["id"])),
+                    )}
+                bound_ids = {value for handle in bound for value in NowcoderAdapter._extract_ids(handle)}
+                for team in teams:
+                    team["bound"] = team["id"] in bound_ids
+                return self.send_json(200, {"ok": True, "teams": teams})
             if path == "/api/insights":
                 params = urllib.parse.parse_qs(parsed.query)
                 member_key = str(params.get("member", ["all"])[0] or "all")

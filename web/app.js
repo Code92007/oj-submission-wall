@@ -3078,6 +3078,59 @@ async function submitProfile(event) {
   }
 }
 
+async function discoverNowcoderTeams(handle) {
+  const container = $("#nowcoderTeams");
+  container.replaceChildren();
+  const status = el("p");
+  status.textContent = "正在查找关联团队…";
+  container.append(status);
+  try {
+    const data = await api(`/api/nowcoder/teams?handle=${encodeURIComponent(handle)}`);
+    status.textContent = data.teams.length ? "关联团队（各自独立显示 Rating），勾选后添加：" : "没有查到关联团队。";
+    const choices = [];
+    for (const team of data.teams) {
+      const label = el("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.disabled = team.bound;
+      checkbox.checked = !team.bound;
+      const link = document.createElement("a");
+      link.href = team.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = `${team.name} · ${team.id}${team.bound ? "（已绑定）" : ""}`;
+      label.append(checkbox, link);
+      container.append(label);
+      choices.push({ checkbox, team });
+    }
+    if (!choices.some(({ team }) => !team.bound)) return;
+    const button = el("button", "button primary full");
+    button.type = "button";
+    button.textContent = "添加选中的团队";
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      try {
+        for (const { checkbox, team } of choices) {
+          if (!checkbox.checked || checkbox.disabled) continue;
+          const result = await api("/api/handles", { method: "POST", body: { platform: "nowcoder", handle: team.id } });
+          checkbox.disabled = true;
+          checkbox.checked = false;
+          applyOverviewData(result);
+        }
+        showMessage("选中的团队已绑定，已加入后台同步队列。");
+        scheduleOverviewPoll();
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
+    });
+    container.append(button);
+  } catch (error) {
+    status.textContent = `关联团队查询失败：${error.message}。可点击“查找牛客关联团队”重试。`;
+  }
+}
+
 async function submitHandle(event) {
   event.preventDefault();
   clearMessage();
@@ -3106,6 +3159,7 @@ async function submitHandle(event) {
     applyOverviewData(data);
     showMessage("绑定已保存，已加入后台同步队列。");
     scheduleOverviewPoll();
+    if (form.get("platform") === "nowcoder") await discoverNowcoderTeams(form.get("handle"));
   } catch (error) {
     showMessage(error.message, "error");
   } finally {
@@ -3254,6 +3308,14 @@ function bindEvents() {
   $("#registerForm").addEventListener("submit", submitRegister);
   $("#profileForm").addEventListener("submit", submitProfile);
   $("#handleForm").addEventListener("submit", submitHandle);
+  $("#discoverNowcoderTeams").addEventListener("click", () => {
+    const handle = $("#handleInput").value.trim();
+    if (!handle) {
+      showMessage("请在账号框填入牛客个人 ID 或 profile 链接，再查找关联团队。", "error");
+      return;
+    }
+    discoverNowcoderTeams(handle);
+  });
   $("#platformSelect").addEventListener("change", updateHandleHint);
   $("#refreshBtn").addEventListener("click", refreshSync);
   $("#logoutBtn").addEventListener("click", logout);

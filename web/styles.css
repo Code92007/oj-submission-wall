@@ -2893,3 +2893,18 @@ select:focus {
     font-size: 12px;
   }
 }
+
+#nowcoderTeams label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#nowcoderTeams input[type="checkbox"] {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+#nowcoderTeams a {
+  overflow-wrap: anywhere;
+}

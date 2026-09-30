@@ -165,6 +165,47 @@ class InsightsTest(unittest.TestCase):
         self.assertEqual(difficulty["leetcode"]["total"], 100)
         self.assertEqual(result["ratings"][0]["points"][0]["newRating"], 1450)
 
+    def test_nowcoder_uses_profile_history_and_separates_legacy_combined_handles(self):
+        histories = {
+            "660700529": [{"contestId": 1, "rating": 2013, "changeValue": 22, "time": self.now * 1000}],
+            "778088490": [{"contestId": 1, "rating": 1974, "changeValue": -10, "time": self.now * 1000}],
+        }
+        with app.connect_db() as conn:
+            conn.execute(
+                "INSERT INTO handles(owner_type, owner_id, platform, handle, active, created_at, stats_json) VALUES('user', '1', 'nowcoder', ?, 1, ?, ?)",
+                ("660700529+778088490", self.now, json.dumps({"nowcoderRatingHistories": histories})),
+            )
+            conn.execute(
+                "INSERT INTO contests(owner_type, owner_id, platform, handle, remote_id, contest_name, category, participated_at, url, raw_json, created_at) VALUES('user', '1', 'nowcoder', ?, '2', 'Unrated team contest', 'nowcoder.other', ?, '', ?, ?)",
+                ("660700529+778088490", self.now, json.dumps({"rating": 1000, "teamId": "778088490"}), self.now),
+            )
+        ratings = [item for item in app.build_insights(None, "user:1")["ratings"] if item["platform"] == "nowcoder"]
+        self.assertEqual({item["handle"]: [point["newRating"] for point in item["points"]] for item in ratings},
+                         {"660700529": [2013], "778088490": [1974]})
+
+    def test_nowcoder_does_not_silently_include_teams(self):
+        with mock.patch.object(app.NowcoderAdapter, "_discover_team_ids", return_value=["778088490"]) as discover:
+            self.assertEqual(app.NowcoderAdapter._submission_source_ids("660700529"), ["660700529"])
+            discover.assert_not_called()
+
+    def test_nowcoder_discovery_paginates_and_uses_profile_uid(self):
+        pages = [
+            {"code": 0, "data": {"dataList": [{"uid": 778088490, "teamId": 123, "name": "Team B"}], "pageInfo": {"pageCount": 2}}},
+            {"code": 0, "data": {"dataList": [{"uid": 883394194, "teamId": 456, "name": "Team C"}], "pageInfo": {"pageCount": 2}}},
+        ]
+        with mock.patch.object(app, "http_get_json", side_effect=pages) as get:
+            teams = app.NowcoderAdapter.discover_teams("660700529")
+        self.assertEqual([team["id"] for team in teams], ["778088490", "883394194"])
+        self.assertIn("page=2", get.call_args_list[1].args[0])
+        self.assertTrue(teams[0]["url"].endswith("/778088490"))
+
+    def test_nowcoder_fetches_exact_official_history(self):
+        payload = [{"rating": 2013, "contestId": 120566, "time": self.now * 1000}]
+        with mock.patch.object(app, "http_get_json", return_value={"code": 0, "data": payload}) as get:
+            stats = app.NowcoderAdapter().fetch_profile_stats("660700529", [])
+        self.assertEqual(stats["nowcoderRatingHistories"]["660700529"], payload)
+        self.assertIn("rating-history?uid=660700529", get.call_args.args[0])
+
     def test_leetcode_adapter_parses_public_profile_without_cookie(self):
         current_year = dt.datetime.now(dt.timezone.utc).year
         calendar = json.dumps({str(self.now - 86400): 2})

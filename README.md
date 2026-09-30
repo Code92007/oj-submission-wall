@@ -102,7 +102,7 @@ docker compose up -d --build
 
 - Codeforces：填写 handle，例如 `tourist`。
 - AtCoder：填写用户名，例如 `tourist`。
-- 牛客：填写竞赛个人页数字 ID，例如 `https://ac.nowcoder.com/acm/contest/profile/123456` 里的 `123456`。
+- 牛客：填写个人或团队 profile 数字 ID / 链接。绑定个人账号后会查询关联团队，可勾选全部或部分作为独立账号添加；也可在账号框输入个人 ID 后点击“查找牛客关联团队”。
 - 洛谷：填写用户名、数字 UID 或用户主页链接。
 - VJudge：填写 VJudge 用户名。
 - LOJ：填写 LOJ 用户名。
@@ -183,7 +183,7 @@ docker compose exec -T oj-submission-wall python app.py luogu-backfill \
 - Codeforces 使用官方 `user.status` API，并分页拉取历史提交；比赛统计使用 `contest.list` 的主站和 Gym 数据。
 - AtCoder 使用 AtCoder Problems 公开 API；比赛统计使用 AtCoder 官方用户参赛历史 JSON。
 - 洛谷优先读取公开个人页、练习页和 `record/list`，海外出口受限时可使用私有国内代理或第三方公开统计兜底。
-- 牛客从公开竞赛个人页和参赛历史接口同步提交与比赛。
+- 牛客从公开 profile 和参赛历史接口同步提交与比赛；Rating 使用官网 `rating-history`，个人和每个团队独立绘图，不混入未计分比赛。已有绑定需要同步一次以获取新的完整 Rating 历史。
 - VJudge 使用公开 `solveDetail2` 和 `status/data`。
 - LOJ 使用公开 `submission/querySubmission` API。
 - LeetCode 使用公开 GraphQL 接口；国际站同步活动、题量、难度、近期 AC 和比赛 Rating，中国站同步公开可用的活动、题量、难度和近期 AC。
