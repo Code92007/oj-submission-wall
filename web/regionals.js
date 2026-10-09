@@ -6,14 +6,20 @@ async function cpcRequest(path,body){
   const response=await fetch(path,{credentials:'same-origin',cache:'no-store',...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
   const data=await response.json();if(!response.ok)throw new Error(data.error||'请求失败');return data;
 }
+function cpcMembers(){
+  const selected=el('cpcMember').value;
+  const keyword=el('cpcMemberSearch').value.trim().toLocaleLowerCase();
+  const matches=cpcData.members.filter(m=>`${m.name} ${m.school}`.toLocaleLowerCase().includes(keyword));
+  el('cpcMember').innerHTML='<option value="">'+(matches.length?'选择成员':'没有匹配的成员')+'</option>'+matches.map(m=>`<option value="${escapeCpc(m.id)}">${escapeCpc(m.name)} · ${escapeCpc(m.school)}</option>`).join('');
+  el('cpcMember').value=matches.some(m=>m.id===selected)?selected:'';
+  el('cpcMemberCount').textContent=keyword?`找到 ${matches.length} / ${cpcData.members.length} 名成员，请选择对应人员。`:`共 ${cpcData.members.length} 名成员，可输入部分姓名缩小范围。`;
+}
 function cpcRender(){
   const identity=cpcData.identity;
   const statuses={approved:'已认证',pending:'待管理员审核',rejected:'申请已拒绝',revoked:'认证已撤销',unverified:'尚未认证'};
   el('cpcIdentity').textContent=(statuses[identity.status]||identity.status)+(identity.status==='approved'&&identity.verified_until*1000<Date.now()?' · 核验暂时过期，等待恢复同步':'');
   el('cpcClaim').hidden=['approved','pending'].includes(identity.status);
-  const selectedMember=el('cpcMember').value;
-  el('cpcMember').innerHTML='<option value="">选择成员</option>'+cpcData.members.map(m=>`<option value="${escapeCpc(m.id)}">${escapeCpc(m.name)} · ${escapeCpc(m.school)}</option>`).join('');
-  el('cpcMember').value=selectedMember;
+  cpcMembers();
   el('cpcHandles').innerHTML=cpcData.handles.map(h=>`<p>${escapeCpc(h.platform)} · ${escapeCpc(h.handle)} <select data-handle="${h.id}"><option value="personal" ${h.kind==='personal'?'selected':''}>个人</option><option value="team" ${h.kind==='team'?'selected':''}>团队</option></select></p>`).join('');
   cpcWall();
 }
@@ -40,6 +46,7 @@ async function loadCpc(){
 async function cpcRun(fn){try{await fn();}catch(e){el('cpcMessage').textContent=e.message;}}
 document.addEventListener('DOMContentLoaded',()=>{
   cpcRun(loadCpc);
+  el('cpcMemberSearch').oninput=()=>{if(cpcData)cpcMembers();};
   el('cpcYear').onchange=cpcWall;el('cpcTeams').onchange=cpcWall;
   el('cpcClaim').onsubmit=e=>{e.preventDefault();cpcRun(async()=>{await cpcRequest('/api/cpc/claim',{person:el('cpcMember').value,note:el('cpcNote').value});el('cpcMessage').textContent='申请已提交，等待管理员核验。';await loadCpc();});};
   el('cpcRefresh').onclick=()=>cpcRun(async()=>{await cpcRequest('/api/cpc/refresh',{});await loadCpc();el('cpcMessage').textContent='已安排后台更新，稍后自动显示。';});
