@@ -1,6 +1,6 @@
 # OJ Wall 三工程联动说明
 
-2026-10-09 · v4 首版。此文与本工程代码一同提交；后续调整保留 Git 历史，重大协议变更追加版本记录。
+2026-10-09 · v4.1。此文与本工程代码一同提交；后续调整保留 Git 历史，重大协议变更追加版本记录。
 
 ## 职责与统计口径
 
@@ -18,7 +18,7 @@ CPC_DLUT_AUTHORITY_ID=DLUT运行库的发布方UUID
 CPC_SYNC_TOKEN=管理员配置的服务凭据
 ```
 
-同机可用私网地址，跨服务器使用 HTTPS；浏览器写操作要求 Origin 与 `PUBLIC_BASE_URL` 一致。用户登录正式账号后选择成员、填写核验说明；DLUT 管理员核验并批准。一个成员只有一个有效认证主账号，无需给 DLUT 成员新建密码系统。
+同机可用私网地址，跨服务器使用 HTTPS；浏览器写操作要求 Origin 与 `PUBLIC_BASE_URL` 一致。用户登录正式账号后选择成员、填写核验说明；管理员登录 DLUT CPC 的 `/admin`，进入“成员认证”，查看申请账号及核验说明后批准、拒绝或撤销；原 Docker 审核命令继续可用。一个成员只有一个有效认证主账号，无需给 DLUT 成员新建密码系统。
 
 ```sh
 docker compose exec -T oj-submission-wall python tools/cpc_admin.py sync
@@ -81,6 +81,8 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests
 ## 版本记录与相关方案
 
 - 2026-10-09 界面迭代：成员选择增加关键词筛选、匹配人数和无匹配提示；仍由 DLUT CPC 管理员审核认领。
+
+- v4.1 / 2026-10-09：DLUT CPC 增加网页成员认证审核入口，沿用原审批快照；本工程用户可点击“更新认证状态”取得结果。
 
 - v4 / 2026-10-09：首版采用人工核验榜单、本人只读连接码、完整快照及持久 UUID；不新增中心服务或外站运行依赖。
 
