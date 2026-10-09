@@ -20,6 +20,11 @@ function cpcRender(){
   el('cpcIdentity').textContent=(statuses[identity.status]||identity.status)+(identity.status==='approved'&&identity.verified_until*1000<Date.now()?' · 核验暂时过期，等待恢复同步':'');
   el('cpcClaim').hidden=['approved','pending'].includes(identity.status);
   cpcMembers();
+  const job=cpcData.onsite_sync||{status:'waiting',issues:[]};
+  const jobStatus={unverified:'认证通过后自动同步现场成绩',waiting:'等待同步现场成绩',running:'正在同步现场成绩',complete:'现场成绩已同步',partial:'部分现场成绩已同步，其余将重试',error:'现场成绩同步暂未完成，将重试'};
+  el('cpcOnsiteStatus').textContent=(jobStatus[job.status]||'等待同步')+(job.listed!==undefined?` · ${job.imported}/${job.listed} 场`:'');
+  const rows=cpcData.onsite_contests||[];
+  el('cpcOnsiteContests').innerHTML=rows.map(c=>`<p><strong>${escapeCpc(c.name)}</strong> · ${escapeCpc(c.date)} · ${escapeCpc(c.team)}${c.official===false?' · 打星':''}<br>现场 AC ${c.accepted.length} 题：${escapeCpc(c.accepted.join('、')||'暂无')} · <a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">原榜单</a>${c.mapped?'':' · 已保存，题目待映射'}</p>`).join('')+(job.issues||[]).map(i=>`<p>${escapeCpc(i.contest)}：${escapeCpc(i.reason)}</p>`).join('');
   el('cpcHandles').innerHTML=cpcData.handles.map(h=>`<p>${escapeCpc(h.platform)} · ${escapeCpc(h.handle)} <select data-handle="${h.id}"><option value="personal" ${h.kind==='personal'?'selected':''}>个人</option><option value="team" ${h.kind==='team'?'selected':''}>团队</option></select></p>`).join('');
   cpcWall();
 }

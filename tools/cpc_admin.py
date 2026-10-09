@@ -25,7 +25,8 @@ if args.command == 'meta':
     print(service.authority)
 elif args.command == 'sync':
     service.sync()
-    print('已同步名单及认证结果')
+    service.sync_onsite(force=True)
+    print('已同步名单、认证及现场成绩；各账号页面显示逐场同步状态')
 elif args.command == 'rosters':
     with service.db() as db:
         remote, checked = service.remote(db)

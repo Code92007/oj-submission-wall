@@ -9,6 +9,7 @@ import uuid
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
 from cpc_common import connect, uid, digest, fetch, validate_snapshot, catalog
+from cpc_sources import Scoreboards, profile_awards
 
 
 def problem_key(platform, value):
@@ -27,10 +28,13 @@ class Integration:
         self.path = app.DB_PATH
         self.catalog, self.aliases = catalog(os.environ.get('CPC_CATALOG_PATH', app.ROOT / 'catalog/regionals.json'))
         self.contests = {c['id']: c for c in self.catalog['contests']}
+        self.problem_ids = {p['id'] for c in self.contests.values() for p in c['problems']}
         with self.db() as db:
             self.authority = uid(db, 'authority', 'self')
         self.wake = threading.Event()
         self.sync_lock = threading.Lock()
+        self.onsite_lock = threading.Lock()
+        self.force_onsite = threading.Event()
 
     @property
     def configured(self):
@@ -44,6 +48,7 @@ class Integration:
           create table if not exists cpc_handle_kinds(handle_id integer primary key,kind text);
           create table if not exists cpc_onsite(id text primary key,participation text,contest text,body text,active integer);
           create table if not exists cpc_onsite_history(id integer primary key,evidence_id text,body text,created integer);
+          create table if not exists cpc_onsite_sync(person text primary key,body text,checked integer);
         ''')
         return db
 
@@ -94,12 +99,70 @@ class Integration:
             while True:
                 try:
                     self.sync()
+                    force = self.force_onsite.is_set()
+                    self.force_onsite.clear()
+                    self.sync_onsite(force=force)
                 except Exception:
                     # Do not log request bodies, credentials or verification notes.
                     print('CPC sync failed; previous snapshot retained', flush=True)
                 self.wake.wait(300)
                 self.wake.clear()
         threading.Thread(target=worker, daemon=True, name='cpc-roster').start()
+
+    def sync_onsite(self, force=False):
+        """Detection of an approved claim triggers profile-scoped scoreboard import."""
+        with self.onsite_lock:
+            with self.db() as db:
+                remote, checked = self.remote(db)
+            if checked + 86400 < time.time():
+                return
+            people = {m['id']: m for m in remote['roster']['members']}
+            redirects = remote['roster']['redirects']
+            boards = Scoreboards(self.app.DATA_DIR / 'cpc_sources')
+            for claim in remote['claims']:
+                if claim['status'] != 'approved': continue
+                person = claim['person']; visited = set()
+                while person in redirects and person not in visited:
+                    visited.add(person); person = redirects[person]
+                member = people.get(person)
+                if not member: continue
+                with self.db() as db:
+                    old = db.execute('select body,checked from cpc_onsite_sync where person=?',(person,)).fetchone()
+                if old and not force:
+                    previous = json.loads(old['body'])
+                    interval = 86400 if previous['status'] == 'complete' else 300
+                    if old['checked'] + interval > time.time() and old['checked'] >= claim['updated']: continue
+                report = {'status':'running','imported':0,'listed':0,'issues':[]}
+                def save_report():
+                    with self.db() as db:
+                        db.execute('insert or replace into cpc_onsite_sync values (?,?,?)',
+                                   (person,json.dumps(report,ensure_ascii=False),int(time.time())))
+                save_report()
+                try:
+                    participations = [p for p in remote['roster']['participations'] if person in p['members']]
+                    awards = []
+                    if member.get('cpcfinder_id'):
+                        try:
+                            awards = profile_awards(member)
+                        except (OSError,ValueError,KeyError,TypeError):
+                            report['issues'].append({'contest':'CPC Finder','reason':'选手比赛列表暂不可用，继续使用 DLUT 原榜单链接'})
+                    report['listed'] = len(participations)
+                    for participation in participations:
+                        matches = [a for a in awards if a.get('date','')[:10] == participation['date']
+                                   and a.get('teamName') == participation['team']]
+                        award = matches[0] if len(matches) == 1 else None
+                        try:
+                            body = boards.prepare(award,participation,[people[m]['name'] for m in participation['members']],self.contests)
+                            self.import_auto_onsite(body)
+                            report['imported'] += 1
+                        except (OSError,ValueError,KeyError,TypeError) as exc:
+                            reason = str(exc) if isinstance(exc,ValueError) else '原榜单暂时无法读取，稍后重试'
+                            report['issues'].append({'contest':participation['event'],'reason':reason[:200]})
+                    report['status'] = 'partial' if report['issues'] else 'complete'
+                except (OSError,ValueError,KeyError,TypeError) as exc:
+                    report['status'] = 'error'
+                    report['issues'].append({'contest':'选手比赛列表','reason':str(exc)[:200] if isinstance(exc,ValueError) else 'CPC Finder 暂时无法读取，稍后重试'})
+                save_report()
 
     def remote(self, db):
         row = db.execute('select * from cpc_remote where id=1').fetchone()
@@ -152,6 +215,17 @@ class Integration:
             identity['person'] = person
             result = {}
             unmatched = set()
+            participations = {p['id']: p for p in remote['roster']['participations'] if person and person in p['members']}
+            onsite_rows = [(row, json.loads(row['body'])) for row in db.execute('select * from cpc_onsite where active=1')
+                           if row['participation'] in participations]
+            aliases = dict(self.aliases)
+            extra_aliases = {}
+            for _, evidence in onsite_rows:
+                for pid, alias in evidence.get('problem_aliases', {}).items():
+                    extra_aliases.setdefault(alias, set()).add(self.aliases.get(alias, pid))
+            for alias, targets in extra_aliases.items():
+                if len(targets) == 1:
+                    aliases.setdefault(alias, next(iter(targets)))
             handles = [dict(r) for r in db.execute('select h.id,h.platform,h.handle,k.kind from handles h left join cpc_handle_kinds k on k.handle_id=h.id where h.owner_type=? and h.owner_id=? and h.active=1', ('user',str(owner)))]
             by_account = {}
             for h in handles:
@@ -164,29 +238,71 @@ class Integration:
                 if not kind:
                     continue
                 key = problem_key(r['platform'], r['problem_id'])
-                pid = self.aliases.get(key)
+                pid = aliases.get(key)
                 if not pid:
                     if r['verdict'] in {'AC','OK','Accepted'}:
                         unmatched.add(key)
                     continue
+                if pid not in self.problem_ids and str(r['verdict']).upper() in {'AC','OK','ACCEPTED'}:
+                    unmatched.add(pid)
                 p = result.setdefault(pid, {'personal': False, 'team': False, 'onsite': False, 'attempted': False, 'evidence': []})
                 p['attempted'] = True
                 if str(r['verdict']).upper() in {'AC','OK','ACCEPTED'}:
                     p[kind] = True
-            participations = {p['id']: p for p in remote['roster']['participations'] if person and person in p['members']}
-            for row in db.execute('select * from cpc_onsite where active=1'):
-                participation = participations.get(row['participation'])
-                if not participation:
-                    continue
-                evidence = json.loads(row['body'])
+            onsite_contests = []
+            for row, evidence in onsite_rows:
+                participation = participations[row['participation']]
+                onsite_contests.append({'name':evidence.get('contest_name',row['contest']),
+                    'date':participation['date'],'team':participation['team'],'official':participation.get('official'),
+                    'accepted':evidence.get('accepted_labels',[p.rsplit(':',1)[-1] for p in evidence['accepted']]),
+                    'source_url':evidence['source_url'],'mapped':row['contest'] in self.contests})
                 for pid in evidence['accepted']:
+                    alias = evidence.get('problem_aliases',{}).get(pid)
+                    pid = self.aliases.get(alias,pid) if alias else pid
+                    if pid not in self.problem_ids:
+                        unmatched.add(pid)
                     p = result.setdefault(pid, {'personal': False, 'team': False, 'onsite': False, 'attempted': False, 'evidence': []})
                     p['onsite'] = True
                     p['evidence'].append({'id': row['id'], 'source': evidence['source_url'], 'team': participation['team']})
+            job = db.execute('select body,checked from cpc_onsite_sync where person=?',(person,)).fetchone() if person else None
+            onsite_sync = {**json.loads(job['body']),'checked':job['checked']} if job else {'status':'waiting' if person else 'unverified','issues':[]}
+            if person and not job: self.wake.set()
             return {'schema_version': 1, 'authority_id': self.authority, 'subject_id': subject,
                     'snapshot_complete': True, 'identity': identity, 'problems': result,
                     'record_count': len(result), 'unmapped_count': len(unmatched),
-                    'coverage': 'partial', 'handles': handles, 'roster_checked': checked}
+                    'coverage': 'partial', 'handles': handles, 'roster_checked': checked,
+                    'onsite_contests':sorted(onsite_contests,key=lambda c:c['date'],reverse=True),'onsite_sync':onsite_sync}
+
+    def import_auto_onsite(self, body):
+        """Provider adapters validated the row; retain unmapped contests for later catalogs."""
+        contest = self.contests.get(body['contest_id'])
+        labels = body['problem_labels']
+        if len(labels) != len(set(labels)) or any(p not in labels for p in body['accepted']):
+            raise ValueError('原榜单题序无效')
+        if contest and set(labels) != {p['index'] for p in contest['problems']}:
+            raise ValueError('原榜单题序与区域赛目录不一致')
+        indices = {p['index']:p['id'] for p in contest['problems']} if contest else {p:body['contest_id']+':'+p for p in labels}
+        gyms = set()
+        for url in body.get('reference_urls',[]):
+            parsed = urlsplit(url)
+            if parsed.hostname in {'codeforces.com','www.codeforces.com'} and parsed.path.startswith('/gym/'):
+                identifier = parsed.path.split('/')[2]
+                if identifier.isdigit(): gyms.add(identifier)
+        aliases = {indices[p]:'codeforces:'+next(iter(gyms))+p for p in labels} if len(gyms) == 1 else {}
+        stored = {**body,'accepted_labels':sorted(set(body['accepted'])),
+                  'accepted':sorted({indices[p] for p in body['accepted']}),'problem_aliases':aliases}
+        raw = json.dumps(stored,ensure_ascii=False)
+        key = digest('auto|'+body['participation_id'])
+        with self.db() as db:
+            remote,_ = self.remote(db)
+            participation = next((p for p in remote['roster']['participations'] if p['id'] == body['participation_id']),None)
+            if not participation or participation['team'] != body['team'] or participation['date'] != body['contest_date']:
+                raise ValueError('参赛记录已改变，请重新同步')
+            old = db.execute('select body,active from cpc_onsite where id=?',(key,)).fetchone()
+            if old and old['body'] == raw and old['active']:return key
+            db.execute('insert into cpc_onsite_history(evidence_id,body,created) values (?,?,?)',(key,raw,int(time.time())))
+            db.execute('insert or replace into cpc_onsite values (?,?,?,?,1)',(key,body['participation_id'],body['contest_id'],raw))
+        return key
 
     def import_onsite(self, body):
         contest = self.contests.get(body.get('contest_id'))
@@ -256,6 +372,7 @@ def handle(handler, service, post=False):
                     db.execute('delete from cpc_read_tokens where owner=?', (owner,))
                 result = {'ok': True}
             elif path == '/api/cpc/refresh':
+                service.force_onsite.set()
                 service.wake.set()
                 result = {'ok': True}
             elif path == '/api/cpc/handle-kind':
