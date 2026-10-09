@@ -28,6 +28,7 @@ from email.message import EmailMessage
 from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from cpc_integration import Integration as CpcIntegration, handle as cpc_handle
 
 
 APP_NAME = "OJ Submission Wall"
@@ -6098,6 +6099,18 @@ def build_competition(
     }
 
 
+_cpc_service = None
+_cpc_lock = threading.Lock()
+
+
+def get_cpc_service():
+    global _cpc_service
+    with _cpc_lock:
+        if _cpc_service is None:
+            _cpc_service = CpcIntegration(sys.modules[__name__])
+        return _cpc_service
+
+
 class AppHandler(BaseHTTPRequestHandler):
     server_version = "OJWall/1.0"
 
@@ -6134,6 +6147,12 @@ class AppHandler(BaseHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         try:
+            if path.startswith(("/api/cpc/", "/api/integration/")) and cpc_handle(self, get_cpc_service()):
+                return
+            if path in {"/regionals", "/regionals.html"}:
+                return self.serve_static("regionals.html")
+            if path == "/regionals.js":
+                return self.serve_static("regionals.js")
             if path == "/api/health":
                 return self.send_json(200, {"ok": True, "app": APP_NAME, "time": iso_from_ts(utcnow())})
             if path == "/api/session":
@@ -6222,6 +6241,8 @@ class AppHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urllib.parse.urlparse(self.path)
         try:
+            if parsed.path.startswith(("/api/cpc/", "/api/integration/")) and cpc_handle(self, get_cpc_service(), post=True):
+                return
             if parsed.path == "/api/auth/register":
                 return self.handle_register()
             if parsed.path == "/api/auth/login":
@@ -6664,6 +6685,7 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
 
 def main() -> None:
     init_db()
+    get_cpc_service().start()
     thread = threading.Thread(target=background_sync_loop, daemon=True)
     thread.start()
     server = ThreadingHTTPServer((HOST, PORT), AppHandler)

@@ -9,6 +9,10 @@ ENV PYTHONUNBUFFERED=1 \
     APP_ENV=production
 
 COPY app.py /app/app.py
+COPY cpc_common.py /app/cpc_common.py
+COPY cpc_integration.py /app/cpc_integration.py
+COPY catalog /app/catalog
+COPY tools /app/tools
 COPY web /app/web
 
 VOLUME ["/data"]

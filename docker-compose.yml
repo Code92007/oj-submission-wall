@@ -10,6 +10,9 @@ services:
     volumes:
       - ./data:/data
     environment:
+      CPC_DLUT_URL: ${CPC_DLUT_URL:-}
+      CPC_DLUT_AUTHORITY_ID: ${CPC_DLUT_AUTHORITY_ID:-}
+      CPC_SYNC_TOKEN: ${CPC_SYNC_TOKEN:-}
       APP_ENV: production
       HOST: 0.0.0.0
       PORT: 8000

@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js" defer></script></head>
+<body><header class="topbar"><h1>区域赛进度</h1><a class="button" href="/">返回训练墙</a></header><main style="max-width:1400px;margin:24px auto;padding:0 16px">
+<p id="cpcMessage" role="status"></p>
+<section class="panel"><h2>DLUT CPC 成员认证</h2><p id="cpcIdentity">正在加载…</p><form id="cpcClaim"><label>成员 <select id="cpcMember" required></select></label><label>核验说明 <input id="cpcNote" required maxlength="2000" placeholder="年级、队内联系及可核查证明"></label><button class="button">申请认证</button></form><button id="cpcRefresh" class="button" type="button">更新认证状态</button><p>管理员确认后合并你的现场队伍通过情况；线上记录无需成员认证。</p></section>
+<section class="panel"><h2>我的区域赛</h2><label>年份 <select id="cpcYear"></select></label> <label><input id="cpcTeams" type="checkbox">包含我绑定的线上团队账号</label><p id="cpcSummary"></p><div style="overflow-x:auto"><table><thead id="cpcHead"></thead><tbody id="cpcRows"></tbody></table></div><p>个：个人账号通过；团：绑定团队通过；现：现场所在队伍通过。未着色表示暂无通过证据，历史仍可能待补。本页不计口胡。</p><details><summary>确认绑定账号类型</summary><div id="cpcHandles"></div></details></section>
+<section class="panel"><h2>连接 CF Bot</h2><p>生成只读连接码，在 CF Bot 区域赛页粘贴一次即可。连接码限读取你自己的进度，有效期 180 天；重新生成或撤销立即使旧码失效。</p><button id="cpcToken" class="button">生成连接码</button> <button id="cpcRevoke" class="button">撤销连接码</button><textarea id="cpcCode" readonly hidden aria-label="只读连接码"></textarea><p>请只将连接码粘贴到你自己的 CF Bot 账号。</p></section>
+</main></body></html>

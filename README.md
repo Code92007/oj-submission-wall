@@ -201,3 +201,11 @@ docker compose exec -T oj-submission-wall python app.py luogu-backfill \
 ## License
 
 MIT
+
+## 可选成员认证与区域赛进度
+
+登录后进入 `/regionals`，查看本人个人/团队线上通过、申请 DLUT CPC 成员认证并生成 CF Bot 只读连接码。成员认证由 DLUT CPC 管理员核验；现场逐题成绩由本站管理员核验榜单后导入，首版不自动抓取外站。默认进度包含个人线上与现场队伍通过，可勾选团队线上记录；口胡仍由 CF Bot 独立负责。
+
+配置 `CPC_DLUT_URL`、`CPC_DLUT_AUTHORITY_ID`、`CPC_SYNC_TOKEN` 后启用名单同步；管理员用 `python tools/cpc_admin.py meta|sync|rosters` 查询，`import 文件.json` 预览、追加 `--confirm` 确认导入。运行库包含稳定 UUID、认证快照、现场证据及连接码校验记录，迁移时必须一致备份。
+
+本工程的职责、接口、配置、持久数据及迁移步骤见 [联动方案说明](docs/cpc-integration.md)。完整方案与迭代快照统一维护于 [qq-cf-bot/docs](https://github.com/Code92007/qq-cf-bot/tree/main/docs)。

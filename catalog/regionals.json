@@ -1,0 +1,4822 @@
+{
+  "verified_at": "2026-10-08",
+  "source": "QOJ regional categories 459/458/576 and 275/379/581; official Gym dashboards; verified VJudge replay problem lists",
+  "contests": [
+    {
+      "id": "ccpc-2025-哈尔滨",
+      "year": 2025,
+      "series": "CCPC",
+      "site": "哈尔滨",
+      "name": "2025 CCPC 哈尔滨站",
+      "source_url": "https://qoj.ac/contest/2575",
+      "problems": [
+        {
+          "id": "ccpc-2025-哈尔滨:A",
+          "index": "A",
+          "name": "k-子集和最大公约数问题",
+          "aliases": [
+            "qoj:14814"
+          ],
+          "qoj_id": 14814
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:B",
+          "index": "B",
+          "name": "液压机",
+          "aliases": [
+            "qoj:14815"
+          ],
+          "qoj_id": 14815
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:C",
+          "index": "C",
+          "name": "Many Many Sequence Covering Problems",
+          "aliases": [
+            "qoj:14816"
+          ],
+          "qoj_id": 14816
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:D",
+          "index": "D",
+          "name": "比赛",
+          "aliases": [
+            "qoj:14817"
+          ],
+          "qoj_id": 14817
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:E",
+          "index": "E",
+          "name": "函数求和",
+          "aliases": [
+            "qoj:14818"
+          ],
+          "qoj_id": 14818
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:F",
+          "index": "F",
+          "name": "1-2-按位或子序列问题",
+          "aliases": [
+            "qoj:14819"
+          ],
+          "qoj_id": 14819
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:G",
+          "index": "G",
+          "name": "扫雪",
+          "aliases": [
+            "qoj:14820"
+          ],
+          "qoj_id": 14820
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:H",
+          "index": "H",
+          "name": "匹配",
+          "aliases": [
+            "qoj:14821"
+          ],
+          "qoj_id": 14821
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:I",
+          "index": "I",
+          "name": "六边形翻转",
+          "aliases": [
+            "qoj:14822"
+          ],
+          "qoj_id": 14822
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:J",
+          "index": "J",
+          "name": "幻想乡的裁判长",
+          "aliases": [
+            "qoj:14823"
+          ],
+          "qoj_id": 14823
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:K",
+          "index": "K",
+          "name": "01 背包",
+          "aliases": [
+            "qoj:14824"
+          ],
+          "qoj_id": 14824
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:L",
+          "index": "L",
+          "name": "网格避障",
+          "aliases": [
+            "qoj:14825"
+          ],
+          "qoj_id": 14825
+        },
+        {
+          "id": "ccpc-2025-哈尔滨:M",
+          "index": "M",
+          "name": "连通的正三角形",
+          "aliases": [
+            "qoj:14826"
+          ],
+          "qoj_id": 14826
+        }
+      ],
+      "qoj_contest_id": 2575,
+      "qoj_url": "https://qoj.ac/contest/2575",
+      "mapping_source": "https://vjudge.net/contest/768013"
+    },
+    {
+      "id": "ccpc-2025-济南",
+      "year": 2025,
+      "series": "CCPC",
+      "site": "济南",
+      "name": "2025 CCPC 济南站",
+      "source_url": "https://qoj.ac/contest/2693",
+      "problems": [
+        {
+          "id": "ccpc-2025-济南:A",
+          "index": "A",
+          "name": "Cipher",
+          "qoj_id": 15032,
+          "aliases": [
+            "qoj:15032"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:B",
+          "index": "B",
+          "name": "Fortress",
+          "qoj_id": 15033,
+          "aliases": [
+            "qoj:15033"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:C",
+          "index": "C",
+          "name": "Finding Keywords",
+          "qoj_id": 15034,
+          "aliases": [
+            "qoj:15034"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:D",
+          "index": "D",
+          "name": "Lighthouse",
+          "qoj_id": 15035,
+          "aliases": [
+            "qoj:15035"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:E",
+          "index": "E",
+          "name": "Tree and Subgraph Problem",
+          "qoj_id": 15036,
+          "aliases": [
+            "qoj:15036"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:F",
+          "index": "F",
+          "name": "Grid Filling Game",
+          "qoj_id": 15037,
+          "aliases": [
+            "qoj:15037"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:G",
+          "index": "G",
+          "name": "Make SYSU Great Again IV",
+          "qoj_id": 15038,
+          "aliases": [
+            "qoj:15038"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:H",
+          "index": "H",
+          "name": "Hashing",
+          "qoj_id": 15039,
+          "aliases": [
+            "qoj:15039"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:I",
+          "index": "I",
+          "name": "I Love CCPC",
+          "qoj_id": 15040,
+          "aliases": [
+            "qoj:15040"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:J",
+          "index": "J",
+          "name": "Memory, Permutation, and Rooted Tree",
+          "qoj_id": 15041,
+          "aliases": [
+            "qoj:15041"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:K",
+          "index": "K",
+          "name": "Card Game",
+          "qoj_id": 15042,
+          "aliases": [
+            "qoj:15042"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:L",
+          "index": "L",
+          "name": "Activity Rehearsal",
+          "qoj_id": 15043,
+          "aliases": [
+            "qoj:15043"
+          ]
+        },
+        {
+          "id": "ccpc-2025-济南:M",
+          "index": "M",
+          "name": "MEX Problem",
+          "qoj_id": 15044,
+          "aliases": [
+            "qoj:15044"
+          ]
+        }
+      ],
+      "qoj_contest_id": 2693,
+      "qoj_url": "https://qoj.ac/contest/2693",
+      "mapping_source": "https://qoj.ac/problems?tag=CCPC+Jinan+2025"
+    },
+    {
+      "id": "ccpc-2025-郑州",
+      "year": 2025,
+      "series": "CCPC",
+      "site": "郑州",
+      "name": "2025 CCPC 郑州站",
+      "source_url": "https://qoj.ac/contest/2661",
+      "problems": [
+        {
+          "id": "ccpc-2025-郑州:A",
+          "index": "A",
+          "name": "Challenge Matrix Multiplication II",
+          "aliases": [
+            "qoj:15301"
+          ],
+          "qoj_id": 15301
+        },
+        {
+          "id": "ccpc-2025-郑州:B",
+          "index": "B",
+          "name": "Cutting Chocolate",
+          "aliases": [
+            "qoj:15302"
+          ],
+          "qoj_id": 15302
+        },
+        {
+          "id": "ccpc-2025-郑州:C",
+          "index": "C",
+          "name": "Basic Counting Practice Problems",
+          "aliases": [
+            "qoj:15303"
+          ],
+          "qoj_id": 15303
+        },
+        {
+          "id": "ccpc-2025-郑州:D",
+          "index": "D",
+          "name": "Diameter of a Tree",
+          "aliases": [
+            "qoj:15304"
+          ],
+          "qoj_id": 15304
+        },
+        {
+          "id": "ccpc-2025-郑州:E",
+          "index": "E",
+          "name": "Doo Doo Doo",
+          "aliases": [
+            "qoj:15305"
+          ],
+          "qoj_id": 15305
+        },
+        {
+          "id": "ccpc-2025-郑州:F",
+          "index": "F",
+          "name": "Challenge NPC II",
+          "aliases": [
+            "qoj:15306"
+          ],
+          "qoj_id": 15306
+        },
+        {
+          "id": "ccpc-2025-郑州:G",
+          "index": "G",
+          "name": "Plus Xor",
+          "aliases": [
+            "qoj:15307"
+          ],
+          "qoj_id": 15307
+        },
+        {
+          "id": "ccpc-2025-郑州:H",
+          "index": "H",
+          "name": "Random Shuffle",
+          "aliases": [
+            "qoj:15308"
+          ],
+          "qoj_id": 15308
+        },
+        {
+          "id": "ccpc-2025-郑州:I",
+          "index": "I",
+          "name": "Dumb Problem II",
+          "aliases": [
+            "qoj:15309"
+          ],
+          "qoj_id": 15309
+        },
+        {
+          "id": "ccpc-2025-郑州:J",
+          "index": "J",
+          "name": "Subrectangle Count",
+          "aliases": [
+            "qoj:15310"
+          ],
+          "qoj_id": 15310
+        },
+        {
+          "id": "ccpc-2025-郑州:K",
+          "index": "K",
+          "name": "Parentheses and Swapping",
+          "aliases": [
+            "qoj:15311"
+          ],
+          "qoj_id": 15311
+        },
+        {
+          "id": "ccpc-2025-郑州:L",
+          "index": "L",
+          "name": "Triangle Grid",
+          "aliases": [
+            "qoj:15312"
+          ],
+          "qoj_id": 15312
+        },
+        {
+          "id": "ccpc-2025-郑州:M",
+          "index": "M",
+          "name": "Replacement",
+          "aliases": [
+            "qoj:15313"
+          ],
+          "qoj_id": 15313
+        }
+      ],
+      "qoj_contest_id": 2661,
+      "qoj_url": "https://qoj.ac/contest/2661",
+      "mapping_source": "https://vjudge.net/contest/855404"
+    },
+    {
+      "id": "ccpc-2025-重庆",
+      "year": 2025,
+      "series": "CCPC",
+      "site": "重庆",
+      "name": "2025 CCPC 重庆站",
+      "source_url": "https://qoj.ac/contest/3387",
+      "problems": [
+        {
+          "id": "ccpc-2025-重庆:A",
+          "index": "A",
+          "name": "New Gomoku",
+          "aliases": [
+            "qoj:15419"
+          ],
+          "qoj_id": 15419
+        },
+        {
+          "id": "ccpc-2025-重庆:B",
+          "index": "B",
+          "name": "Abstract Portal",
+          "aliases": [
+            "qoj:15420"
+          ],
+          "qoj_id": 15420
+        },
+        {
+          "id": "ccpc-2025-重庆:C",
+          "index": "C",
+          "name": "GPA Optimization Plan",
+          "aliases": [
+            "qoj:15421"
+          ],
+          "qoj_id": 15421
+        },
+        {
+          "id": "ccpc-2025-重庆:D",
+          "index": "D",
+          "name": "Route Investigation",
+          "aliases": [
+            "qoj:15422"
+          ],
+          "qoj_id": 15422
+        },
+        {
+          "id": "ccpc-2025-重庆:E",
+          "index": "E",
+          "name": "Dinner Invitation",
+          "aliases": [
+            "qoj:15423"
+          ],
+          "qoj_id": 15423
+        },
+        {
+          "id": "ccpc-2025-重庆:F",
+          "index": "F",
+          "name": "Turtle Soup",
+          "aliases": [
+            "qoj:15424"
+          ],
+          "qoj_id": 15424
+        },
+        {
+          "id": "ccpc-2025-重庆:G",
+          "index": "G",
+          "name": "The Messenger",
+          "aliases": [
+            "qoj:15425"
+          ],
+          "qoj_id": 15425
+        },
+        {
+          "id": "ccpc-2025-重庆:H",
+          "index": "H",
+          "name": "Hot Pot",
+          "aliases": [
+            "qoj:15426"
+          ],
+          "qoj_id": 15426
+        },
+        {
+          "id": "ccpc-2025-重庆:I",
+          "index": "I",
+          "name": "Shit",
+          "aliases": [
+            "qoj:15427"
+          ],
+          "qoj_id": 15427
+        },
+        {
+          "id": "ccpc-2025-重庆:J",
+          "index": "J",
+          "name": "Tetris",
+          "aliases": [
+            "qoj:15428"
+          ],
+          "qoj_id": 15428
+        },
+        {
+          "id": "ccpc-2025-重庆:K",
+          "index": "K",
+          "name": "Reverse KMP",
+          "aliases": [
+            "qoj:15429"
+          ],
+          "qoj_id": 15429
+        },
+        {
+          "id": "ccpc-2025-重庆:L",
+          "index": "L",
+          "name": "Tiling the Floor",
+          "aliases": [
+            "qoj:15430"
+          ],
+          "qoj_id": 15430
+        },
+        {
+          "id": "ccpc-2025-重庆:M",
+          "index": "M",
+          "name": "Reduction and Growth",
+          "aliases": [
+            "qoj:15431"
+          ],
+          "qoj_id": 15431
+        }
+      ],
+      "qoj_contest_id": 3387,
+      "qoj_url": "https://qoj.ac/contest/3387",
+      "mapping_source": "https://vjudge.net/contest/799675"
+    },
+    {
+      "id": "icpc-2025-上海",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "上海",
+      "name": "2025 ICPC 上海站",
+      "source_url": "https://qoj.ac/contest/2908",
+      "problems": [
+        {
+          "id": "icpc-2025-上海:A",
+          "index": "A",
+          "name": "Menji, we miss you!",
+          "aliases": [
+            "luogu:P17121",
+            "qoj:15314"
+          ],
+          "qoj_id": 15314
+        },
+        {
+          "id": "icpc-2025-上海:B",
+          "index": "B",
+          "name": "Hamu",
+          "aliases": [
+            "luogu:P17122",
+            "qoj:15315"
+          ],
+          "qoj_id": 15315
+        },
+        {
+          "id": "icpc-2025-上海:C",
+          "index": "C",
+          "name": "Singularity",
+          "aliases": [
+            "luogu:P17123",
+            "qoj:15316"
+          ],
+          "qoj_id": 15316
+        },
+        {
+          "id": "icpc-2025-上海:D",
+          "index": "D",
+          "name": "Not a subset sum",
+          "aliases": [
+            "luogu:P17124",
+            "qoj:15317"
+          ],
+          "qoj_id": 15317
+        },
+        {
+          "id": "icpc-2025-上海:E",
+          "index": "E",
+          "name": "Flower' s land 3",
+          "aliases": [
+            "luogu:P17125",
+            "qoj:15318"
+          ],
+          "qoj_id": 15318
+        },
+        {
+          "id": "icpc-2025-上海:F",
+          "index": "F",
+          "name": "Flower' s land 4",
+          "aliases": [
+            "luogu:P17126",
+            "qoj:15319"
+          ],
+          "qoj_id": 15319
+        },
+        {
+          "id": "icpc-2025-上海:G",
+          "index": "G",
+          "name": "Gemcrate",
+          "aliases": [
+            "luogu:P17127",
+            "qoj:15320"
+          ],
+          "qoj_id": 15320
+        },
+        {
+          "id": "icpc-2025-上海:H",
+          "index": "H",
+          "name": "AGI",
+          "aliases": [
+            "luogu:P17128",
+            "qoj:15321"
+          ],
+          "qoj_id": 15321
+        },
+        {
+          "id": "icpc-2025-上海:I",
+          "index": "I",
+          "name": "Round screws",
+          "aliases": [
+            "luogu:P17129",
+            "qoj:15322"
+          ],
+          "qoj_id": 15322
+        },
+        {
+          "id": "icpc-2025-上海:J",
+          "index": "J",
+          "name": "Yet another mailbox problem",
+          "aliases": [
+            "luogu:P17130",
+            "qoj:15323"
+          ],
+          "qoj_id": 15323
+        },
+        {
+          "id": "icpc-2025-上海:K",
+          "index": "K",
+          "name": "No more regrets",
+          "aliases": [
+            "luogu:P17131",
+            "qoj:15324"
+          ],
+          "qoj_id": 15324
+        },
+        {
+          "id": "icpc-2025-上海:L",
+          "index": "L",
+          "name": "Yet another permutation problem",
+          "aliases": [
+            "luogu:P17132",
+            "qoj:15325"
+          ],
+          "qoj_id": 15325
+        },
+        {
+          "id": "icpc-2025-上海:M",
+          "index": "M",
+          "name": "Yet another 01 problem",
+          "aliases": [
+            "luogu:P17133",
+            "qoj:15326"
+          ],
+          "qoj_id": 15326
+        }
+      ],
+      "qoj_contest_id": 2908,
+      "qoj_url": "https://qoj.ac/contest/2908",
+      "mapping_source": "https://vjudge.net/contest/854142"
+    },
+    {
+      "id": "icpc-2025-南京",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "南京",
+      "name": "2025 ICPC 南京站",
+      "source_url": "https://qoj.ac/contest/2581",
+      "problems": [
+        {
+          "id": "icpc-2025-南京:A",
+          "index": "A",
+          "name": "Wow, It’s Yesterday Six Times More",
+          "aliases": [
+            "qoj:14801"
+          ],
+          "qoj_id": 14801
+        },
+        {
+          "id": "icpc-2025-南京:B",
+          "index": "B",
+          "name": "What, More Kangaroos?",
+          "aliases": [
+            "qoj:14802"
+          ],
+          "qoj_id": 14802
+        },
+        {
+          "id": "icpc-2025-南京:C",
+          "index": "C",
+          "name": "Distributing Candies",
+          "aliases": [
+            "qoj:14803"
+          ],
+          "qoj_id": 14803
+        },
+        {
+          "id": "icpc-2025-南京:D",
+          "index": "D",
+          "name": "Fallleaves01 and Golf",
+          "aliases": [
+            "qoj:14804"
+          ],
+          "qoj_id": 14804
+        },
+        {
+          "id": "icpc-2025-南京:E",
+          "index": "E",
+          "name": "Cyan White Tree",
+          "aliases": [
+            "qoj:14805"
+          ],
+          "qoj_id": 14805
+        },
+        {
+          "id": "icpc-2025-南京:F",
+          "index": "F",
+          "name": "Bitwise And Path",
+          "aliases": [
+            "qoj:14806"
+          ],
+          "qoj_id": 14806
+        },
+        {
+          "id": "icpc-2025-南京:G",
+          "index": "G",
+          "name": "Bucket Bonanza",
+          "aliases": [
+            "qoj:14807"
+          ],
+          "qoj_id": 14807
+        },
+        {
+          "id": "icpc-2025-南京:H",
+          "index": "H",
+          "name": "Pen Pineapple Apple Pen",
+          "aliases": [
+            "qoj:14808"
+          ],
+          "qoj_id": 14808
+        },
+        {
+          "id": "icpc-2025-南京:I",
+          "index": "I",
+          "name": "Chi Fan",
+          "aliases": [
+            "qoj:14809"
+          ],
+          "qoj_id": 14809
+        },
+        {
+          "id": "icpc-2025-南京:J",
+          "index": "J",
+          "name": "Trajan Algorithm",
+          "aliases": [
+            "qoj:14810"
+          ],
+          "qoj_id": 14810
+        },
+        {
+          "id": "icpc-2025-南京:K",
+          "index": "K",
+          "name": "Xiangqi",
+          "aliases": [
+            "qoj:14811"
+          ],
+          "qoj_id": 14811
+        },
+        {
+          "id": "icpc-2025-南京:L",
+          "index": "L",
+          "name": "Regional Champion",
+          "aliases": [
+            "qoj:14812"
+          ],
+          "qoj_id": 14812
+        },
+        {
+          "id": "icpc-2025-南京:M",
+          "index": "M",
+          "name": "Many Convex Polygons",
+          "aliases": [
+            "qoj:14813"
+          ],
+          "qoj_id": 14813
+        }
+      ],
+      "qoj_contest_id": 2581,
+      "qoj_url": "https://qoj.ac/contest/2581",
+      "mapping_source": "https://vjudge.net/contest/768397"
+    },
+    {
+      "id": "icpc-2025-成都",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "成都",
+      "name": "2025 ICPC 成都站",
+      "original_name": "The 2025 ICPC Asia Chengdu Regional Contest (The 4rd Universal Cup. Stage 4: Grand Prix of Chengdu)",
+      "source_url": "https://codeforces.com/gym/106161",
+      "cf_contest_id": 106161,
+      "problems": [
+        {
+          "id": "icpc-2025-成都:A",
+          "index": "A",
+          "name": "A Lot of Paintings",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161A",
+            "qoj:14706"
+          ],
+          "qoj_id": 14706
+        },
+        {
+          "id": "icpc-2025-成都:B",
+          "index": "B",
+          "name": "Blood Memories",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161B",
+            "qoj:14707"
+          ],
+          "qoj_id": 14707
+        },
+        {
+          "id": "icpc-2025-成都:C",
+          "index": "C",
+          "name": "Crossing River",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161C",
+            "qoj:14708"
+          ],
+          "qoj_id": 14708
+        },
+        {
+          "id": "icpc-2025-成都:D",
+          "index": "D",
+          "name": "Deductive Snooker Scoring",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161D",
+            "qoj:14709"
+          ],
+          "qoj_id": 14709
+        },
+        {
+          "id": "icpc-2025-成都:E",
+          "index": "E",
+          "name": "Escaping from Trap",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161E",
+            "qoj:14710"
+          ],
+          "qoj_id": 14710
+        },
+        {
+          "id": "icpc-2025-成都:F",
+          "index": "F",
+          "name": "Following Arrows",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161F",
+            "qoj:14711"
+          ],
+          "qoj_id": 14711
+        },
+        {
+          "id": "icpc-2025-成都:G",
+          "index": "G",
+          "name": "GCD of Subsets",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161G",
+            "qoj:14712"
+          ],
+          "qoj_id": 14712
+        },
+        {
+          "id": "icpc-2025-成都:H",
+          "index": "H",
+          "name": "Heuristic Knapsack",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161H",
+            "qoj:14713"
+          ],
+          "qoj_id": 14713
+        },
+        {
+          "id": "icpc-2025-成都:I",
+          "index": "I",
+          "name": "Inside Triangle",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161I",
+            "qoj:14714"
+          ],
+          "qoj_id": 14714
+        },
+        {
+          "id": "icpc-2025-成都:J",
+          "index": "J",
+          "name": "Judging Papers",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161J",
+            "qoj:14715"
+          ],
+          "qoj_id": 14715
+        },
+        {
+          "id": "icpc-2025-成都:K",
+          "index": "K",
+          "name": "K-Coverage",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161K",
+            "qoj:14716"
+          ],
+          "qoj_id": 14716
+        },
+        {
+          "id": "icpc-2025-成都:L",
+          "index": "L",
+          "name": "Label Matching",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161L",
+            "qoj:14717"
+          ],
+          "qoj_id": 14717
+        },
+        {
+          "id": "icpc-2025-成都:M",
+          "index": "M",
+          "name": "Meeting for Meals",
+          "cf_contest_id": 106161,
+          "aliases": [
+            "codeforces:106161M",
+            "qoj:14718"
+          ],
+          "qoj_id": 14718
+        }
+      ],
+      "qoj_contest_id": 2567,
+      "qoj_url": "https://qoj.ac/contest/2567"
+    },
+    {
+      "id": "icpc-2025-武汉",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "武汉",
+      "name": "2025 ICPC 武汉站",
+      "source_url": "https://qoj.ac/contest/2609",
+      "problems": [
+        {
+          "id": "icpc-2025-武汉:A",
+          "index": "A",
+          "name": "Planting Trees",
+          "aliases": [
+            "qoj:14719"
+          ],
+          "qoj_id": 14719
+        },
+        {
+          "id": "icpc-2025-武汉:B",
+          "index": "B",
+          "name": "77G Network",
+          "aliases": [
+            "qoj:14720"
+          ],
+          "qoj_id": 14720
+        },
+        {
+          "id": "icpc-2025-武汉:C",
+          "index": "C",
+          "name": "Not Aqre",
+          "aliases": [
+            "qoj:14721"
+          ],
+          "qoj_id": 14721
+        },
+        {
+          "id": "icpc-2025-武汉:D",
+          "index": "D",
+          "name": "Outsmarting",
+          "aliases": [
+            "qoj:14722"
+          ],
+          "qoj_id": 14722
+        },
+        {
+          "id": "icpc-2025-武汉:E",
+          "index": "E",
+          "name": "Magic Trick",
+          "aliases": [
+            "qoj:14723"
+          ],
+          "qoj_id": 14723
+        },
+        {
+          "id": "icpc-2025-武汉:F",
+          "index": "F",
+          "name": "Divide and Conquer",
+          "aliases": [
+            "qoj:14724"
+          ],
+          "qoj_id": 14724
+        },
+        {
+          "id": "icpc-2025-武汉:G",
+          "index": "G",
+          "name": "Projection",
+          "aliases": [
+            "qoj:14725"
+          ],
+          "qoj_id": 14725
+        },
+        {
+          "id": "icpc-2025-武汉:H",
+          "index": "H",
+          "name": "Restore the Array",
+          "aliases": [
+            "qoj:14726"
+          ],
+          "qoj_id": 14726
+        },
+        {
+          "id": "icpc-2025-武汉:I",
+          "index": "I",
+          "name": "Dolls 2",
+          "aliases": [
+            "qoj:14727"
+          ],
+          "qoj_id": 14727
+        },
+        {
+          "id": "icpc-2025-武汉:J",
+          "index": "J",
+          "name": "Circular Matching",
+          "aliases": [
+            "qoj:14728"
+          ],
+          "qoj_id": 14728
+        },
+        {
+          "id": "icpc-2025-武汉:K",
+          "index": "K",
+          "name": "Organize the Bookshelf",
+          "aliases": [
+            "qoj:14729"
+          ],
+          "qoj_id": 14729
+        },
+        {
+          "id": "icpc-2025-武汉:L",
+          "index": "L",
+          "name": "ICPC",
+          "aliases": [
+            "qoj:14730"
+          ],
+          "qoj_id": 14730
+        },
+        {
+          "id": "icpc-2025-武汉:M",
+          "index": "M",
+          "name": "Kingdom of Construction",
+          "aliases": [
+            "qoj:14731"
+          ],
+          "qoj_id": 14731
+        }
+      ],
+      "qoj_contest_id": 2609,
+      "qoj_url": "https://qoj.ac/contest/2609",
+      "mapping_source": "https://vjudge.net/contest/853203"
+    },
+    {
+      "id": "icpc-2025-沈阳",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "沈阳",
+      "name": "2025 ICPC 沈阳站",
+      "original_name": "The 2025 ICPC Asia Shenyang Regional Contest (The 4th Universal Cup. Stage 6: Grand Prix of Shenyang)",
+      "source_url": "https://codeforces.com/gym/106252",
+      "cf_contest_id": 106252,
+      "problems": [
+        {
+          "id": "icpc-2025-沈阳:A",
+          "index": "A",
+          "name": "Square Kingdom",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252A",
+            "qoj:14940"
+          ],
+          "qoj_id": 14940
+        },
+        {
+          "id": "icpc-2025-沈阳:B",
+          "index": "B",
+          "name": "Buggy Painting Software I",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252B",
+            "qoj:14941"
+          ],
+          "qoj_id": 14941
+        },
+        {
+          "id": "icpc-2025-沈阳:C",
+          "index": "C",
+          "name": "Buggy Painting Software II",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252C",
+            "qoj:14942"
+          ],
+          "qoj_id": 14942
+        },
+        {
+          "id": "icpc-2025-沈阳:D",
+          "index": "D",
+          "name": "LED Display Renovation",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252D",
+            "qoj:14943"
+          ],
+          "qoj_id": 14943
+        },
+        {
+          "id": "icpc-2025-沈阳:E",
+          "index": "E",
+          "name": "Play It by Ear",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252E",
+            "qoj:14944"
+          ],
+          "qoj_id": 14944
+        },
+        {
+          "id": "icpc-2025-沈阳:F",
+          "index": "F",
+          "name": "The Bond Beyond Time",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252F",
+            "qoj:14945"
+          ],
+          "qoj_id": 14945
+        },
+        {
+          "id": "icpc-2025-沈阳:G",
+          "index": "G",
+          "name": "Collision Damage",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252G",
+            "qoj:14946"
+          ],
+          "qoj_id": 14946
+        },
+        {
+          "id": "icpc-2025-沈阳:H",
+          "index": "H",
+          "name": "Cute Young Diagram Counting",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252H",
+            "qoj:14947"
+          ],
+          "qoj_id": 14947
+        },
+        {
+          "id": "icpc-2025-沈阳:I",
+          "index": "I",
+          "name": "Volunteer Simulator",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252I",
+            "qoj:14948"
+          ],
+          "qoj_id": 14948
+        },
+        {
+          "id": "icpc-2025-沈阳:J",
+          "index": "J",
+          "name": "The Echoes of Chronos",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252J",
+            "qoj:14949"
+          ],
+          "qoj_id": 14949
+        },
+        {
+          "id": "icpc-2025-沈阳:K",
+          "index": "K",
+          "name": "Relay Jump",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252K",
+            "qoj:14950"
+          ],
+          "qoj_id": 14950
+        },
+        {
+          "id": "icpc-2025-沈阳:L",
+          "index": "L",
+          "name": "Leo",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252L",
+            "qoj:14951"
+          ],
+          "qoj_id": 14951
+        },
+        {
+          "id": "icpc-2025-沈阳:M",
+          "index": "M",
+          "name": "The End?",
+          "cf_contest_id": 106252,
+          "aliases": [
+            "codeforces:106252M",
+            "qoj:14952"
+          ],
+          "qoj_id": 14952
+        }
+      ],
+      "qoj_contest_id": 2641,
+      "qoj_url": "https://qoj.ac/contest/2641"
+    },
+    {
+      "id": "icpc-2025-西安",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "西安",
+      "name": "2025 ICPC 西安站",
+      "source_url": "https://qoj.ac/contest/2562",
+      "problems": [
+        {
+          "id": "icpc-2025-西安:A",
+          "index": "A",
+          "name": "Azalea Garden",
+          "aliases": [
+            "qoj:14681"
+          ],
+          "qoj_id": 14681
+        },
+        {
+          "id": "icpc-2025-西安:B",
+          "index": "B",
+          "name": "Beautiful Dangos",
+          "aliases": [
+            "qoj:14682"
+          ],
+          "qoj_id": 14682
+        },
+        {
+          "id": "icpc-2025-西安:C",
+          "index": "C",
+          "name": "Catch the Monster",
+          "aliases": [
+            "qoj:14683"
+          ],
+          "qoj_id": 14683
+        },
+        {
+          "id": "icpc-2025-西安:D",
+          "index": "D",
+          "name": "Directed Acyclic Graph",
+          "aliases": [
+            "qoj:14684"
+          ],
+          "qoj_id": 14684
+        },
+        {
+          "id": "icpc-2025-西安:E",
+          "index": "E",
+          "name": "Epilogue of Happiness",
+          "aliases": [
+            "qoj:14685"
+          ],
+          "qoj_id": 14685
+        },
+        {
+          "id": "icpc-2025-西安:F",
+          "index": "F",
+          "name": "Follow the Penguins",
+          "aliases": [
+            "qoj:14686"
+          ],
+          "qoj_id": 14686
+        },
+        {
+          "id": "icpc-2025-西安:G",
+          "index": "G",
+          "name": "Grand Voting",
+          "aliases": [
+            "qoj:14687"
+          ],
+          "qoj_id": 14687
+        },
+        {
+          "id": "icpc-2025-西安:H",
+          "index": "H",
+          "name": "Heart of Darkness",
+          "aliases": [
+            "qoj:14688"
+          ],
+          "qoj_id": 14688
+        },
+        {
+          "id": "icpc-2025-西安:I",
+          "index": "I",
+          "name": "Imagined Holly",
+          "aliases": [
+            "qoj:14689"
+          ],
+          "qoj_id": 14689
+        },
+        {
+          "id": "icpc-2025-西安:J",
+          "index": "J",
+          "name": "January's Color",
+          "aliases": [
+            "qoj:14690"
+          ],
+          "qoj_id": 14690
+        },
+        {
+          "id": "icpc-2025-西安:K",
+          "index": "K",
+          "name": "Killing Bits",
+          "aliases": [
+            "qoj:14691"
+          ],
+          "qoj_id": 14691
+        },
+        {
+          "id": "icpc-2025-西安:L",
+          "index": "L",
+          "name": "Let's Make a Convex!",
+          "aliases": [
+            "qoj:14692"
+          ],
+          "qoj_id": 14692
+        },
+        {
+          "id": "icpc-2025-西安:M",
+          "index": "M",
+          "name": "Mystique as Iris",
+          "aliases": [
+            "qoj:14693"
+          ],
+          "qoj_id": 14693
+        }
+      ],
+      "qoj_contest_id": 2562,
+      "qoj_url": "https://qoj.ac/contest/2562",
+      "mapping_source": "https://vjudge.net/contest/772883"
+    },
+    {
+      "id": "icpc-2025-香港",
+      "year": 2025,
+      "series": "ICPC",
+      "site": "香港",
+      "name": "2025 ICPC 香港站",
+      "source_url": "https://qoj.ac/contest/3169",
+      "problems": [
+        {
+          "id": "icpc-2025-香港:A",
+          "index": "A",
+          "name": "Bipartite Graph Matching Problem",
+          "aliases": [
+            "qoj:15432"
+          ],
+          "qoj_id": 15432
+        },
+        {
+          "id": "icpc-2025-香港:B",
+          "index": "B",
+          "name": "Travelling",
+          "aliases": [
+            "qoj:15433"
+          ],
+          "qoj_id": 15433
+        },
+        {
+          "id": "icpc-2025-香港:C",
+          "index": "C",
+          "name": "Stonebag",
+          "aliases": [
+            "qoj:15434"
+          ],
+          "qoj_id": 15434
+        },
+        {
+          "id": "icpc-2025-香港:D",
+          "index": "D",
+          "name": "Dumb Problem",
+          "aliases": [
+            "qoj:15435"
+          ],
+          "qoj_id": 15435
+        },
+        {
+          "id": "icpc-2025-香港:E",
+          "index": "E",
+          "name": "Bipartite Graph Weighting Problem",
+          "aliases": [
+            "qoj:15436"
+          ],
+          "qoj_id": 15436
+        },
+        {
+          "id": "icpc-2025-香港:F",
+          "index": "F",
+          "name": "Find the Circuit",
+          "aliases": [
+            "qoj:15437"
+          ],
+          "qoj_id": 15437
+        },
+        {
+          "id": "icpc-2025-香港:G",
+          "index": "G",
+          "name": "Watering System",
+          "aliases": [
+            "qoj:15438"
+          ],
+          "qoj_id": 15438
+        },
+        {
+          "id": "icpc-2025-香港:H",
+          "index": "H",
+          "name": "Longest Common Prefix",
+          "aliases": [
+            "qoj:15439"
+          ],
+          "qoj_id": 15439
+        },
+        {
+          "id": "icpc-2025-香港:I",
+          "index": "I",
+          "name": "DFS Order - Extra Stage",
+          "aliases": [
+            "qoj:15440"
+          ],
+          "qoj_id": 15440
+        },
+        {
+          "id": "icpc-2025-香港:J",
+          "index": "J",
+          "name": "Re: Becoming the Programming Champion",
+          "aliases": [
+            "qoj:15441"
+          ],
+          "qoj_id": 15441
+        },
+        {
+          "id": "icpc-2025-香港:K",
+          "index": "K",
+          "name": "Cyclic Shift",
+          "aliases": [
+            "qoj:15442"
+          ],
+          "qoj_id": 15442
+        },
+        {
+          "id": "icpc-2025-香港:L",
+          "index": "L",
+          "name": "Cyclic Shift II",
+          "aliases": [
+            "qoj:15443"
+          ],
+          "qoj_id": 15443
+        }
+      ],
+      "qoj_contest_id": 3169,
+      "qoj_url": "https://qoj.ac/contest/3169",
+      "mapping_source": "https://vjudge.net/contest/805570"
+    },
+    {
+      "id": "ccpc-2024-哈尔滨",
+      "year": 2024,
+      "series": "CCPC",
+      "site": "哈尔滨",
+      "name": "2024 CCPC 哈尔滨站",
+      "original_name": "2024 China Collegiate Programming Contest (CCPC) Harbin Onsite (The 3rd Universal Cup. Stage 14: Harbin)",
+      "source_url": "https://codeforces.com/gym/105459",
+      "cf_contest_id": 105459,
+      "problems": [
+        {
+          "id": "ccpc-2024-哈尔滨:A",
+          "index": "A",
+          "name": "Build a Computer",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459A",
+            "qoj:9519"
+          ],
+          "qoj_id": 9519
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:B",
+          "index": "B",
+          "name": "Concave Hull",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459B",
+            "qoj:9520"
+          ],
+          "qoj_id": 9520
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:C",
+          "index": "C",
+          "name": "Giving Directions in Harbin",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459C",
+            "qoj:9521"
+          ],
+          "qoj_id": 9521
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:D",
+          "index": "D",
+          "name": "A Simple String Problem",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459D",
+            "qoj:9522"
+          ],
+          "qoj_id": 9522
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:E",
+          "index": "E",
+          "name": "Marble Race",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459E",
+            "qoj:9523"
+          ],
+          "qoj_id": 9523
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:F",
+          "index": "F",
+          "name": "1D Galaxy",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459F",
+            "qoj:9524"
+          ],
+          "qoj_id": 9524
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:G",
+          "index": "G",
+          "name": "Welcome to Join the Online Meeting!",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459G",
+            "qoj:9525"
+          ],
+          "qoj_id": 9525
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:H",
+          "index": "H",
+          "name": "Subsequence Counting",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459H",
+            "qoj:9526"
+          ],
+          "qoj_id": 9526
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:I",
+          "index": "I",
+          "name": "A Brand New Geometric Problem",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459I",
+            "qoj:9527"
+          ],
+          "qoj_id": 9527
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:J",
+          "index": "J",
+          "name": "New Energy Vehicle",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459J",
+            "qoj:9528"
+          ],
+          "qoj_id": 9528
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:K",
+          "index": "K",
+          "name": "Farm Management",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459K",
+            "qoj:9529"
+          ],
+          "qoj_id": 9529
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:L",
+          "index": "L",
+          "name": "A Game On Tree",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459L",
+            "qoj:9530"
+          ],
+          "qoj_id": 9530
+        },
+        {
+          "id": "ccpc-2024-哈尔滨:M",
+          "index": "M",
+          "name": "Weird Ceiling",
+          "cf_contest_id": 105459,
+          "aliases": [
+            "codeforces:105459M",
+            "qoj:9531"
+          ],
+          "qoj_id": 9531
+        }
+      ],
+      "qoj_contest_id": 1817,
+      "qoj_url": "https://qoj.ac/contest/1817",
+      "mapping_source": "https://vjudge.net/contest/668635"
+    },
+    {
+      "id": "ccpc-2024-济南",
+      "year": 2024,
+      "series": "CCPC",
+      "site": "济南",
+      "name": "2024 CCPC 济南站",
+      "original_name": "2024 China Collegiate Programming Contest (CCPC) Jinan Site (The 3rd Universal Cup. Stage 17: Jinan)",
+      "source_url": "https://codeforces.com/gym/105540",
+      "cf_contest_id": 105540,
+      "problems": [
+        {
+          "id": "ccpc-2024-济南:A",
+          "index": "A",
+          "name": "The Fool",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540A",
+            "qoj:9548"
+          ],
+          "qoj_id": 9548
+        },
+        {
+          "id": "ccpc-2024-济南:B",
+          "index": "B",
+          "name": "The Magician",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540B",
+            "qoj:9549"
+          ],
+          "qoj_id": 9549
+        },
+        {
+          "id": "ccpc-2024-济南:C",
+          "index": "C",
+          "name": "The Empress",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540C",
+            "qoj:9550"
+          ],
+          "qoj_id": 9550
+        },
+        {
+          "id": "ccpc-2024-济南:D",
+          "index": "D",
+          "name": "The Emperor",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540D",
+            "qoj:9551"
+          ],
+          "qoj_id": 9551
+        },
+        {
+          "id": "ccpc-2024-济南:E",
+          "index": "E",
+          "name": "The Chariot",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540E",
+            "qoj:9552"
+          ],
+          "qoj_id": 9552
+        },
+        {
+          "id": "ccpc-2024-济南:F",
+          "index": "F",
+          "name": "The Hermit",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540F",
+            "qoj:9553"
+          ],
+          "qoj_id": 9553
+        },
+        {
+          "id": "ccpc-2024-济南:G",
+          "index": "G",
+          "name": "The Wheel of Fortune",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540G",
+            "qoj:9554"
+          ],
+          "qoj_id": 9554
+        },
+        {
+          "id": "ccpc-2024-济南:H",
+          "index": "H",
+          "name": "Strength",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540H",
+            "qoj:9555"
+          ],
+          "qoj_id": 9555
+        },
+        {
+          "id": "ccpc-2024-济南:I",
+          "index": "I",
+          "name": "The Hanged Man",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540I",
+            "qoj:9556"
+          ],
+          "qoj_id": 9556
+        },
+        {
+          "id": "ccpc-2024-济南:J",
+          "index": "J",
+          "name": "Temperance",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540J",
+            "qoj:9557"
+          ],
+          "qoj_id": 9557
+        },
+        {
+          "id": "ccpc-2024-济南:K",
+          "index": "K",
+          "name": "The Devil",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540K",
+            "qoj:9558"
+          ],
+          "qoj_id": 9558
+        },
+        {
+          "id": "ccpc-2024-济南:L",
+          "index": "L",
+          "name": "The Tower",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540L",
+            "qoj:9559"
+          ],
+          "qoj_id": 9559
+        },
+        {
+          "id": "ccpc-2024-济南:M",
+          "index": "M",
+          "name": "Judgement",
+          "cf_contest_id": 105540,
+          "aliases": [
+            "codeforces:105540M",
+            "qoj:9560"
+          ],
+          "qoj_id": 9560
+        }
+      ],
+      "qoj_contest_id": 1843,
+      "qoj_url": "https://qoj.ac/contest/1843",
+      "mapping_source": "https://vjudge.net/contest/675631"
+    },
+    {
+      "id": "ccpc-2024-郑州",
+      "year": 2024,
+      "series": "CCPC",
+      "site": "郑州",
+      "name": "2024 CCPC 郑州站",
+      "original_name": "2024 China Collegiate Programming Contest (CCPC) Zhengzhou Onsite (The 3rd Universal Cup. Stage 22: Zhengzhou)",
+      "source_url": "https://codeforces.com/gym/105632",
+      "cf_contest_id": 105632,
+      "problems": [
+        {
+          "id": "ccpc-2024-郑州:A",
+          "index": "A",
+          "name": "A + B = C Problem",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632A",
+            "qoj:9768"
+          ],
+          "qoj_id": 9768
+        },
+        {
+          "id": "ccpc-2024-郑州:B",
+          "index": "B",
+          "name": "Rolling Stones",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632B",
+            "qoj:9769"
+          ],
+          "qoj_id": 9769
+        },
+        {
+          "id": "ccpc-2024-郑州:C",
+          "index": "C",
+          "name": "Middle Point",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632C",
+            "qoj:9770"
+          ],
+          "qoj_id": 9770
+        },
+        {
+          "id": "ccpc-2024-郑州:D",
+          "index": "D",
+          "name": "Guessing Game",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632D",
+            "qoj:9771"
+          ],
+          "qoj_id": 9771
+        },
+        {
+          "id": "ccpc-2024-郑州:E",
+          "index": "E",
+          "name": "Permutation Routing",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632E",
+            "qoj:9772"
+          ],
+          "qoj_id": 9772
+        },
+        {
+          "id": "ccpc-2024-郑州:F",
+          "index": "F",
+          "name": "Infinite Loop",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632F",
+            "qoj:9773"
+          ],
+          "qoj_id": 9773
+        },
+        {
+          "id": "ccpc-2024-郑州:G",
+          "index": "G",
+          "name": "Same Sum",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632G",
+            "qoj:9774"
+          ],
+          "qoj_id": 9774
+        },
+        {
+          "id": "ccpc-2024-郑州:H",
+          "index": "H",
+          "name": "The Witness",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632H",
+            "qoj:9775"
+          ],
+          "qoj_id": 9775
+        },
+        {
+          "id": "ccpc-2024-郑州:I",
+          "index": "I",
+          "name": "Best Friend, Worst Enemy",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632I",
+            "qoj:9776"
+          ],
+          "qoj_id": 9776
+        },
+        {
+          "id": "ccpc-2024-郑州:J",
+          "index": "J",
+          "name": "Balance in All Things",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632J",
+            "qoj:9777"
+          ],
+          "qoj_id": 9777
+        },
+        {
+          "id": "ccpc-2024-郑州:K",
+          "index": "K",
+          "name": "Brotato",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632K",
+            "qoj:9778"
+          ],
+          "qoj_id": 9778
+        },
+        {
+          "id": "ccpc-2024-郑州:L",
+          "index": "L",
+          "name": "Z-order Curve",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632L",
+            "qoj:9779"
+          ],
+          "qoj_id": 9779
+        },
+        {
+          "id": "ccpc-2024-郑州:M",
+          "index": "M",
+          "name": "Rejection Sampling",
+          "cf_contest_id": 105632,
+          "aliases": [
+            "codeforces:105632M",
+            "qoj:9780"
+          ],
+          "qoj_id": 9780
+        }
+      ],
+      "qoj_contest_id": 1873,
+      "qoj_url": "https://qoj.ac/contest/1873",
+      "mapping_source": "https://vjudge.net/contest/683109"
+    },
+    {
+      "id": "ccpc-2024-重庆",
+      "year": 2024,
+      "series": "CCPC",
+      "site": "重庆",
+      "name": "2024 CCPC 重庆站",
+      "original_name": "2024 China Collegiate Programming Contest (CCPC) Chongqing Onsite",
+      "source_url": "https://codeforces.com/gym/106030",
+      "cf_contest_id": 106030,
+      "problems": [
+        {
+          "id": "ccpc-2024-重庆:A",
+          "index": "A",
+          "name": "乘积，欧拉函数，求和",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030A",
+            "qoj:9619"
+          ],
+          "qoj_id": 9619
+        },
+        {
+          "id": "ccpc-2024-重庆:B",
+          "index": "B",
+          "name": "osu!mania",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030B",
+            "qoj:9620"
+          ],
+          "qoj_id": 9620
+        },
+        {
+          "id": "ccpc-2024-重庆:C",
+          "index": "C",
+          "name": "连方",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030C",
+            "qoj:9621"
+          ],
+          "qoj_id": 9621
+        },
+        {
+          "id": "ccpc-2024-重庆:D",
+          "index": "D",
+          "name": "有限小数",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030D",
+            "qoj:9622"
+          ],
+          "qoj_id": 9622
+        },
+        {
+          "id": "ccpc-2024-重庆:E",
+          "index": "E",
+          "name": "合成大西瓜",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030E",
+            "qoj:9623"
+          ],
+          "qoj_id": 9623
+        },
+        {
+          "id": "ccpc-2024-重庆:F",
+          "index": "F",
+          "name": "Pico Park",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030F",
+            "qoj:9624"
+          ],
+          "qoj_id": 9624
+        },
+        {
+          "id": "ccpc-2024-重庆:G",
+          "index": "G",
+          "name": "魔弹",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030G",
+            "qoj:9625"
+          ],
+          "qoj_id": 9625
+        },
+        {
+          "id": "ccpc-2024-重庆:H",
+          "index": "H",
+          "name": "str(list(s))",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030H",
+            "qoj:9626"
+          ],
+          "qoj_id": 9626
+        },
+        {
+          "id": "ccpc-2024-重庆:I",
+          "index": "I",
+          "name": "算术",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030I",
+            "qoj:9627"
+          ],
+          "qoj_id": 9627
+        },
+        {
+          "id": "ccpc-2024-重庆:J",
+          "index": "J",
+          "name": "骰子",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030J",
+            "qoj:9628"
+          ],
+          "qoj_id": 9628
+        },
+        {
+          "id": "ccpc-2024-重庆:K",
+          "index": "K",
+          "name": "小 C 的神秘图形",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030K",
+            "qoj:9629"
+          ],
+          "qoj_id": 9629
+        },
+        {
+          "id": "ccpc-2024-重庆:L",
+          "index": "L",
+          "name": "沙堆",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030L",
+            "qoj:9630"
+          ],
+          "qoj_id": 9630
+        },
+        {
+          "id": "ccpc-2024-重庆:M",
+          "index": "M",
+          "name": "Median Replacement",
+          "cf_contest_id": 106030,
+          "aliases": [
+            "codeforces:106030M",
+            "qoj:9631"
+          ],
+          "qoj_id": 9631
+        }
+      ],
+      "qoj_contest_id": 1840,
+      "qoj_url": "https://qoj.ac/contest/1840",
+      "mapping_source": "https://vjudge.net/contest/673000"
+    },
+    {
+      "id": "icpc-2024-上海",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "上海",
+      "name": "2024 ICPC 上海站",
+      "source_url": "https://qoj.ac/contest/1913",
+      "problems": [
+        {
+          "id": "icpc-2024-上海:A",
+          "index": "A",
+          "name": "Ancient Maps, Hidden Danger",
+          "aliases": [
+            "qoj:9037"
+          ],
+          "qoj_id": 9037
+        },
+        {
+          "id": "icpc-2024-上海:B",
+          "index": "B",
+          "name": "Basic Graph Algorithm",
+          "aliases": [
+            "qoj:9038"
+          ],
+          "qoj_id": 9038
+        },
+        {
+          "id": "icpc-2024-上海:C",
+          "index": "C",
+          "name": "Conquer the Multiples",
+          "aliases": [
+            "qoj:9039"
+          ],
+          "qoj_id": 9039
+        },
+        {
+          "id": "icpc-2024-上海:D",
+          "index": "D",
+          "name": "Decrease and Swap",
+          "aliases": [
+            "qoj:9040"
+          ],
+          "qoj_id": 9040
+        },
+        {
+          "id": "icpc-2024-上海:E",
+          "index": "E",
+          "name": "Equal Measure",
+          "aliases": [
+            "qoj:9041"
+          ],
+          "qoj_id": 9041
+        },
+        {
+          "id": "icpc-2024-上海:F",
+          "index": "F",
+          "name": "Fast Bogosort",
+          "aliases": [
+            "qoj:9042"
+          ],
+          "qoj_id": 9042
+        },
+        {
+          "id": "icpc-2024-上海:G",
+          "index": "G",
+          "name": "Geometry Task",
+          "aliases": [
+            "qoj:9043"
+          ],
+          "qoj_id": 9043
+        },
+        {
+          "id": "icpc-2024-上海:H",
+          "index": "H",
+          "name": "Hexagon Puzzle",
+          "aliases": [
+            "qoj:9044"
+          ],
+          "qoj_id": 9044
+        },
+        {
+          "id": "icpc-2024-上海:I",
+          "index": "I",
+          "name": "In Search of the Ultimate Artifact",
+          "aliases": [
+            "qoj:9045"
+          ],
+          "qoj_id": 9045
+        },
+        {
+          "id": "icpc-2024-上海:J",
+          "index": "J",
+          "name": "Just-in-Time Render Analysis",
+          "aliases": [
+            "qoj:9046"
+          ],
+          "qoj_id": 9046
+        },
+        {
+          "id": "icpc-2024-上海:K",
+          "index": "K",
+          "name": "Knights of Night",
+          "aliases": [
+            "qoj:9047"
+          ],
+          "qoj_id": 9047
+        },
+        {
+          "id": "icpc-2024-上海:L",
+          "index": "L",
+          "name": "Lazy Susan",
+          "aliases": [
+            "qoj:9048"
+          ],
+          "qoj_id": 9048
+        },
+        {
+          "id": "icpc-2024-上海:M",
+          "index": "M",
+          "name": "Machine Learning with Penguins",
+          "aliases": [
+            "qoj:9049"
+          ],
+          "qoj_id": 9049
+        }
+      ],
+      "qoj_contest_id": 1913,
+      "qoj_url": "https://qoj.ac/contest/1913",
+      "mapping_source": "https://vjudge.net/contest/752913"
+    },
+    {
+      "id": "icpc-2024-南京",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "南京",
+      "name": "2024 ICPC 南京站",
+      "original_name": "The 2024 ICPC Asia Nanjing Regional Contest (The 3rd Universal Cup. Stage 16: Nanjing)",
+      "source_url": "https://codeforces.com/gym/105484",
+      "cf_contest_id": 105484,
+      "problems": [
+        {
+          "id": "icpc-2024-南京:A",
+          "index": "A",
+          "name": "Hey, Have You Seen My Kangaroo?",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484A",
+            "qoj:9564"
+          ],
+          "qoj_id": 9564
+        },
+        {
+          "id": "icpc-2024-南京:B",
+          "index": "B",
+          "name": "Birthday Gift",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484B",
+            "qoj:9565"
+          ],
+          "qoj_id": 9565
+        },
+        {
+          "id": "icpc-2024-南京:C",
+          "index": "C",
+          "name": "Topology",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484C",
+            "qoj:9566"
+          ],
+          "qoj_id": 9566
+        },
+        {
+          "id": "icpc-2024-南京:D",
+          "index": "D",
+          "name": "Toe-Tac-Tics",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484D",
+            "qoj:9567"
+          ],
+          "qoj_id": 9567
+        },
+        {
+          "id": "icpc-2024-南京:E",
+          "index": "E",
+          "name": "Left Shifting 3",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484E",
+            "qoj:9568"
+          ],
+          "qoj_id": 9568
+        },
+        {
+          "id": "icpc-2024-南京:F",
+          "index": "F",
+          "name": "Subway",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484F",
+            "qoj:9569"
+          ],
+          "qoj_id": 9569
+        },
+        {
+          "id": "icpc-2024-南京:G",
+          "index": "G",
+          "name": "Binary Tree",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484G",
+            "qoj:9570"
+          ],
+          "qoj_id": 9570
+        },
+        {
+          "id": "icpc-2024-南京:H",
+          "index": "H",
+          "name": "Border Jump 2",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484H",
+            "qoj:9571"
+          ],
+          "qoj_id": 9571
+        },
+        {
+          "id": "icpc-2024-南京:I",
+          "index": "I",
+          "name": "Bingo",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484I",
+            "qoj:9572"
+          ],
+          "qoj_id": 9572
+        },
+        {
+          "id": "icpc-2024-南京:J",
+          "index": "J",
+          "name": "Social Media",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484J",
+            "qoj:9573"
+          ],
+          "qoj_id": 9573
+        },
+        {
+          "id": "icpc-2024-南京:K",
+          "index": "K",
+          "name": "Strips",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484K",
+            "qoj:9574"
+          ],
+          "qoj_id": 9574
+        },
+        {
+          "id": "icpc-2024-南京:L",
+          "index": "L",
+          "name": "$P \\oplus Q = R$",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484L",
+            "qoj:9575"
+          ],
+          "qoj_id": 9575
+        },
+        {
+          "id": "icpc-2024-南京:M",
+          "index": "M",
+          "name": "Ordainer of Inexorable Judgment",
+          "cf_contest_id": 105484,
+          "aliases": [
+            "codeforces:105484M",
+            "qoj:9576"
+          ],
+          "qoj_id": 9576
+        }
+      ],
+      "qoj_contest_id": 1828,
+      "qoj_url": "https://qoj.ac/contest/1828"
+    },
+    {
+      "id": "icpc-2024-成都",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "成都",
+      "name": "2024 ICPC 成都站",
+      "original_name": "2024 ICPC Asia Chengdu Regional Contest (The 3rd Universal Cup. Stage 15: Chengdu)",
+      "source_url": "https://codeforces.com/gym/105486",
+      "cf_contest_id": 105486,
+      "problems": [
+        {
+          "id": "icpc-2024-成都:A",
+          "index": "A",
+          "name": "Arrow a Row",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486A",
+            "qoj:9535"
+          ],
+          "qoj_id": 9535
+        },
+        {
+          "id": "icpc-2024-成都:B",
+          "index": "B",
+          "name": "Athlete Welcome Ceremony",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486B",
+            "qoj:9536"
+          ],
+          "qoj_id": 9536
+        },
+        {
+          "id": "icpc-2024-成都:C",
+          "index": "C",
+          "name": "Chinese Chess",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486C",
+            "qoj:9537"
+          ],
+          "qoj_id": 9537
+        },
+        {
+          "id": "icpc-2024-成都:D",
+          "index": "D",
+          "name": "Closest Derangement",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486D",
+            "qoj:9538"
+          ],
+          "qoj_id": 9538
+        },
+        {
+          "id": "icpc-2024-成都:E",
+          "index": "E",
+          "name": "Disrupting Communications",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486E",
+            "qoj:9539"
+          ],
+          "qoj_id": 9539
+        },
+        {
+          "id": "icpc-2024-成都:F",
+          "index": "F",
+          "name": "Double 11",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486F",
+            "qoj:9540"
+          ],
+          "qoj_id": 9540
+        },
+        {
+          "id": "icpc-2024-成都:G",
+          "index": "G",
+          "name": "Expanding Array",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486G",
+            "qoj:9541"
+          ],
+          "qoj_id": 9541
+        },
+        {
+          "id": "icpc-2024-成都:H",
+          "index": "H",
+          "name": "Friendship is Magic",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486H",
+            "qoj:9542"
+          ],
+          "qoj_id": 9542
+        },
+        {
+          "id": "icpc-2024-成都:I",
+          "index": "I",
+          "name": "Good Partitions",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486I",
+            "qoj:9543"
+          ],
+          "qoj_id": 9543
+        },
+        {
+          "id": "icpc-2024-成都:J",
+          "index": "J",
+          "name": "Grand Prix of Ballance",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486J",
+            "qoj:9544"
+          ],
+          "qoj_id": 9544
+        },
+        {
+          "id": "icpc-2024-成都:K",
+          "index": "K",
+          "name": "Magical Set",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486K",
+            "qoj:9545"
+          ],
+          "qoj_id": 9545
+        },
+        {
+          "id": "icpc-2024-成都:L",
+          "index": "L",
+          "name": "Recover Statistics",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486L",
+            "qoj:9546"
+          ],
+          "qoj_id": 9546
+        },
+        {
+          "id": "icpc-2024-成都:M",
+          "index": "M",
+          "name": "Two Convex Holes",
+          "cf_contest_id": 105486,
+          "aliases": [
+            "codeforces:105486M",
+            "qoj:9547"
+          ],
+          "qoj_id": 9547
+        }
+      ],
+      "qoj_contest_id": 1821,
+      "qoj_url": "https://qoj.ac/contest/1821"
+    },
+    {
+      "id": "icpc-2024-昆明",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "昆明",
+      "name": "2024 ICPC 昆明站",
+      "original_name": "The 2024 ICPC Asia Kunming Regional Contest (The 3rd Universal Cup. Stage 20: Kunming)",
+      "source_url": "https://codeforces.com/gym/105588",
+      "cf_contest_id": 105588,
+      "problems": [
+        {
+          "id": "icpc-2024-昆明:A",
+          "index": "A",
+          "name": "Antivirus",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588A",
+            "qoj:9862"
+          ],
+          "qoj_id": 9862
+        },
+        {
+          "id": "icpc-2024-昆明:B",
+          "index": "B",
+          "name": "Brackets",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588B",
+            "qoj:9863"
+          ],
+          "qoj_id": 9863
+        },
+        {
+          "id": "icpc-2024-昆明:C",
+          "index": "C",
+          "name": "Coin",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588C",
+            "qoj:9864"
+          ],
+          "qoj_id": 9864
+        },
+        {
+          "id": "icpc-2024-昆明:D",
+          "index": "D",
+          "name": "Dolls",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588D",
+            "qoj:9865"
+          ],
+          "qoj_id": 9865
+        },
+        {
+          "id": "icpc-2024-昆明:E",
+          "index": "E",
+          "name": "Extracting Weights",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588E",
+            "qoj:9866"
+          ],
+          "qoj_id": 9866
+        },
+        {
+          "id": "icpc-2024-昆明:F",
+          "index": "F",
+          "name": "Flowers",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588F",
+            "qoj:9867"
+          ],
+          "qoj_id": 9867
+        },
+        {
+          "id": "icpc-2024-昆明:G",
+          "index": "G",
+          "name": "GCD",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588G",
+            "qoj:9868"
+          ],
+          "qoj_id": 9868
+        },
+        {
+          "id": "icpc-2024-昆明:H",
+          "index": "H",
+          "name": "Horizon Scanning",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588H",
+            "qoj:9869"
+          ],
+          "qoj_id": 9869
+        },
+        {
+          "id": "icpc-2024-昆明:I",
+          "index": "I",
+          "name": "Items",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588I",
+            "qoj:9870"
+          ],
+          "qoj_id": 9870
+        },
+        {
+          "id": "icpc-2024-昆明:J",
+          "index": "J",
+          "name": "Just another Sorting Problem",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588J",
+            "qoj:9871"
+          ],
+          "qoj_id": 9871
+        },
+        {
+          "id": "icpc-2024-昆明:K",
+          "index": "K",
+          "name": "Key Recovery",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588K",
+            "qoj:9872"
+          ],
+          "qoj_id": 9872
+        },
+        {
+          "id": "icpc-2024-昆明:L",
+          "index": "L",
+          "name": "Last Chance: Threads of Despair",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588L",
+            "qoj:9873"
+          ],
+          "qoj_id": 9873
+        },
+        {
+          "id": "icpc-2024-昆明:M",
+          "index": "M",
+          "name": "Matrix Construction",
+          "cf_contest_id": 105588,
+          "aliases": [
+            "codeforces:105588M",
+            "qoj:9874"
+          ],
+          "qoj_id": 9874
+        }
+      ],
+      "qoj_contest_id": 1871,
+      "qoj_url": "https://qoj.ac/contest/1871"
+    },
+    {
+      "id": "icpc-2024-杭州",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "杭州",
+      "name": "2024 ICPC 杭州站",
+      "original_name": "The 2024 ICPC Asia Hangzhou Regional Contest (The 3rd Universal Cup. Stage 25: Hangzhou)",
+      "source_url": "https://codeforces.com/gym/105657",
+      "cf_contest_id": 105657,
+      "problems": [
+        {
+          "id": "icpc-2024-杭州:A",
+          "index": "A",
+          "name": "AUS",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657A",
+            "qoj:9726"
+          ],
+          "qoj_id": 9726
+        },
+        {
+          "id": "icpc-2024-杭州:B",
+          "index": "B",
+          "name": "Barkley III",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657B",
+            "qoj:9727"
+          ],
+          "qoj_id": 9727
+        },
+        {
+          "id": "icpc-2024-杭州:C",
+          "index": "C",
+          "name": "Catch the Star",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657C",
+            "qoj:9728"
+          ],
+          "qoj_id": 9728
+        },
+        {
+          "id": "icpc-2024-杭州:D",
+          "index": "D",
+          "name": "Dividing Sequence",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657D",
+            "qoj:9729"
+          ],
+          "qoj_id": 9729
+        },
+        {
+          "id": "icpc-2024-杭州:E",
+          "index": "E",
+          "name": "Elevator II",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657E",
+            "qoj:9730"
+          ],
+          "qoj_id": 9730
+        },
+        {
+          "id": "icpc-2024-杭州:F",
+          "index": "F",
+          "name": "Fuzzy Ranking",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657F",
+            "qoj:9731"
+          ],
+          "qoj_id": 9731
+        },
+        {
+          "id": "icpc-2024-杭州:G",
+          "index": "G",
+          "name": "Gathering Mushrooms",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657G",
+            "qoj:9732"
+          ],
+          "qoj_id": 9732
+        },
+        {
+          "id": "icpc-2024-杭州:H",
+          "index": "H",
+          "name": "Heavy-light Decomposition",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657H",
+            "qoj:9733"
+          ],
+          "qoj_id": 9733
+        },
+        {
+          "id": "icpc-2024-杭州:I",
+          "index": "I",
+          "name": "Identify Chord",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657I",
+            "qoj:9734"
+          ],
+          "qoj_id": 9734
+        },
+        {
+          "id": "icpc-2024-杭州:J",
+          "index": "J",
+          "name": "Japanese Bands",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657J",
+            "qoj:9735"
+          ],
+          "qoj_id": 9735
+        },
+        {
+          "id": "icpc-2024-杭州:K",
+          "index": "K",
+          "name": "Kind of Bingo",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657K",
+            "qoj:9736"
+          ],
+          "qoj_id": 9736
+        },
+        {
+          "id": "icpc-2024-杭州:L",
+          "index": "L",
+          "name": "Let's Go! New Adventure",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657L",
+            "qoj:9737"
+          ],
+          "qoj_id": 9737
+        },
+        {
+          "id": "icpc-2024-杭州:M",
+          "index": "M",
+          "name": "Make It Divisible",
+          "cf_contest_id": 105657,
+          "aliases": [
+            "codeforces:105657M",
+            "qoj:9738"
+          ],
+          "qoj_id": 9738
+        }
+      ],
+      "qoj_contest_id": 1893,
+      "qoj_url": "https://qoj.ac/contest/1893"
+    },
+    {
+      "id": "icpc-2024-沈阳",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "沈阳",
+      "name": "2024 ICPC 沈阳站",
+      "original_name": "The 2024 ICPC Asia Shenyang Regional Contest (The 3rd Universal Cup. Stage 19: Shenyang)",
+      "source_url": "https://codeforces.com/gym/105578",
+      "cf_contest_id": 105578,
+      "problems": [
+        {
+          "id": "icpc-2024-沈阳:A",
+          "index": "A",
+          "name": "Safety First",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578A",
+            "qoj:9798"
+          ],
+          "qoj_id": 9798
+        },
+        {
+          "id": "icpc-2024-沈阳:B",
+          "index": "B",
+          "name": "Magical Palette",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578B",
+            "qoj:9799"
+          ],
+          "qoj_id": 9799
+        },
+        {
+          "id": "icpc-2024-沈阳:C",
+          "index": "C",
+          "name": "Crisis Event: Meteorite",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578C",
+            "qoj:9800"
+          ],
+          "qoj_id": 9800
+        },
+        {
+          "id": "icpc-2024-沈阳:D",
+          "index": "D",
+          "name": "Dot Product Game",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578D",
+            "qoj:9801"
+          ],
+          "qoj_id": 9801
+        },
+        {
+          "id": "icpc-2024-沈阳:E",
+          "index": "E",
+          "name": "Light Up the Grid",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578E",
+            "qoj:9802"
+          ],
+          "qoj_id": 9802
+        },
+        {
+          "id": "icpc-2024-沈阳:F",
+          "index": "F",
+          "name": "Light Up the Hypercube",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578F",
+            "qoj:9803"
+          ],
+          "qoj_id": 9803
+        },
+        {
+          "id": "icpc-2024-沈阳:G",
+          "index": "G",
+          "name": "Guess the Polygon",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578G",
+            "qoj:9804"
+          ],
+          "qoj_id": 9804
+        },
+        {
+          "id": "icpc-2024-沈阳:H",
+          "index": "H",
+          "name": "Guide Map",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578H",
+            "qoj:9805"
+          ],
+          "qoj_id": 9805
+        },
+        {
+          "id": "icpc-2024-沈阳:I",
+          "index": "I",
+          "name": "Growing Tree",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578I",
+            "qoj:9806"
+          ],
+          "qoj_id": 9806
+        },
+        {
+          "id": "icpc-2024-沈阳:J",
+          "index": "J",
+          "name": "Make Them Believe",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578J",
+            "qoj:9807"
+          ],
+          "qoj_id": 9807
+        },
+        {
+          "id": "icpc-2024-沈阳:K",
+          "index": "K",
+          "name": "Fragile Pinball",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578K",
+            "qoj:9808"
+          ],
+          "qoj_id": 9808
+        },
+        {
+          "id": "icpc-2024-沈阳:L",
+          "index": "L",
+          "name": "The Grand Contest",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578L",
+            "qoj:9809"
+          ],
+          "qoj_id": 9809
+        },
+        {
+          "id": "icpc-2024-沈阳:M",
+          "index": "M",
+          "name": "Obliviate, Then Reincarnate",
+          "cf_contest_id": 105578,
+          "aliases": [
+            "codeforces:105578M",
+            "qoj:9810"
+          ],
+          "qoj_id": 9810
+        }
+      ],
+      "qoj_contest_id": 1865,
+      "qoj_url": "https://qoj.ac/contest/1865"
+    },
+    {
+      "id": "icpc-2024-香港",
+      "year": 2024,
+      "series": "ICPC",
+      "site": "香港",
+      "name": "2024 ICPC 香港站",
+      "source_url": "https://qoj.ac/contest/1885",
+      "problems": [
+        {
+          "id": "icpc-2024-香港:A",
+          "index": "A",
+          "name": "General Symmetry",
+          "aliases": [
+            "qoj:9915"
+          ],
+          "qoj_id": 9915
+        },
+        {
+          "id": "icpc-2024-香港:B",
+          "index": "B",
+          "name": "Defeat the Enemies",
+          "aliases": [
+            "qoj:9916"
+          ],
+          "qoj_id": 9916
+        },
+        {
+          "id": "icpc-2024-香港:C",
+          "index": "C",
+          "name": "The Story of Emperor Bie",
+          "aliases": [
+            "qoj:9917"
+          ],
+          "qoj_id": 9917
+        },
+        {
+          "id": "icpc-2024-香港:D",
+          "index": "D",
+          "name": "Master of Both VI",
+          "aliases": [
+            "qoj:9918"
+          ],
+          "qoj_id": 9918
+        },
+        {
+          "id": "icpc-2024-香港:E",
+          "index": "E",
+          "name": "Concave Hull",
+          "aliases": [
+            "qoj:9919"
+          ],
+          "qoj_id": 9919
+        },
+        {
+          "id": "icpc-2024-香港:F",
+          "index": "F",
+          "name": "Money Game 2",
+          "aliases": [
+            "qoj:9920"
+          ],
+          "qoj_id": 9920
+        },
+        {
+          "id": "icpc-2024-香港:G",
+          "index": "G",
+          "name": "Yelkrab",
+          "aliases": [
+            "qoj:9921"
+          ],
+          "qoj_id": 9921
+        },
+        {
+          "id": "icpc-2024-香港:H",
+          "index": "H",
+          "name": "Mah-jong",
+          "aliases": [
+            "qoj:9922"
+          ],
+          "qoj_id": 9922
+        },
+        {
+          "id": "icpc-2024-香港:I",
+          "index": "I",
+          "name": "Ma Meilleure Ennemie",
+          "aliases": [
+            "qoj:9923"
+          ],
+          "qoj_id": 9923
+        },
+        {
+          "id": "icpc-2024-香港:J",
+          "index": "J",
+          "name": "Reconstruction",
+          "aliases": [
+            "qoj:9924"
+          ],
+          "qoj_id": 9924
+        },
+        {
+          "id": "icpc-2024-香港:K",
+          "index": "K",
+          "name": "LR String",
+          "aliases": [
+            "qoj:9925"
+          ],
+          "qoj_id": 9925
+        },
+        {
+          "id": "icpc-2024-香港:L",
+          "index": "L",
+          "name": "Flipping Paths",
+          "aliases": [
+            "qoj:9926"
+          ],
+          "qoj_id": 9926
+        },
+        {
+          "id": "icpc-2024-香港:M",
+          "index": "M",
+          "name": "Godzilla",
+          "aliases": [
+            "qoj:9927"
+          ],
+          "qoj_id": 9927
+        }
+      ],
+      "qoj_contest_id": 1885,
+      "qoj_url": "https://qoj.ac/contest/1885",
+      "mapping_source": "https://vjudge.net/contest/684424"
+    },
+    {
+      "id": "ccpc-2023-哈尔滨",
+      "year": 2023,
+      "series": "CCPC",
+      "site": "哈尔滨",
+      "name": "2023 CCPC 哈尔滨站",
+      "source_url": "https://qoj.ac/contest/1412",
+      "problems": [
+        {
+          "id": "ccpc-2023-哈尔滨:A",
+          "index": "A",
+          "name": "Go go Baron Bunny!",
+          "aliases": [
+            "qoj:7746"
+          ],
+          "qoj_id": 7746
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:B",
+          "index": "B",
+          "name": "Memory",
+          "aliases": [
+            "qoj:7747"
+          ],
+          "qoj_id": 7747
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:C",
+          "index": "C",
+          "name": "Karshilov's Matching Problem II",
+          "aliases": [
+            "qoj:7748"
+          ],
+          "qoj_id": 7748
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:D",
+          "index": "D",
+          "name": "A Simple MST Problem",
+          "aliases": [
+            "qoj:7749"
+          ],
+          "qoj_id": 7749
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:E",
+          "index": "E",
+          "name": "Revenge on My Boss",
+          "aliases": [
+            "qoj:7750"
+          ],
+          "qoj_id": 7750
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:F",
+          "index": "F",
+          "name": "Palindrome Path",
+          "aliases": [
+            "qoj:7751"
+          ],
+          "qoj_id": 7751
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:G",
+          "index": "G",
+          "name": "The Only Way to the Destination",
+          "aliases": [
+            "qoj:7752"
+          ],
+          "qoj_id": 7752
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:H",
+          "index": "H",
+          "name": "Energy Distribution",
+          "aliases": [
+            "qoj:7753"
+          ],
+          "qoj_id": 7753
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:I",
+          "index": "I",
+          "name": "Rolling For Days",
+          "aliases": [
+            "qoj:7754"
+          ],
+          "qoj_id": 7754
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:J",
+          "index": "J",
+          "name": "Game on a Forest",
+          "aliases": [
+            "qoj:7755"
+          ],
+          "qoj_id": 7755
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:K",
+          "index": "K",
+          "name": "Omniscia Spares None",
+          "aliases": [
+            "qoj:7756"
+          ],
+          "qoj_id": 7756
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:L",
+          "index": "L",
+          "name": "Palm Island",
+          "aliases": [
+            "qoj:7757"
+          ],
+          "qoj_id": 7757
+        },
+        {
+          "id": "ccpc-2023-哈尔滨:M",
+          "index": "M",
+          "name": "Painter",
+          "aliases": [
+            "qoj:7758"
+          ],
+          "qoj_id": 7758
+        }
+      ],
+      "qoj_contest_id": 1412,
+      "qoj_url": "https://qoj.ac/contest/1412",
+      "mapping_source": "https://vjudge.net/contest/661852"
+    },
+    {
+      "id": "ccpc-2023-桂林",
+      "year": 2023,
+      "series": "CCPC",
+      "site": "桂林",
+      "name": "2023 CCPC 桂林站",
+      "original_name": "2023 China Collegiate Programming Contest (CCPC) Guilin Onsite (The 2nd Universal Cup. Stage 8: Guilin)",
+      "source_url": "https://codeforces.com/gym/104768",
+      "cf_contest_id": 104768,
+      "problems": [
+        {
+          "id": "ccpc-2023-桂林:A",
+          "index": "A",
+          "name": "Easy Diameter Problem",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768A",
+            "qoj:7677"
+          ],
+          "qoj_id": 7677
+        },
+        {
+          "id": "ccpc-2023-桂林:B",
+          "index": "B",
+          "name": "The Game",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768B",
+            "qoj:7678"
+          ],
+          "qoj_id": 7678
+        },
+        {
+          "id": "ccpc-2023-桂林:C",
+          "index": "C",
+          "name": "Master of Both IV",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768C",
+            "qoj:7679"
+          ],
+          "qoj_id": 7679
+        },
+        {
+          "id": "ccpc-2023-桂林:D",
+          "index": "D",
+          "name": "Subway",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768D",
+            "qoj:7680"
+          ],
+          "qoj_id": 7680
+        },
+        {
+          "id": "ccpc-2023-桂林:E",
+          "index": "E",
+          "name": "Prefix Mahjong",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768E",
+            "qoj:7681"
+          ],
+          "qoj_id": 7681
+        },
+        {
+          "id": "ccpc-2023-桂林:F",
+          "index": "F",
+          "name": "Redundant Towers",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768F",
+            "qoj:7682"
+          ],
+          "qoj_id": 7682
+        },
+        {
+          "id": "ccpc-2023-桂林:G",
+          "index": "G",
+          "name": "Hard Brackets Problem",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768G",
+            "qoj:7683"
+          ],
+          "qoj_id": 7683
+        },
+        {
+          "id": "ccpc-2023-桂林:H",
+          "index": "H",
+          "name": "Sweet Sugar",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768H",
+            "qoj:7684"
+          ],
+          "qoj_id": 7684
+        },
+        {
+          "id": "ccpc-2023-桂林:I",
+          "index": "I",
+          "name": "Barkley II",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768I",
+            "qoj:7685"
+          ],
+          "qoj_id": 7685
+        },
+        {
+          "id": "ccpc-2023-桂林:J",
+          "index": "J",
+          "name": "The Phantom Menace",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768J",
+            "qoj:7686"
+          ],
+          "qoj_id": 7686
+        },
+        {
+          "id": "ccpc-2023-桂林:K",
+          "index": "K",
+          "name": "Randias Permutation Task",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768K",
+            "qoj:7687"
+          ],
+          "qoj_id": 7687
+        },
+        {
+          "id": "ccpc-2023-桂林:L",
+          "index": "L",
+          "name": "Alea Iacta Est",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768L",
+            "qoj:7688"
+          ],
+          "qoj_id": 7688
+        },
+        {
+          "id": "ccpc-2023-桂林:M",
+          "index": "M",
+          "name": "Flipping Cards",
+          "cf_contest_id": 104768,
+          "aliases": [
+            "codeforces:104768M",
+            "qoj:7689"
+          ],
+          "qoj_id": 7689
+        }
+      ],
+      "qoj_contest_id": 1404,
+      "qoj_url": "https://qoj.ac/contest/1404",
+      "mapping_source": "https://vjudge.net/contest/669109"
+    },
+    {
+      "id": "ccpc-2023-深圳",
+      "year": 2023,
+      "series": "CCPC",
+      "site": "深圳",
+      "name": "2023 CCPC 深圳站",
+      "source_url": "https://qoj.ac/contest/1540",
+      "problems": [
+        {
+          "id": "ccpc-2023-深圳:A",
+          "index": "A",
+          "name": "A Good Problem",
+          "aliases": [
+            "qoj:8328"
+          ],
+          "qoj_id": 8328
+        },
+        {
+          "id": "ccpc-2023-深圳:B",
+          "index": "B",
+          "name": "Excuse",
+          "aliases": [
+            "qoj:8329"
+          ],
+          "qoj_id": 8329
+        },
+        {
+          "id": "ccpc-2023-深圳:C",
+          "index": "C",
+          "name": "Count off 3",
+          "aliases": [
+            "qoj:8330"
+          ],
+          "qoj_id": 8330
+        },
+        {
+          "id": "ccpc-2023-深圳:D",
+          "index": "D",
+          "name": "Bot Brothers",
+          "aliases": [
+            "qoj:8331"
+          ],
+          "qoj_id": 8331
+        },
+        {
+          "id": "ccpc-2023-深圳:E",
+          "index": "E",
+          "name": "Two in One",
+          "aliases": [
+            "qoj:8332"
+          ],
+          "qoj_id": 8332
+        },
+        {
+          "id": "ccpc-2023-深圳:F",
+          "index": "F",
+          "name": "Gift",
+          "aliases": [
+            "qoj:8333"
+          ],
+          "qoj_id": 8333
+        },
+        {
+          "id": "ccpc-2023-深圳:G",
+          "index": "G",
+          "name": "Gene",
+          "aliases": [
+            "qoj:8334"
+          ],
+          "qoj_id": 8334
+        },
+        {
+          "id": "ccpc-2023-深圳:H",
+          "index": "H",
+          "name": "Fast Hash Transform",
+          "aliases": [
+            "qoj:8335"
+          ],
+          "qoj_id": 8335
+        },
+        {
+          "id": "ccpc-2023-深圳:I",
+          "index": "I",
+          "name": "Indeterminate Equation",
+          "aliases": [
+            "qoj:8336"
+          ],
+          "qoj_id": 8336
+        },
+        {
+          "id": "ccpc-2023-深圳:J",
+          "index": "J",
+          "name": "Counter Reset Problem",
+          "aliases": [
+            "qoj:8337"
+          ],
+          "qoj_id": 8337
+        },
+        {
+          "id": "ccpc-2023-深圳:K",
+          "index": "K",
+          "name": "Quad Kingdoms Chess",
+          "aliases": [
+            "qoj:8338"
+          ],
+          "qoj_id": 8338
+        },
+        {
+          "id": "ccpc-2023-深圳:L",
+          "index": "L",
+          "name": "Rooted Tree",
+          "aliases": [
+            "qoj:8339"
+          ],
+          "qoj_id": 8339
+        },
+        {
+          "id": "ccpc-2023-深圳:M",
+          "index": "M",
+          "name": "3 Sum",
+          "aliases": [
+            "qoj:8340"
+          ],
+          "qoj_id": 8340
+        }
+      ],
+      "qoj_contest_id": 1540,
+      "qoj_url": "https://qoj.ac/contest/1540",
+      "mapping_source": "https://vjudge.net/contest/758929"
+    },
+    {
+      "id": "ccpc-2023-秦皇岛",
+      "year": 2023,
+      "series": "CCPC",
+      "site": "秦皇岛",
+      "name": "2023 CCPC 秦皇岛站",
+      "source_url": "https://qoj.ac/contest/1411",
+      "problems": [
+        {
+          "id": "ccpc-2023-秦皇岛:A",
+          "index": "A",
+          "name": "Make SYSU Great Again I",
+          "aliases": [
+            "codeforces:104787A",
+            "qoj:7619"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7619
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:B",
+          "index": "B",
+          "name": "Yet Another Subsequence Problem",
+          "aliases": [
+            "codeforces:104787B",
+            "qoj:7620"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7620
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:C",
+          "index": "C",
+          "name": "Palindrome",
+          "aliases": [
+            "codeforces:104787C",
+            "qoj:7621"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7621
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:D",
+          "index": "D",
+          "name": "Yet Another Coffee",
+          "aliases": [
+            "codeforces:104787D",
+            "qoj:7622"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7622
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:E",
+          "index": "E",
+          "name": "Coloring Tape",
+          "aliases": [
+            "codeforces:104787E",
+            "qoj:7623"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7623
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:F",
+          "index": "F",
+          "name": "Mystery of Prime",
+          "aliases": [
+            "codeforces:104787F",
+            "qoj:7624"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7624
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:G",
+          "index": "G",
+          "name": "Path",
+          "aliases": [
+            "codeforces:104787G",
+            "qoj:7625"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7625
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:H",
+          "index": "H",
+          "name": "Quake and Rebuild",
+          "aliases": [
+            "codeforces:104787H",
+            "qoj:7626"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7626
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:I",
+          "index": "I",
+          "name": "Phony",
+          "aliases": [
+            "codeforces:104787I",
+            "qoj:7627"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7627
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:J",
+          "index": "J",
+          "name": "Keyi LIkes Reading",
+          "aliases": [
+            "codeforces:104787J",
+            "qoj:7628"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7628
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:K",
+          "index": "K",
+          "name": "Make SYSU Great Again II",
+          "aliases": [
+            "codeforces:104787K",
+            "qoj:7629"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7629
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:L",
+          "index": "L",
+          "name": "Yet Another Maximize Permutation Subarrays",
+          "aliases": [
+            "codeforces:104787L",
+            "qoj:7630"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7630
+        },
+        {
+          "id": "ccpc-2023-秦皇岛:M",
+          "index": "M",
+          "name": "Inverted",
+          "aliases": [
+            "codeforces:104787M",
+            "qoj:7631"
+          ],
+          "cf_contest_id": 104787,
+          "qoj_id": 7631
+        }
+      ],
+      "qoj_contest_id": 1411,
+      "qoj_url": "https://qoj.ac/contest/1411",
+      "cf_contest_id": 104787,
+      "mapping_source": "https://vjudge.net/contest/664228"
+    },
+    {
+      "id": "icpc-2023-南京",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "南京",
+      "name": "2023 ICPC 南京站",
+      "original_name": "The 2023 ICPC Asia Nanjing Regional Contest (The 2nd Universal Cup. Stage 11: Nanjing)",
+      "source_url": "https://codeforces.com/gym/104821",
+      "cf_contest_id": 104821,
+      "problems": [
+        {
+          "id": "icpc-2023-南京:A",
+          "index": "A",
+          "name": "Cool, It's Yesterday Four Times More",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821A",
+            "qoj:7733"
+          ],
+          "qoj_id": 7733
+        },
+        {
+          "id": "icpc-2023-南京:B",
+          "index": "B",
+          "name": "Intersection over Union",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821B",
+            "qoj:7734"
+          ],
+          "qoj_id": 7734
+        },
+        {
+          "id": "icpc-2023-南京:C",
+          "index": "C",
+          "name": "Primitive Root",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821C",
+            "qoj:7735"
+          ],
+          "qoj_id": 7735
+        },
+        {
+          "id": "icpc-2023-南京:D",
+          "index": "D",
+          "name": "Red Black Tree",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821D",
+            "qoj:7736"
+          ],
+          "qoj_id": 7736
+        },
+        {
+          "id": "icpc-2023-南京:E",
+          "index": "E",
+          "name": "Extending Distance",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821E",
+            "qoj:7737"
+          ],
+          "qoj_id": 7737
+        },
+        {
+          "id": "icpc-2023-南京:F",
+          "index": "F",
+          "name": "Equivalent Rewriting",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821F",
+            "qoj:7738"
+          ],
+          "qoj_id": 7738
+        },
+        {
+          "id": "icpc-2023-南京:G",
+          "index": "G",
+          "name": "Knapsack",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821G",
+            "qoj:7739"
+          ],
+          "qoj_id": 7739
+        },
+        {
+          "id": "icpc-2023-南京:H",
+          "index": "H",
+          "name": "Puzzle: Question Mark",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821H",
+            "qoj:7740"
+          ],
+          "qoj_id": 7740
+        },
+        {
+          "id": "icpc-2023-南京:I",
+          "index": "I",
+          "name": "Counter",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821I",
+            "qoj:7741"
+          ],
+          "qoj_id": 7741
+        },
+        {
+          "id": "icpc-2023-南京:J",
+          "index": "J",
+          "name": "Suffix Structure",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821J",
+            "qoj:7742"
+          ],
+          "qoj_id": 7742
+        },
+        {
+          "id": "icpc-2023-南京:K",
+          "index": "K",
+          "name": "Grand Finale",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821K",
+            "qoj:7743"
+          ],
+          "qoj_id": 7743
+        },
+        {
+          "id": "icpc-2023-南京:L",
+          "index": "L",
+          "name": "Elevator",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821L",
+            "qoj:7744"
+          ],
+          "qoj_id": 7744
+        },
+        {
+          "id": "icpc-2023-南京:M",
+          "index": "M",
+          "name": "Trapping Rain Water",
+          "cf_contest_id": 104821,
+          "aliases": [
+            "codeforces:104821M",
+            "qoj:7745"
+          ],
+          "qoj_id": 7745
+        }
+      ],
+      "qoj_contest_id": 1435,
+      "qoj_url": "https://qoj.ac/contest/1435"
+    },
+    {
+      "id": "icpc-2023-合肥",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "合肥",
+      "name": "2023 ICPC 合肥站",
+      "original_name": "The 2023 ICPC Asia Hefei Regional Contest (The 2nd Universal Cup. Stage 12: Hefei)",
+      "source_url": "https://codeforces.com/gym/104857",
+      "cf_contest_id": 104857,
+      "problems": [
+        {
+          "id": "icpc-2023-合肥:A",
+          "index": "A",
+          "name": "SQRT Problem",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857A",
+            "qoj:7874"
+          ],
+          "qoj_id": 7874
+        },
+        {
+          "id": "icpc-2023-合肥:B",
+          "index": "B",
+          "name": "Queue Sorting",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857B",
+            "qoj:7875"
+          ],
+          "qoj_id": 7875
+        },
+        {
+          "id": "icpc-2023-合肥:C",
+          "index": "C",
+          "name": "Cyclic Substrings",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857C",
+            "qoj:7876"
+          ],
+          "qoj_id": 7876
+        },
+        {
+          "id": "icpc-2023-合肥:D",
+          "index": "D",
+          "name": "Balanced Array",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857D",
+            "qoj:7877"
+          ],
+          "qoj_id": 7877
+        },
+        {
+          "id": "icpc-2023-合肥:E",
+          "index": "E",
+          "name": "Matrix Distances",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857E",
+            "qoj:7878"
+          ],
+          "qoj_id": 7878
+        },
+        {
+          "id": "icpc-2023-合肥:F",
+          "index": "F",
+          "name": "Colorful Balloons",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857F",
+            "qoj:7879"
+          ],
+          "qoj_id": 7879
+        },
+        {
+          "id": "icpc-2023-合肥:G",
+          "index": "G",
+          "name": "Streak Manipulation",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857G",
+            "qoj:7880"
+          ],
+          "qoj_id": 7880
+        },
+        {
+          "id": "icpc-2023-合肥:H",
+          "index": "H",
+          "name": "Computational Complexity",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857H",
+            "qoj:7881"
+          ],
+          "qoj_id": 7881
+        },
+        {
+          "id": "icpc-2023-合肥:I",
+          "index": "I",
+          "name": "Linguistics Puzzle",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857I",
+            "qoj:7882"
+          ],
+          "qoj_id": 7882
+        },
+        {
+          "id": "icpc-2023-合肥:J",
+          "index": "J",
+          "name": "Takeout Delivering",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857J",
+            "qoj:7883"
+          ],
+          "qoj_id": 7883
+        },
+        {
+          "id": "icpc-2023-合肥:K",
+          "index": "K",
+          "name": "Campus Partition",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857K",
+            "qoj:7884"
+          ],
+          "qoj_id": 7884
+        },
+        {
+          "id": "icpc-2023-合肥:L",
+          "index": "L",
+          "name": "Information Spread",
+          "cf_contest_id": 104857,
+          "aliases": [
+            "codeforces:104857L",
+            "qoj:7885"
+          ],
+          "qoj_id": 7885
+        }
+      ],
+      "qoj_contest_id": 1440,
+      "qoj_url": "https://qoj.ac/contest/1440"
+    },
+    {
+      "id": "icpc-2023-杭州",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "杭州",
+      "name": "2023 ICPC 杭州站",
+      "source_url": "https://qoj.ac/contest/1516",
+      "problems": [
+        {
+          "id": "icpc-2023-杭州:A",
+          "index": "A",
+          "name": "Submissions",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976A",
+            "qoj:8230"
+          ],
+          "qoj_id": 8230
+        },
+        {
+          "id": "icpc-2023-杭州:B",
+          "index": "B",
+          "name": "Festival Decorating",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976B",
+            "qoj:8231"
+          ],
+          "qoj_id": 8231
+        },
+        {
+          "id": "icpc-2023-杭州:C",
+          "index": "C",
+          "name": "Yet Another Shortest Path Query",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976C",
+            "qoj:8232"
+          ],
+          "qoj_id": 8232
+        },
+        {
+          "id": "icpc-2023-杭州:D",
+          "index": "D",
+          "name": "Operator Precedence",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976D",
+            "qoj:8233"
+          ],
+          "qoj_id": 8233
+        },
+        {
+          "id": "icpc-2023-杭州:E",
+          "index": "E",
+          "name": "Period of a String",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976E",
+            "qoj:8234"
+          ],
+          "qoj_id": 8234
+        },
+        {
+          "id": "icpc-2023-杭州:F",
+          "index": "F",
+          "name": "Top Cluster",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976F",
+            "qoj:8235"
+          ],
+          "qoj_id": 8235
+        },
+        {
+          "id": "icpc-2023-杭州:G",
+          "index": "G",
+          "name": "Snake Move",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976G",
+            "qoj:8236"
+          ],
+          "qoj_id": 8236
+        },
+        {
+          "id": "icpc-2023-杭州:H",
+          "index": "H",
+          "name": "Sugar Sweet II",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976H",
+            "qoj:8237"
+          ],
+          "qoj_id": 8237
+        },
+        {
+          "id": "icpc-2023-杭州:I",
+          "index": "I",
+          "name": "Dreamy Putata",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976I",
+            "qoj:8238"
+          ],
+          "qoj_id": 8238
+        },
+        {
+          "id": "icpc-2023-杭州:J",
+          "index": "J",
+          "name": "Mysterious Tree",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976J",
+            "qoj:8239"
+          ],
+          "qoj_id": 8239
+        },
+        {
+          "id": "icpc-2023-杭州:K",
+          "index": "K",
+          "name": "Card Game",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976K",
+            "qoj:8240"
+          ],
+          "qoj_id": 8240
+        },
+        {
+          "id": "icpc-2023-杭州:L",
+          "index": "L",
+          "name": "Master of Both V",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976L",
+            "qoj:8241"
+          ],
+          "qoj_id": 8241
+        },
+        {
+          "id": "icpc-2023-杭州:M",
+          "index": "M",
+          "name": "V-Diagram",
+          "cf_contest_id": 104976,
+          "aliases": [
+            "codeforces:104976M",
+            "qoj:8242"
+          ],
+          "qoj_id": 8242
+        }
+      ],
+      "qoj_contest_id": 1516,
+      "qoj_url": "https://qoj.ac/contest/1516",
+      "cf_contest_id": 104976
+    },
+    {
+      "id": "icpc-2023-沈阳",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "沈阳",
+      "name": "2023 ICPC 沈阳站",
+      "original_name": "The 2023 ICPC Asia Shenyang Regional Contest (The 2nd Universal Cup. Stage 13: Shenyang)",
+      "source_url": "https://codeforces.com/gym/104869",
+      "cf_contest_id": 104869,
+      "problems": [
+        {
+          "id": "icpc-2023-沈阳:A",
+          "index": "A",
+          "name": "Intro: Dawn of a New Era",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869A",
+            "qoj:7777"
+          ],
+          "qoj_id": 7777
+        },
+        {
+          "id": "icpc-2023-沈阳:B",
+          "index": "B",
+          "name": "Turning Permutation",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869B",
+            "qoj:7778"
+          ],
+          "qoj_id": 7778
+        },
+        {
+          "id": "icpc-2023-沈阳:C",
+          "index": "C",
+          "name": "Swiss Stage",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869C",
+            "qoj:7779"
+          ],
+          "qoj_id": 7779
+        },
+        {
+          "id": "icpc-2023-沈阳:D",
+          "index": "D",
+          "name": "Dark LaTeX vs. Light LaTeX",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869D",
+            "qoj:7780"
+          ],
+          "qoj_id": 7780
+        },
+        {
+          "id": "icpc-2023-沈阳:E",
+          "index": "E",
+          "name": "Sheep Eat Wolves",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869E",
+            "qoj:7781"
+          ],
+          "qoj_id": 7781
+        },
+        {
+          "id": "icpc-2023-沈阳:F",
+          "index": "F",
+          "name": "Ursa Minor",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869F",
+            "qoj:7782"
+          ],
+          "qoj_id": 7782
+        },
+        {
+          "id": "icpc-2023-沈阳:G",
+          "index": "G",
+          "name": "Military Maneuver",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869G",
+            "qoj:7783"
+          ],
+          "qoj_id": 7783
+        },
+        {
+          "id": "icpc-2023-沈阳:H",
+          "index": "H",
+          "name": "Line Graph Sequence",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869H",
+            "qoj:7784"
+          ],
+          "qoj_id": 7784
+        },
+        {
+          "id": "icpc-2023-沈阳:I",
+          "index": "I",
+          "name": "Three Rectangles",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869I",
+            "qoj:7785"
+          ],
+          "qoj_id": 7785
+        },
+        {
+          "id": "icpc-2023-沈阳:J",
+          "index": "J",
+          "name": "Graft and Transplant",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869J",
+            "qoj:7786"
+          ],
+          "qoj_id": 7786
+        },
+        {
+          "id": "icpc-2023-沈阳:K",
+          "index": "K",
+          "name": "Maximum Rating",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869K",
+            "qoj:7787"
+          ],
+          "qoj_id": 7787
+        },
+        {
+          "id": "icpc-2023-沈阳:L",
+          "index": "L",
+          "name": "Rook Detection",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869L",
+            "qoj:7788"
+          ],
+          "qoj_id": 7788
+        },
+        {
+          "id": "icpc-2023-沈阳:M",
+          "index": "M",
+          "name": "Outro: True Love Waits",
+          "cf_contest_id": 104869,
+          "aliases": [
+            "codeforces:104869M",
+            "qoj:7789"
+          ],
+          "qoj_id": 7789
+        }
+      ],
+      "qoj_contest_id": 1449,
+      "qoj_url": "https://qoj.ac/contest/1449"
+    },
+    {
+      "id": "icpc-2023-济南",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "济南",
+      "name": "2023 ICPC 济南站",
+      "original_name": "The 2023 ICPC Asia Jinan Regional Contest (The 2nd Universal Cup. Stage 17: Jinan)",
+      "source_url": "https://codeforces.com/gym/104901",
+      "cf_contest_id": 104901,
+      "problems": [
+        {
+          "id": "icpc-2023-济南:A",
+          "index": "A",
+          "name": "Many Many Heads",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901A",
+            "qoj:7894"
+          ],
+          "qoj_id": 7894
+        },
+        {
+          "id": "icpc-2023-济南:B",
+          "index": "B",
+          "name": "Graph Partitioning 2",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901B",
+            "qoj:7895"
+          ],
+          "qoj_id": 7895
+        },
+        {
+          "id": "icpc-2023-济南:C",
+          "index": "C",
+          "name": "Turn on the Light 2",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901C",
+            "qoj:7896"
+          ],
+          "qoj_id": 7896
+        },
+        {
+          "id": "icpc-2023-济南:D",
+          "index": "D",
+          "name": "Largest Digit",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901D",
+            "qoj:7897"
+          ],
+          "qoj_id": 7897
+        },
+        {
+          "id": "icpc-2023-济南:E",
+          "index": "E",
+          "name": "I Just Want... One More...",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901E",
+            "qoj:7898"
+          ],
+          "qoj_id": 7898
+        },
+        {
+          "id": "icpc-2023-济南:F",
+          "index": "F",
+          "name": "Say Hello to the Future",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901F",
+            "qoj:7899"
+          ],
+          "qoj_id": 7899
+        },
+        {
+          "id": "icpc-2023-济南:G",
+          "index": "G",
+          "name": "Gifts from Knowledge",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901G",
+            "qoj:7900"
+          ],
+          "qoj_id": 7900
+        },
+        {
+          "id": "icpc-2023-济南:H",
+          "index": "H",
+          "name": "Basic Substring Structure",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901H",
+            "qoj:7901"
+          ],
+          "qoj_id": 7901
+        },
+        {
+          "id": "icpc-2023-济南:I",
+          "index": "I",
+          "name": "Strange Sorting",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901I",
+            "qoj:7902"
+          ],
+          "qoj_id": 7902
+        },
+        {
+          "id": "icpc-2023-济南:J",
+          "index": "J",
+          "name": "Computational Intelligence",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901J",
+            "qoj:7903"
+          ],
+          "qoj_id": 7903
+        },
+        {
+          "id": "icpc-2023-济南:K",
+          "index": "K",
+          "name": "Rainbow Subarray",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901K",
+            "qoj:7904"
+          ],
+          "qoj_id": 7904
+        },
+        {
+          "id": "icpc-2023-济南:L",
+          "index": "L",
+          "name": "Ticket to Ride",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901L",
+            "qoj:7905"
+          ],
+          "qoj_id": 7905
+        },
+        {
+          "id": "icpc-2023-济南:M",
+          "index": "M",
+          "name": "Almost Convex",
+          "cf_contest_id": 104901,
+          "aliases": [
+            "codeforces:104901M",
+            "qoj:7906"
+          ],
+          "qoj_id": 7906
+        }
+      ],
+      "qoj_contest_id": 1472,
+      "qoj_url": "https://qoj.ac/contest/1472"
+    },
+    {
+      "id": "icpc-2023-澳门",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "澳门",
+      "name": "2023 ICPC 澳门站",
+      "source_url": "https://qoj.ac/contest/1459",
+      "problems": [
+        {
+          "id": "icpc-2023-澳门:A",
+          "index": "A",
+          "name": "(-1,1)-Sumplete",
+          "aliases": [
+            "codeforces:104891A",
+            "qoj:7857"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7857
+        },
+        {
+          "id": "icpc-2023-澳门:B",
+          "index": "B",
+          "name": "Basic Equation Solving",
+          "aliases": [
+            "codeforces:104891B",
+            "qoj:7858"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7858
+        },
+        {
+          "id": "icpc-2023-澳门:C",
+          "index": "C",
+          "name": "Bladestorm",
+          "aliases": [
+            "codeforces:104891C",
+            "qoj:7859"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7859
+        },
+        {
+          "id": "icpc-2023-澳门:D",
+          "index": "D",
+          "name": "Graph of Maximum Degree 3",
+          "aliases": [
+            "codeforces:104891D",
+            "qoj:7860"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7860
+        },
+        {
+          "id": "icpc-2023-澳门:E",
+          "index": "E",
+          "name": "Inverse Topological Sort",
+          "aliases": [
+            "codeforces:104891E",
+            "qoj:7861"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7861
+        },
+        {
+          "id": "icpc-2023-澳门:F",
+          "index": "F",
+          "name": "Land Trade",
+          "aliases": [
+            "codeforces:104891F",
+            "qoj:7862"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7862
+        },
+        {
+          "id": "icpc-2023-澳门:G",
+          "index": "G",
+          "name": "Parity Game",
+          "aliases": [
+            "codeforces:104891G",
+            "qoj:7863"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7863
+        },
+        {
+          "id": "icpc-2023-澳门:H",
+          "index": "H",
+          "name": "Random Tree Parking",
+          "aliases": [
+            "codeforces:104891H",
+            "qoj:7864"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7864
+        },
+        {
+          "id": "icpc-2023-澳门:I",
+          "index": "I",
+          "name": "Refresher into Midas",
+          "aliases": [
+            "codeforces:104891I",
+            "qoj:7865"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7865
+        },
+        {
+          "id": "icpc-2023-澳门:J",
+          "index": "J",
+          "name": "Teleportation",
+          "aliases": [
+            "codeforces:104891J",
+            "qoj:7866"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7866
+        },
+        {
+          "id": "icpc-2023-澳门:K",
+          "index": "K",
+          "name": "Understand",
+          "aliases": [
+            "codeforces:104891K",
+            "qoj:7867"
+          ],
+          "cf_contest_id": 104891,
+          "qoj_id": 7867
+        }
+      ],
+      "qoj_contest_id": 1459,
+      "qoj_url": "https://qoj.ac/contest/1459",
+      "cf_contest_id": 104891
+    },
+    {
+      "id": "icpc-2023-西安",
+      "year": 2023,
+      "series": "ICPC",
+      "site": "西安",
+      "name": "2023 ICPC 西安站",
+      "original_name": "The 2023 ICPC Asia Xian Regional Contest (The 3rd Universal Cup. Stage 9: Xian)",
+      "source_url": "https://codeforces.com/gym/105471",
+      "cf_contest_id": 105471,
+      "problems": [
+        {
+          "id": "icpc-2023-西安:A",
+          "index": "A",
+          "name": "An Easy Geometry Problem",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471A",
+            "qoj:9242"
+          ],
+          "qoj_id": 9242
+        },
+        {
+          "id": "icpc-2023-西安:B",
+          "index": "B",
+          "name": "Counting Multisets",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471B",
+            "qoj:9243"
+          ],
+          "qoj_id": 9243
+        },
+        {
+          "id": "icpc-2023-西安:C",
+          "index": "C",
+          "name": "Counting Strings",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471C",
+            "qoj:9244"
+          ],
+          "qoj_id": 9244
+        },
+        {
+          "id": "icpc-2023-西安:D",
+          "index": "D",
+          "name": "Bracket Sequence",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471D",
+            "qoj:9245"
+          ],
+          "qoj_id": 9245
+        },
+        {
+          "id": "icpc-2023-西安:E",
+          "index": "E",
+          "name": "Dominating Point",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471E",
+            "qoj:9246"
+          ],
+          "qoj_id": 9246
+        },
+        {
+          "id": "icpc-2023-西安:F",
+          "index": "F",
+          "name": "An Easy Counting Problem",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471F",
+            "qoj:9247"
+          ],
+          "qoj_id": 9247
+        },
+        {
+          "id": "icpc-2023-西安:G",
+          "index": "G",
+          "name": "An Easy Math Problem",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471G",
+            "qoj:9248"
+          ],
+          "qoj_id": 9248
+        },
+        {
+          "id": "icpc-2023-西安:H",
+          "index": "H",
+          "name": "Elimination Series Once More",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471H",
+            "qoj:9249"
+          ],
+          "qoj_id": 9249
+        },
+        {
+          "id": "icpc-2023-西安:I",
+          "index": "I",
+          "name": "Max GCD",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471I",
+            "qoj:9250"
+          ],
+          "qoj_id": 9250
+        },
+        {
+          "id": "icpc-2023-西安:J",
+          "index": "J",
+          "name": "Graph Changing",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471J",
+            "qoj:9251"
+          ],
+          "qoj_id": 9251
+        },
+        {
+          "id": "icpc-2023-西安:K",
+          "index": "K",
+          "name": "Penguins in Refrigerator",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471K",
+            "qoj:9252"
+          ],
+          "qoj_id": 9252
+        },
+        {
+          "id": "icpc-2023-西安:L",
+          "index": "L",
+          "name": "Prism Palace",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471L",
+            "qoj:9253"
+          ],
+          "qoj_id": 9253
+        },
+        {
+          "id": "icpc-2023-西安:M",
+          "index": "M",
+          "name": "Random Variables",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471M",
+            "qoj:9254"
+          ],
+          "qoj_id": 9254
+        },
+        {
+          "id": "icpc-2023-西安:N",
+          "index": "N",
+          "name": "Python Program",
+          "cf_contest_id": 105471,
+          "aliases": [
+            "codeforces:105471N",
+            "qoj:9255"
+          ],
+          "qoj_id": 9255
+        }
+      ],
+      "qoj_contest_id": 1784,
+      "qoj_url": "https://qoj.ac/contest/1784"
+    }
+  ],
+  "scope": "2023–2025 QOJ 中国 ICPC / CCPC 区域赛正赛目录（不含热身、预选、邀请赛和总决赛）"
+}
