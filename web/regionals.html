@@ -1,9 +1,124 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js?v=3" defer></script></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js?v=4" defer></script><style>
+
+/* Regional progress styles are isolated from the main submission wall. */
+.cpc-regionals { padding: 28px; border-radius: 12px; box-shadow: none; }
+.cpc-regionals h2 { margin: 0; font-size: 25px; letter-spacing: -.5px; }
+.cpc-regionals .cpc-intro { margin: 8px 0 28px; color: var(--muted); line-height: 1.7; }
+.cpc-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+.cpc-regionals .cpc-year { display: flex; flex-direction: column; gap: 8px; width: 140px; color: var(--muted); font-size: 13px; }
+.cpc-year-picker { position: relative; width: 100%; color: var(--ink); font-size: 16px; }
+.cpc-year-picker summary { display: flex; align-items: center; justify-content: space-between; min-height: 42px; padding: 8px 12px; border: 1px solid #dce4df; border-radius: 7px; background: #fff; list-style: none; cursor: pointer; }
+.cpc-year-picker summary::-webkit-details-marker { display: none; }
+.cpc-year-picker summary::after { content: ''; width: 7px; height: 7px; border-right: 1.5px solid #65796d; border-bottom: 1.5px solid #65796d; transform: rotate(45deg); margin: -4px 2px 0 12px; }
+.cpc-year-choices { position: absolute; top: calc(100% + 6px); left: 0; z-index: 6; width: 160px; padding: 6px; border: 1px solid #dce4df; border-radius: 8px; background: #fff; box-shadow: 0 8px 24px #263d3026; }
+.cpc-year-choices button { display: block; width: 100%; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 5px; background: transparent; text-align: left; font-size: 16px; color: #304438; }
+.cpc-year-choices button:hover, .cpc-year-choices button:focus-visible { background: #eff5f1; }
+.cpc-year-choices button[aria-pressed="true"] { background: #e0eee5; color: #26734f; font-weight: 600; }
+.cpc-regionals .cpc-team-toggle { display: inline-flex; align-items: center; gap: 10px; width: auto; margin: 0; padding: 12px 14px; border-radius: 8px; background: #f3f6f5; color: #53655d; font-size: 13px; line-height: 1.4; cursor: pointer; }
+.cpc-regionals #cpcTeams { appearance: none; position: relative; width: 32px; height: 18px; min-height: 0; flex: 0 0 32px; margin: 0; padding: 0; border: 0; border-radius: 12px; background: #c3cfc8; cursor: pointer; transition: background .15s; }
+.cpc-regionals #cpcTeams::before { content: ''; position: absolute; left: 3px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px #0002; transition: transform .15s; }
+.cpc-regionals #cpcTeams:checked { background: #3b896b; }
+.cpc-regionals #cpcTeams:checked::before { transform: translateX(14px); }
+.cpc-regionals #cpcTeams:focus-visible { outline: 2px solid #28775c; outline-offset: 3px; }
+.cpc-wall-summary { display: flex; justify-content: space-between; align-items: center; gap: 14px 24px; flex-wrap: wrap; margin: 0 0 16px; }
+.cpc-wall-summary strong { font-size: 15px; line-height: 1.6; }
+.cpc-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.cpc-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.cpc-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.cpc-legend .cpc-solved { background: #d5eedb; }
+.cpc-legend .cpc-unrecorded { background: #edf1f3; }
+.cpc-table-wrap { width: 100%; max-height: 72vh; overflow: auto; border: 1px solid #e2e8e8; border-radius: 10px; background: #fff; scrollbar-gutter: stable; }
+.cpc-table { width: 100%; min-width: 1100px; border-collapse: separate; border-spacing: 0; white-space: nowrap; }
+.cpc-table th, .cpc-table td { padding: 10px 8px; min-width: 56px; border-right: 1px solid #e8edef; border-bottom: 1px solid #e8edef; text-align: center; }
+.cpc-table tr > :last-child { border-right: 0; }
+.cpc-table tbody tr:last-child > * { border-bottom: 0; }
+.cpc-table thead th { position: sticky; top: 0; z-index: 2; padding-top: 16px; padding-bottom: 16px; background: #f2f5f5; color: #708078; font-size: 12px; font-weight: 600; }
+.cpc-table .cpc-contest { position: sticky; left: 0; z-index: 1; min-width: 230px; padding: 16px 18px; text-align: left; background: #fff; }
+.cpc-table thead .cpc-contest { z-index: 3; background: #f2f5f5; }
+.cpc-table tbody tr:nth-child(even) > * { background: #fafcfc; }
+.cpc-table .cpc-site-name { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #29382f; }
+.cpc-series-badge { flex-shrink: 0; border: 1px solid #dce7e1; border-radius: 4px; padding: 2px 5px; background: #fff; color: #2c7b60; font-size: 10px; line-height: 1.4; }
+.cpc-table .cpc-progress { min-width: 128px; color: #718091; font-size: 12px; line-height: 1.6; }
+.cpc-progress strong { color: #4d6358; font-size: 13px; font-weight: 600; }
+.cpc-progress small { display: block; font-size: 11px; }
+.cpc-progress progress { display: block; width: 64px; height: 4px; margin: 7px auto 0; border: 0; border-radius: 3px; overflow: hidden; appearance: none; background: #e9efec; }
+.cpc-progress progress::-webkit-progress-bar { background: #e9efec; }
+.cpc-progress progress::-webkit-progress-value { background: #6cab86; border-radius: 3px; }
+.cpc-progress progress::-moz-progress-bar { background: #6cab86; border-radius: 3px; }
+.cpc-tile { display: inline-flex; width: 42px; min-height: 45px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 6px; background: #f0f3f5; color: #7b8790; vertical-align: middle; }
+.cpc-tile.is-done { background: #d5eedb; color: #277348; }
+.cpc-tile .cpc-letter { font: 600 14px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.cpc-tile .cpc-mark { min-height: 11px; font-size: 9px; line-height: 11px; letter-spacing: 1px; }
+.cpc-tile:focus-visible { outline: 2px solid #28775c; outline-offset: 3px; }
+.cpc-regionals .cpc-coverage { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.cpc-regionals .cpc-account-settings { margin-top: 22px; padding-top: 18px; border-top: 1px solid #e8edef; }
+.cpc-account-settings summary { color: #586c60; font-size: 13px; cursor: pointer; }
+.cpc-history { padding: 28px; border-radius: 12px; box-shadow: none; }
+.cpc-history h2 { margin: 0; font-size: 22px; }
+.cpc-history #cpcOnsiteStatus { margin: 10px 0 24px; color: #66796d; font-size: 13px; }
+.cpc-history-wrap { overflow: auto; border: 1px solid #e2e8e8; border-radius: 10px; }
+.cpc-history-table { width: 100%; min-width: 850px; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.cpc-history-table th, .cpc-history-table td { padding: 18px; border-bottom: 1px solid #e8edef; text-align: left; vertical-align: middle; font-size: 13px; line-height: 1.7; }
+.cpc-history-table thead th { padding: 14px 18px; background: #f2f5f5; color: #708078; font-size: 12px; font-weight: 600; }
+.cpc-history-table tr > :nth-child(1) { width: 38%; }
+.cpc-history-table tr > :nth-child(2) { width: 13%; }
+.cpc-history-table tr > :nth-child(3) { width: 19%; }
+.cpc-history-table tr > :nth-child(4) { width: 20%; }
+.cpc-history-table tr > :nth-child(5) { width: 10%; }
+.cpc-history-table tbody tr:nth-child(even) { background: #fafcfc; }
+.cpc-history-table tbody tr:last-child > * { border-bottom: 0; }
+.cpc-history-name { display: block; font-weight: 600; color: #29382f; overflow-wrap: anywhere; }
+.cpc-history-pending, .cpc-history-star { display: inline-block; margin-top: 7px; padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 400; }
+.cpc-history-pending { color: #927143; background: #f8f1e5; }
+.cpc-history-star { color: #65798a; background: #edf1f5; }
+.cpc-history-date { color: #77858c; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cpc-history-team { display: block; overflow-wrap: anywhere; }
+.cpc-history-count { display: block; margin-bottom: 7px; color: #4e715d; font-size: 12px; }
+.cpc-history-problems { display: flex; flex-wrap: wrap; gap: 4px; }
+.cpc-history-problems > span { min-width: 22px; padding: 1px 3px; border-radius: 4px; background: #e4f2e8; color: #397650; text-align: center; font: 600 11px/20px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.cpc-history-link { color: #367d63; font-size: 12px; white-space: nowrap; text-decoration: none; }
+.cpc-history-link:hover { text-decoration: underline; }
+.cpc-history .cpc-history-note, .cpc-history-empty, .cpc-history-issue { color: var(--muted); font-size: 12px; line-height: 1.9; }
+.cpc-history .cpc-history-note { margin: 16px 0 0; }
+@media (max-width: 720px) {
+  .cpc-regionals, .cpc-history { padding: 20px 14px; }
+  .cpc-regionals h2 { font-size: 22px; }
+  .cpc-regionals .cpc-intro { margin-bottom: 22px; font-size: 13px; }
+  .cpc-toolbar { align-items: center; gap: 16px; margin-bottom: 20px; }
+  .cpc-wall-summary { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .cpc-legend { gap: 6px 12px; font-size: 11px; }
+  .cpc-table .cpc-contest { min-width: 170px; padding: 14px 12px; }
+  .cpc-table .cpc-site-name { font-size: 12px; gap: 6px; }
+  .cpc-table .cpc-progress { min-width: 100px; }
+  .cpc-table th, .cpc-table td { padding: 9px 6px; }
+}
+</style></head>
 <body><header class="topbar"><h1>区域赛进度</h1><a class="button" href="/">返回训练墙</a></header><main style="max-width:1400px;margin:24px auto;padding:0 16px">
 <p id="cpcMessage" role="status"></p>
 <section class="panel"><h2>DLUT CPC 成员认证</h2><p id="cpcIdentity">正在加载…</p><form id="cpcClaim"><label>搜索成员 <input id="cpcMemberSearch" type="search" placeholder="输入部分姓名或学校 / 校区" autocomplete="off" maxlength="100" aria-controls="cpcMember" aria-describedby="cpcMemberCount"></label><label>成员 <select id="cpcMember" required></select></label><p id="cpcMemberCount" class="small" role="status"></p><label>核验说明 <input id="cpcNote" required maxlength="2000" placeholder="年级、队内联系及可核查证明"></label><button class="button">申请认证</button></form><button id="cpcRefresh" class="button" type="button">更新认证状态</button><p>管理员确认后合并你的现场队伍通过情况；线上记录无需成员认证。</p></section>
-<section class="panel"><h2>我的区域赛</h2><label>年份 <select id="cpcYear"></select></label> <label><input id="cpcTeams" type="checkbox">包含我绑定的线上团队账号</label><p id="cpcSummary"></p><div style="overflow-x:auto"><table><thead id="cpcHead"></thead><tbody id="cpcRows"></tbody></table></div><p>个：个人账号通过；团：绑定团队通过；现：现场所在队伍通过。未着色表示暂无通过证据，历史仍可能待补。本页不计口胡。</p><details><summary>确认绑定账号类型</summary><div id="cpcHandles"></div></details></section>
-<section class="panel"><h2>现场比赛通过</h2><p id="cpcOnsiteStatus" role="status"></p><div id="cpcOnsiteContests"></div><p>正式与打星队伍的赛中通过均计入。按 DLUT 已确认名单及比赛原榜单链接同步；尚未进入区域赛目录的题目先保存现场记录，待映射后合并到上方题目进度。</p></section>
+<section class="panel cpc-regionals" aria-labelledby="cpcWallTitle">
+  <h2 id="cpcWallTitle">我的区域赛</h2>
+  <p class="cpc-intro">个人线上与现场队伍通过，按题合并。每一点进度都留在这里。</p>
+  <div class="cpc-toolbar">
+    <div class="cpc-year"><span id="cpcYearCaption">年份</span><input id="cpcYear" type="hidden"><details id="cpcYearPicker" class="cpc-year-picker"><summary aria-labelledby="cpcYearCaption cpcYearLabel"><span id="cpcYearLabel">—</span></summary><div id="cpcYearChoices" class="cpc-year-choices" role="group" aria-label="选择年份"></div></details></div>
+    <label class="cpc-team-toggle"><input id="cpcTeams" type="checkbox" role="switch"><span>包含我绑定的线上团队账号</span></label>
+  </div>
+  <div class="cpc-wall-summary">
+    <strong id="cpcSummary" role="status"></strong>
+    <div class="cpc-legend" aria-label="进度图例">
+      <span><i class="cpc-solved" aria-hidden="true"></i>已完成</span>
+      <span><i class="cpc-unrecorded" aria-hidden="true"></i>暂无通过记录</span>
+      <span>个 · 个人 AC　团 · 团队 AC　现 · 现场通过</span>
+    </div>
+  </div>
+  <div class="cpc-table-wrap" tabindex="0" role="region" aria-label="区域赛题目进度，可横向滚动">
+    <table class="cpc-table"><thead id="cpcHead"></thead><tbody id="cpcRows"></tbody></table>
+  </div>
+  <p id="cpcCoverage" class="cpc-coverage"></p>
+  <p class="cpc-coverage">未着色表示暂无通过证据，历史仍可能待补。本页不计口胡。</p>
+  <details class="cpc-account-settings"><summary>确认绑定账号类型</summary><div id="cpcHandles"></div></details>
+</section>
+<section class="panel cpc-history" aria-labelledby="cpcHistoryTitle"><h2 id="cpcHistoryTitle">现场比赛通过</h2><p id="cpcOnsiteStatus" role="status"></p><div id="cpcOnsiteContests"></div><p class="cpc-history-note">正式与打星队伍的赛中通过均计入。按 DLUT 已确认名单及比赛原榜单链接同步；尚未进入区域赛目录的题目先保存现场记录，待映射后合并到上方题目进度。</p></section>
 <section class="panel"><h2>连接 CF Bot</h2><p>生成只读连接码，在 CF Bot 区域赛页粘贴一次即可。连接码限读取你自己的进度，有效期 180 天；重新生成或撤销立即使旧码失效。</p><button id="cpcToken" class="button">生成连接码</button> <button id="cpcRevoke" class="button">撤销连接码</button><textarea id="cpcCode" readonly hidden aria-label="只读连接码"></textarea><p>请只将连接码粘贴到你自己的 CF Bot 账号。</p></section>
 </main></body></html>

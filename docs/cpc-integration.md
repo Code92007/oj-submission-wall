@@ -101,3 +101,11 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests
 - v4 / 2026-10-09：首版采用人工核验榜单、本人只读连接码、完整快照及持久 UUID；不新增中心服务或外站运行依赖。
 
 完整设计及版本快照：[三工程方案](https://github.com/Code92007/qq-cf-bot/blob/main/docs/cpc-cross-project-integration.md)、[迭代记录](https://github.com/Code92007/qq-cf-bot/blob/main/docs/cpc-integration/CHANGELOG.md)、[统一运维说明](https://github.com/Code92007/qq-cf-bot/blob/main/docs/cpc-integration-operations.md)。
+
+## 2026-10-10 区域赛页面和历史赛季
+
+区域赛页采用宽松的逐题卡片表格，显示个人、团队和现场来源，不添加 rating。现场记录改为比赛、日期、参赛队伍、现场通过、榜单五列，长名称换行，打星及待映射保留独立标签。团队选项为小开关；年份为页面内 16px 字号、40px 行高的下拉菜单，支持键盘选择与 Escape 关闭。
+
+公共目录与 CF Bot 一致，新增 2019–2022 年 42 场、528 题，合计 2019–2025 年 75 场、954 题；按赛季归档延期比赛。来源留在 `catalog/regional_history_sources.json`。35 场已核对 Codeforces/牛客题号；7 场仅核对原榜单题序，线上映射显式标为 pending，现场通过照常进入规范题目 ID，不能猜测线上题号。新增银川、南昌、徐州、广州、厦门及 haerbin 旧别名识别，修正 XCPCIO 2021/2022 归档届次路径。部署后对已有认证执行 sync，稳定参赛 UUID 会替换暂存题号并保留历史，不重复导入。
+
+此迭代不改变 v4.2 的审批触发、每 5 分钟同步、个人 AC 合并或迁移协议。

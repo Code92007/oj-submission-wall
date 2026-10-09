@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from cpc_scoreboard import prepare_xcpc
-from cpc_sources import Scoreboards, rankland_body, public_bytes
+from cpc_sources import Scoreboards, rankland_body, public_bytes, edition_path
 
 
 class ScoreboardTests(unittest.TestCase):
@@ -104,3 +104,20 @@ class ScoreboardTests(unittest.TestCase):
         srk['rows'][0]['statuses'][0]['time']=[301,'min']
         raw=('<script>window.__INITIAL_STATE__='+json.dumps(json.dumps({'ranklistData':{'srk':srk}}))+';</script>').encode()
         with self.assertRaises(ValueError):rankland_body(raw,{},participation,[],participation['ranklist_url'])
+
+    def test_historical_boards_map_by_season_even_when_held_next_year(self):
+        self.assertEqual(edition_path({'contestName':'第 45 届 ICPC','place':'银川'}),('icpc',2020,'icpc/2020/yinchuan'))
+        self.assertEqual(edition_path({'contestName':'第 46 届 ICPC','place':'济南'}),('icpc',2021,'icpc/46th/jinan'))
+        self.assertEqual(edition_path({'contestName':'第 8 届 CCPC','place':'广州'}),('ccpc',2022,'ccpc/8th/guangzhou'))
+        for key, series, season, site in [('icpc2020yinchuan','ICPC',2020,'银川'),('icpc2019nanchang','ICPC',2019,'南昌'),('ccpc2019haerbin','CCPC',2019,'哈尔滨')]:
+            with self.subTest(key=key):
+                srk={'type':'general','contest':{'startAt':'2021-05-16T11:00:00+08:00','duration':[5,'h']},
+                     'problems':[{'alias':'A'},{'alias':'B'}], 'rows':[{'user':{'id':'old','name':'打星队','organization':'大连理工大学','official':False},
+                     'statuses':[{'result':'AC','time':[1,'min']},{'result':None}]}]}
+                raw=('<script>window.__INITIAL_STATE__='+json.dumps(json.dumps({'ranklistData':{'srk':srk}}))+';</script>').encode()
+                participation={**self.participation,'date':'2021-05-16','event':'原比赛','ranklist_url':'https://rl.algoux.cn/ranklist/'+key}
+                contest={**self.contest,'id':f'{series.lower()}-{season}-{site}','series':series,'year':season,'site':site}
+                with patch('cpc_sources.public_bytes',return_value=raw):
+                    body=Scoreboards(self.root).prepare(None,participation,[],{contest['id']:contest})
+                self.assertEqual(body['contest_id'],contest['id'])
+                self.assertEqual(body['accepted'],['A'])

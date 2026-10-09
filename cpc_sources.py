@@ -15,8 +15,8 @@ from cpc_common import NoRedirect
 from cpc_scoreboard import prepare_xcpc
 
 SITES = dict(zip(
-    ['哈尔滨','济南','郑州','重庆','上海','南京','成都','武汉','沈阳','西安','香港','桂林','深圳','秦皇岛','合肥','杭州','澳门','昆明','长春','绵阳','威海'],
-    ['harbin','jinan','zhengzhou','chongqing','shanghai','nanjing','chengdu','wuhan','shenyang','xian','hongkong','guilin','shenzhen','qinhuangdao','hefei','hangzhou','macau','kunming','changchun','mianyang','weihai']))
+    ['哈尔滨','济南','郑州','重庆','上海','南京','成都','武汉','沈阳','西安','香港','桂林','深圳','秦皇岛','合肥','杭州','澳门','昆明','长春','绵阳','威海','银川','南昌','徐州','广州','厦门'],
+    ['harbin','jinan','zhengzhou','chongqing','shanghai','nanjing','chengdu','wuhan','shenyang','xian','hongkong','guilin','shenzhen','qinhuangdao','hefei','hangzhou','macau','kunming','changchun','mianyang','weihai','yinchuan','nanchang','xuzhou','guangzhou','xiamen']))
 
 
 def public_bytes(url):
@@ -53,7 +53,7 @@ def edition_path(award):
         raise ValueError('比赛暂未建立原榜单映射')
     edition = int(match[1])
     season = edition + (2014 if series == 'ccpc' else 1975)
-    return series, season, f'{series}/{season if season <= 2022 else str(edition)+"th"}/{site}'
+    return series, season, f'{series}/{season if season <= 2020 else str(edition)+"th"}/{site}'
 
 
 def localized(value):
@@ -200,7 +200,8 @@ class Scoreboards:
             if match:
                 series, year, site = match.groups()
                 season = int(year)
-                site_name = next((cn for cn, en in SITES.items() if en == site.replace('_','')), site_name)
+                site_key = site.replace('_','').replace('haerbin','harbin')
+                site_name = next((cn for cn, en in SITES.items() if en == site_key), site_name)
         contest = next((c for c in contests.values() if c['series'].lower() == series
                         and c['year'] == season and c['site'] == site_name), None)
         # Prefer the original board chosen by DLUT, including archived RankLand events.
