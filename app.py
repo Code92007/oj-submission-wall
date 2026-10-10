@@ -1359,34 +1359,38 @@ class CodeforcesAdapter(OJAdapter):
             # manager-visible history; old Coach AC can predate the public watermark.
             history_floor = utcnow() - FETCH_LOOKBACK_DAYS * 86400
             for gym_id in sorted(gym_ids):
-                start = 1
-                while True:
-                    query = {"handle": handle, "contestId": int(gym_id), "asManager": "true",
-                             "from": start, "count": page_size}
-                    try:
+                gym_submissions = {}
+                try:
+                    start = 1
+                    while True:
+                        query = {"handle": handle, "contestId": int(gym_id), "asManager": "true",
+                                 "from": start, "count": page_size}
                         data = signed_api_get("contest.status", query, auth, http_get)
-                    except ManagerAccessUnavailable:
-                        message = f"Gym {gym_id} 无 Coach 读取权限，已保留公开记录，私有补题待核验"
-                        if gym_warnings is None:
-                            raise RuntimeError(message) from None
-                        gym_warnings.append(message)
-                        break
-                    items = data["result"]
-                    reached_older = False
-                    for item in items:
-                        author = item.get("author") or {}
-                        members = {str(m.get("handle", "")).casefold() for m in author.get("members") or []}
-                        contest_id = item.get("contestId") or (item.get("problem") or {}).get("contestId")
-                        if handle.casefold() not in members or int(contest_id or 0) != int(gym_id):
-                            raise RuntimeError("Gym 提交的账号或比赛归属不匹配，停止本次同步")
-                        normalized = self._submission(item)
-                        if normalized["submitted_at"] and normalized["submitted_at"] < history_floor:
-                            reached_older = True
-                            continue
-                        submissions[normalized["remote_id"]] = normalized
-                    if reached_older or len(items) < page_size:
-                        break
-                    start += page_size
+                        items = data["result"]
+                        reached_older = False
+                        for item in items:
+                            author = item.get("author") or {}
+                            members = {str(m.get("handle", "")).casefold() for m in author.get("members") or []}
+                            contest_id = item.get("contestId") or (item.get("problem") or {}).get("contestId")
+                            if handle.casefold() not in members or int(contest_id or 0) != int(gym_id):
+                                raise ValueError("Gym 提交的账号或比赛归属不匹配，停止本次同步")
+                            normalized = self._submission(item)
+                            if normalized["submitted_at"] and normalized["submitted_at"] < history_floor:
+                                reached_older = True
+                                continue
+                            gym_submissions[normalized["remote_id"]] = normalized
+                        if reached_older or len(items) < page_size:
+                            break
+                        start += page_size
+                except RuntimeError as exc:
+                    reason = "Coach 记录不可读" if isinstance(exc, ManagerAccessUnavailable) else "Coach 提交读取失败"
+                    message = f"Gym {gym_id} {reason}，已保留公开记录，私有补题待核验并将重试"
+                    if gym_warnings is None:
+                        raise RuntimeError(message) from None
+                    gym_warnings.append(message)
+                else:
+                    # A failed page must not commit an incomplete Gym history.
+                    submissions.update(gym_submissions)
         return list(submissions.values())
 
     def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:

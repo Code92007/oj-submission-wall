@@ -155,28 +155,47 @@ class CoachHistoryTests(unittest.TestCase):
         self.assertEqual(second['inserted'], 0)
         self.assertEqual(self.service.progress('4')['problems'], {})
 
-    def test_failed_private_page_does_not_advance_history_marker_or_insert_partial_data(self):
+    def test_failed_gym_page_discards_its_partial_data_then_retries_full_gym(self):
         self.sync([self.newest]+self.vp)
         app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
         result, _ = self.sync([self.newest]+self.coach+self.vp, fail=True)
-        self.assertIn('error', result)
+        self.assertIn('Gym 104076 Coach 提交读取失败', result['warning'])
         with app.connect_db() as db:
             row = db.execute('SELECT stats_json FROM handles WHERE id=3').fetchone()
-            self.assertNotIn('codeforcesAuthHistory', json.loads(row['stats_json'] or '{}'))
+            self.assertIn('codeforcesAuthHistory', json.loads(row['stats_json'] or '{}'))
             self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
         result, pages = self.sync([self.newest]+self.coach+self.vp)
         self.assertEqual(result['inserted'], 4)
-        self.assertEqual(pages, [('user.status',1),('user.status',5),('contest.status',1),('contest.status',5),('contest.status',9)])
+        self.assertEqual(pages, [('user.status',1),('contest.status',1),('contest.status',5),('contest.status',9)])
 
     def test_manager_permission_denial_keeps_public_history_and_warns(self):
         self.sync([self.newest]+self.vp)
         app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
         result, _ = self.sync([self.newest]+self.coach+self.vp, deny=True)
-        self.assertIn('无 Coach 读取权限', result['warning'])
+        self.assertIn('Coach 记录不可读', result['warning'])
         with app.connect_db() as db:
             self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
         retried, _ = self.sync([self.newest]+self.coach+self.vp)
         self.assertEqual(retried['inserted'], 4)
+
+    def test_unavailable_old_gym_does_not_block_other_gyms_coach_history(self):
+        self.sync([self.newest]+self.vp)
+        app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
+        adapter=app.ADAPTERS['codeforces']
+        def fetch(method,params,auth,getter):
+            if method=='user.status':
+                return {'status':'OK','result':[self.newest]}
+            if params['contestId']==100371:
+                raise RuntimeError('historical API HTTP 400')
+            start=params['from']-1
+            return {'status':'OK','result':(self.coach+self.vp)[start:start+params['count']]}
+        warnings=[]
+        with patch.object(app,'signed_api_get',side_effect=fetch):
+            records=adapter.fetch_submissions('Yzm007',self.now-100,auth=load_auth(app.CODEFORCES_AUTH_FILE,'user','3','Yzm007'),
+                                               known_gym_ids={100371,104076},gym_warnings=warnings)
+        self.assertEqual({r['problem_id'] for r in records if r['problem_id'].startswith('104076')}, {'104076'+p for p in 'ACDEGJKM'})
+        self.assertEqual(len(warnings),1)
+        self.assertIn('100371',warnings[0])
 
     def test_manager_api_returning_other_users_rows_is_rejected(self):
         self.sync([self.newest]+self.vp)
