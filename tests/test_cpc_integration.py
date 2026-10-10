@@ -45,3 +45,18 @@ class CpcTests(unittest.TestCase):
               'source_url':'https://example.com/final','source_row':'1'}
         with self.assertRaises(ValueError):self.service.import_onsite(body)
         with self.service.db() as db:self.assertEqual(db.execute('select count(*) from cpc_onsite').fetchone()[0],0)
+
+    def test_catalog_mapping_overrides_replay_link_with_a_missing_gym_letter(self):
+        cid='ccpc-2020-秦皇岛'
+        participation={'id':'historical','team':'原队伍','date':'2020-10-18'}
+        body={'contest_id':cid,'problem_labels':list('ABCDEFGHIJKL'),'accepted':['A','C'],
+              'reference_urls':['https://codeforces.com/gym/102769'],
+              'participation_id':participation['id'],'team':participation['team'],
+              'contest_date':participation['date'],'source_url':'https://rl.algoux.cn/ranklist/ccpc2020qinhuangdao'}
+        with patch.object(self.service,'remote',return_value=({'roster':{'participations':[participation]}},0)):
+            key=self.service.import_auto_onsite(body)
+        with self.service.db() as db:
+            saved=json.loads(db.execute('select body from cpc_onsite where id=?',(key,)).fetchone()[0])
+        self.assertEqual(saved['accepted'],[cid+':A',cid+':C'])
+        self.assertEqual(saved['problem_aliases'][cid+':A'],'codeforces:102769A')
+        self.assertNotIn(cid+':C',saved['problem_aliases'])

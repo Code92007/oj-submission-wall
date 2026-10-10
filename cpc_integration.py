@@ -289,6 +289,8 @@ class Integration:
                 identifier = parsed.path.split('/')[2]
                 if identifier.isdigit(): gyms.add(identifier)
         aliases = {indices[p]:'codeforces:'+next(iter(gyms))+p for p in labels} if len(gyms) == 1 else {}
+        if contest:
+            aliases = {pid:alias for pid,alias in aliases.items() if self.aliases.get(alias) == pid}
         stored = {**body,'accepted_labels':sorted(set(body['accepted'])),
                   'accepted':sorted({indices[p] for p in body['accepted']}),'problem_aliases':aliases}
         raw = json.dumps(stored,ensure_ascii=False)

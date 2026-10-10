@@ -41,10 +41,11 @@
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2019shanghai",
         "https://qoj.ac/contest/1866",
-        "https://github.com/algoux/srk-collection-raw/tree/master/files/icpc2019shanghai"
+        "https://github.com/algoux/srk-collection-raw/tree/master/files/icpc2019shanghai",
+        "https://qoj.ac/contest/1866/problem/11004"
       ],
       "rankland_sha256": "add130f47bae6de6a97513c53040df57979bb32007d35c270b78ffe3c4f1fe96",
-      "online_mapping": "pending"
+      "online_mapping": "verified"
     },
     {
       "id": "icpc-2019-徐州",
@@ -67,10 +68,11 @@
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2019xuzhou",
         "https://qoj.ac/contest/1834",
-        "https://github.com/algoux/srk-collection-raw/tree/master/files/icpc2019xuzhou"
+        "https://github.com/algoux/srk-collection-raw/tree/master/files/icpc2019xuzhou",
+        "https://qoj.ac/contest/1834/problem/9701"
       ],
       "rankland_sha256": "ae16e2080827f2b553c001c0c180890c78668de5db475a3d6db340148b37b23c",
-      "online_mapping": "pending"
+      "online_mapping": "verified"
     },
     {
       "id": "icpc-2019-南京",
@@ -91,7 +93,8 @@
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2019nanjing",
         "https://codeforces.com/gym/103466",
-        "https://github.com/algoux/srk-collection-raw/tree/master/files/icpc2019nanjing"
+        "https://github.com/algoux/srk-collection-raw/tree/master/files/icpc2019nanjing",
+        "https://qoj.ac/contest/1321"
       ],
       "rankland_sha256": "011f01ac1ddb1d3243818a39c964c100337f30a1e98276e3646c54d467d7d803",
       "online_mapping": "verified"
@@ -140,7 +143,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2021guangzhou",
-        "https://codeforces.com/gym/103415"
+        "https://codeforces.com/gym/103415",
+        "https://qoj.ac/contest/2700"
       ],
       "rankland_sha256": "4768672b35833d056c53b64a135b03c536a19bff47486ec8e8b6c3683b064fcb",
       "online_mapping": "verified"
@@ -165,7 +169,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2022nanjing",
-        "https://codeforces.com/gym/104128"
+        "https://codeforces.com/gym/104128",
+        "https://qoj.ac/contest/1093"
       ],
       "rankland_sha256": "0329e0c642e463a6de96c0d6f4eee77b98eafee0edd9cab7016e6ef3d9f6dcb6",
       "online_mapping": "verified"
@@ -189,7 +194,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2022hongkong",
-        "https://codeforces.com/gym/104172"
+        "https://codeforces.com/gym/104172",
+        "https://qoj.ac/contest/1099"
       ],
       "rankland_sha256": "838449bbf9767f524bfa5bba5eb8b783746d0073c57f83ef7ed7f8d9efc11064",
       "online_mapping": "verified"
@@ -238,10 +244,11 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2019xiamen",
-        "https://qoj.ac/contest/1733"
+        "https://qoj.ac/contest/1733",
+        "https://qoj.ac/contest/1733/problem/9101"
       ],
       "rankland_sha256": "a3a05af75d15d1d620d335761760fb0538ac7e80fbd6097c1b5d65307a7a2dc8",
-      "online_mapping": "pending"
+      "online_mapping": "verified"
     },
     {
       "id": "icpc-2019-南昌",
@@ -290,7 +297,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2019yinchuan",
-        "https://codeforces.com/gym/104021"
+        "https://codeforces.com/gym/104021",
+        "https://qoj.ac/contest/1320"
       ],
       "rankland_sha256": "8f834de844dfef13fcce861263ecf733ac2d107940190eb00188e46914bc3d5d",
       "online_mapping": "verified"
@@ -314,7 +322,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2022xi_an",
-        "https://codeforces.com/gym/104077"
+        "https://codeforces.com/gym/104077",
+        "https://qoj.ac/contest/1051"
       ],
       "rankland_sha256": "47bfaa5b75c2c28789dba8820769f2a515b64ff0fa0a4ba52aa69625af084b26",
       "online_mapping": "verified"
@@ -339,7 +348,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2020shenyang",
-        "https://codeforces.com/gym/103202"
+        "https://codeforces.com/gym/103202",
+        "https://qoj.ac/contest/1251"
       ],
       "rankland_sha256": "858039499cd9c00a85604ad53813b96190255e899ad5e8a3392e7a83cff3452e",
       "online_mapping": "verified"
@@ -364,7 +374,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2020yinchuan",
-        "https://codeforces.com/gym/104022"
+        "https://codeforces.com/gym/104022",
+        "https://qoj.ac/contest/1322"
       ],
       "rankland_sha256": "c05f2c2d204203161bc7de46b732d173c3c7900af9bbe19c0b3cf35c676af9f7",
       "online_mapping": "verified"
@@ -414,7 +425,9 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2020jinan",
-        "https://ac.nowcoder.com/acm/contest/10662"
+        "https://ac.nowcoder.com/acm/contest/10662",
+        "https://qoj.ac/contest/2181",
+        "https://qoj.ac/contest/2181/problem/12398"
       ],
       "rankland_sha256": "7aeb3d23183fd1ac8b853d78cbee50e190dfe2ba1850da68f36b25f3ad63b9ca",
       "online_mapping": "verified"
@@ -439,7 +452,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2020nanjing",
-        "https://codeforces.com/gym/102992"
+        "https://codeforces.com/gym/102992",
+        "https://qoj.ac/contest/1235"
       ],
       "rankland_sha256": "b4776309a59d4aab4f17f982212a44c6362bdd41e9f3a5a7196bf3c568c38dfb",
       "online_mapping": "verified"
@@ -464,7 +478,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2020shanghai",
-        "https://codeforces.com/gym/102900"
+        "https://codeforces.com/gym/102900",
+        "https://qoj.ac/contest/1477"
       ],
       "rankland_sha256": "00018dff454921839f7294c3105a379d40689e39177364ad1a2e8ca9aac3bb8d",
       "online_mapping": "verified"
@@ -537,7 +552,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2021guilin",
-        "https://codeforces.com/gym/103409"
+        "https://codeforces.com/gym/103409",
+        "https://qoj.ac/contest/1305"
       ],
       "rankland_sha256": "7aa042812e76ff89f5e530f59148ff53797fd44d3d753fe413f20737d9bd59d7",
       "online_mapping": "verified"
@@ -562,7 +578,9 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2021kunming",
-        "https://ac.nowcoder.com/acm/contest/32708"
+        "https://ac.nowcoder.com/acm/contest/32708",
+        "https://qoj.ac/contest/1870",
+        "https://qoj.ac/contest/1870/problem/9849"
       ],
       "rankland_sha256": "8b6d6b2b3a1f16e11f0b9f0289a8f8e43f748026c167b2a8eb9b29af9e3318d1",
       "online_mapping": "verified"
@@ -586,7 +604,8 @@
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2021macau",
         "https://codeforces.com/gym/104373",
-        "https://ac.nowcoder.com/acm/contest/31454"
+        "https://ac.nowcoder.com/acm/contest/31454",
+        "https://qoj.ac/contest/911"
       ],
       "rankland_sha256": "d22b3d5f75dac04929931f3bbd9a5c8c1d23f4ce498c78ebfcd9cfd36054513e",
       "online_mapping": "verified"
@@ -611,7 +630,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2022hangzhou",
-        "https://codeforces.com/gym/104090"
+        "https://codeforces.com/gym/104090",
+        "https://qoj.ac/contest/1071"
       ],
       "rankland_sha256": "2c3ca025bdb89279b177bde114c7a96d708f801bf7134c3d0003e84f4ef5d038",
       "online_mapping": "verified"
@@ -636,7 +656,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2022jinan",
-        "https://codeforces.com/gym/104076"
+        "https://codeforces.com/gym/104076",
+        "https://qoj.ac/contest/1053"
       ],
       "rankland_sha256": "3b974a10f2815f9629911031ef23153397d691681045e8b4b9c03a17c7c26d96",
       "online_mapping": "verified"
@@ -664,7 +685,7 @@
         "https://github.com/algoux/srk-collection-raw/tree/master/files/ccpc2020qinhuangdao"
       ],
       "rankland_sha256": "159b931e0ca18926236d175a21bc8819ac8c3a79111d2e8d46aad95af5597242",
-      "online_mapping": "verified"
+      "online_mapping": "partial"
     },
     {
       "id": "icpc-2021-济南",
@@ -686,10 +707,12 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2021jinan",
-        "https://pintia.cn/market/item/1459833348620926976"
+        "https://pintia.cn/market/item/1459833348620926976",
+        "https://qoj.ac/contest/1997",
+        "https://qoj.ac/contest/1997/problem/10773"
       ],
       "rankland_sha256": "f3b11ef6823b423a6ab514fc6d41ef2852d166b771f2e1ca9376167273c09dc5",
-      "online_mapping": "pending"
+      "online_mapping": "verified"
     },
     {
       "id": "icpc-2021-沈阳",
@@ -711,7 +734,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2021shenyang",
-        "https://codeforces.com/gym/103427"
+        "https://codeforces.com/gym/103427",
+        "https://qoj.ac/contest/1252"
       ],
       "rankland_sha256": "93c2015dc12f5565ce928ec4b802c35ff7873c0dd0b57904b3cdece725b4f810",
       "online_mapping": "verified"
@@ -736,7 +760,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2021shanghai",
-        "https://codeforces.com/gym/103446"
+        "https://codeforces.com/gym/103446",
+        "https://qoj.ac/contest/2016"
       ],
       "rankland_sha256": "a1e3b6e0e90b924bdb71beb7a303766deea9e6a1c3533f354b9a2f6466427952",
       "online_mapping": "verified"
@@ -761,7 +786,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2021nanjing",
-        "https://codeforces.com/gym/103470"
+        "https://codeforces.com/gym/103470",
+        "https://qoj.ac/contest/1236"
       ],
       "rankland_sha256": "b071144ae943ee4894b19030b3fea211e5770293704aea3161021388ae877c50",
       "online_mapping": "verified"
@@ -786,7 +812,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2022guangzhou",
-        "https://codeforces.com/gym/104053"
+        "https://codeforces.com/gym/104053",
+        "https://qoj.ac/contest/1493"
       ],
       "rankland_sha256": "84d84f843ba8e40315131d93c76b3f6b17c4badafb20e6c6fcaedb97810512e8",
       "online_mapping": "verified"
@@ -811,7 +838,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2022guilin",
-        "https://codeforces.com/gym/104008"
+        "https://codeforces.com/gym/104008",
+        "https://qoj.ac/contest/1303"
       ],
       "rankland_sha256": "b8eccfc38b6bb5bbfa2ef4ec3ae52f3299ed910be80b5fd5cd33cb4c384b9ab1",
       "online_mapping": "verified"
@@ -836,7 +864,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2022weihai",
-        "https://codeforces.com/gym/104023"
+        "https://codeforces.com/gym/104023",
+        "https://qoj.ac/contest/1833"
       ],
       "rankland_sha256": "61591c6ea08dd9801e0e299ae0ba0630e95ab634c6bb90603441dd625dd4ae27",
       "online_mapping": "verified"
@@ -861,7 +890,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2022mianyang",
-        "https://codeforces.com/gym/104065"
+        "https://codeforces.com/gym/104065",
+        "https://qoj.ac/contest/1480"
       ],
       "rankland_sha256": "5dc2972387420a3f890f9d30a2b8e604fba1aefb0e427731c8e5d34a47a83e02",
       "online_mapping": "verified"
@@ -886,7 +916,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/icpc2022shenyang",
-        "https://codeforces.com/gym/104160"
+        "https://codeforces.com/gym/104160",
+        "https://qoj.ac/contest/1096"
       ],
       "rankland_sha256": "f96cac7e4eb1eaa65a6dd8ebcd51d5674c8ab684b81058d76ac8d093110adc51",
       "online_mapping": "verified"
@@ -934,7 +965,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2019haerbin",
-        "https://codeforces.com/gym/102394"
+        "https://codeforces.com/gym/102394",
+        "https://qoj.ac/contest/1797"
       ],
       "rankland_sha256": "dee85dea16e94ee280a559cb541d230c67038e92fe39fef97aa299c9b3c83843",
       "online_mapping": "verified"
@@ -958,7 +990,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2020weihai",
-        "https://codeforces.com/gym/102798"
+        "https://codeforces.com/gym/102798",
+        "https://qoj.ac/contest/1793"
       ],
       "rankland_sha256": "29190bea129be0dc9309de76ba06fcfa9bca30f438f07ea9290b653ca042f8f1",
       "online_mapping": "verified"
@@ -982,7 +1015,8 @@
       ],
       "source_urls": [
         "https://rl.algoux.cn/ranklist/ccpc2020mianyang",
-        "https://codeforces.com/gym/102822"
+        "https://codeforces.com/gym/102822",
+        "https://qoj.ac/contest/1838"
       ],
       "rankland_sha256": "13320dfd4fe3cd085192580369ab7b426ad52bc1a7f95e4b20b1b43955ce1fc9",
       "online_mapping": "verified"
@@ -1028,7 +1062,8 @@
         "K"
       ],
       "source_urls": [
-        "https://codeforces.com/gym/102452"
+        "https://codeforces.com/gym/102452",
+        "https://qoj.ac/contest/1537"
       ],
       "rankland_sha256": null,
       "online_mapping": "verified"
@@ -1051,7 +1086,8 @@
         "L"
       ],
       "source_urls": [
-        "https://codeforces.com/gym/103119"
+        "https://codeforces.com/gym/103119",
+        "https://qoj.ac/contest/1538"
       ],
       "rankland_sha256": null,
       "online_mapping": "verified"
