@@ -29,7 +29,7 @@ from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from cpc_integration import Integration as CpcIntegration, handle as cpc_handle
-from codeforces_auth import CodeforcesAuth, load_auth, signed_api_get
+from codeforces_auth import CodeforcesAuth, ManagerAccessUnavailable, load_auth, signed_api_get
 
 
 APP_NAME = "OJ Submission Wall"
@@ -1300,9 +1300,33 @@ class CodeforcesAdapter(OJAdapter):
     label = "Codeforces"
     handle_hint = "Codeforces handle，例如 tourist"
 
-    def fetch_submissions(self, handle: str, since_ts: int, *, auth: CodeforcesAuth | None = None) -> list[dict]:
-        submissions = []
+    @staticmethod
+    def _submission(item: dict) -> dict:
+        problem = item.get("problem") or {}
+        contest_id = item.get("contestId") or problem.get("contestId")
+        index = problem.get("index") or ""
+        name = problem.get("name") or ""
+        problem_id = f"{contest_id}{index}" if contest_id and index else (name or "")
+        url = None
+        if contest_id and item.get("id"):
+            section = "gym" if int(contest_id) >= 100000 else "contest"
+            url = f"https://codeforces.com/{section}/{contest_id}/submission/{item['id']}"
+        return {
+            "remote_id": str(item.get("id")),
+            "problem_id": problem_id,
+            "problem_name": f"{problem_id} {name}".strip() if name else problem_id,
+            "verdict": normalize_verdict(item.get("verdict") or "TESTING"),
+            "language": item.get("programmingLanguage") or "",
+            "submitted_at": int(item.get("creationTimeSeconds") or 0),
+            "url": url,
+            "raw": item,
+        }
+
+    def fetch_submissions(self, handle: str, since_ts: int, *, auth: CodeforcesAuth | None = None,
+                          known_gym_ids=(), gym_warnings: list[str] | None = None) -> list[dict]:
+        submissions = {}
         page_size = min(max(FETCH_LIMIT, 1), 1000)
+        gym_ids = set(known_gym_ids)
         start = 1
         while True:
             query = {"handle": handle, "from": start, "count": page_size}
@@ -1316,39 +1340,54 @@ class CodeforcesAdapter(OJAdapter):
             items = data.get("result", [])
             if not items:
                 break
-
             reached_older = False
             for item in items:
-                submitted_at = int(item.get("creationTimeSeconds") or 0)
-                if submitted_at and submitted_at < since_ts:
+                normalized = self._submission(item)
+                if normalized["submitted_at"] and normalized["submitted_at"] < since_ts:
                     reached_older = True
                     continue
-                problem = item.get("problem") or {}
-                contest_id = item.get("contestId") or problem.get("contestId")
-                index = problem.get("index") or ""
-                name = problem.get("name") or ""
-                problem_id = f"{contest_id}{index}" if contest_id and index else (name or "")
-                url = None
-                if contest_id and item.get("id"):
-                    section = "gym" if int(contest_id) >= 100000 else "contest"
-                    url = f"https://codeforces.com/{section}/{contest_id}/submission/{item['id']}"
-                submissions.append(
-                    {
-                        "remote_id": str(item.get("id")),
-                        "problem_id": problem_id,
-                        "problem_name": f"{problem_id} {name}".strip() if name else problem_id,
-                        "verdict": normalize_verdict(item.get("verdict") or "TESTING"),
-                        "language": item.get("programmingLanguage") or "",
-                        "submitted_at": submitted_at,
-                        "url": url,
-                        "raw": item,
-                    }
-                )
-
+                submissions[normalized["remote_id"]] = normalized
+                contest_id = item.get("contestId") or (item.get("problem") or {}).get("contestId")
+                if contest_id and int(contest_id) >= 100000:
+                    gym_ids.add(int(contest_id))
             if reached_older or len(items) < page_size:
                 break
             start += page_size
-        return submissions
+
+        if auth is not None:
+            # user.status omits MANAGER even when signed. Fetch each known Gym's own
+            # manager-visible history; old Coach AC can predate the public watermark.
+            history_floor = utcnow() - FETCH_LOOKBACK_DAYS * 86400
+            for gym_id in sorted(gym_ids):
+                start = 1
+                while True:
+                    query = {"handle": handle, "contestId": int(gym_id), "asManager": "true",
+                             "from": start, "count": page_size}
+                    try:
+                        data = signed_api_get("contest.status", query, auth, http_get)
+                    except ManagerAccessUnavailable:
+                        message = f"Gym {gym_id} 无 Coach 读取权限，已保留公开记录，私有补题待核验"
+                        if gym_warnings is None:
+                            raise RuntimeError(message) from None
+                        gym_warnings.append(message)
+                        break
+                    items = data["result"]
+                    reached_older = False
+                    for item in items:
+                        author = item.get("author") or {}
+                        members = {str(m.get("handle", "")).casefold() for m in author.get("members") or []}
+                        contest_id = item.get("contestId") or (item.get("problem") or {}).get("contestId")
+                        if handle.casefold() not in members or int(contest_id or 0) != int(gym_id):
+                            raise RuntimeError("Gym 提交的账号或比赛归属不匹配，停止本次同步")
+                        normalized = self._submission(item)
+                        if normalized["submitted_at"] and normalized["submitted_at"] < history_floor:
+                            reached_older = True
+                            continue
+                        submissions[normalized["remote_id"]] = normalized
+                    if reached_older or len(items) < page_size:
+                        break
+                    start += page_size
+        return list(submissions.values())
 
     def fetch_contests(self, handle: str, since_ts: int, submissions: list[dict]) -> list[dict]:
         lookup = codeforces_contest_lookup()
@@ -3559,12 +3598,26 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
             if cf_auth is not None and previous_profile_stats.get("codeforcesAuthHistory") != cf_auth.history_token:
                 # Newly authorized private history can predate the public watermark.
                 since_ts = default_since
-            submissions = adapter.fetch_submissions(row["handle"], since_ts, auth=cf_auth)
+            known_gym_ids = set()
+            if cf_auth is not None:
+                stored_problems = conn.execute(
+                    "SELECT DISTINCT problem_id FROM submissions WHERE owner_type=? AND owner_id=? AND platform=? AND handle=? AND submitted_at>=?",
+                    (row["owner_type"], row["owner_id"], row["platform"], row["handle"], default_since),
+                )
+                for stored in stored_problems:
+                    match = re.fullmatch(r"(\d{6,})[A-Za-z]\d*", str(stored["problem_id"] or ""))
+                    if match:
+                        known_gym_ids.add(int(match[1]))
+            gym_warnings = []
+            submissions = adapter.fetch_submissions(row["handle"], since_ts, auth=cf_auth,
+                                                    known_gym_ids=known_gym_ids, gym_warnings=gym_warnings)
         else:
             submissions = adapter.fetch_submissions(row["handle"], since_ts)
         profile_stats = adapter.fetch_profile_stats(row["handle"], submissions)
         if cf_auth is not None:
             profile_stats = {**previous_profile_stats, **(profile_stats or {}), "codeforcesAuthHistory": cf_auth.history_token}
+            if gym_warnings:
+                profile_stats["_warning"] = "；".join(gym_warnings[:3]) + (f"；共 {len(gym_warnings)} 场待核验" if len(gym_warnings) > 3 else "")
         profile_warning = ""
         profile_is_fallback = False
         if isinstance(profile_stats, dict):

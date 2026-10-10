@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlparse
 
 import app
 import codeforces_auth as auth_module
-from codeforces_auth import CodeforcesAuth, load_auth, signed_api_get, signed_url
+from codeforces_auth import CodeforcesAuth, ManagerAccessUnavailable, load_auth, signed_api_get, signed_url
 from cpc_integration import Integration
 
 
@@ -42,6 +42,25 @@ class AuthTests(unittest.TestCase):
         for params in [{'handle': 'other'}, {'handle': 'Yzm007', 'includeSources': True}]:
             with self.assertRaises(ValueError):
                 signed_url('user.status', params, self.auth, timestamp=1, nonce='123456')
+
+    def test_gym_manager_signature_requires_own_handle_gym_and_no_source_codes(self):
+        valid = {'handle': 'Yzm007', 'contestId': 104076, 'asManager': 'true', 'from': 1, 'count': 1000}
+        url = signed_url('contest.status', valid, self.auth, timestamp=1, nonce='123456')
+        self.assertEqual(parse_qs(urlparse(url).query)['asManager'], ['true'])
+        for params in [{**valid, 'handle': 'other'}, {**valid, 'contestId': 2000}, {**valid, 'includeSources': 'true'}, {k:v for k,v in valid.items() if k!='handle'}]:
+            with self.assertRaises(ValueError):
+                signed_url('contest.status', params, self.auth, timestamp=1, nonce='123456')
+
+    def test_explicit_manager_permission_error_remains_distinct_from_bad_api_key(self):
+        params = {'handle':'Yzm007','contestId':104076,'asManager':'true'}
+        with patch.object(auth_module.time, 'sleep'):
+            with self.assertRaises(ManagerAccessUnavailable):
+                signed_api_get('contest.status', params, self.auth,
+                               lambda *a,**k:(b'{"status":"FAILED","comment":"asManager: You should be a manager of the contest"}', ''))
+            with self.assertRaises(RuntimeError) as error:
+                signed_api_get('contest.status', params, self.auth,
+                               lambda *a,**k:(b'{"status":"FAILED","comment":"apiKey: Invalid API key"}', ''))
+            self.assertNotIsInstance(error.exception, ManagerAccessUnavailable)
 
     def test_signed_http_disables_shared_cache_and_sanitizes_errors(self):
         calls = []
@@ -90,14 +109,19 @@ class CoachHistoryTests(unittest.TestCase):
                                            'teamId': 98797 if kind == 'VIRTUAL' else None,
                                            'startTimeSeconds': self.old}}
 
-    def sync(self, records, *, fail=False):
+    def sync(self, records, *, fail=False, deny=False, wrong_owner=False):
         pages = []
         def status(method, params, auth, getter):
-            pages.append(params['from'])
-            if fail and params['from'] > 1:
+            pages.append((method,params['from']))
+            if method == 'contest.status' and deny:
+                raise ManagerAccessUnavailable()
+            if method == 'contest.status' and fail and params['from'] > 1:
                 raise RuntimeError('授权读取失败')
+            source = [r for r in records if (r['author']['participantType']!='MANAGER' if method=='user.status' else r['contestId']==params['contestId'])]
+            if method == 'contest.status' and wrong_owner:
+                source = [{**self.coach[0], 'author': {'participantType':'MANAGER','members':[{'handle':'other'}]}}]
             start = params['from'] - 1
-            return {'status': 'OK', 'result': records[start:start+params['count']]}
+            return {'status': 'OK', 'result': source[start:start+params['count']]}
         def public(url, **kwargs):
             if '/user.rating?' in url:
                 return {'status': 'OK', 'result': []}
@@ -116,7 +140,7 @@ class CoachHistoryTests(unittest.TestCase):
         self.sync([self.newest]+self.vp)
         app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
         result, pages = self.sync([self.newest]+self.coach+self.vp)
-        self.assertEqual(pages, [1,5,9])
+        self.assertEqual(pages, [('user.status',1),('user.status',5),('contest.status',1),('contest.status',5),('contest.status',9)])
         self.assertEqual(result['inserted'], 4)
         progress = self.service.progress('3')['problems']
         self.assertEqual({p for p in 'ABCDEFGHIJKLM' if progress.get('icpc-2022-济南:'+p, {}).get('personal')}, set('ACDEGJKM'))
@@ -127,7 +151,7 @@ class CoachHistoryTests(unittest.TestCase):
             self.assertNotIn('MANAGER', contests[0]['raw_json'])
             self.assertIn('codeforcesAuthHistory', json.loads(db.execute('SELECT stats_json FROM handles WHERE id=3').fetchone()[0]))
         second, pages = self.sync([self.newest]+self.coach+self.vp)
-        self.assertEqual(pages, [1])
+        self.assertEqual(pages, [('user.status',1),('contest.status',1),('contest.status',5),('contest.status',9)])
         self.assertEqual(second['inserted'], 0)
         self.assertEqual(self.service.progress('4')['problems'], {})
 
@@ -142,7 +166,25 @@ class CoachHistoryTests(unittest.TestCase):
             self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
         result, pages = self.sync([self.newest]+self.coach+self.vp)
         self.assertEqual(result['inserted'], 4)
-        self.assertEqual(pages, [1,5,9])
+        self.assertEqual(pages, [('user.status',1),('user.status',5),('contest.status',1),('contest.status',5),('contest.status',9)])
+
+    def test_manager_permission_denial_keeps_public_history_and_warns(self):
+        self.sync([self.newest]+self.vp)
+        app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
+        result, _ = self.sync([self.newest]+self.coach+self.vp, deny=True)
+        self.assertIn('无 Coach 读取权限', result['warning'])
+        with app.connect_db() as db:
+            self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
+        retried, _ = self.sync([self.newest]+self.coach+self.vp)
+        self.assertEqual(retried['inserted'], 4)
+
+    def test_manager_api_returning_other_users_rows_is_rejected(self):
+        self.sync([self.newest]+self.vp)
+        app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
+        result, _ = self.sync([self.newest]+self.coach+self.vp, wrong_owner=True)
+        self.assertIn('归属不匹配',result['error'])
+        with app.connect_db() as db:
+            self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
 
     def test_coach_submission_never_counts_as_a_contest_solve(self):
         row = {'handle': 'Yzm007', 'platform': 'codeforces', 'raw_json': json.dumps(self.coach[0]),

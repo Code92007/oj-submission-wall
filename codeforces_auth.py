@@ -12,6 +12,10 @@ import time
 from urllib.parse import urlencode
 
 
+class ManagerAccessUnavailable(RuntimeError):
+    """The API explicitly denied Coach/manager visibility for this Gym."""
+
+
 @dataclass(frozen=True)
 class CodeforcesAuth:
     owner_id: str
@@ -50,8 +54,15 @@ def load_auth(path: Path, owner_type: str, owner_id: str, handle: str) -> Codefo
 
 def signed_url(method: str, params: dict, auth: CodeforcesAuth, *, timestamp: int, nonce: str) -> str:
     # Keep the signing primitive limited to this integration's own submissions.
-    if method != 'user.status' or str(params.get('handle', '')).casefold() != auth.handle.casefold():
+    if method not in {'user.status', 'contest.status'} or str(params.get('handle', '')).casefold() != auth.handle.casefold():
         raise ValueError('Codeforces 授权只能读取配置账号的提交')
+    allowed = {'handle', 'from', 'count'}
+    if method == 'contest.status':
+        if str(params.get('asManager')) != 'true' or not str(params.get('contestId', '')).isdigit() or int(params['contestId']) < 100000:
+            raise ValueError('Codeforces 授权比赛查询仅支持 Gym Coach 本人提交')
+        allowed |= {'contestId', 'asManager'}
+    if set(params) - allowed:
+        raise ValueError('Codeforces 授权请求包含不允许的参数')
     if not re.fullmatch(r'[a-zA-Z0-9]{6}', nonce):
         raise ValueError('Codeforces 签名随机前缀应为六位')
     query = {str(k): str(v) for k, v in params.items()}
@@ -79,9 +90,15 @@ def signed_api_get(method: str, params: dict, auth: CodeforcesAuth, http_get) ->
             # Signed URLs contain apiKey. Never persist them or reuse stale private data.
             body, _ = http_get(url, allow_stale_cache=False, cache_write=False)
             data = json.loads(body.decode('utf-8'))
+            if isinstance(data, dict) and data.get('status') == 'FAILED' and method == 'contest.status':
+                comment = str(data.get('comment') or '').lower()
+                if 'manager' in comment and any(word in comment for word in ('access', 'permission', 'should', 'must')):
+                    raise ManagerAccessUnavailable('该 Gym 不允许本人以 Coach/manager 身份读取')
             if not isinstance(data, dict) or data.get('status') != 'OK' or not isinstance(data.get('result'), list):
                 raise ValueError()
             return data
+        except ManagerAccessUnavailable:
+            raise
         except Exception:
             # HTTP/API exceptions may contain the signed URL; keep credentials out of logs/UI.
             raise RuntimeError('Codeforces 授权读取失败，请检查 API Key、secret、账号归属和服务器时间后重试') from None

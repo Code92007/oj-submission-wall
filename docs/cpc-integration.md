@@ -119,7 +119,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests
 
 济南 2022（Gym 104076）排查：匿名 `user.status`、按 handle 的 `contest.status`、完整 40007 条比赛提交均只能找到 Yzm007 的 31 条记录、A/E/K/M 四题 AC；截图中的 C/D/G/J 五条 AC 提交 ID 不在匿名结果中。用户确认开过 Coach。公开结果没有 MANAGER 类型，需使用本人授权进一步核验，不能把截图直接写成平台提交。
 
-OJ Wall 可选使用 Codeforces 官方签名 API，读取配置账号的 `user.status`，保留其中真实的 MANAGER/PRACTICE/VIRTUAL 提交，并按原 remote_id 幂等合并。Coach 的 AC 参与线上题目覆盖和训练记录，不生成参赛成绩，不参与赛中对战计算；已有团队 VP 与现场通过继续按题取并集。首次授权或更换 Key 自动回补 `FETCH_LOOKBACK_DAYS`（默认十年）内历史，成功后恢复增量；任一提交分页失败不写入部分数据、不推进回补标记、不降级为匿名成功。签名请求按 2.1 秒间隔执行，不写共享 HTTP 缓存，错误信息不回显 Key/签名。
+OJ Wall 可选使用 Codeforces 官方签名 API，读取配置账号的 `user.status`，再对该账号已知的 Gym 调用带 `handle` 与 `asManager=true` 的 `contest.status`，合并真实的 MANAGER/PRACTICE/VIRTUAL 提交；按原 remote_id 幂等去重。已知 Gym 来自该账号在十年窗口内已保存的个人/团队提交及本次新提交，不查询其他用户的完整榜单。Coach 的 AC 参与线上题目覆盖和训练记录，不生成参赛成绩，不参与赛中对战计算；已有团队 VP 与现场通过继续按题取并集。首次授权或更换 Key 自动回补 `FETCH_LOOKBACK_DAYS`（默认十年）内 user.status 历史，成功后恢复其增量同步；已知 Gym 的本人 Coach 历史每轮完整补查，避免早于全局增量时间戳的旧补题继续遗漏。任一网络/签名/格式错误不写入部分数据、不推进回补标记、不降级为匿名成功；平台明确拒绝某场 Coach 权限时保留其公开记录并提示该场私有补题待核验，下一轮继续重试。签名请求按 2.1 秒间隔执行，不写共享 HTTP 缓存，错误信息不回显 Key/签名。
 
 管理员先核对 OJ Wall 正式用户 ID 与已绑定 CF handle，再让账号本人在 [CF API 设置](https://codeforces.com/settings/api) 生成自己的 Key/secret。在服务器交互输入（无回显，避免放进命令历史或聊天）：
 
@@ -128,7 +128,7 @@ cd /root/oj-submission-wall
 docker compose exec oj-submission-wall python tools/configure_codeforces.py --owner-id 3 --handle Yzm007
 ```
 
-默认文件 `/data/codeforces-auth.json`，对应宿主机 `data/codeforces-auth.json`，权限 0600；可以用 `CODEFORCES_AUTH_FILE` 改位置。支持多个内部用户，严格匹配 ownerId 和 handle，不给同名的其他 Wall 用户或游客使用该授权。文件格式如下（占位示例）：
+默认文件 `/data/codeforces-auth.json`，对应宿主机 `data/codeforces-auth.json`，权限 0600；可以用 `CODEFORCES_AUTH_FILE` 改位置。支持多个内部用户，严格匹配 ownerId 和 handle，不给同名的其他 Wall 用户或游客使用该授权；Gym 响应逐条检查比赛 ID 和 author.members，拒绝混入他人提交。文件格式如下（占位示例）：
 
 ```json
 {"accounts":[{"ownerId":"3","handle":"Yzm007","key":"本人API Key","secret":"本人API secret"}]}
@@ -136,4 +136,4 @@ docker compose exec oj-submission-wall python tools/configure_codeforces.py --ow
 
 配置后无需重启，下一轮自动同步会补拉，或在训练墙主动刷新。迁移时连同原 SQLite 和整个 data 卷复制，保留本地用户 ID、服务 UUID、授权文件权限；回补标记也随数据库迁移。撤销授权可删除对应配置并在 CF 设置撤销 Key，已保存的真实提交继续保留。此授权仅由 Wall 使用，CF Bot 仍只读 Wall 进度，DLUT CPC 仍只管理人员/队伍关系。
 
-验证：新增签名、授权隔离、完整分页、回补失败重试和 Coach/VP 合并的回归测试。模拟数据验证 A/E/K/M 与 C/D/G/J 合并为 8/13；实际四道补题需要本人 API 授权后从平台复核，未授权时仍为 4/13。官方协议参考：[API 授权](https://codeforces.com/apiHelp)、[user.status](https://codeforces.com/apiHelp/methods#user.status)。
+验证迭代：本人授权后实测，签名 user.status 返回 5320 条并新增 310 条私有记录，但仍遗漏 MANAGER；签名 contest.status 默认返回 31 条，显式 asManager=true 返回 49 条，含 18 条 MANAGER，其中五条 AC ID 与截图完全一致：226752209（J）、226715410（C）、226606542 / 226606494（G）、226567874（D）。因此修正同步通路；回归模型也改为 user.status 不返回 MANAGER，避免只验证理想化数据。12 项授权/Coach 回归、原有测试共 47 项通过，覆盖分页失败重试、权限拒绝警告和他人记录拒绝。官方协议参考：[API 授权](https://codeforces.com/apiHelp)、[user.status](https://codeforces.com/apiHelp/methods#user.status)。
