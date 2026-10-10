@@ -29,6 +29,7 @@ from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from cpc_integration import Integration as CpcIntegration, handle as cpc_handle
+from codeforces_auth import CodeforcesAuth, load_auth, signed_api_get
 
 
 APP_NAME = "OJ Submission Wall"
@@ -50,6 +51,7 @@ SYNC_INCREMENTAL_OVERLAP_SECONDS = int(os.environ.get("SYNC_INCREMENTAL_OVERLAP_
 FETCH_LOOKBACK_DAYS = int(os.environ.get("FETCH_LOOKBACK_DAYS", "3650"))
 FETCH_LIMIT = int(os.environ.get("FETCH_LIMIT", "1000"))
 CODEFORCES_VP_RANKS_PER_SYNC = max(1, int(os.environ.get("CODEFORCES_VP_RANKS_PER_SYNC", "4")))
+CODEFORCES_AUTH_FILE = Path(os.environ.get("CODEFORCES_AUTH_FILE", str(DATA_DIR / "codeforces-auth.json")))
 HTTP_TIMEOUT_SECONDS = int(os.environ.get("HTTP_TIMEOUT_SECONDS", "15"))
 HTTP_RETRY_COUNT = int(os.environ.get("HTTP_RETRY_COUNT", "2"))
 HTTP_RETRY_BACKOFF_SECONDS = float(os.environ.get("HTTP_RETRY_BACKOFF_SECONDS", "0.8"))
@@ -1298,13 +1300,17 @@ class CodeforcesAdapter(OJAdapter):
     label = "Codeforces"
     handle_hint = "Codeforces handle，例如 tourist"
 
-    def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
+    def fetch_submissions(self, handle: str, since_ts: int, *, auth: CodeforcesAuth | None = None) -> list[dict]:
         submissions = []
         page_size = min(max(FETCH_LIMIT, 1), 1000)
         start = 1
         while True:
-            params = urllib.parse.urlencode({"handle": handle, "from": start, "count": page_size})
-            data = http_get_json(f"https://codeforces.com/api/user.status?{params}")
+            query = {"handle": handle, "from": start, "count": page_size}
+            if auth is not None:
+                data = signed_api_get("user.status", query, auth, http_get)
+            else:
+                params = urllib.parse.urlencode(query)
+                data = http_get_json(f"https://codeforces.com/api/user.status?{params}")
             if data.get("status") != "OK":
                 raise RuntimeError(data.get("comment") or "Codeforces API 返回失败")
             items = data.get("result", [])
@@ -1324,7 +1330,8 @@ class CodeforcesAdapter(OJAdapter):
                 problem_id = f"{contest_id}{index}" if contest_id and index else (name or "")
                 url = None
                 if contest_id and item.get("id"):
-                    url = f"https://codeforces.com/contest/{contest_id}/submission/{item['id']}"
+                    section = "gym" if int(contest_id) >= 100000 else "contest"
+                    url = f"https://codeforces.com/{section}/{contest_id}/submission/{item['id']}"
                 submissions.append(
                     {
                         "remote_id": str(item.get("id")),
@@ -1369,7 +1376,7 @@ class CodeforcesAdapter(OJAdapter):
             if not contest_id or submitted_at < history_floor:
                 continue
             participant_type = str((raw.get("author") or {}).get("participantType") or "")
-            if participant_type.upper() == "PRACTICE":
+            if participant_type.upper() in {"PRACTICE", "MANAGER"}:
                 continue
             contest_id = int(contest_id)
             if participant_type.upper() in CODEFORCES_UNOFFICIAL_PARTICIPANT_TYPES:
@@ -3546,8 +3553,18 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
         reset_http_stale_hits()
         if hasattr(adapter, "set_previous_stats"):
             adapter.set_previous_stats(row["handle"], previous_stats_json)
-        submissions = adapter.fetch_submissions(row["handle"], since_ts)
+        cf_auth = None
+        if adapter.key == "codeforces":
+            cf_auth = load_auth(CODEFORCES_AUTH_FILE, row["owner_type"], str(row["owner_id"]), row["handle"])
+            if cf_auth is not None and previous_profile_stats.get("codeforcesAuthHistory") != cf_auth.history_token:
+                # Newly authorized private history can predate the public watermark.
+                since_ts = default_since
+            submissions = adapter.fetch_submissions(row["handle"], since_ts, auth=cf_auth)
+        else:
+            submissions = adapter.fetch_submissions(row["handle"], since_ts)
         profile_stats = adapter.fetch_profile_stats(row["handle"], submissions)
+        if cf_auth is not None:
+            profile_stats = {**previous_profile_stats, **(profile_stats or {}), "codeforcesAuthHistory": cf_auth.history_token}
         profile_warning = ""
         profile_is_fallback = False
         if isinstance(profile_stats, dict):
@@ -5407,7 +5424,7 @@ def battle_in_contest_solve(row: sqlite3.Row, entry: dict) -> dict | None:
         return None
     if row["platform"] == "codeforces":
         participant_type = str((raw.get("author") or {}).get("participantType") or "").upper()
-        if participant_type == "PRACTICE":
+        if participant_type in {"PRACTICE", "MANAGER"}:
             return None
 
     submitted_at = int(row["submitted_at"] or 0)

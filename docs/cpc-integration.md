@@ -113,3 +113,27 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests
 生产验证（2026-10-10）：本工程 `8e21e32` 与 CF Bot `7ca496a` 已部署。已有认证强制补刷完成 9/9 场、36 道现场 AC，其中 31 道进入 2019/2020/2024 区域赛目录；打星保留，另外 5 道属于目录外比赛，仍保存在现场记录。114,160 条原线上提交无缺失；两个 CF Bot 连接刷新成功。备份、旧镜像和验证报告位于 `/root/backups/cpc-regional-history-20261010-004406/`；源站地址仍由环境变量配置，迁移规则不变。
 
 目录并行更新对齐（2026-10-10）：沿用 CF Bot 已核对的最新 QOJ/Gym 题号和真实题名。待映射仅剩 2019 ICPC 沈阳/南昌、2022 ICPC 合肥共 39 题及 2020 CCPC 秦皇岛 C；Gym 102769 没有 C，不构造其别名。现场题序和通过仍完整保留；目录中的题号映射优先于榜单重现链接推导。CF Bot 的离线历史评级由该工程独立维护，本工程不展示 rating。
+
+
+## 2026-10-10：Coach 私有补题与公开 VP 合并
+
+济南 2022（Gym 104076）排查：匿名 `user.status`、按 handle 的 `contest.status`、完整 40007 条比赛提交均只能找到 Yzm007 的 31 条记录、A/E/K/M 四题 AC；截图中的 C/D/G/J 五条 AC 提交 ID 不在匿名结果中。用户确认开过 Coach。公开结果没有 MANAGER 类型，需使用本人授权进一步核验，不能把截图直接写成平台提交。
+
+OJ Wall 可选使用 Codeforces 官方签名 API，读取配置账号的 `user.status`，保留其中真实的 MANAGER/PRACTICE/VIRTUAL 提交，并按原 remote_id 幂等合并。Coach 的 AC 参与线上题目覆盖和训练记录，不生成参赛成绩，不参与赛中对战计算；已有团队 VP 与现场通过继续按题取并集。首次授权或更换 Key 自动回补 `FETCH_LOOKBACK_DAYS`（默认十年）内历史，成功后恢复增量；任一提交分页失败不写入部分数据、不推进回补标记、不降级为匿名成功。签名请求按 2.1 秒间隔执行，不写共享 HTTP 缓存，错误信息不回显 Key/签名。
+
+管理员先核对 OJ Wall 正式用户 ID 与已绑定 CF handle，再让账号本人在 [CF API 设置](https://codeforces.com/settings/api) 生成自己的 Key/secret。在服务器交互输入（无回显，避免放进命令历史或聊天）：
+
+```sh
+cd /root/oj-submission-wall
+docker compose exec oj-submission-wall python tools/configure_codeforces.py --owner-id 3 --handle Yzm007
+```
+
+默认文件 `/data/codeforces-auth.json`，对应宿主机 `data/codeforces-auth.json`，权限 0600；可以用 `CODEFORCES_AUTH_FILE` 改位置。支持多个内部用户，严格匹配 ownerId 和 handle，不给同名的其他 Wall 用户或游客使用该授权。文件格式如下（占位示例）：
+
+```json
+{"accounts":[{"ownerId":"3","handle":"Yzm007","key":"本人API Key","secret":"本人API secret"}]}
+```
+
+配置后无需重启，下一轮自动同步会补拉，或在训练墙主动刷新。迁移时连同原 SQLite 和整个 data 卷复制，保留本地用户 ID、服务 UUID、授权文件权限；回补标记也随数据库迁移。撤销授权可删除对应配置并在 CF 设置撤销 Key，已保存的真实提交继续保留。此授权仅由 Wall 使用，CF Bot 仍只读 Wall 进度，DLUT CPC 仍只管理人员/队伍关系。
+
+验证：新增签名、授权隔离、完整分页、回补失败重试和 Coach/VP 合并的回归测试。模拟数据验证 A/E/K/M 与 C/D/G/J 合并为 8/13；实际四道补题需要本人 API 授权后从平台复核，未授权时仍为 4/13。官方协议参考：[API 授权](https://codeforces.com/apiHelp)、[user.status](https://codeforces.com/apiHelp/methods#user.status)。

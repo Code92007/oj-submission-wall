@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
     APP_ENV=production
 
 COPY app.py /app/app.py
+COPY codeforces_auth.py /app/codeforces_auth.py
 COPY cpc_common.py /app/cpc_common.py
 COPY cpc_integration.py /app/cpc_integration.py
 COPY cpc_scoreboard.py /app/cpc_scoreboard.py
