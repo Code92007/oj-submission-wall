@@ -139,3 +139,5 @@ docker compose exec oj-submission-wall python tools/configure_codeforces.py --ow
 验证迭代：本人授权后实测，签名 user.status 返回 5320 条并新增 310 条私有记录，但仍遗漏 MANAGER；签名 contest.status 默认返回 31 条，显式 asManager=true 返回 49 条，含 18 条 MANAGER，其中五条 AC ID 与截图完全一致：226752209（J）、226715410（C）、226606542 / 226606494（G）、226567874（D）。因此修正同步通路；回归模型也改为 user.status 不返回 MANAGER，避免只验证理想化数据。13 项授权/Coach 回归、原有测试共 48 项通过，覆盖分页失败重试、权限拒绝警告和他人记录拒绝。官方协议参考：[API 授权](https://codeforces.com/apiHelp)、[user.status](https://codeforces.com/apiHelp/methods#user.status)。
 
 整批补刷进一步发现历史 Gym 100371 的接口返回 HTTP 400；改为单场完整分页成功后合并，避免一个历史接口不可用阻塞济南等其他比赛。签名 user.status 的成功回补标记仅代表该接口历史完成，不代表所有 Gym 私有记录完整；Gym 失败由 last_error 警告单独呈现并每轮重试。
+
+实际补刷完成：最终运行版本 15bf006，备份 `/root/backups/cpc-coach-manager-final-20261010-223036/`。100 场已知 Gym 共补入 170 条 MANAGER；济南 2022 已核验为 A/C/D/E/G/J/K/M，8/13，截图中五条 AC ID 全部存在，原四道 VP 保留，G 两次 AC 按题去重。备份前 115106 条提交缺失 0，补刷后 115276 条。另有 26 场历史 Gym 的 Coach 记录暂不可读，已有记录保留并继续重试；不影响成功场次导入。核验报告位于备份目录 `backfill-verification.json`，不含凭据。
