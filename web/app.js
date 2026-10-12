@@ -17,9 +17,12 @@ const state = {
   selectedMemberKey: "",
   selectedHandleKeys: new Set(),
   memberGroupFilter: "",
+  onlySelf: false,
   binding: false,
   handleBusy: new Set(),
   overviewPollTimer: null,
+  syncPollTimer: null,
+  syncOverviewUpdatedAt: 0,
   mainView: "overview",
   battleMode: "individual",
   battleLeftKey: "",
@@ -145,8 +148,9 @@ function clearMessage() {
 
 function setBusy(value) {
   state.busy = value;
-  $("#refreshBtn").disabled = value;
-  $("#refreshBtn").textContent = value ? "提交中..." : "刷新同步";
+  const syncing = hasActiveSync();
+  $("#refreshBtn").disabled = value || syncing;
+  $("#refreshBtn").textContent = value ? "提交中..." : syncing ? "全站同步中..." : "刷新同步";
 }
 
 function setHandleBusy(id, value) {
@@ -256,6 +260,7 @@ function applyOverviewData(data, options = {}) {
   if (data.platforms) state.platforms = data.platforms;
   updateWallRange(data);
   renderAll();
+  startSyncStatusPoll();
   if (options.save !== false) saveOverviewBrowserCache(data);
   if (state.mainView === "battle" && state.battleMode === "duel" && state.battleLeftKey && state.battleRightKey) {
     loadBattle();
@@ -280,6 +285,31 @@ function scheduleOverviewPoll(delay = 1600, remaining = 8) {
       scheduleOverviewPoll(Math.min(Math.round(delay * 1.5), 8000), remaining - 1);
     }
   }, delay);
+}
+
+function startSyncStatusPoll() {
+  if (state.syncPollTimer) return;
+  state.syncPollTimer = setTimeout(async () => {
+    try {
+      const wasActive = hasActiveSync();
+      const previousFinish = state.overview?.mirror?.sync?.lastFinishedJob?.finishedAt;
+      const data = await api("/api/sync/status", { signal: AbortSignal.timeout(10000) });
+      if (state.overview?.mirror) state.overview.mirror.sync = data.sync;
+      setBusy(state.busy);
+      renderStats();
+      if ((wasActive && !hasActiveSync()) ||
+          (data.sync?.lastFinishedJob?.finishedAt && data.sync.lastFinishedJob.finishedAt !== previousFinish) ||
+          (hasActiveSync() && Date.now() - state.syncOverviewUpdatedAt > 30000)) {
+        state.syncOverviewUpdatedAt = Date.now();
+        await loadOverview();
+      }
+    } catch (_) {
+      // Keep observing after transient network failures, including long jobs.
+    } finally {
+      state.syncPollTimer = null;
+      startSyncStatusPoll();
+    }
+  }, hasActiveSync() ? 3000 : 8000);
 }
 
 function hydrateOverviewFromBrowserCache() {
@@ -339,6 +369,7 @@ function updateHandleHint() {
 }
 
 function renderAll() {
+  setBusy(state.busy);
   renderSession();
   renderPlatformSelect();
   renderWallYearSelect();
@@ -429,6 +460,8 @@ function renderMyHandles() {
   }
 
   for (const item of handles) {
+    const platform = String(item.platform || "").toLowerCase();
+    const platformLabel = platform === "qoj" ? "QOJ" : item.platformLabel;
     const syncStatus = item.syncStatus || "";
     const busy = state.handleBusy.has(String(item.id)) || syncStatus === "queued" || syncStatus === "running";
     const row = el("div", "handle-item");
@@ -436,7 +469,9 @@ function renderMyHandles() {
     const title = document.createElement("strong");
     title.textContent = `${item.platformLabel} / ${item.displayHandle || item.handle}`;
     const meta = document.createElement("span");
-    if (syncStatus === "running") {
+    if (item.manualImport) {
+      meta.textContent = item.lastSyncAt ? `插件导入 ${formatDateTime(item.lastSyncAt)}` : `等待在${platformLabel}页面授权并同步`;
+    } else if (syncStatus === "running") {
       meta.textContent = "正在后台同步";
     } else if (syncStatus === "queued") {
       meta.textContent = "等待后台同步";
@@ -450,7 +485,14 @@ function renderMyHandles() {
     main.append(title, meta);
 
     const actions = el("div", "handle-actions");
-    if (item.lastError) {
+    if (item.manualImport) {
+      const link = el("a", "button ghost");
+      link.href = platform === "qoj" ? "https://qoj.ac/submissions" : "https://www.luogu.com.cn/";
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = `去${platformLabel}同步`;
+      actions.appendChild(link);
+    } else if (item.lastError) {
       const retry = el("button", "button ghost");
       retry.type = "button";
       retry.textContent = busy ? "重试中..." : "重试";
@@ -473,10 +515,14 @@ function renderMyHandles() {
 function renderMembers() {
   const container = $("#members");
   container.innerHTML = "";
-  const members = sortedMembers([...(state.overview?.members || [])]);
+  const checkbox = $("#onlySelfCheckbox");
+  checkbox.checked = Boolean(state.user && state.onlySelf);
+  checkbox.disabled = !state.user;
+  checkbox.title = state.user ? "只显示当前账号的分组和成员记录" : "登录后可以只看自己";
+  const members = sortedMembers([...(state.overview?.members || [])].filter(member => !state.user || !state.onlySelf || member.isCurrent));
   if (!members.length) {
     const empty = el("div", "empty-state");
-    empty.textContent = "还没有成员。可以先注册或用游客模式绑定账号看效果。";
+    empty.textContent = state.user && state.onlySelf ? "还没有自己的记录，请先绑定 OJ 账号。" : "还没有成员。可以先注册或用游客模式绑定账号看效果。";
     container.appendChild(empty);
     return;
   }
@@ -2175,7 +2221,7 @@ function summarizeTeams(members) {
 
 function renderMemberDirectory(members) {
   const section = el("section", "member-directory");
-  const filteredMembers = state.memberGroupFilter
+  const filteredMembers = state.memberGroupFilter && !(state.user && state.onlySelf)
     ? members.filter((member) => memberTeam(member) === state.memberGroupFilter)
     : members;
   const rangeLabel = state.wallRange === "all" ? "近 10 年" : `${state.wallRange} 年`;
@@ -3178,6 +3224,11 @@ async function refreshSync() {
     showMessage("请先登录或用游客模式进入，再触发同步。", "error");
     return;
   }
+  if (hasActiveSync()) {
+    showMessage("全站正在同步，完成后会自动更新当前页面。");
+    startSyncStatusPoll();
+    return;
+  }
   setBusy(true);
   try {
     const data = await api("/api/sync", {
@@ -3186,7 +3237,8 @@ async function refreshSync() {
     });
     applyOverviewData(data);
     const queued = (data.results || []).some((item) => item.queued || item.alreadyQueued);
-    showMessage(queued ? "已加入后台同步队列。" : "后台同步请求已提交。");
+    const joined = (data.results || []).some((item) => item.alreadyRunning || item.alreadyQueued);
+    showMessage(joined ? "全站正在同步，已复用当前任务，完成后会自动更新。" : queued ? "已加入后台同步队列。" : "后台同步请求已提交。");
     scheduleOverviewPoll();
   } catch (error) {
     showMessage(error.message, "error");
@@ -3319,6 +3371,14 @@ function bindEvents() {
   $("#platformSelect").addEventListener("change", updateHandleHint);
   $("#refreshBtn").addEventListener("click", refreshSync);
   $("#logoutBtn").addEventListener("click", logout);
+  $("#onlySelfCheckbox").addEventListener("change", (event) => {
+    state.onlySelf = event.currentTarget.checked;
+    state.selectedMemberKey = "";
+    state.selectedHandleKeys.clear();
+    state.memberGroupFilter = "";
+    try { localStorage.setItem("ojwall-only-self", state.onlySelf ? "1" : "0"); } catch (_) {}
+    renderMembers();
+  });
   $("#wallYearSelect").addEventListener("change", (event) => {
     state.wallRange = event.currentTarget.value;
     renderMembers();
@@ -3391,6 +3451,8 @@ function bindEvents() {
 }
 
 async function init() {
+  try { state.onlySelf = localStorage.getItem("ojwall-only-self") === "1"; } catch (_) {}
+  setupLuoguAuthorization();
   bindEvents();
   hydrateOverviewFromBrowserCache();
   try {
@@ -3399,6 +3461,32 @@ async function init() {
   } catch (error) {
     showMessage(error.message, "error");
   }
+}
+
+function setupLuoguAuthorization() {
+const luoguAuthParams = new URLSearchParams(location.search);
+if (luoguAuthParams.has("luoguAuthorize") || luoguAuthParams.has("qojAuthorize")) {
+  const platform = luoguAuthParams.has("qojAuthorize") ? "qoj" : "luogu";
+  const label = platform === "qoj" ? "QOJ 用户名" : "洛谷 UID";
+  const uid = luoguAuthParams.get("uid");
+  const nonce = luoguAuthParams.get("nonce");
+  const box = document.querySelector("#luoguAuthorization");
+  box.textContent = `连接${label} ${uid}：请先确认本站登录账号。授权后插件可以为此账号导入提交记录，30 天内有效，解绑即可撤销。`;
+  const button = document.createElement("button");
+  button.className = "button primary";
+  button.textContent = `确认授权并绑定此${platform === "qoj" ? " QOJ " : "洛谷"}账号`;
+  box.append(button);
+  button.onclick = async () => {
+    button.disabled = true;
+    try {
+      const result = await api(`/api/${platform}-plugin/authorize`, {method: "POST", body: {uid}});
+      if (!window.opener) throw new Error("请从同步脚本重新打开授权页");
+      window.opener.postMessage({type: `ojwall-${platform}-authorized`, uid, nonce, token: result.token}, platform === "qoj" ? "https://qoj.ac" : "https://www.luogu.com.cn");
+      box.textContent = "授权成功，请返回对应 OJ 页面点击同步。";
+    } catch (error) { showMessage(error.message, "error"); button.disabled = false; }
+  };
+}
+
 }
 
 init();

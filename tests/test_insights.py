@@ -249,10 +249,10 @@ class InsightsTest(unittest.TestCase):
         self.assertEqual(stats["allTimeAccepted"], 7)
         self.assertEqual(stats["difficultyCounts"], {"Easy": 4, "Medium": 2, "Hard": 1})
 
-    def test_supported_platforms_replace_qoj_with_leetcode(self):
+    def test_supported_platforms_include_leetcode_and_manual_qoj(self):
         platforms = [item["key"] for item in app.platform_meta()]
         self.assertIn("leetcode", platforms)
-        self.assertNotIn("qoj", platforms)
+        self.assertIn("qoj", platforms)
 
 
 if __name__ == "__main__":

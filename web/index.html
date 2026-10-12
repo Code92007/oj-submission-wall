@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OJ Submission Wall</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=20261010-button-links">
   </head>
   <body>
     <header class="topbar">
@@ -119,6 +119,18 @@
           </form>
           <button id="discoverNowcoderTeams" class="button ghost full" type="button">查找牛客关联团队</button>
           <div id="nowcoderTeams" class="stack" aria-live="polite"></div>
+          <details class="stack"><summary>洛谷：安装插件并手动导入</summary>
+            <p>1. 安装 <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey（篡改猴）</a>，并按扩展提示允许用户脚本。</p>
+            <p>2. <a href="/luogu-sync.user.js">安装洛谷同步脚本</a>。</p>
+            <p>3. 登录洛谷，点击右下角「OJ Wall 同步」，连接本站并确认授权，再点击同步。请保持页面开启。</p>
+            <p>仅导入当前洛谷账号的提交记录，不上传密码、Cookie 或代码。授权有效期 30 天；解绑账号即可撤销。无需处理 JSON 文件。</p>
+          </details>
+          <details class="stack"><summary>QOJ：安装插件并手动导入</summary>
+            <p>安装 <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> 后，<a href="/qoj-sync.user.js">安装 QOJ 同步脚本</a>。</p>
+            <p>登录 QOJ，点击右下角「OJ Wall 同步」连接本站并授权，再点击同步。支持个人及 ucup-team 团队账号，只导入当前登录账号的提交，不上传 Cookie、密码或代码。</p>
+            <p>授权有效期 30 天，解绑即可撤销；请保持 QOJ 页面开启。</p>
+          </details>
+          <div id="luoguAuthorization" class="stack"></div>
           <div id="myHandles" class="handle-list"></div>
         </section>
       </aside>
@@ -141,6 +153,10 @@
                 <label class="wall-year-control">
                   绿墙范围
                   <select id="wallYearSelect"></select>
+                </label>
+                <label class="only-self-control">
+                  <input id="onlySelfCheckbox" type="checkbox">
+                  只看自己
                 </label>
               </div>
             </div>
@@ -341,6 +357,6 @@
       </aside>
     </main>
 
-    <script src="/app.js" defer></script>
+    <script src="/app.js?v=20261008-only-self" defer></script>
   </body>
 </html>

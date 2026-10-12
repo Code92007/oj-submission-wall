@@ -79,6 +79,7 @@ LUOGU_USER_AGENT = os.environ.get(
     "LUOGU_USER_AGENT",
     f"OJSubmissionWall/1.0 (+{PUBLIC_BASE_URL})" if PUBLIC_BASE_URL else "OJSubmissionWall/1.0",
 )
+LUOGU_BROWSER_IMPORT = os.environ.get("LUOGU_BROWSER_IMPORT", "true").lower() not in {"0", "false", "no"}
 LUOGU_CF_CLEARANCE = os.environ.get("LUOGU_CF_CLEARANCE", "").strip()
 LUOGU_COOKIE = os.environ.get("LUOGU_COOKIE", "").strip()
 LUOGU_CSRF_TOKEN = os.environ.get("LUOGU_CSRF_TOKEN", "").strip()
@@ -130,6 +131,7 @@ HTTP_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 CODEFORCES_STANDINGS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 SYNC_LOCK = threading.Lock()
 SYNC_QUEUE_LOCK = threading.Lock()
+LUOGU_RECOVERY_QUEUED_AT: dict[int, int] = {}
 SYNC_QUEUE_EVENT = threading.Event()
 SYNC_PENDING_JOBS: list[dict] = []
 SYNC_RUNNING_JOB: dict | None = None
@@ -388,6 +390,11 @@ def init_db() -> None:
                 expires_at INTEGER NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS luogu_plugin_tokens (
+                token_hash TEXT PRIMARY KEY,
+                handle_id INTEGER NOT NULL UNIQUE,
+                expires_at INTEGER NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS handles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 owner_type TEXT NOT NULL CHECK(owner_type IN ('user', 'guest')),
@@ -576,6 +583,12 @@ def http_get(
     raise RuntimeError("HTTP request failed")
 
 
+class LuoguSessionUnavailable(RuntimeError):
+    def __init__(self, message: str, retry_after_seconds: int = 300):
+        super().__init__(message)
+        self.retry_after_seconds = max(30, retry_after_seconds)
+
+
 def proxy_http_get(
     url: str,
     headers: dict[str, str] | None,
@@ -615,6 +628,12 @@ def proxy_http_get(
         status = int(data.get("status") or 200)
         if not data.get("ok") or status >= 400:
             detail = str(data.get("error") or data.get("message") or "").strip()
+            if "/record/list" in url and (status in {401, 403} or data.get("session")):
+                session = data.get("session") or {}
+                message = detail or "洛谷登录会话失效，记录同步已暂停；登录恢复后自动补抓"
+                if status == 401 and not data.get("sessionRequired"):
+                    message = "洛谷登录会话失效，记录同步已暂停；登录恢复后自动补抓（HTTP 401）"
+                raise LuoguSessionUnavailable(message, int(session.get("retryAfterSeconds") or (900 if status == 403 else 300)))
             raise RuntimeError(detail or f"代理请求失败：HTTP {status}")
         content_type = str(data.get("contentType") or data.get("content_type") or "")
         if data.get("bodyBase64") is not None:
@@ -1592,6 +1611,8 @@ class LuoguAdapter(OJAdapter):
     def __init__(self):
         self._profile_stats: dict[str, dict] = {}
         self._previous_stats: dict[str, dict] = {}
+        self._record_retry_at = 0
+        self._record_pause_message = ""
 
     def set_previous_stats(self, handle: str, stats_json: str | None) -> None:
         stats = {}
@@ -1656,6 +1677,8 @@ class LuoguAdapter(OJAdapter):
                     self._profile_stats[handle]["_warning"] = (
                         "洛谷记录页部分同步失败，已保存本轮已抓到页面，下次会从失败页附近继续"
                     )
+                elif record_sync.get("incrementalComplete") is False:
+                    self._profile_stats[handle]["_warning"] = "洛谷断档记录正在自动补抓，下一轮会从进度页继续"
                 if record_submissions or record_sync.get("historyComplete") or record_sync.get("source"):
                     self._profile_stats[handle]["source"] = "luogu-profile+record-list"
                     return record_submissions
@@ -1666,11 +1689,14 @@ class LuoguAdapter(OJAdapter):
                     "source": "luogu-record-list",
                     "lastError": str(exc)[:240] or exc.__class__.__name__,
                     "lastErrorAt": utcnow(),
+                    "lastAttemptAt": utcnow(),
+                    "retryAt": self._record_retry_at or None,
+                    "pausedForSession": self._record_retry_at > utcnow(),
                 }
+                self._profile_stats[handle]["_warning"] = "洛谷记录页同步失败，已保留本地历史记录；" + str(exc)[:240]
                 if previous_record_sync:
-                    self._profile_stats[handle]["_warning"] = "洛谷记录页同步失败，已保留本地历史记录并继续使用缓存"
                     self._profile_stats[handle]["source"] = "luogu-profile+record-list"
-                    return []
+                return []
 
         submissions = []
         for date_key, counts in sorted(daily_counts.items()):
@@ -1712,7 +1738,11 @@ class LuoguAdapter(OJAdapter):
         incremental_since = since_ts
         if previous_newest:
             overlap_seconds = max(0, LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS)
-            incremental_since = max(incremental_since, previous_newest - overlap_seconds)
+            # Local rows can already contain page 1 from an unfinished scan;
+            # they are not a proof that the intervening pages were fetched.
+            incremental_since = max(history_since, min(incremental_since, previous_newest - overlap_seconds))
+        if previous_sync.get("catchupPage"):
+            incremental_since = int(previous_sync.get("catchupSince") or incremental_since)
         record_query_user = profile_name or uid
 
         submissions_by_id: dict[str, dict] = {}
@@ -1720,10 +1750,11 @@ class LuoguAdapter(OJAdapter):
         total_count = int(previous_sync.get("totalRecordCount") or 0)
         per_page = int(previous_sync.get("perPage") or 20)
         page_count = int(previous_sync.get("pageCount") or 0)
-        newest_seen = previous_newest
+        newest_seen = max(previous_newest, int(previous_sync.get("catchupNewest") or 0))
         oldest_seen = previous_oldest or 0
         request_index = 0
         fetch_error = ""
+        incremental_complete = False
 
         def fetch_page(page_no: int) -> tuple[list[dict], dict]:
             nonlocal request_index, total_count, per_page, page_count, newest_seen, oldest_seen
@@ -1753,10 +1784,16 @@ class LuoguAdapter(OJAdapter):
                     submissions_by_id[str(item["remote_id"])] = item
             return parsed, records
 
-        recent_pages = max(0, LUOGU_RECORD_RECENT_PAGES_PER_SYNC)
+        history_only = LUOGU_RECORD_RECENT_PAGES_PER_SYNC <= 0
+        # A resumable scan needs one head page plus one page at its cursor.
+        recent_pages = 0 if history_only else max(2, LUOGU_RECORD_RECENT_PAGES_PER_SYNC)
         recent_reached_old = False
         last_recent_page = 0
-        for page_no in range(1, recent_pages + 1):
+        resume_page = max(2, int(previous_sync.get("catchupPage") or 2))
+        previous_count = int(previous_sync.get("catchupCount") or previous_sync.get("totalRecordCount") or 0)
+        page_no = 1
+        next_recent_page = resume_page
+        for request_no in range(recent_pages):
             try:
                 parsed, _ = fetch_page(page_no)
             except Exception as exc:
@@ -1765,19 +1802,31 @@ class LuoguAdapter(OJAdapter):
             last_recent_page = page_no
             if not parsed:
                 history_complete = True
+                incremental_complete = True
                 break
             oldest_page_ts = min(int(item.get("submitted_at") or 0) for item in parsed)
             if oldest_page_ts < incremental_since:
                 recent_reached_old = True
+                incremental_complete = True
                 break
             if page_count and page_no >= page_count:
                 history_complete = True
+                incremental_complete = True
                 break
+            if request_no == 0 and previous_sync.get("catchupPage"):
+                # New records shift numbered pages. Revisit an overlapping page
+                # and compensate for growth before resuming the old gap.
+                shift = (max(0, total_count - previous_count) + per_page - 1) // per_page
+                overlap_pages = 1 if recent_pages >= 3 else 0
+                next_recent_page = max(2, resume_page + shift - overlap_pages)
+            elif page_no != 1:
+                next_recent_page = page_no + 1
+            page_no = next_recent_page
 
         next_backfill_page = int(previous_sync.get("nextBackfillPage") or max(2, last_recent_page + 1))
         if next_backfill_page <= last_recent_page:
             next_backfill_page = last_recent_page + 1
-        backfill_pages = 0 if history_complete else max(0, LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC)
+        backfill_pages = 0 if history_complete or (not incremental_complete and not history_only) or fetch_error else max(0, LUOGU_RECORD_BACKFILL_PAGES_PER_SYNC)
         for _ in range(backfill_pages):
             if page_count and next_backfill_page > page_count:
                 history_complete = True
@@ -1802,21 +1851,35 @@ class LuoguAdapter(OJAdapter):
             if int(item.get("submitted_at") or 0) >= history_since
         ]
         filtered.sort(key=lambda item: int(item.get("submitted_at") or 0))
+        committed_newest = int(previous_sync.get("catchupNewest") or newest_seen) if incremental_complete else previous_newest
+        head_pending = incremental_complete and newest_seen > committed_newest
+        fully_current = incremental_complete and not head_pending
         sync_state = {
             "source": "luogu-record-list",
-            "syncedAt": utcnow(),
+            "syncedAt": utcnow() if fully_current and not fetch_error else previous_sync.get("syncedAt"),
+            "lastAttemptAt": utcnow(),
             "pagesFetched": sorted(pages_fetched),
             "nextBackfillPage": next_backfill_page,
             "historyComplete": bool(history_complete or recent_reached_old and not previous_sync),
             "totalRecordCount": total_count,
             "perPage": per_page,
             "pageCount": page_count,
-            "newestSubmitTime": newest_seen,
+            "newestSubmitTime": committed_newest,
             "oldestFetchedTime": oldest_seen,
             "queryUser": record_query_user,
         }
-        if recent_reached_old:
-            sync_state["incrementalComplete"] = True
+        sync_state["incrementalComplete"] = fully_current
+        if history_only:
+            for key in ("catchupPage", "catchupSince", "catchupCount", "catchupNewest"):
+                if key in previous_sync:
+                    sync_state[key] = previous_sync[key]
+        elif head_pending:
+            sync_state.update({"catchupPage": 2, "catchupSince": max(history_since, committed_newest - max(0, LUOGU_RECORD_INCREMENTAL_OVERLAP_SECONDS)),
+                               "catchupCount": total_count, "catchupNewest": newest_seen})
+        elif not incremental_complete:
+            sync_state.update({"catchupPage": max(2, next_recent_page), "catchupSince": incremental_since,
+                               "catchupCount": total_count,
+                               "catchupNewest": int(previous_sync.get("catchupNewest") or newest_seen)})
         if fetch_error:
             if not submissions_by_id and not pages_fetched:
                 raise RuntimeError(fetch_error)
@@ -1833,6 +1896,8 @@ class LuoguAdapter(OJAdapter):
         for candidate in candidates:
             try:
                 return self._fetch_record_page_once(uid, candidate, page_no)
+            except LuoguSessionUnavailable:
+                raise
             except Exception as exc:
                 errors.append(str(exc)[:240] or exc.__class__.__name__)
         raise RuntimeError("；".join(errors))
@@ -1895,6 +1960,8 @@ class LuoguAdapter(OJAdapter):
         return search(payload) or data
 
     def _fetch_record_page_once(self, uid: str, query_user: str, page_no: int) -> dict:
+        if utcnow() < self._record_retry_at:
+            raise LuoguSessionUnavailable(self._record_pause_message, self._record_retry_at - utcnow())
         query_user = str(query_user or uid)
         params = urllib.parse.urlencode({"user": query_user, "page": page_no, "_contentOnly": 1})
         referer = f"https://www.luogu.com.cn/record/list?user={urllib.parse.quote(query_user, safe='')}"
@@ -1907,15 +1974,18 @@ class LuoguAdapter(OJAdapter):
                 "Sec-Fetch-Site": "same-origin",
             }
         )
-        body, _ = proxy_http_get(
-            url,
-            headers=headers,
-            proxy_url=LUOGU_PROXY_URL,
-            proxy_token=LUOGU_PROXY_TOKEN,
-            cache_ttl_seconds=None,
-            allow_stale_cache=False,
-            cache_write=False,
-        )
+        try:
+            body, _ = proxy_http_get(
+                url, headers=headers, proxy_url=LUOGU_PROXY_URL, proxy_token=LUOGU_PROXY_TOKEN,
+                cache_ttl_seconds=None, allow_stale_cache=False, cache_write=False,
+            )
+        except (LuoguSessionUnavailable, urllib.error.HTTPError) as exc:
+            if isinstance(exc, urllib.error.HTTPError) and exc.code not in {401, 403}:
+                raise
+            self._record_pause_message = str(exc) if isinstance(exc, LuoguSessionUnavailable) else "洛谷登录会话失效，记录同步已暂停；登录恢复后自动补抓"
+            delay = exc.retry_after_seconds if isinstance(exc, LuoguSessionUnavailable) else 300
+            self._record_retry_at = utcnow() + delay
+            raise LuoguSessionUnavailable(self._record_pause_message, delay) from exc
         payload = self._parse_luogu_payload(body.decode("utf-8", errors="ignore"))
         data = self._record_data(payload)
         if not isinstance(data.get("records"), dict):
@@ -1923,10 +1993,9 @@ class LuoguAdapter(OJAdapter):
             nested = payload.get("data") if isinstance(payload.get("data"), dict) else {}
             template = template or str(nested.get("currentTemplate") or nested.get("template") or "").lower()
             if template == "login":
-                raise RuntimeError(
-                    f"洛谷 record/list 返回登录页（user={query_user}, page={page_no}），"
-                    "请确认国内 luogu_proxy.py 已更新并重启，代理需要保留洛谷临时 CookieJar"
-                )
+                self._record_pause_message = "洛谷记录页返回登录页，记录同步已暂停；登录恢复后自动补抓"
+                self._record_retry_at = utcnow() + 300
+                raise LuoguSessionUnavailable(self._record_pause_message)
             raise RuntimeError(
                 f"洛谷记录页没有返回 records（user={query_user}, page={page_no}；{self._record_payload_summary(payload)}）"
             )
@@ -3282,6 +3351,71 @@ class LeetCodeAdapter(OJAdapter):
         return contests
 
 
+class QOJAdapter(OJAdapter):
+    key = "qoj"
+    label = "QOJ"
+    handle_hint = "QOJ 用户名（支持 ucup-team 团队账号）；通过浏览器插件导入"
+
+    def normalize_handle(self, handle: str) -> str:
+        value = handle.strip()
+        if value.startswith(("https://qoj.ac/", "http://qoj.ac/")):
+            match = re.fullmatch(r"/user/profile/([^/]+)/?", urllib.parse.urlparse(value).path)
+            value = urllib.parse.unquote(match.group(1)) if match else ""
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", value):
+            raise ValueError("请填写有效的 QOJ 用户名")
+        return value
+
+    def fetch_submissions(self, handle: str, since_ts: int) -> list[dict]:
+        raise ValueError("QOJ 请通过浏览器插件手动同步")
+
+
+def qoj_verdict(value: str) -> str:
+    text = str(value).strip()
+    marker = text.endswith(("✓", "✔", "✅"))
+    cleaned = text.rstrip("✓✔✅").strip().upper()
+    if not cleaned or len(cleaned) > 64:
+        raise ValueError("QOJ 判题结果无效")
+    aliases = {"ACCEPTED": "AC", "WRONG ANSWER": "WA", "COMPILATION ERROR": "CE",
+               "COMPILE ERROR": "CE", "TIME LIMIT EXCEEDED": "TLE", "MEMORY LIMIT EXCEEDED": "MLE",
+               "RUNTIME ERROR": "RE", "OUTPUT LIMIT EXCEEDED": "OLE", "PRESENTATION ERROR": "PE",
+               "JUDGED, WAITING": "WAITING", "WAITING REJUDGE": "WAITING", "JUDGED, JUDGING": "JUDGING"}
+    if re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", cleaned):
+        if float(cleaned) > 1000000:
+            raise ValueError("QOJ 分数无效")
+        return "AC" if marker else "WA"
+    if cleaned in {"NAN", "INF", "+INF", "ACCESS DENIED", "CENTRAL FAILURE"}:
+        raise ValueError("QOJ 判题结果无效")
+    return aliases.get(cleaned, cleaned)
+
+
+def import_qoj_records(conn, row, records):
+    items = []
+    for record in records:
+        if not isinstance(record, dict) or record.get("submitter") != row["handle"]:
+            raise ValueError("提交记录不属于授权 QOJ 账号")
+        remote_id = str(record.get("id", ""))
+        pid = str(record.get("problemId", ""))
+        timestamp = int(record.get("submittedAt") or 0)
+        if not remote_id.isdigit() or not pid.isdigit() or not 0 < timestamp <= utcnow() + 300:
+            raise ValueError("QOJ 提交记录无效")
+        verdict = qoj_verdict(record.get("verdict", ""))
+        title = str(record.get("problemTitle") or pid)[:300]
+        language = str(record.get("language") or "")[:100]
+        safe = {"source": "qoj-browser-import", "submitter": row["handle"], "pid": pid}
+        items.append((remote_id, pid, title, verdict, language, timestamp, safe))
+    for remote_id, pid, title, verdict, language, timestamp, safe in items:
+        conn.execute("""INSERT INTO submissions(owner_type,owner_id,platform,handle,remote_id,problem_id,
+            problem_name,verdict,language,submitted_at,url,raw_json,created_at)
+            VALUES (?,?,'qoj',?,?,?,?,?,?,?,?,?,?)
+            ON CONFLICT(owner_type,owner_id,platform,handle,remote_id) DO UPDATE SET
+            problem_id=excluded.problem_id,problem_name=excluded.problem_name,verdict=excluded.verdict,
+            language=excluded.language,submitted_at=excluded.submitted_at,raw_json=excluded.raw_json""",
+            (row["owner_type"],row["owner_id"],row["handle"],remote_id,pid,title,verdict,language,timestamp,
+             f"https://qoj.ac/submission/{remote_id}",json.dumps(safe),utcnow()))
+    conn.execute("UPDATE handles SET last_sync_at=?,last_error=NULL,stats_json=NULL WHERE id=?", (utcnow(),row["id"]))
+    return len(items)
+
+
 ADAPTERS: dict[str, OJAdapter] = {
     "codeforces": CodeforcesAdapter(),
     "atcoder": AtCoderAdapter(),
@@ -3290,6 +3424,7 @@ ADAPTERS: dict[str, OJAdapter] = {
     "vjudge": VJudgeAdapter(),
     "loj": LOJAdapter(),
     "leetcode": LeetCodeAdapter(),
+    "qoj": QOJAdapter(),
 }
 
 
@@ -3475,6 +3610,37 @@ def clear_session_cookie(handler) -> None:
     )
 
 
+def import_luogu_records(conn, row, records):
+    items = []
+    for record in records:
+        if not isinstance(record, dict) or str((record.get("user") or {}).get("uid")) != row["handle"]:
+            raise ValueError("提交记录不属于授权洛谷账号")
+        # Only accept public submission fields; never persist arbitrary page data/code.
+        safe = {key: record.get(key) for key in ("id", "submitTime", "status", "score", "language")}
+        problem = record.get("problem") or {}
+        safe["problem"] = {key: problem.get(key) for key in ("pid", "title", "type", "fullScore")}
+        item = LuoguAdapter._record_to_submission(row["handle"], row["handle"], safe)
+        if not item or not str(item["remote_id"]).isdigit() or not 0 < item["submitted_at"] <= utcnow() + 300:
+            raise ValueError("提交记录无效")
+        item["raw"]["source"] = "luogu-browser-import"
+        items.append(item)
+    inserted = 0
+    for item in items:
+        cur = conn.execute("""INSERT INTO submissions(owner_type, owner_id, platform, handle, remote_id,
+            problem_id, problem_name, verdict, language, submitted_at, url, raw_json, created_at)
+            VALUES (?, ?, 'luogu', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(owner_type, owner_id, platform, handle, remote_id) DO UPDATE SET
+            verdict=excluded.verdict, problem_name=excluded.problem_name, language=excluded.language, raw_json=excluded.raw_json""",
+            (row["owner_type"], row["owner_id"], row["handle"], item["remote_id"], item["problem_id"],
+             item["problem_name"], item["verdict"], item["language"], item["submitted_at"], item["url"],
+             json.dumps(item["raw"], ensure_ascii=False), utcnow()))
+        inserted += cur.rowcount
+    if items:
+        conn.execute("DELETE FROM submissions WHERE owner_type=? AND owner_id=? AND platform='luogu' AND handle=? AND problem_id LIKE 'luogu-activity-%'", (row["owner_type"], row["owner_id"], row["handle"]))
+    conn.execute("UPDATE handles SET last_sync_at=?, last_error=NULL, stats_json=NULL WHERE id=?", (utcnow(), row["id"]))
+    return inserted
+
+
 def read_json_body(handler) -> dict:
     length = int(handler.headers.get("Content-Length") or "0")
     if length > 64 * 1024:
@@ -3547,6 +3713,9 @@ def get_handle_rows(conn: sqlite3.Connection, principal: dict | None = None, inc
 
 
 def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = False, full: bool = False) -> dict:
+    if row["platform"] == "qoj" or (row["platform"] == "luogu" and LUOGU_BROWSER_IMPORT):
+        return {"handleId": row["id"], "platform": row["platform"], "manual": True,
+                "warning": "请通过浏览器插件手动同步"}
     now = utcnow()
     has_error = bool(row["last_error"])
     if not force and not has_error and row["last_sync_at"] and now - int(row["last_sync_at"]) < SYNC_MIN_AGE_SECONDS:
@@ -3808,7 +3977,8 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
             )
         if warnings:
             error = "；".join(warnings)
-            update_sync_at = int(row["last_sync_at"] or now) if use_previous_exact_stats else now
+            luogu_incomplete = row["platform"] == "luogu" and LUOGU_RECORD_SYNC and bool(profile_warning)
+            update_sync_at = row["last_sync_at"] if use_previous_exact_stats or luogu_incomplete or stale_hits else now
             conn.execute(
                 "UPDATE handles SET last_sync_at = ?, last_error = ?, stats_json = ? WHERE id = ?",
                 (update_sync_at, error, stats_json, row["id"]),
@@ -3847,7 +4017,11 @@ def sync_targets(
     try:
         with luogu_request_auth(luogu_auth):
             with connect_db() as conn:
-                rows = get_handle_rows(conn, principal=principal, include_guests=include_guests)
+                rows = [row for row in get_handle_rows(conn, principal=principal, include_guests=include_guests)
+                        if row["platform"] not in {"luogu", "qoj"}]
+                with SYNC_QUEUE_LOCK:
+                    if SYNC_RUNNING_JOB is not None:
+                        SYNC_RUNNING_JOB["handle_ids"] = {int(row["id"]) for row in rows}
                 for row in rows:
                     results.append(sync_handle_row(conn, row, force=force, full=full))
                     conn.commit()
@@ -4053,14 +4227,13 @@ def enqueue_sync_job(
     auth = compact_luogu_auth(luogu_auth)
     now = utcnow()
     with SYNC_QUEUE_LOCK:
+        # A running whole-site refresh belongs to every viewer. Joining it must
+        # never mutate its options, authentication, owner, or starting time.
+        if SYNC_RUNNING_JOB and sync_job_covers_request(SYNC_RUNNING_JOB, principal, handle_id, include_guests, full):
+            return {"queued": False, "alreadyRunning": True, "job": public_sync_job(SYNC_RUNNING_JOB)}
         for job in SYNC_PENDING_JOBS:
-            if job.get("key") != job_key:
+            if not sync_job_covers_request(job, principal, handle_id, include_guests, full):
                 continue
-            job["force"] = bool(job.get("force") or force)
-            job["full"] = bool(job.get("full") or full)
-            job["queued_at"] = now
-            if auth:
-                job["luogu_auth"] = auth
             SYNC_QUEUE_EVENT.set()
             clear_overview_memory_cache()
             return {"queued": True, "alreadyQueued": True, "job": public_sync_job(job)}
@@ -4084,10 +4257,31 @@ def enqueue_sync_job(
     return {"queued": True, "job": public_sync_job(job)}
 
 
+def sync_job_covers_request(job: dict, principal: dict | None, handle_id: int | None,
+                            include_guests: bool, full: bool) -> bool:
+    if full and not job.get("full"):
+        return False
+    if job.get("handle_id") is not None:
+        return handle_id is not None and int(job["handle_id"]) == int(handle_id)
+    if handle_id is not None and "handle_ids" in job and int(handle_id) not in job["handle_ids"]:
+        return False
+    existing = job.get("principal") or {}
+    requested = principal or {}
+    covers_guests = bool(job.get("include_guests"))
+    if requested.get("type") == "guest":
+        if not covers_guests and not (existing.get("type") == "guest" and str(existing.get("id")) == str(requested.get("id"))):
+            return False
+    elif include_guests and not covers_guests:
+        return False
+    return True
+
+
 def pop_next_sync_job(timeout: float | None) -> dict | None:
+    global SYNC_RUNNING_JOB
     with SYNC_QUEUE_LOCK:
         if SYNC_PENDING_JOBS:
             job = SYNC_PENDING_JOBS.pop(0)
+            SYNC_RUNNING_JOB = job
             if not SYNC_PENDING_JOBS:
                 SYNC_QUEUE_EVENT.clear()
             return job
@@ -4101,6 +4295,7 @@ def pop_next_sync_job(timeout: float | None) -> dict | None:
             SYNC_QUEUE_EVENT.clear()
             return None
         job = SYNC_PENDING_JOBS.pop(0)
+        SYNC_RUNNING_JOB = job
         if not SYNC_PENDING_JOBS:
             SYNC_QUEUE_EVENT.clear()
         return job
@@ -4108,6 +4303,8 @@ def pop_next_sync_job(timeout: float | None) -> dict | None:
 
 def sync_job_matches_handle(job: dict, row: sqlite3.Row) -> bool:
     handle_id = job.get("handle_id")
+    if handle_id is None and row["platform"] in {"luogu", "qoj"}:
+        return False
     if handle_id is not None:
         return int(row["id"]) == int(handle_id)
     principal = job.get("principal") if isinstance(job.get("principal"), dict) else None
@@ -4225,6 +4422,61 @@ def background_sync_loop() -> None:
             traceback.print_exc()
 
 
+def queue_luogu_recovery_once() -> int:
+    """Resume saved gaps only when the browser reports a usable session.
+
+    This is separate from the site's (possibly hourly) full-platform schedule.
+    It reads proxy health, never retries the login form or stale credentials.
+    """
+    if LUOGU_BROWSER_IMPORT or not LUOGU_PROXY_URL or not LUOGU_RECORD_SYNC:
+        return 0
+    request = urllib.request.Request(LUOGU_PROXY_URL.rstrip("/") + "/health")
+    with urllib.request.urlopen(request, timeout=5) as response:
+        health = json.load(response)
+    if health.get("backend") != "browser" or (health.get("session") or {}).get("state") != "authenticated":
+        return 0
+    # Session recovery is positively confirmed, so an old 401 cooldown should
+    # not delay the first resumed record page.
+    adapter = ADAPTERS.get("luogu")
+    if isinstance(adapter, LuoguAdapter):
+        adapter._record_retry_at = 0
+    with connect_db() as conn:
+        rows = conn.execute("SELECT * FROM handles WHERE active = 1 AND platform = 'luogu'").fetchall()
+    candidates = []
+    now = utcnow()
+    for row in rows:
+        state = luogu_record_sync_state(row)
+        if not (row["last_error"] or state.get("catchupPage") or (state and not state.get("historyComplete"))):
+            continue
+        last_attempt = max(int(state.get("lastAttemptAt") or 0), int(state.get("lastErrorAt") or 0),
+                           int(row["last_sync_at"] or 0), LUOGU_RECOVERY_QUEUED_AT.get(int(row["id"]), 0))
+        # A generic profile/network failure should not become a tight loop.
+        if not state.get("catchupPage") and not state.get("pausedForSession") and row["last_error"] and now - last_attempt < 300:
+            continue
+        candidates.append((last_attempt, row))
+    queued = 0
+    for _, row in sorted(candidates, key=lambda item: (item[0], item[1]["id"]))[:3]:
+        result = enqueue_sync_job(principal={"type": row["owner_type"], "id": str(row["owner_id"])},
+                                  handle_id=int(row["id"]), force=True)
+        if result.get("queued") and not result.get("alreadyQueued"):
+            LUOGU_RECOVERY_QUEUED_AT[int(row["id"])] = now
+            queued += 1
+    return queued
+
+
+def background_luogu_recovery_loop() -> None:
+    while True:
+        # This event is local to the recovery thread; it does not consume or
+        # alter the main queue's wakeup event.
+        threading.Event().wait(60)
+        try:
+            queue_luogu_recovery_once()
+        except Exception:
+            # Temporary health/network failure leaves the regular schedule and
+            # all saved progress intact. No credentials are logged here.
+            pass
+
+
 def handle_to_json(row: sqlite3.Row, sync_snapshot: dict | None = None) -> dict:
     adapter = ADAPTERS.get(row["platform"])
     display_handle = str(row["handle"] or "")
@@ -4245,6 +4497,7 @@ def handle_to_json(row: sqlite3.Row, sync_snapshot: dict | None = None) -> dict:
         "lastSyncAt": iso_from_ts(row["last_sync_at"]),
         "lastError": row["last_error"],
         "syncStatus": sync_status_for_handle(row, sync_snapshot),
+        "manualImport": row["platform"] == "qoj" or (row["platform"] == "luogu" and LUOGU_BROWSER_IMPORT),
     }
 
 
@@ -6206,11 +6459,12 @@ class AppHandler(BaseHTTPRequestHandler):
     def send_html(self, status: int, html_text: str, extra_headers: list[tuple[str, str]] | None = None) -> None:
         payload = html_text.encode("utf-8")
         self.send_response(status)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Type", next((v for k, v in (extra_headers or []) if k == "Content-Type"), "text/html; charset=utf-8"))
         self.send_header("Content-Length", str(len(payload)))
         if extra_headers:
             for name, value in extra_headers:
-                self.send_header(name, value)
+                if name != "Content-Type":
+                    self.send_header(name, value)
         self.end_headers()
         self.wfile.write(payload)
 
@@ -6227,11 +6481,24 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.serve_static("regionals.html")
             if path == "/regionals.js":
                 return self.serve_static("regionals.js")
+            if path in {"/luogu-sync.user.js", "/qoj-sync.user.js"}:
+                base = PUBLIC_BASE_URL.rstrip("/") or ("http://" + self.headers.get("Host", "localhost:8000"))
+                parsed_base = urllib.parse.urlparse(base)
+                if not parsed_base.hostname or parsed_base.scheme not in {"http", "https"}:
+                    raise ValueError("请配置 PUBLIC_BASE_URL")
+                source = (WEB_ROOT / path.lstrip("/")).read_text()
+                source = source.replace("__SITE_JSON__", json.dumps(base)).replace("__CONNECT_HOST__", parsed_base.hostname).replace("__SCRIPT_URL__", base + path)
+                return self.send_html(200, source, [("Content-Type", "application/javascript; charset=utf-8")])
             if path == "/api/health":
                 return self.send_json(200, {"ok": True, "app": APP_NAME, "time": iso_from_ts(utcnow())})
             if path == "/api/session":
                 principal = get_current_principal(self)
                 return self.send_json(200, {"ok": True, "user": principal, "platforms": platform_meta()})
+            if path == "/api/sync/status":
+                snapshot = sync_status_snapshot()
+                return self.send_json(200, {"ok": True, "sync": {
+                    key: value for key, value in snapshot.items() if not key.startswith("_")
+                }})
             if path == "/api/overview":
                 params = urllib.parse.parse_qs(parsed.query)
                 days = int(params.get("days", ["365"])[0])
@@ -6317,6 +6584,49 @@ class AppHandler(BaseHTTPRequestHandler):
         try:
             if parsed.path.startswith(("/api/cpc/", "/api/integration/")) and cpc_handle(self, get_cpc_service(), post=True):
                 return
+            if parsed.path in {"/api/luogu-plugin/authorize", "/api/qoj-plugin/authorize"}:
+                platform = "qoj" if "/qoj-plugin/" in parsed.path else "luogu"
+                principal = get_current_principal(self)
+                if not principal:
+                    return self.send_error_json(401, "请先登录本站，再确认授权")
+                if self.headers.get("Origin") and self.headers["Origin"] != (PUBLIC_BASE_URL.rstrip("/") or "http://" + self.headers.get("Host", "")):
+                    return self.send_error_json(403, "授权来源无效")
+                data = read_json_body(self)
+                uid = str(data.get("uid", ""))
+                if platform == "qoj":
+                    uid = ADAPTERS["qoj"].normalize_handle(uid)
+                elif not re.fullmatch(r"[1-9][0-9]{0,11}", uid):
+                    raise ValueError("洛谷 UID 无效")
+                token = secrets.token_urlsafe(32)
+                with connect_db() as conn:
+                    row = add_or_restore_handle(conn, principal, platform, uid)
+                    conn.execute("INSERT OR REPLACE INTO luogu_plugin_tokens VALUES (?, ?, ?)",
+                                 (sha256_hex(token), row["id"], utcnow() + 30 * 86400))
+                clear_overview_memory_cache()
+                return self.send_json(200, {"ok": True, "token": token})
+            if parsed.path in {"/api/luogu-plugin/revoke", "/api/qoj-plugin/revoke"}:
+                platform = "qoj" if "/qoj-plugin/" in parsed.path else "luogu"
+                authorization = self.headers.get("Authorization", "")
+                if not authorization.startswith("Bearer ") or not authorization[7:]:
+                    return self.send_error_json(401, "缺少插件授权")
+                with connect_db() as conn:
+                    conn.execute("""DELETE FROM luogu_plugin_tokens WHERE token_hash=? AND handle_id IN
+                        (SELECT id FROM handles WHERE platform=?)""", (sha256_hex(authorization[7:]), platform))
+                return self.send_json(200, {"ok": True})
+            if parsed.path in {"/api/luogu-plugin/import", "/api/qoj-plugin/import"}:
+                platform = "qoj" if "/qoj-plugin/" in parsed.path else "luogu"
+                data = read_json_body(self)
+                token = self.headers.get("Authorization", "").removeprefix("Bearer ")
+                with connect_db() as conn:
+                    row = conn.execute("SELECT h.* FROM handles h JOIN luogu_plugin_tokens t ON t.handle_id=h.id WHERE t.token_hash=? AND t.expires_at>? AND h.active=1", (sha256_hex(token), utcnow())).fetchone()
+                    if not row or row["platform"] != platform:
+                        return self.send_error_json(401, "授权已过期、已解绑或平台不匹配，请重新连接")
+                    records = data.get("records")
+                    if str(data.get("uid")) != row["handle"] or not isinstance(records, list) or len(records) > 50:
+                        raise ValueError("账号不匹配或记录数量超限")
+                    inserted = (import_qoj_records if platform == "qoj" else import_luogu_records)(conn, row, records)
+                clear_overview_memory_cache()
+                return self.send_json(200, {"ok": True, "inserted": inserted})
             if parsed.path == "/api/auth/register":
                 return self.handle_register()
             if parsed.path == "/api/auth/login":
@@ -6592,6 +6902,8 @@ class AppHandler(BaseHTTPRequestHandler):
                     """,
                     (int(handle_id), principal["type"], str(principal["id"])),
                 )
+                if cursor.rowcount > 0:
+                    conn.execute("DELETE FROM luogu_plugin_tokens WHERE handle_id=?", (int(handle_id),))
                 if cursor.rowcount <= 0:
                     return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
         except sqlite3.OperationalError as exc:
@@ -6609,6 +6921,9 @@ class AppHandler(BaseHTTPRequestHandler):
         if not path_match:
             raise ValueError("缺少账号绑定 ID")
         data = read_json_body(self)
+        with connect_db() as conn:
+            if not get_owned_handle_row(conn, principal, int(path_match.group(1))):
+                return self.send_error_json(404, "没有找到这个账号绑定，可能已经移除")
         result = enqueue_sync_job(
             principal=principal,
             handle_id=int(path_match.group(1)),
@@ -6762,6 +7077,8 @@ def main() -> None:
     get_cpc_service().start()
     thread = threading.Thread(target=background_sync_loop, daemon=True)
     thread.start()
+    if LUOGU_PROXY_URL and LUOGU_RECORD_SYNC:
+        threading.Thread(target=background_luogu_recovery_loop, daemon=True, name="luogu-recovery").start()
     server = ThreadingHTTPServer((HOST, PORT), AppHandler)
     print(f"{APP_NAME} listening on http://{HOST}:{PORT}", flush=True)
     print(f"SQLite database: {DB_PATH}", flush=True)

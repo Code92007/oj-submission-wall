@@ -1,0 +1,23 @@
+services:
+  luogu-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.luogu-browser
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 60s
+    shm_size: 256mb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:8787:8787"
+      - "127.0.0.1:6080:6080"
+    volumes:
+      - luogu-browser-session:/data
+    environment:
+      LUOGU_PROXY_TOKEN: ${LUOGU_PROXY_TOKEN:?Set a private proxy token}
+      LUOGU_PROXY_TIMEOUT_SECONDS: 15
+      LUOGU_BROWSER_RELAY_URL: ${LUOGU_BROWSER_RELAY_URL:-}
+      LUOGU_BROWSER_RELAY_TOKEN: ${LUOGU_BROWSER_RELAY_TOKEN:-}
+volumes:
+  luogu-browser-session:

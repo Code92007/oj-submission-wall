@@ -1,0 +1,12 @@
+# Use together with docker-compose.luogu-browser.yml on the main server.
+# Match OJWALL_NETWORK to the running main application's Docker network.
+services:
+  luogu-proxy:
+    networks:
+      ojwall:
+        aliases:
+          - luogu-browser-proxy
+networks:
+  ojwall:
+    external: true
+    name: ${OJWALL_NETWORK:-oj-submission-wall_default}

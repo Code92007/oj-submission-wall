@@ -227,6 +227,7 @@ select:focus {
 }
 
 .button {
+  text-decoration: none;
   border: 1px solid var(--line);
   min-height: 38px;
   border-radius: 8px;
@@ -2907,4 +2908,20 @@ select:focus {
 
 #nowcoderTeams a {
   overflow-wrap: anywhere;
+}
+
+.only-self-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 14px;
+}
+.only-self-control input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #2563eb;
 }
