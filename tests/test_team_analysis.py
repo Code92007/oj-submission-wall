@@ -179,7 +179,7 @@ class TeamAnalysisTests(unittest.TestCase):
         self.assertEqual(len(data['families']), 12)
         self.assertEqual(next(t for t in data['families'] if t['key']=='dp')['label'], '动态规划')
         dp = next(t for t in data['tags'] if t['key'] == 'dp')
-        self.assertEqual(dp['label'], 'dp')
+        self.assertEqual(dp['label'], '动态规划')
         self.assertEqual(dp['coverageLabel'], '双人覆盖')
         self.assertEqual(dp['status'], 'covered')
         self.assertGreater(dp['rating'], 1900)

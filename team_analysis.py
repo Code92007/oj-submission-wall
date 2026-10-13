@@ -14,6 +14,48 @@ from pathlib import Path
 from cpc_integration import problem_key
 
 MODEL_VERSION = "team-tags-v2"
+# Keep source keys stable for aggregation; labels are only for display.
+TAG_LABELS = {
+    "*special": "特殊题目",
+    "2-sat": "二元可满足性",
+    "bfs": "广度优先搜索",
+    "binary search": "二分查找",
+    "bitmasks": "位运算 / 状态压缩",
+    "brute force": "暴力枚举",
+    "chinese remainder theorem": "中国剩余定理",
+    "combinatorics": "组合数学",
+    "communication": "通信",
+    "constructive algorithms": "构造算法",
+    "data structures": "数据结构",
+    "dfs and similar": "深度优先搜索及类似算法",
+    "divide and conquer": "分治",
+    "dp": "动态规划",
+    "dsu": "并查集",
+    "expression parsing": "表达式解析",
+    "fft": "快速傅里叶变换",
+    "flows": "网络流",
+    "games": "博弈论",
+    "geometry": "计算几何",
+    "graph matchings": "图匹配",
+    "graphs": "图论",
+    "greedy": "贪心",
+    "hashing": "哈希",
+    "implementation": "实现 / 模拟",
+    "interactive": "交互题",
+    "math": "数学",
+    "matrices": "矩阵",
+    "meet-in-the-middle": "折半搜索",
+    "number theory": "数论",
+    "probabilities": "概率论",
+    "schedules": "调度",
+    "shortest paths": "最短路",
+    "sortings": "排序",
+    "string suffix structures": "字符串后缀结构",
+    "strings": "字符串",
+    "ternary search": "三分查找",
+    "trees": "树",
+    "two pointers": "双指针",
+}
 FAMILIES = {
     "implementation": ("实现 / 模拟", {"implementation", "brute force"}),
     "greedy": ("贪心", {"greedy", "sortings", "two pointers"}),
@@ -406,7 +448,7 @@ def profile(problems, cutoff, target, rating_history=None, rating_basis="hybrid"
 
 def team_profiles(profiles, target):
     tags = sorted(set().union(*(p["tags"] for p in profiles)))
-    return {"tags": [{"key": t, "label": t, **combine([p["tags"].get(t, estimate([], 0)) for p in profiles], target)} for t in tags],
+    return {"tags": [{"key": t, "label": TAG_LABELS.get(t, t), **combine([p["tags"].get(t, estimate([], 0)) for p in profiles], target)} for t in tags],
         "families": [{"key": k, "label": label, **combine([p["families"][k] for p in profiles], target)} for k, (label, _) in FAMILIES.items()],
         "overall": combine([p["overall"] for p in profiles], target)}
 
@@ -527,6 +569,7 @@ def forecast_contest(app, service, cid, profiles, records, meta, target, budget,
         ability = min(abilities) if tagged else overall["rating"]
         confidence = min(scores[t]["confidence"] for t in tags) if tagged else overall["confidence"]
         row = {"problemId": p["id"], "index": p["index"], "name": p["name"], "tags": tags,
+            "tagLabels": [TAG_LABELS.get(t, t) for t in tags],
             "rating": m.get("rating"), "tagged": tagged, "ratingSource": m.get("source"),
             "ability": ability,
             "ratingRange": release["problems"].get(p["id"], {}).get("range")}
@@ -680,7 +723,7 @@ def backtest(app, service, principal, keys, platform, target, meta, release, all
             "predictedMeanMinutes": round(statistics.mean(s["conditionalMinutes"] for s in ss), 1)})
     for t in sorted({t for s in tagged for t in s["tags"]}):
         ss = [s for s in tagged if t in s["tags"]]
-        result["tagMetrics"].append({"tag": t, **metrics(ss), "baselineBrier": metrics(ss, "baseline")["brier"]})
+        result["tagMetrics"].append({"tag": t, "label": TAG_LABELS.get(t, t), **metrics(ss), "baselineBrier": metrics(ss, "baseline")["brier"]})
     # Diagnostic residuals only; no tuning or write-back to the published ratings.
     for pid in sorted({s["problemId"] for s in samples}):
         ss = [s for s in samples if s["problemId"] == pid]

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>组队分析 · OJ 训练墙</title>
-  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/team-analysis.css?v=3">
-  <script src="/team-analysis.js?v=3" defer></script>
+  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/team-analysis.css?v=4">
+  <script src="/team-analysis.js?v=4" defer></script>
 </head>
 <body>
   <header class="topbar"><div><h1>组队分析</h1><p>找到三个人的交集，也看见队伍的空缺。</p></div><nav class="top-actions"><a class="button ghost" href="/regionals">区域赛进度</a><a class="button ghost" href="/">返回训练墙</a></nav></header>
@@ -14,7 +14,7 @@
       <form id="analysisForm">
         <label class="ta-search">筛选成员<input id="memberSearch" type="search" placeholder="昵称 / 分组" autocomplete="off"></label>
         <div class="ta-selectors"><label><span><i class="ta-dot player-0"></i>队员一</span><select id="member0" required aria-label="队员一"></select></label><label><span><i class="ta-dot player-1"></i>队员二</span><select id="member1" required aria-label="队员二"></select></label><label><span><i class="ta-dot player-2"></i>队员三</span><select id="member2" required aria-label="队员三"></select></label><label>训练来源<select id="platform"><option value="codeforces">Codeforces</option><option value="all">全部可比数据</option></select></label><button id="analyze" class="button primary" type="submit">分析队伍</button></div>
-        <details class="ta-target-setting"><summary>训练目标参考线（可选）</summary><label>参考评级<input id="target" type="number" min="800" max="3500" step="100" value="1900" aria-describedby="targetHelp"></label><p id="targetHelp" class="ta-muted ta-small">默认 1900：只用于雷达虚线、tag 覆盖判断和补强建议。它不是队伍评级，也不影响战力估计、过题概率或预计时间；无需填写也能分析。</p></details>
+        <details class="ta-target-setting"><summary>训练目标参考线（可选）</summary><label>参考评级<input id="target" type="number" min="800" max="3500" step="100" value="1900" aria-describedby="targetHelp"></label><p id="targetHelp" class="ta-muted ta-small">默认 1900：只用于雷达虚线、标签覆盖判断和补强建议。它不是队伍评级，也不影响战力估计、过题概率或预计时间；无需填写也能分析。</p></details>
       </form>
       <p class="ta-muted ta-small">全部可比数据包含有 CF 官方评级或 CF Bot 区域赛经验评级的个人提交。不同 OJ 的难度刻度不直接相加。</p>
     </section>
@@ -25,14 +25,26 @@
       <section id="teamAccounts" class="panel" hidden></section>
       <section id="onsiteReference" class="panel"></section>
       <div class="ta-chart-layout">
-        <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">COVERAGE MAP</p><h2>团队 tag 雷达</h2></div><div class="ta-compact ta-mode-control"><span id="radarModeCaption">维度</span><input id="radarMode" type="hidden" value="families"><details id="radarModePicker" class="ta-mode-picker"><summary aria-labelledby="radarModeCaption radarModeLabel"><span id="radarModeLabel">综合 12 维</span></summary><div class="ta-mode-choices" role="group" aria-label="选择雷达维度"><button type="button" data-radar-mode="families" aria-pressed="true">综合 12 维</button><button type="button" data-radar-mode="tags" aria-pressed="false">原始 tags</button></div></details></div></div><div id="radarTags" class="ta-tag-picker" hidden></div><div id="radarLegend" class="ta-legend"></div><div id="radar"></div><p class="ta-muted ta-small">中心为 0，刻度统一到 3500。虚线为训练目标参考线；空心点表示证据不足，不能当作零能力。综合维度按题去重。</p></section>
+        <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">COVERAGE MAP</p><h2>团队标签雷达</h2></div><div class="ta-compact ta-mode-control"><span id="radarModeCaption">维度</span><input id="radarMode" type="hidden" value="families"><details id="radarModePicker" class="ta-mode-picker"><summary aria-labelledby="radarModeCaption radarModeLabel"><span id="radarModeLabel">综合 12 维</span></summary><div class="ta-mode-choices" role="group" aria-label="选择雷达维度"><button type="button" data-radar-mode="families" aria-pressed="true">综合 12 维</button><button type="button" data-radar-mode="tags" aria-pressed="false">细分标签</button></div></details></div></div><div id="radarTags" class="ta-tag-picker" hidden></div><div id="radarLegend" class="ta-legend"></div><div id="radar"></div><p class="ta-muted ta-small">中心为 0，刻度统一到 3500。虚线为训练目标参考线；空心点表示证据不足，不能当作零能力。综合维度按题去重。</p></section>
         <section class="panel"><p class="ta-eyebrow">NEXT PRACTICE</p><h2>下一步练什么</h2><div id="recommendations"></div></section>
       </div>
-      <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">TRAINING EVIDENCE</p><h2>每个 tag 的训练证据</h2></div><label class="ta-compact">筛选 tag<input id="tagSearch" type="search" placeholder="例如 dp / geometry"></label></div><p class="ta-muted ta-small">展开成员数据查看过题分布、WA、首过前错误和最近练习。无可比评级的题仍保留在练习量中。</p><div id="tagTable" class="ta-table-wrap" tabindex="0" role="region" aria-label="tag 训练明细，可横向滚动"></div></section>
-      <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">RETRY PATTERNS</p><h2>平均尝试次数</h2></div><span class="ta-muted ta-small">只计算已通过题 · 首次 AC 为止</span></div><p class="ta-muted">结合题目难度看调试成本；高尝试次数也可能来自主动挑战。仅展示至少 3 道已通过题的 tag。</p><div id="retryBars"></div></section>
+      <section class="panel" aria-labelledby="trainingEvidenceTitle">
+        <div class="ta-heading"><div><p class="ta-eyebrow">TRAINING EVIDENCE</p><h2 id="trainingEvidenceTitle">每个标签的训练证据</h2></div></div>
+        <p class="ta-muted ta-small">展开成员数据查看过题分布、WA、首过前错误和最近练习。无可比评级的题仍保留在练习量中。</p>
+        <div class="ta-evidence-filters">
+          <label>筛选标签<input id="tagSearch" type="search" placeholder="动态规划 / dp / 几何"></label>
+          <label>证据范围<select id="tagEvidence"><option value="all">查看全部</option><option value="reliable">过滤证据不足</option></select></label>
+          <label>排序<select id="tagSort"><option value="name">标签名称</option><option value="rating-desc">团队评级从高到低</option><option value="rating-asc">团队评级从低到高</option></select></label>
+          <fieldset class="ta-rating-filter"><legend>团队估计评级区间</legend><div><input id="tagRatingMin" type="number" min="0" max="4000" step="1" placeholder="不限" aria-label="最低团队估计评级"><span aria-hidden="true">–</span><input id="tagRatingMax" type="number" min="0" max="4000" step="1" placeholder="不限" aria-label="最高团队估计评级"></div></fieldset>
+          <button id="tagReset" class="button ghost" type="button">重置筛选</button>
+        </div>
+        <p id="tagFilterStatus" class="ta-muted ta-small" role="status" aria-live="polite"></p>
+        <div id="tagTable" class="ta-table-wrap" tabindex="0" role="region" aria-label="标签训练明细，可横向滚动"></div>
+      </section>
+      <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">RETRY PATTERNS</p><h2>平均尝试次数</h2></div><span class="ta-muted ta-small">只计算已通过题 · 首次 AC 为止</span></div><p class="ta-muted">结合题目难度看调试成本；高尝试次数也可能来自主动挑战。仅展示至少 3 道已通过题的标签。</p><div id="retryBars"></div></section>
       <section class="panel"><p class="ta-eyebrow">PRE-CONTEST ESTIMATE</p><h2 id="forecastTitle">逐题赛前推演</h2><div id="forecast"></div></section>
       <section class="panel"><p class="ta-eyebrow">HISTORICAL CHECK</p><h2>历史区域赛回测</h2><p id="backtestStatus" class="ta-muted"></p><div id="backtest"></div></section>
-      <section class="panel"><details><summary class="ta-method-title">评分方法与数据覆盖</summary><div class="ta-method"><p>综合能力结合官方 Rating 历史和近期训练，不再把全部已过题的难度均值或分位数当作真实水平。多账号取各自最新官方值中的最高值，历史峰值单独保留。峰值减去 200 分及最多 100 分的长期未练习衰减，作为经验保留基线；当前官方值更高时采用当前值。这是备战估计，并非官方 Rating 或已经校准的能力保证。</p><p>Recent 20 AC 为最近 20 道不同 CF 评级题首次 AC 的难度均值。综合趋势取最近 20 AC 的时间加权均值占 70%、近半年移动均值占 30%，时间权重按 90 天衰减。持续解难题可在保留基线上增加最多 280 分，增幅受样本数量和新鲜程度约束；集中做简单题不会抹掉历史已证实的水平。重复 AC 不刷新该窗口；CF Bot 区域赛评级不参与这个 CF 训练基线。</p><p>tag 评级以综合能力为基线，用该 tag 相对全部练习的难度分位数、首过前错误和熟悉程度作有限调整，最多 ±400 分并按样本可信程度收缩。没有样本仍显示证据不足。多标签题分摊证据权重，至少 5 道评级 AC 且有效题数至少 3 才有可靠 tag 估计。没有官方历史时采用近期训练代理，并明确标注。</p><p>将可靠队员从强到弱记作 A、B、C。双人覆盖评级 = B + 0.15 × min(400, A − B)；第三人也有可靠估计时，加上 0.1 × max(0, 400 − (B − C))，最多奖励 40 分作为备份深度。A 至少有 8 道评级 AC 且置信度 ≥ 65% 时，专长评级 = A − 250。团队取两条通路的较高值；两人达到参考线标为双人覆盖，专长通路达到参考线则提示需要备份。三人不会简单求和。</p><p>CE、系统错误和待判不扣分。历史回测只使用赛前首次 AC、赛前官方 Rating 更新与当年的真实名单，不引用赛后峰值或训练。逐题预测另列恢复历史峰值水平的参考情景，帮助区分近期状态与过去达到的水平。</p><div id="coverage"></div><div id="modelNotes"></div></div></details></section>
+      <section class="panel"><details><summary class="ta-method-title">评分方法与数据覆盖</summary><div class="ta-method"><p>综合能力结合官方 Rating 历史和近期训练，不再把全部已过题的难度均值或分位数当作真实水平。多账号取各自最新官方值中的最高值，历史峰值单独保留。峰值减去 200 分及最多 100 分的长期未练习衰减，作为经验保留基线；当前官方值更高时采用当前值。这是备战估计，并非官方 Rating 或已经校准的能力保证。</p><p>Recent 20 AC 为最近 20 道不同 CF 评级题首次 AC 的难度均值。综合趋势取最近 20 AC 的时间加权均值占 70%、近半年移动均值占 30%，时间权重按 90 天衰减。持续解难题可在保留基线上增加最多 280 分，增幅受样本数量和新鲜程度约束；集中做简单题不会抹掉历史已证实的水平。重复 AC 不刷新该窗口；CF Bot 区域赛评级不参与这个 CF 训练基线。</p><p>标签评级以综合能力为基线，用该标签相对全部练习的难度分位数、首过前错误和熟悉程度作有限调整，最多 ±400 分并按样本可信程度收缩。没有样本仍显示证据不足。多标签题分摊证据权重，至少 5 道评级 AC 且有效题数至少 3 才有可靠标签估计。没有官方历史时采用近期训练代理，并明确标注。</p><p>将可靠队员从强到弱记作 A、B、C。双人覆盖评级 = B + 0.15 × min(400, A − B)；第三人也有可靠估计时，加上 0.1 × max(0, 400 − (B − C))，最多奖励 40 分作为备份深度。A 至少有 8 道评级 AC 且置信度 ≥ 65% 时，专长评级 = A − 250。团队取两条通路的较高值；两人达到参考线标为双人覆盖，专长通路达到参考线则提示需要备份。三人不会简单求和。</p><p>CE、系统错误和待判不扣分。历史回测只使用赛前首次 AC、赛前官方 Rating 更新与当年的真实名单，不引用赛后峰值或训练。逐题预测另列恢复历史峰值水平的参考情景，帮助区分近期状态与过去达到的水平。</p><div id="coverage"></div><div id="modelNotes"></div></div></details></section>
     </div>
   </main>
 </body>
