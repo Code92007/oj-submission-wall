@@ -44,7 +44,9 @@
 .ta-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 12px; }
 .ta-legend label { flex-direction: row; align-items: center; gap: 5px; cursor: pointer; }
 .ta-legend input, .ta-tag-picker input { height: 14px; width: 14px; accent-color: #3b896b; }
-#radar svg { width: 100%; max-height: 490px; display: block; overflow: visible; }
+#radar svg, #onsiteReferenceRadar svg { width: 100%; max-height: 490px; display: block; overflow: visible; }
+#onsiteReference .ta-table { min-width: 430px; }
+#onsiteReference .ta-compact { width: 220px; max-width: 100%; }
 .ta-radar-grid { fill: none; stroke: #e0e7e2; stroke-width: 1; }.ta-radar-axis { stroke: #e8ece9; }
 .ta-radar-target { stroke: #a3aca6; stroke-dasharray: 5 5; fill: none; }
 .ta-radar-label { fill: #57675f; font-size: 12px; }.ta-radar-scale { fill: #89988e; font-size: 9px; }

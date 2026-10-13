@@ -4,6 +4,7 @@ const escapeTa = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;"
 const colors = ["#4b79d1", "#bb8c41", "#9a73bd", "#308663"];
 let optionsTa = null, dataTa = null, requestTa = 0;
 let radarSelected = new Set();
+let onsiteBoardTa = "all";
 const shownPlayers = new Set([3]);
 const numberTa = (n) => n == null ? "—" : n;
 const dateTa = (seconds) => seconds ? new Intl.DateTimeFormat("zh-CN", {timeZone:"Asia/Shanghai"}).format(new Date(seconds*1000)) : "暂无";
@@ -43,9 +44,13 @@ async function analyzeTa(event) {
   finally { if(id===requestTa) $ta("analyze").disabled=false; }
 }
 function chipTa(row) { return `<span class="ta-chip ${escapeTa(row.status)}">${escapeTa(row.coverageLabel)}</span>`; }
+function memberSummaryTa(member,i) {
+  const m=member.overall, trend=m.momentum;
+  return `<article class="ta-stat"><span class="ta-name"><i class="ta-dot player-${i}"></i>${escapeTa(member.displayName)}</span><strong>${numberTa(m.rating)}</strong><p>综合能力估计 · ${m.ratingSource==="cf-training-hybrid"?"官方历史 + 近期训练":m.ratingSource==="recent-training"?"近期训练代理":"训练代理"}</p>${m.officialRating!=null?`<p>官方最新 ${m.officialRating} · 历史峰值 ${m.peakRating}</p>`:""}${trend?.recent20Count?`<p>Recent 20 AC 均值 ${trend.recent20Mean} · ${trend.recent20Count} 题</p><p>近半年移动均值 ${numberTa(trend.monthsWeightedMean)}</p>`:""}<p>${m.solved} 题 AC · ${member.coverage.usable}/${member.coverage.problems} 题支持 tag 分析</p><p>${m.wa} 次首过前 WA · ${m.reliable?"样本可用":"样本偏少"}</p></article>`;
+}
 function renderTa() {
   const d=dataTa, usable=d.members.reduce((s,m)=>s+m.coverage.usable,0);
-  $ta("summary").innerHTML=`<article class="ta-stat"><span class="ta-name">团队综合估计</span><strong>${numberTa(d.overall.rating)}</strong><p>参考线 ${d.target} · ${d.families.filter(t=>t.status==="covered").length}/12 维双人覆盖</p><p>${usable} 道有评级且有标签的个人练习</p></article>`+d.members.map((m,i)=>`<article class="ta-stat"><span class="ta-name"><i class="ta-dot player-${i}"></i>${escapeTa(m.displayName)}</span><strong>${numberTa(m.overall.rating)}</strong><p>${m.overall.solved} 题 AC · ${m.coverage.usable}/${m.coverage.problems} 题支持 tag 分析</p><p>${m.overall.wa} 次首过前 WA · ${m.overall.reliable?"样本可用":"样本偏少"}</p></article>`).join("");
+  $ta("summary").innerHTML=`<article class="ta-stat"><span class="ta-name">团队综合估计</span><strong>${numberTa(d.overall.rating)}</strong><p>参考线 ${d.target} · ${d.families.filter(t=>t.status==="covered").length}/12 维双人覆盖</p><p>${usable} 道有评级且有标签的个人练习</p><p>按综合能力估计推演，区别于官方 Rating。</p></article>`+d.members.map(memberSummaryTa).join("");
   $ta("radarLegend").replaceChildren();
   [...d.members.map(m=>m.displayName),"团队"].forEach((name,i)=>{
     const label=document.createElement("label"), box=document.createElement("input"), dot=document.createElement("i");
@@ -58,7 +63,7 @@ function renderTa() {
     box.addEventListener("change",()=>{if(box.checked && radarSelected.size>=12){box.checked=false;setStatusTa("原始 tag 雷达最多选择 12 个维度。",true);return;}box.checked?radarSelected.add(t.key):radarSelected.delete(t.key);renderRadarTa();});
     label.append(box,document.createTextNode(t.label));$ta("radarTags").append(label);
   });
-  renderTeamAccountsTa();renderRadarTa();renderRecommendationsTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
+  renderTeamAccountsTa();renderOnsiteReferenceTa();renderRadarTa();renderRecommendationsTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
   $ta("coverage").innerHTML=`<h3>本次数据覆盖</h3><ul>${d.members.map(m=>`<li>${escapeTa(m.displayName)}：${m.coverage.problems} 道个人练习，${m.coverage.unrated} 道缺兼容评级、${m.coverage.untagged} 道缺标签（两者可重叠）。可见提交从 ${dateTa(m.coverage.firstSubmission)} 至 ${dateTa(m.coverage.lastSubmission)}，只代表已同步范围。</li>`).join("")}</ul><p>区域赛评级快照：${escapeTa(d.ratingRelease.method)} · ${d.ratingRelease.problems} 题 · ${escapeTa(d.ratingRelease.revision)}。标签缺失时不猜测题型。</p>`;
   $ta("modelNotes").innerHTML=`<ul>${d.notes.map(s=>`<li>${escapeTa(s)}</li>`).join("")}</ul>`;
 }
@@ -67,6 +72,27 @@ function renderTeamAccountsTa() {
   section.innerHTML=accounts.length?`<p class="ta-eyebrow">TEAM ACCOUNT EVIDENCE</p><h2>队伍账号 · 去重记录</h2><p class="ta-muted ta-small">共享牛客号和已标记的队伍号单独列示。相同提交与题目合并后只计一份，不重复归到个人，也不据此判断双人覆盖。战力与预测使用上方三位成员的个人训练。</p><div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>队伍账号</th><th>当前选中绑定成员</th><th>去重提交 / 练习 / AC</th><th>首过前 WA</th><th>当前来源</th></tr></thead><tbody>${accounts.map(a=>`<tr><td>${escapeTa(a.platform==="nowcoder"?"牛客":a.platform)} · ${escapeTa(a.handle)}<small>${a.shared?"共享账号":"已标记团队账号"}</small></td><td>${a.members.map(escapeTa).join(" / ")}</td><td>${a.coverage.submissions} / ${a.coverage.problems} / ${a.solved}</td><td>${a.wa}</td><td>${a.inSelectedSource?"队伍证据单列":"不在当前训练来源内"}</td></tr>`).join("")}</tbody></table></div>`:"";
 }
 function svgTa(tag, attributes={}, text="") { const node=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attributes).forEach(([k,v])=>node.setAttribute(k,v));if(text)node.textContent=text;return node; }
+function renderOnsiteReferenceTa() {
+  const ref=dataTa.onsiteReference, section=$ta("onsiteReference");
+  if(!ref){section.hidden=true;return;}
+  section.hidden=false;
+  const title=`<p class="ta-eyebrow">ONSITE EVIDENCE · Hei-MaoM</p><h2>现场赛十三维参考</h2>`;
+  if(!["ready","stale"].includes(ref.status)){section.innerHTML=title+`<p class="ta-muted">${escapeTa(ref.message)}</p>`;return;}
+  const panel=ref.panels[onsiteBoardTa], member=dataTa.members.find(m=>m.key===ref.owner);
+  const modes=`<label class="ta-compact">参赛口径<select id="onsiteBoard" aria-label="现场参考参赛口径"><option value="all" ${onsiteBoardTa==="all"?"selected":""}>全部参赛（含打星）</option><option value="official" ${onsiteBoardTa==="official"?"selected":""}>仅正式参赛</option></select></label>`;
+  const evidence={missing:"暂无证据",exploratory:"探索样本",provisional:"暂定估计",established:"积累充分",legacy:"旧版数据"};
+  section.innerHTML=`<div class="ta-heading"><div>${title}<p class="ta-muted">${escapeTa(member?.displayName||"本人")} · <a href="${escapeTa(ref.url)}" target="_blank" rel="noopener noreferrer">查看公开档案</a></p></div>${modes}</div><p class="ta-muted ta-small">${escapeTa(ref.message)} 数据是所在历史队伍共同完成的表现，不代表每道题均由本人独立完成，也不重复算作三份战力。</p><p class="ta-muted ta-small">来源更新 ${dateTa(Date.parse(ref.generatedAt)/1000)} · 本站核对 ${dateTa(ref.checkedAt)}${ref.status==="stale"?" · 当前显示上次成功缓存，正在重试更新":""}</p>${panel?`<p>${panel.contests} 场参赛 · 总体 ${panel.uniqueProblems} 道题 · 标签证据覆盖 ${panel.coverage==null?"未知":(panel.coverage*100).toFixed(1)+"%"}</p><div class="ta-chart-layout"><div id="onsiteReferenceRadar"></div><div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>题型</th><th>现场评分 / 同级前</th><th>题量 / 可信程度</th></tr></thead><tbody>${panel.axes.map(a=>`<tr><td>${escapeTa(a.label)}</td><td>${a.score==null?"暂无数据":a.score.toFixed(1)}<small>${a.topPercent==null?"":`同级前 ${a.topPercent.toFixed(1)}% · ${escapeTa(a.grade||"")}`}</small></td><td>${a.uniqueProblems} 题<small>${escapeTa(evidence[a.evidenceLevel]||"暂无证据")}${a.confidence==null?"":` · ${a.confidence>0&&a.confidence<.01?"&lt;1":Math.round(a.confidence*100)}%`}</small></td></tr>`).join("")}</tbody></table></div></div><p class="ta-muted ta-small">此雷达采用来源站 ${panel.scoreScale==="rating"?"独立评级":panel.scoreScale==="percent"?"百分比":"原始"} 刻度；空心点表示无数据。低覆盖或少样本维度需要结合训练记录复核。</p>`:`<p class="ta-muted">该参赛口径尚无十三维题型数据。</p>`}<details><summary class="ta-method-title">历史现场表现 · ${ref.history.filter(h=>onsiteBoardTa==="all"||h.official===true).length} 场</summary><div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>比赛 / 日期</th><th>参赛性质</th><th>队伍通过 / 排名</th><th>首题 AC / 错误提交</th></tr></thead><tbody>${ref.history.filter(h=>onsiteBoardTa==="all"||h.official===true).map(h=>`<tr><td>${escapeTa(h.title)}<small>${escapeTa(h.date.slice(0,10))}</small></td><td>${h.official===true?"正式":h.official===false?"打星 / 非正式":"未标记"}</td><td>${numberTa(h.solved)} 题 · ${numberTa(h.rank)}/${numberTa(h.teamCount)}</td><td>${numberTa(h.firstAcMinutes)} 分钟 / ${numberTa(h.wrongAttempts)} 次</td></tr>`).join("")}</tbody></table></div></details>`;
+  $ta("onsiteBoard").addEventListener("change",e=>{onsiteBoardTa=e.target.value;renderOnsiteReferenceTa();});
+  if(!panel)return;
+  const svg=svgTa("svg",{viewBox:"0 0 540 520",role:"img","aria-label":"本人历史现场赛十三维雷达，使用来源独立刻度"}),cx=270,cy=255,r=175,max=panel.scoreScale==="percent"?100:Math.max(2000,Math.ceil(Math.max(0,...panel.axes.map(a=>a.score||0))/500)*500);
+  const point=(i,v,extra=0)=>{const angle=-Math.PI/2+2*Math.PI*i/13;return [cx+Math.cos(angle)*(r*Math.max(0,Math.min(max,v))/max+extra),cy+Math.sin(angle)*(r*Math.max(0,Math.min(max,v))/max+extra)];};
+  for(let ring=1;ring<=4;ring++)svg.append(svgTa("polygon",{points:panel.axes.map((a,i)=>point(i,max*ring/4).join(",")).join(" "),class:"ta-radar-grid"}));
+  panel.axes.forEach((a,i)=>{const [x,y]=point(i,max),[tx,ty]=point(i,max,28);svg.append(svgTa("line",{x1:cx,y1:cy,x2:x,y2:y,class:"ta-radar-axis"}),svgTa("text",{x:tx,y:ty,"text-anchor":tx<cx-20?"end":tx>cx+20?"start":"middle","dominant-baseline":"middle",class:"ta-radar-label"},a.label));});
+  svg.append(svgTa("polygon",{points:panel.axes.map((a,i)=>point(i,a.score||0).join(",")).join(" "),fill:"#308663", "fill-opacity":.13,stroke:"#308663","stroke-width":2}));
+  panel.axes.forEach((a,i)=>{const [x,y]=point(i,a.score||0);svg.append(svgTa("circle",{cx:x,cy:y,r:4,fill:a.score==null?"white":"#308663",stroke:"#308663"}));});
+  svg.append(svgTa("text",{x:cx+7,y:cy-r-7,class:"ta-radar-scale"},`0–${max} · 独立刻度`));
+  $ta("onsiteReferenceRadar").append(svg);
+}
 function renderRadarTa() {
   if(!dataTa) return;
   const raw=$ta("radarMode").value==="tags";$ta("radarTags").hidden=!raw;
@@ -100,7 +126,7 @@ function renderRecommendationsTa() {
 }
 function detailTa(m) {
   const dist=Object.entries(m.distribution).sort((a,b)=>Number(a[0])-Number(b[0])), max=Math.max(1,...dist.map(([,v])=>v));
-  return `<details><summary>${numberTa(m.rating)} <span class="ta-muted">· AC ${m.solved} / 练 ${m.practiced}</span></summary><div class="ta-member-detail"><p>评级 AC ${m.ratedSolved} · 置信度 ${Math.round(m.confidence*100)}%${m.reliable?"":" · 样本偏少"}</p><p>WA ${m.wa} · 首过前错误 ${m.errors}<br>未过 ${m.unresolved} · 平均尝试 ${numberTa(m.averageTries)}</p><p>最近练习 ${dateTa(m.lastPractice)}<br>错误扣分 ${m.errorPenalty} · 衰减扣分 ${m.memoryPenalty}</p>${dist.length?`<div class="ta-mini-hist" aria-label="过题评级分布">${dist.map(([bucket,n])=>`<span style="height:${Math.max(4,n/max*100)}%" title="${bucket}–${Number(bucket)+199}：${n} 题"></span>`).join("")}</div><p>${dist.map(([bucket,n])=>`${bucket}–${Number(bucket)+199}: ${n}`).join(" · ")}</p>`:""}</div></details>`;
+  return `<details><summary>${numberTa(m.rating)} <span class="ta-muted">· AC ${m.solved} / 练 ${m.practiced}</span></summary><div class="ta-member-detail"><p>评级 AC ${m.ratedSolved} · 置信度 ${Math.round(m.confidence*100)}%${m.reliable?"":" · 样本偏少"}</p><p>WA ${m.wa} · 首过前错误 ${m.errors}<br>未过 ${m.unresolved} · 平均尝试 ${numberTa(m.averageTries)}</p><p>最近练习 ${dateTa(m.lastPractice)}<br>${m.ratingSource==="training-anchored-tags"?`能力基线 ${m.abilityBaseline} · 相对调整 ${m.relativeAdjustment==null?"证据不足":m.relativeAdjustment>0?"+"+m.relativeAdjustment:m.relativeAdjustment}`:`错误扣分 ${m.errorPenalty} · 衰减扣分 ${m.memoryPenalty}`}</p>${dist.length?`<div class="ta-mini-hist" aria-label="过题评级分布">${dist.map(([bucket,n])=>`<span style="height:${Math.max(4,n/max*100)}%" title="${bucket}–${Number(bucket)+199}：${n} 题"></span>`).join("")}</div><p>${dist.map(([bucket,n])=>`${bucket}–${Number(bucket)+199}: ${n}`).join(" · ")}</p>`:""}</div></details>`;
 }
 function renderTableTa() {
   if(!dataTa)return;const query=$ta("tagSearch").value.toLowerCase().trim();
@@ -114,8 +140,8 @@ function renderRetriesTa() {
 function probabilityTa(row) {return row.probability==null?"—":`${Math.round(row.probability*100)}% <small>范围 ${Math.round(row.probabilityRange[0]*100)}–${Math.round(row.probabilityRange[1]*100)}%</small>`;}
 function timeTa(row) {return row.conditionalMinutes==null?"—":`${row.conditionalMinutes} 分钟<small>${row.timeRangeMinutes[0]}–${row.timeRangeMinutes[1]} 分钟 · 解出时</small>`;}
 function renderForecastTa() {
-  const f=dataTa.forecast;$ta("forecastTitle").textContent=`${f.name} · ${f.budgetMinutes} 分钟推演`;
-  $ta("forecast").innerHTML=`<div class="ta-metrics"><div class="ta-metric">预计通过<strong>${f.expectedSolves} 题</strong></div><div class="ta-metric">敏感性范围<strong>${f.expectedSolvesRange.join("–")} 题</strong></div><div class="ta-metric">可预测题目<strong>${f.predictedProblems}/${f.problems.length}</strong></div><div class="ta-metric">时间基准<strong>${f.timing.source==="heuristic"?"经验先验":"个人历史"} · ${f.timing.samples} 个样本</strong></div></div><div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>题目 / tags</th><th>经验评级</th><th>限时内通过倾向</th><th>首过条件期望 / 区间</th><th>含失败风险的预算期望</th></tr></thead><tbody>${f.problems.map(p=>`<tr><td>${escapeTa(p.index)} · ${escapeTa(p.name)}<small>${escapeTa(p.tags.join(" / ")||"缺少标签 · 使用综合基线")}</small></td><td>${numberTa(p.rating)}<small>${p.ratingRange?p.ratingRange.join("–"):""}</small></td><td>${probabilityTa(p)}<small>${p.probability==null?escapeTa(p.reason):p.tagged?"tag 战力":"综合基线"}</small></td><td>${timeTa(p)}</td><td>${p.budgetedMinutes==null?"—":`${p.budgetedMinutes} 分钟`}<small>未解出按 ${f.budgetMinutes} 分钟计</small></td></tr>`).join("")}</tbody></table></div><ul class="ta-muted ta-small">${f.notes.map(n=>`<li>${escapeTa(n)}</li>`).join("")}</ul>`;
+  const f=dataTa.forecast, peak=dataTa.peakForecast;$ta("forecastTitle").textContent=`${f.name} · ${f.budgetMinutes} 分钟推演`;
+  $ta("forecast").innerHTML=`<div class="ta-metrics"><div class="ta-metric">综合能力推演<strong>${f.expectedSolves} 题</strong></div><div class="ta-metric">敏感性范围<strong>${f.expectedSolvesRange.join("–")} 题</strong></div><div class="ta-metric">可预测题目<strong>${f.predictedProblems}/${f.problems.length}</strong></div><div class="ta-metric">时间基准<strong>${f.timing.source==="heuristic"?"经验先验":"个人历史"} · ${f.timing.samples} 个样本</strong></div></div>${peak?`<p class="ta-muted ta-small">历史峰值参考情景：预计 ${peak.expectedSolves} 题，敏感性范围 ${peak.expectedSolvesRange.join("–")} 题。表示三人恢复各自历史峰值水平；下表使用官方历史与近期训练综合估计。</p>`:""}<div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>题目 / tags</th><th>经验评级</th><th>限时内通过倾向</th><th>首过条件期望 / 区间</th><th>含失败风险的预算期望</th></tr></thead><tbody>${f.problems.map(p=>`<tr><td>${escapeTa(p.index)} · ${escapeTa(p.name)}<small>${escapeTa(p.tags.join(" / ")||"缺少标签 · 使用综合基线")}</small></td><td>${numberTa(p.rating)}<small>${p.ratingRange?p.ratingRange.join("–"):""}</small></td><td>${probabilityTa(p)}<small>${p.probability==null?escapeTa(p.reason):p.tagged?"tag 战力":"综合基线"}</small></td><td>${timeTa(p)}</td><td>${p.budgetedMinutes==null?"—":`${p.budgetedMinutes} 分钟`}<small>未解出按 ${f.budgetMinutes} 分钟计</small></td></tr>`).join("")}</tbody></table></div><ul class="ta-muted ta-small">${f.notes.map(n=>`<li>${escapeTa(n)}</li>`).join("")}</ul>`;
 }
 function renderBacktestTa() {
   const b=dataTa.backtest;$ta("backtestStatus").textContent=b.message;

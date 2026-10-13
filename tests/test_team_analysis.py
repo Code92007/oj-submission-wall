@@ -70,6 +70,110 @@ class TeamAnalysisTests(unittest.TestCase):
     def analysis(self, **kwargs):
         return ta.build_analysis(app, self.service, self.principal, self.keys, **kwargs)
 
+    def official(self, owner, cid, rating, updated, handle=None, participated=None):
+        raw = {'ratingChange': {'contestId': cid, 'newRating': rating, 'ratingUpdateTimeSeconds': updated}}
+        with app.connect_db() as conn:
+            conn.execute("""INSERT INTO contests(owner_type,owner_id,platform,handle,remote_id,contest_name,
+                category,participated_at,url,raw_json,created_at) VALUES('user',?,'codeforces',?,?,?,'codeforces',?,'',?,?)""",
+                (str(owner), handle or f'cf{owner}', str(cid), f'contest {cid}', participated or updated-7200, json.dumps(raw), self.now))
+
+    def test_peak_retention_and_recent_hard_solves_survive_current_rating_drop(self):
+        self.official(1, 1, 2200, self.now-3*365*86400)
+        self.official(1, 2, 1750, self.now-30*86400)
+        self.official(1, 3, 1700, self.now-20*86400)
+        for j in range(20):
+            self.add(1, f'hard-{j}', f'{600+j}A', self.now-86400+j, rating=2300)
+        m = self.analysis()['members'][0]['overall']
+        self.assertEqual((m['officialRating'], m['peakRating']), (1700, 2200))
+        self.assertEqual(m['momentum']['recent20Mean'], 2300)
+        self.assertGreater(m['rating'], 2100)
+        self.assertEqual(m['ratingSource'], 'cf-training-hybrid')
+        self.assertGreater(m['trainingUplift'], 100)
+
+    def test_easy_warmups_do_not_erase_peak_supported_baseline(self):
+        for cid, rating in enumerate((2200, 1800, 1700)):
+            self.official(1, cid, rating, self.now-(30-cid)*86400)
+        for j in range(25):
+            self.add(1, f'easy-{j}', f'{600+j}A', self.now-1000+j, rating=800)
+        data = self.analysis()
+        m = data['members'][0]['overall']
+        self.assertEqual(m['momentum']['recent20Mean'], 800)
+        self.assertGreaterEqual(m['rating'], 1990)
+        self.assertEqual(m['trainingUplift'], 0)
+        self.assertEqual(data['peakForecast']['ratingBasis'], 'peak')
+
+    def test_repeat_ac_cannot_refresh_moving_average_or_unique_sample_confidence(self):
+        before = self.analysis()['members'][0]['overall']['momentum']
+        for j in range(25):
+            self.add(1, f'repeat-{j}', '100A', self.now-100+j, rating=2000)
+        after = self.analysis()['members'][0]['overall']['momentum']
+        self.assertEqual(before, after)
+
+    def test_moving_average_uses_months_weights_and_excludes_regional_rating_scale(self):
+        def problem(i, rating, age):
+            return {'id': str(i), 'solved': True, 'rating': rating, 'source': 'codeforces',
+                'firstAc': self.now-age*86400, 'errors': 0}
+        old = [problem(i, 1800, 150-i) for i in range(20)]
+        new = [problem(i+20, 2400, 20-i) for i in range(20)]
+        m = ta.training_momentum(old+new, self.now)
+        self.assertEqual(m['recent20Mean'], 2400)
+        self.assertGreater(m['monthsWeightedMean'], 2000)
+        self.assertLess(m['monthsWeightedMean'], 2400)
+        self.assertLess(m['trend'], 2400)
+        self.assertGreater(m['trend'], m['monthsWeightedMean'])
+        self.assertEqual(m, ta.training_momentum(old+new+[{**problem(100, 4000, 0), 'source': 'cf-bot'}], self.now))
+        self.assertEqual(m, ta.training_momentum(old+new+[problem(101, 4000, -1)], self.now))
+
+    def test_official_rating_update_time_prevents_historical_leakage(self):
+        for i in range(1,4):
+            for cid, rating in enumerate((2000, 2100, 2200)):
+                self.official(i, cid, rating, self.cutoff-(40-cid)*86400)
+        before = self.analysis()['backtest']
+        for i in range(1,4):
+            self.official(i, 10, 3500, self.cutoff+86400, participated=self.cutoff-86400)
+            self.official(i, 11, 3600, self.cutoff, participated=self.cutoff-86400)
+        self.assertEqual(before, self.analysis()['backtest'])
+
+    def test_multiple_accounts_take_latest_per_account_and_keep_peak_separate(self):
+        self.bind(1, 'codeforces', 'other')
+        self.official(1, 1, 2500, self.now-30*86400)
+        self.official(1, 2, 1700, self.now-20*86400)
+        self.official(1, 3, 1900, self.now-10*86400, handle='other')
+        m = self.analysis()['members'][0]['overall']
+        self.assertEqual(m['officialRating'], 1900)
+        self.assertEqual(m['peakRating'], 2500)
+        self.assertGreater(m['rating'], 2200)
+
+    def test_later_rating_change_does_not_rewrite_historical_timing_scale(self):
+        for i in range(1,4):
+            self.official(i, 1, 1900, self.cutoff-30*86400)
+        before = self.analysis()['forecast']['timing']
+        for i in range(1,4):
+            self.official(i, 2, 2500, self.cutoff+30*86400)
+        self.assertEqual(before, self.analysis()['forecast']['timing'])
+
+    def test_training_only_fallback_is_explicit_and_unknown_tags_stay_unknown(self):
+        data = self.analysis()
+        m = data['members'][0]['overall']
+        self.assertEqual(m['ratingSource'], 'recent-training')
+        self.assertEqual(m['momentum']['recent20Count'], 12)
+        self.assertNotIn('officialRating', m)
+        self.assertIsNone(data['peakForecast'])
+        self.assertIsNone(next(t for t in data['tags'] if t['key']=='geometry')['rating'])
+
+    def test_retrospective_external_panel_never_changes_forecast_or_backtest(self):
+        before = self.analysis()
+        self.remote['roster']['members'] = [{'id':'p1','name':'成员一','school':'大学'}]
+        body = {'panels':{'all':{'contests':10}}, 'history':[], 'usedForPrediction':False}
+        with self.service.db() as conn:
+            conn.execute('UPDATE cpc_remote SET body=?',(json.dumps(self.remote),))
+            conn.execute('INSERT INTO cpc_xcpc_reference VALUES(?,?,?,?,?,?)',
+                ('p1','成员一@大学',json.dumps(body),self.now,self.now,''))
+        after = self.analysis()
+        self.assertEqual(after['onsiteReference']['status'],'ready')
+        self.assertEqual(before['forecast'],after['forecast'])
+        self.assertEqual(before['backtest'],after['backtest'])
+
     def test_team_radar_forecast_and_historical_time(self):
         data = self.analysis()
         self.assertEqual(len(data['families']), 12)

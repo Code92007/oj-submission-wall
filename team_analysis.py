@@ -13,7 +13,7 @@ from pathlib import Path
 
 from cpc_integration import problem_key
 
-MODEL_VERSION = "team-tags-v1.1"
+MODEL_VERSION = "team-tags-v2"
 FAMILIES = {
     "implementation": ("实现 / 模拟", {"implementation", "brute force"}),
     "greedy": ("贪心", {"greedy", "sortings", "two pointers"}),
@@ -207,6 +207,81 @@ def team_account_evidence(app, service, groups, rows, keys, owners, meta, now, p
     return accounts
 
 
+def official_rating_histories(app, rows, handles):
+    histories, seen = {}, set()
+    for row in rows:
+        owner = f"{row['owner_type']}:{row['owner_id']}"
+        if row["platform"] != "codeforces" or (owner, "codeforces", row["handle"]) not in handles:
+            continue
+        raw = app.raw_json_dict(row)
+        change = raw.get("ratingChange")
+        if not isinstance(change, dict):
+            continue
+        value = change.get("newRating")
+        timestamp = change.get("ratingUpdateTimeSeconds")
+        # A contest's start time is too early to use its new rating in a backtest.
+        if type(value) is not int or not 0 <= value <= 4000 or type(timestamp) is not int or timestamp <= 0:
+            continue
+        key = (owner, row["handle"].casefold(), str(change.get("contestId") or row["remote_id"]))
+        if key in seen:
+            continue
+        seen.add(key)
+        histories.setdefault(owner, []).append({"handle": row["handle"], "rating": value,
+            "updatedAt": timestamp, "contest": str(change.get("contestId") or row["remote_id"])})
+    for history in histories.values():
+        history.sort(key=lambda p: (p["updatedAt"], p["contest"], p["handle"]))
+    return histories
+
+
+def official_baseline(history, cutoff, basis="current"):
+    points = [p for p in history if p["updatedAt"] < cutoff]
+    if not points:
+        return None
+    latest, counts = {}, {}
+    for p in points:
+        key = p["handle"].casefold()
+        latest[key] = p
+        counts[key] = counts.get(key, 0)+1
+    current = max(latest.values(), key=lambda p: (p["rating"], p["updatedAt"]))
+    peak = max(points, key=lambda p: (p["rating"], p["updatedAt"]))
+    selected = peak if basis == "peak" else current
+    count = counts[selected["handle"].casefold()]
+    age = max(0, cutoff-selected["updatedAt"])/(365*86400)
+    return {"rating": selected["rating"], "currentRating": current["rating"], "peakRating": peak["rating"],
+        "handle": selected["handle"], "updatedAt": selected["updatedAt"], "ratedContests": count,
+        "confidence": round((1-math.exp(-count/5))*(.6+.4*math.exp(-age)), 3),
+        "reliable": count >= 3, "basis": basis}
+
+
+def training_momentum(problems, cutoff):
+    # First AC of a distinct CF-rated problem: repeat submissions cannot farm the window.
+    solved = sorted([p for p in problems if p["solved"] and p["rating"] is not None
+                     and p.get("source") == "codeforces" and p["firstAc"] < cutoff], key=lambda p: (p["firstAc"], p["id"]))
+    recent = solved[-20:]
+    result = {"recent20Count": len(recent), "recent20Mean": None, "recent20WeightedMean": None,
+        "monthsWeightedMean": None, "trend": None, "recent180Count": 0, "confidence": 0,
+        "lastAc": recent[-1]["firstAc"] if recent else None, "recentErrorPenalty": 0}
+    if not recent:
+        return result
+    weight = lambda timestamp: math.exp(-max(0, cutoff-timestamp)/(90*86400))
+    weights = [weight(p["firstAc"]) for p in recent]
+    total = sum(weights)
+    if total < 1e-100:
+        return result
+    latest = sum(p["rating"]*w for p, w in zip(recent, weights))/total
+    windows = [(p["firstAc"], statistics.mean(s["rating"] for s in solved[max(0, i-19):i+1]))
+               for i, p in enumerate(solved) if i >= 4 and p["firstAc"] >= cutoff-180*86400]
+    months = sum(v*weight(t) for t, v in windows)/sum(weight(t) for t, _ in windows) if windows else None
+    penalty = min(30, sum(min(3,p["errors"])*10*w for p,w in zip(recent,weights))/total)
+    result.update(recent20Mean=round(statistics.mean(p["rating"] for p in recent)),
+        recent20WeightedMean=round(latest), monthsWeightedMean=round(months) if months is not None else None,
+        trend=round(.7*latest+.3*months) if months is not None else round(latest),
+        recent180Count=sum(p["firstAc"] >= cutoff-180*86400 for p in solved),
+        confidence=round(min(1, sum(math.exp(-max(0, cutoff-p["firstAc"])/(180*86400)) for p in recent)/20), 3),
+        recentErrorPenalty=round(penalty))
+    return result
+
+
 def quantile(values, q):
     values = sorted(values)
     threshold = sum(w for _, w in values) * q
@@ -282,12 +357,51 @@ def combine(members, target):
         "confidence": round(sum(m["confidence"] for m in reliable[:2])/2, 3), "members": members}
 
 
-def profile(problems, cutoff, target):
+def profile(problems, cutoff, target, rating_history=None, rating_basis="hybrid"):
     tags = KNOWN_TAGS | {t for p in problems for t in p["tags"]}
     raw = {tag: estimate([p for p in problems if tag in p["tags"]], cutoff) for tag in sorted(tags)}
     families = {key: estimate([p for p in problems if set(p["tags"]) & tags], cutoff)
                 for key, (_, tags) in FAMILIES.items()}
-    return {"tags": raw, "families": families, "overall": estimate(problems, cutoff)}
+    overall = estimate(problems, cutoff)
+    overall["trainingRating"] = overall["rating"]
+    overall["ratingSource"] = "practice-proxy"
+    history = rating_history or []
+    official = official_baseline(history, cutoff, rating_basis)
+    momentum = training_momentum(problems, cutoff)
+    overall["momentum"] = momentum
+    anchor = None
+    if official:
+        last_evidence = max(momentum["lastAc"] or 0, official["updatedAt"])
+        memory = 100*(1-math.exp(-max(0, cutoff-last_evidence)/(365*86400)))
+        retained = max(0, official["peakRating"]-200-memory)
+        reference = max(official["currentRating"], retained)
+        uplift = .7*momentum["confidence"]*max(0, min(400, (momentum["trend"] or reference)-momentum["recentErrorPenalty"]-reference))
+        anchor = official["peakRating"] if rating_basis == "peak" else round(reference+uplift)
+        overall.update(officialRating=official["currentRating"], peakRating=official["peakRating"],
+            cfHandle=official["handle"], ratingUpdatedAt=official["updatedAt"], officialContests=official["ratedContests"],
+            retainedPeak=round(retained), trainingUplift=round(uplift),
+            confidence=max(momentum["confidence"], round(official["confidence"]*.85, 3)),
+            reliable=official["reliable"] or overall["reliable"], ratingSource="cf-training-hybrid")
+    elif momentum["trend"] is not None:
+        anchor = round(max(800, momentum["trend"]-momentum["recentErrorPenalty"]-100*(1-momentum["confidence"])))
+        overall.update(ratingSource="recent-training", confidence=momentum["confidence"])
+    if anchor is not None:
+        # The training mix locates relative strengths, not the absolute CF scale.
+        for value in list(raw.values())+list(families.values()):
+            value["trainingRating"] = value["rating"]
+            value["ratingSource"] = "training-anchored-tags"
+            value["abilityBaseline"] = anchor
+            if value["baseRating"] is not None and overall["baseRating"] is not None:
+                delta = (value["baseRating"]-overall["baseRating"]
+                    -(value["errorPenalty"]-overall["errorPenalty"])
+                    -(value["memoryPenalty"]-overall["memoryPenalty"]))
+                adjustment = round(max(-400, min(400, delta))*value["confidence"])
+                value["relativeAdjustment"] = adjustment
+                value["rating"] = max(0, min(4000, anchor+adjustment))
+        overall.update(rating=anchor, baseRating=anchor,
+            trainingErrorPenalty=overall["errorPenalty"], trainingMemoryPenalty=overall["memoryPenalty"],
+            errorPenalty=0, memoryPenalty=0)
+    return {"tags": raw, "families": families, "overall": overall, "official": official, "_ratingHistory": history}
 
 
 def team_profiles(profiles, target):
@@ -333,7 +447,10 @@ def timing_reference(records, profiles):
         for problem in problems:
             minutes = problem.get("contestMinutes")
             if problem["rating"] is not None and minutes is not None:
-                observations.append(minutes / 2**((problem["rating"]-ability)/500))
+                past = official_baseline(p.get("_ratingHistory", []), problem["firstAc"])
+                sample_ability = past["rating"] if past else p["overall"].get("trainingRating", ability)
+                if sample_ability is not None:
+                    observations.append(minutes / 2**((problem["rating"]-sample_ability)/500))
     if len(observations) < 8:
         return {"scale": 45, "low": 20, "high": 100, "samples": len(observations), "source": "heuristic"}
     observations.sort()
@@ -396,7 +513,7 @@ def onsite_times(body, contest):
     return {p["id"]: times[p["index"]] for p in contest["problems"] if p["index"] in times}
 
 
-def forecast_contest(app, service, cid, profiles, records, meta, target, budget, release):
+def forecast_contest(app, service, cid, profiles, records, meta, target, budget, release, rating_basis="hybrid"):
     team = team_profiles(profiles, target)
     overall = team["overall"]
     timing = timing_reference(records, profiles)
@@ -421,11 +538,12 @@ def forecast_contest(app, service, cid, profiles, records, meta, target, budget,
                 row["baseline"] = predict(overall["rating"], overall["confidence"], m["rating"], budget, timing)["probability"]
         rows.append(row)
     rated = [r for r in rows if r["probability"] is not None]
-    return {"contest": cid, "name": service.contests[cid]["name"], "budgetMinutes": budget,
+    return {"contest": cid, "name": service.contests[cid]["name"], "budgetMinutes": budget, "ratingBasis": rating_basis,
         "problems": rows, "expectedSolves": round(sum(r["probability"] for r in rated), 1),
         "expectedSolvesRange": [round(sum(r["probabilityRange"][i] for r in rated), 1) for i in (0, 1)],
         "predictedProblems": len(rated), "timing": timing,
         "notes": ["推演使用当前三人训练，排除这场比赛的全部练习；历史回测则使用当年名单与赛前数据。",
+                  "整体能力结合官方当前/历史峰值与 Recent 20 AC、近半年移动均值；tag 作相对调整。历史峰值推演是恢复峰值水平的参考情景，不等于当前官方 Rating。",
                   "时间指开赛至首次 AC，包含读题和排队，非纯编码时间；条件期望只针对限时内解出的情况。失败计满预算后的期望另列。",
                   "概率范围是能力与时间基准扰动的敏感性区间；时间范围是模型条件分布的 10%–90% 分位，尚非经验证的置信区间。",
                   "样本不足时使用 45 分钟经验时间基准；有至少 8 道个人正式/VP 首过时间时，以历史中位数调整。未使用目标场现场成绩拟合。",
@@ -440,7 +558,7 @@ def metrics(samples, prediction="probability"):
         "actualRate": round(sum(s["accepted"] for s in samples)/len(samples), 3)}
 
 
-def backtest(app, service, principal, keys, platform, target, meta, release, all_rows, handles, remote, checked, now):
+def backtest(app, service, principal, keys, platform, target, meta, release, all_rows, handles, remote, checked, now, rating_histories=None):
     result = {"status": "unavailable", "message": "登录并选择本人后，可回测认证成员的历史真实队伍。", "contests": [],
         "skipped": [], "ratingReview": [], "tagMetrics": [], "metrics": metrics([]), "baselineMetrics": metrics([]),
         "probabilityCalibration": [], "ratingCohorts": [],
@@ -491,7 +609,7 @@ def backtest(app, service, principal, keys, platform, target, meta, release, all
         for key in historic_keys:
             records, _ = problem_records(app, service, all_rows.get(key, []), handles, meta, platform, cutoff, cid)
             training.append(records)
-            ps.append(profile(records, cutoff, target))
+            ps.append(profile(records, cutoff, target, (rating_histories or {}).get(key, [])))
         team = team_profiles(ps, target)
         overall = team["overall"]["rating"]
         if overall is None:
@@ -624,6 +742,9 @@ def build_analysis(app, service, principal, keys, platform="codeforces", target=
                     relevant.update(linked[p] for p in participation["members"] if p in linked and linked[p] in owners)
         rows = app.battle_union_rows(conn, "submissions", "*", [tuple(k.split(":", 1)) for k in sorted(relevant)],
                                     order_by="submitted_at, id")
+        rating_rows = app.battle_union_rows(conn, "contests", "*", [tuple(k.split(":", 1)) for k in sorted(relevant)],
+                                           order_by="participated_at, id")
+    rating_histories = official_rating_histories(app, rating_rows, handles)
     meta = metadata(service, release, rows, app)
     by_owner = {key: [] for key in relevant}
     for row in rows:
@@ -631,19 +752,24 @@ def build_analysis(app, service, principal, keys, platform="codeforces", target=
     profiles, members = [], []
     for key in keys:
         records, coverage = problem_records(app, service, by_owner[key], handles, meta, platform, now+1)
-        p = profile(records, now, target)
+        p = profile(records, now, target, rating_histories.get(key, []))
         profiles.append(p)
         members.append({"key": key, "displayName": owners[key]["displayName"], "teamName": owners[key]["teamName"],
                         "coverage": coverage, "overall": p["overall"]})
     forecast_records = [problem_records(app, service, by_owner[k], handles, meta, platform, now+1, contest_id)[0] for k in keys]
-    forecast_profiles = [profile(r, now, target) for r in forecast_records]
+    forecast_profiles = [profile(r, now, target, rating_histories.get(k, [])) for k, r in zip(keys, forecast_records)]
+    peak_profiles = [profile(r, now, target, rating_histories.get(k, []), "peak") for k, r in zip(keys, forecast_records)]
+    from xcpc_reference import analysis_reference
     return {"modelVersion": MODEL_VERSION, "generatedAt": app.iso_from_ts(now), "target": target, "platform": platform,
         "members": members, **team_profiles(profiles, target),
         "teamAccounts": team_account_evidence(app, service, groups, rows, keys, owners, meta, now, platform),
+        "onsiteReference": analysis_reference(service, principal, keys, remote, checked, linked, now),
         "forecast": forecast_contest(app, service, contest_id, forecast_profiles, forecast_records, meta, target, budget, release),
-        "backtest": backtest(app, service, principal, keys, platform, target, meta, release, by_owner, handles, remote, checked, now),
+        "peakForecast": forecast_contest(app, service, contest_id, peak_profiles, forecast_records, meta, target, budget, release, "peak") if any(p["official"] for p in peak_profiles) else None,
+        "backtest": backtest(app, service, principal, keys, platform, target, meta, release, by_owner, handles, remote, checked, now, rating_histories),
         "ratingRelease": {"method": release.get("method"), "revision": release.get("source_revision"), "problems": len(release["problems"])},
         "notes": ["评级为 CF 风格训练估计，不是官方 Rating；平台缺少兼容评级或 tags 的题不会补造数值。",
+                  "个人整体结合官方当前/历史峰值、Recent 20 AC 和近半年移动均值；已过题难度分位数只用于 tag 相对强弱。多账号官方当前值取各自最新值中的最高值，综合估计不是官方 Rating。",
                   "只统计活跃个人绑定账号；已标记的团队账号及 CF 多人提交不计为个人训练。",
                   "多人共享的牛客 profile 按队伍账号单列；合并相同提交和题目，只计一份，不重复归到个人或形成双人覆盖。",
                   "无样本表示证据不足。训练目标参考线只影响覆盖与补强建议，不影响战力、概率或时间。"]}

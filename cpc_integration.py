@@ -49,6 +49,7 @@ class Integration:
           create table if not exists cpc_onsite(id text primary key,participation text,contest text,body text,active integer);
           create table if not exists cpc_onsite_history(id integer primary key,evidence_id text,body text,created integer);
           create table if not exists cpc_onsite_sync(person text primary key,body text,checked integer);
+          create table if not exists cpc_xcpc_reference(person text primary key,player_key text,body text,checked integer,attempted integer,error text);
         ''')
         return db
 
@@ -102,6 +103,8 @@ class Integration:
                     force = self.force_onsite.is_set()
                     self.force_onsite.clear()
                     self.sync_onsite(force=force)
+                    from xcpc_reference import sync_references
+                    sync_references(self, force=force)
                 except Exception:
                     # Do not log request bodies, credentials or verification notes.
                     print('CPC sync failed; previous snapshot retained', flush=True)
