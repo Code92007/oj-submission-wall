@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>组队分析 · OJ 训练墙</title>
-  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/team-analysis.css?v=4">
-  <script src="/team-analysis.js?v=4" defer></script>
+  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/team-analysis.css?v=5">
+  <script src="/team-analysis.js?v=5" defer></script>
 </head>
 <body>
   <header class="topbar"><div><h1>组队分析</h1><p>找到三个人的交集，也看见队伍的空缺。</p></div><nav class="top-actions"><a class="button ghost" href="/regionals">区域赛进度</a><a class="button ghost" href="/">返回训练墙</a></nav></header>
@@ -25,13 +25,14 @@
       <section id="teamAccounts" class="panel" hidden></section>
       <section id="onsiteReference" class="panel"></section>
       <div class="ta-chart-layout">
-        <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">COVERAGE MAP</p><h2>团队标签雷达</h2></div><div class="ta-compact ta-mode-control"><span id="radarModeCaption">维度</span><input id="radarMode" type="hidden" value="families"><details id="radarModePicker" class="ta-mode-picker"><summary aria-labelledby="radarModeCaption radarModeLabel"><span id="radarModeLabel">综合 12 维</span></summary><div class="ta-mode-choices" role="group" aria-label="选择雷达维度"><button type="button" data-radar-mode="families" aria-pressed="true">综合 12 维</button><button type="button" data-radar-mode="tags" aria-pressed="false">细分标签</button></div></details></div></div><div id="radarTags" class="ta-tag-picker" hidden></div><div id="radarLegend" class="ta-legend"></div><div id="radar"></div><p class="ta-muted ta-small">中心为 0，刻度统一到 3500。虚线为训练目标参考线；空心点表示证据不足，不能当作零能力。综合维度按题去重。</p></section>
+        <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">COVERAGE MAP</p><h2>团队标签雷达</h2></div><div class="ta-compact ta-mode-control"><span id="radarModeCaption">维度</span><input id="radarMode" type="hidden" value="families"><details id="radarModePicker" class="ta-mode-picker"><summary aria-labelledby="radarModeCaption radarModeLabel"><span id="radarModeLabel">标准 12 维</span></summary><div class="ta-mode-choices" role="group" aria-label="选择雷达维度"><button type="button" data-radar-mode="families" aria-pressed="true">标准 12 维</button><button type="button" data-radar-mode="categories" aria-pressed="false">自选大类</button><button type="button" data-radar-mode="tags" aria-pressed="false">细分标签</button></div></details></div></div><div id="radarTags" class="ta-tag-picker" hidden></div><div id="radarCategories" class="ta-tag-picker" hidden></div><p id="radarCategoryHelp" class="ta-muted ta-small" hidden>标准模式固定显示这 12 类；自选大类可取消部分，至少保留 3 类。计数包含动态规划与组合数学；博弈、构造独立；概率与期望合为一类。线段树、树状数组、并查集等归数据结构；其他收纳前 11 类之外的所有剩余标签。每道题在一类中只计一次，搜索与图论允许交叉。</p><details id="radarCategoryMap" class="ta-muted ta-small" hidden><summary>大类包含哪些标签</summary><div id="radarCategorySources"></div></details><div id="radarLegend" class="ta-legend"></div><div id="radar"></div><p class="ta-muted ta-small">中心为 0，刻度统一到 3500。灰色虚线是训练参考线；彩色虚线与空心点表示少样本暂估或单人参考，点位对应参考数值；问号表示暂无可用估计。实心点也只是模型估计。各维度按题去重。</p><div id="radarEvidence" class="ta-radar-evidence"></div></section>
         <section class="panel"><p class="ta-eyebrow">NEXT PRACTICE</p><h2>下一步练什么</h2><div id="recommendations"></div></section>
       </div>
       <section class="panel" aria-labelledby="trainingEvidenceTitle">
         <div class="ta-heading"><div><p class="ta-eyebrow">TRAINING EVIDENCE</p><h2 id="trainingEvidenceTitle">每个标签的训练证据</h2></div></div>
-        <p class="ta-muted ta-small">展开成员数据查看过题分布、WA、首过前错误和最近练习。无可比评级的题仍保留在练习量中。</p>
+        <p class="ta-muted ta-small">默认按标准 12 大类查看，展开大类后查看子标签，再展开成员看过题分布、WA、首过前错误和最近练习。搜索与图论等允许交叉，同题在大类汇总中只计一次。无可比评级的题仍保留在练习量中。</p>
         <div class="ta-evidence-filters">
+          <label>展示方式<select id="tagView"><option value="groups">按大类展开</option><option value="flat">平铺子标签</option></select></label>
           <label>筛选标签<input id="tagSearch" type="search" placeholder="动态规划 / dp / 几何"></label>
           <label>证据范围<select id="tagEvidence"><option value="all">查看全部</option><option value="reliable">过滤证据不足</option></select></label>
           <label>排序<select id="tagSort"><option value="name">标签名称</option><option value="rating-desc">团队评级从高到低</option><option value="rating-asc">团队评级从低到高</option></select></label>

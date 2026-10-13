@@ -177,7 +177,8 @@ class TeamAnalysisTests(unittest.TestCase):
     def test_team_radar_forecast_and_historical_time(self):
         data = self.analysis()
         self.assertEqual(len(data['families']), 12)
-        self.assertEqual(next(t for t in data['families'] if t['key']=='dp')['label'], '动态规划')
+        self.assertEqual(next(t for t in data['families'] if t['key']=='counting')['label'], '计数')
+        self.assertEqual(data['families'], data['categories'])
         dp = next(t for t in data['tags'] if t['key'] == 'dp')
         self.assertEqual(dp['label'], '动态规划')
         self.assertEqual(dp['coverageLabel'], '双人覆盖')
@@ -389,6 +390,63 @@ class TeamAnalysisTests(unittest.TestCase):
         lone=ta.combine([person(2500)],1900)
         self.assertEqual(lone['status'],'specialist')
         self.assertEqual(lone['rating'],2250)
+
+    def test_single_reliable_member_keeps_reference_without_claiming_team_coverage(self):
+        members = [
+            {'rating':1898, 'reliable':False, 'confidence':.113, 'ratedSolved':3},
+            {'rating':1717, 'reliable':False, 'confidence':.103, 'ratedSolved':4},
+            {'rating':2004, 'reliable':True, 'confidence':.413, 'ratedSolved':14},
+        ]
+        result = ta.combine(members, 1900)
+        self.assertIsNone(result['rating'])
+        self.assertEqual(result['referenceRating'], 2004)
+        self.assertEqual(result['referenceMember'], 2)
+        self.assertEqual(result['status'], 'unknown')
+        self.assertEqual(result['reliableMembers'], 1)
+        self.assertIn('仅一人', result['evidenceReason'])
+        result = ta.combine(members[:2], 1900)
+        self.assertIsNone(result['referenceRating'])
+
+    def test_selectable_categories_group_source_tags_and_deduplicate_each_problem(self):
+        def problem(tags):
+            return {'solved':True, 'rating':2000, 'tags':tags, 'errors':0, 'wa':0,
+                'lastAc':self.now-100, 'lastPractice':self.now-100, 'firstAc':self.now-100,
+                'source':'codeforces', 'id':'fixture'}
+        p = ta.profile([problem(['dp','combinatorics'])], self.now, 1900)
+        self.assertEqual(p['categories']['counting']['practiced'], 1)
+        self.assertEqual(p['categories']['counting']['ratedSolved'], 1)
+        self.assertEqual(p['categories']['number-theory']['practiced'], 0)
+        for tags, category in [(['number theory','chinese remainder theorem'],'number-theory'),
+                (['games'],'games'), (['constructive algorithms'],'constructive'),
+                (['greedy'],'thinking'), (['probabilities','expectation'],'probability'), (['trees','graphs'],'graphs-trees'),
+                (['segment tree','data structures'],'data-structures'), (['geometry'],'geometry')]:
+            p = ta.profile([problem(tags)], self.now, 1900)
+            self.assertEqual(p['categories'][category]['practiced'], 1)
+        self.assertEqual(len(p['categories']), 12)
+        self.assertEqual(p['families'], p['categories'])
+        p = ta.profile([problem(['segment tree','data structures'])], self.now, 1900)
+        self.assertEqual(p['families']['data-structures']['practiced'], 1)
+        p = ta.profile([problem(['custom new tag','math']), problem(['dp']), problem([])], self.now, 1900)
+        self.assertEqual(p['families']['other']['practiced'], 1)
+        result = ta.team_profiles([p,p,p],1900)
+        other = next(c for c in result['families'] if c['key']=='other')
+        self.assertIn('custom new tag', other['sourceTags'])
+        self.assertIn('math', other['sourceTags'])
+        self.assertNotIn('dp', other['sourceTags'])
+        self.assertEqual(result['families'], result['categories'])
+
+    def test_single_person_reference_is_not_used_as_a_team_forecast(self):
+        for j in range(14):
+            self.add(1, f'geometry-{j}', f'{200+j}A', self.cutoff-86400+j,
+                tags=['geometry','math','greedy'])
+        self.service.contests[self.cid]['problems'][0]['tags'] = ['geometry']
+        data = self.analysis()
+        geometry = next(t for t in data['tags'] if t['key']=='geometry')
+        self.assertIsNotNone(geometry['referenceRating'])
+        self.assertIsNone(geometry['rating'])
+        first = data['forecast']['problems'][0]
+        self.assertFalse(first['tagged'])
+        self.assertEqual(first['ability'], data['overall']['rating'])
 
     def test_missing_time_is_not_zero_and_rankland_units(self):
         contest=self.service.contests[self.cid]

@@ -4,6 +4,7 @@ const escapeTa = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;"
 const colors = ["#4b79d1", "#bb8c41", "#9a73bd", "#308663"];
 let optionsTa = null, dataTa = null, requestTa = 0;
 let radarSelected = new Set();
+let categorySelected = new Set();
 let onsiteBoardTa = "all";
 const shownPlayers = new Set([3]);
 const numberTa = (n) => n == null ? "—" : n;
@@ -38,6 +39,7 @@ async function analyzeTa(event) {
     const data=await apiTa(`/api/team-analysis?${params}`); if (id!==requestTa) return;
     dataTa=data; history.replaceState(null,"",`/team-analysis?${params}`);
     radarSelected=new Set(data.tags.filter(t=>t.members.some(m=>m.practiced)).sort((a,b)=>b.members.reduce((s,m)=>s+m.practiced,0)-a.members.reduce((s,m)=>s+m.practiced,0)).slice(0,10).map(t=>t.key));
+    categorySelected=new Set((data.categories||[]).map(t=>t.key));
     renderTa(); $ta("analysisResult").hidden=false;
     setStatusTa(`训练快照 · ${new Date(data.generatedAt).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai"})} · ${data.modelVersion}`);
   } catch(error) { if(id===requestTa) setStatusTa(error.message,true); }
@@ -63,7 +65,14 @@ function renderTa() {
     box.addEventListener("change",()=>{if(box.checked && radarSelected.size>=12){box.checked=false;setStatusTa("细分标签雷达最多选择 12 个维度。",true);return;}box.checked?radarSelected.add(t.key):radarSelected.delete(t.key);renderRadarTa();});
     label.append(box,document.createTextNode(t.label));$ta("radarTags").append(label);
   });
-  renderTeamAccountsTa();renderOnsiteReferenceTa();renderRadarTa();renderRecommendationsTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
+  $ta("radarCategories").replaceChildren();
+  (d.categories||[]).forEach(t=>{
+    const label=document.createElement("label"),box=document.createElement("input");box.type="checkbox";box.checked=categorySelected.has(t.key);
+    box.addEventListener("change",()=>{box.checked?categorySelected.add(t.key):categorySelected.delete(t.key);renderRadarTa();});
+    label.title="包含："+(t.sourceLabels||t.sourceTags).join("、")+(t.sourceNote?"。"+t.sourceNote:"");label.append(box,document.createTextNode(t.label+(t.key==="counting"?"（动态规划 / 组合数学）":"")+(t.members.some(m=>m.practiced)?"":" · 暂无明确标签")));$ta("radarCategories").append(label);
+  });
+  $ta("radarCategorySources").innerHTML=`<ul>${(d.categories||[]).map(t=>`<li><strong>${escapeTa(t.label)}</strong>：${(t.sourceLabels||t.sourceTags).map(escapeTa).join("、")}${t.sourceNote?`。${escapeTa(t.sourceNote)}`:""}</li>`).join("")}</ul>`;
+  renderTeamAccountsTa();renderOnsiteReferenceTa();renderRadarTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
   $ta("coverage").innerHTML=`<h3>本次数据覆盖</h3><ul>${d.members.map(m=>`<li>${escapeTa(m.displayName)}：${m.coverage.problems} 道个人练习，${m.coverage.unrated} 道缺兼容评级、${m.coverage.untagged} 道缺标签（两者可重叠）。可见提交从 ${dateTa(m.coverage.firstSubmission)} 至 ${dateTa(m.coverage.lastSubmission)}，只代表已同步范围。</li>`).join("")}</ul><p>区域赛评级快照：${escapeTa(d.ratingRelease.method)} · ${d.ratingRelease.problems} 题 · ${escapeTa(d.ratingRelease.revision)}。标签缺失时不猜测题型。</p>`;
   $ta("modelNotes").innerHTML=`<ul>${d.notes.map(s=>`<li>${escapeTa(s)}</li>`).join("")}</ul>`;
 }
@@ -93,30 +102,47 @@ function renderOnsiteReferenceTa() {
   svg.append(svgTa("text",{x:cx+7,y:cy-r-7,class:"ta-radar-scale"},`0–${max} · 独立刻度`));
   $ta("onsiteReferenceRadar").append(svg);
 }
+function radarValueTa(axis,series) {
+  if(series===3)return {value:axis.rating??axis.referenceRating??null,tentative:axis.rating==null && axis.referenceRating!=null};
+  const member=axis.members[series];return {value:member.rating,tentative:member.rating!=null && !member.reliable};
+}
+function radarEvidenceTa(axes) {
+  const pending=axes.filter(t=>shownPlayers.has(3) && t.rating==null);
+  const tentativePeople=axes.filter(t=>[...shownPlayers].some(i=>i<3 && t.members[i].rating!=null && !t.members[i].reliable));
+  $ta("radarEvidence").innerHTML=pending.map(t=>{
+    const ref=t.referenceMember==null?null:dataTa.members[t.referenceMember];
+    return `<p><strong>${escapeTa(t.label)}：${ref?`${escapeTa(ref.displayName)} 单人参考 ${t.referenceRating}`:"暂无团队估计"}</strong><br>${escapeTa(t.evidenceReason||"训练证据不足。")}${t.sourceNote?` ${escapeTa(t.sourceNote)}`:""}<br>${t.members.map((m,i)=>`${escapeTa(dataTa.members[i].displayName)}：评级 AC ${m.ratedSolved}，有效样本 ${m.effectiveSolved}，${m.reliable?"个人估计可用":"样本偏少"}`).join("；")}。${ref?"单人参考用于展示已有能力线索，不作稳定团队评级或预测输入。":""}</p>`;
+  }).join("")+(tentativePeople.length?`<p>个人少样本暂估：${tentativePeople.map(t=>escapeTa(t.label)).join("、")}。对应曲线使用空心点和虚线，不表示已有稳定训练证据。</p>`:"");
+}
 function renderRadarTa() {
   if(!dataTa) return;
-  const raw=$ta("radarMode").value==="tags";$ta("radarTags").hidden=!raw;
-  const axes=raw?dataTa.tags.filter(t=>radarSelected.has(t.key)):dataTa.families;
-  const wrap=$ta("radar");wrap.replaceChildren();
-  if(axes.length<3) {wrap.innerHTML='<p class="ta-empty">请选择至少 3 个标签查看雷达图。</p>';return;}
-  const svg=svgTa("svg",{viewBox:"0 0 600 500",role:"img","aria-label":"团队及个人标签能力雷达图，具体数值见下方训练明细"});
+  const mode=$ta("radarMode").value;
+  $ta("radarTags").hidden=mode!=="tags";$ta("radarCategories").hidden=mode!=="categories";$ta("radarCategoryHelp").hidden=mode==="tags";$ta("radarCategoryMap").hidden=mode==="tags";
+  const axes=mode==="tags"?dataTa.tags.filter(t=>radarSelected.has(t.key)):mode==="categories"?(dataTa.categories||[]).filter(t=>categorySelected.has(t.key)):dataTa.families;
+  const wrap=$ta("radar");wrap.replaceChildren();radarEvidenceTa(axes);renderRecommendationsTa(axes);
+  if(axes.length<3) {wrap.innerHTML='<p class="ta-empty">请选择至少 3 个维度查看雷达图。</p>';return;}
+  const svg=svgTa("svg",{viewBox:"0 0 600 500",role:"img","aria-label":"团队及个人标签能力雷达图；空心点为暂估，证据说明见图下方"});
   const cx=300,cy=245,r=165,max=3500;
   const point=(i,value)=>{const a=-Math.PI/2+i*Math.PI*2/axes.length;return [cx+Math.cos(a)*r*value/max,cy+Math.sin(a)*r*value/max];};
   const points=(values)=>values.map((v,i)=>point(i,v).join(",")).join(" ");
   for(const value of [700,1400,2100,2800,3500]) {svg.append(svgTa("polygon",{points:points(axes.map(()=>value)),class:"ta-radar-grid"}));svg.append(svgTa("text",{x:cx+6,y:cy-r*value/max-3,class:"ta-radar-scale"},String(value)));}
-  axes.forEach((t,i)=>{const [x,y]=point(i,max);svg.append(svgTa("line",{x1:cx,y1:cy,x2:x,y2:y,class:"ta-radar-axis"}));const [lx,ly]=point(i,max+430);const label=svgTa("text",{x:lx,y:ly+4,"text-anchor":Math.abs(lx-cx)<12?"middle":lx>cx?"start":"end",class:"ta-radar-label"},t.label.length>23?t.label.slice(0,21)+"…":t.label);label.append(svgTa("title",{},`${t.label} · 团队 ${numberTa(t.rating)} · ${t.coverageLabel}`));svg.append(label);});
+  axes.forEach((t,i)=>{const [x,y]=point(i,max);svg.append(svgTa("line",{x1:cx,y1:cy,x2:x,y2:y,class:"ta-radar-axis"}));const [lx,ly]=point(i,max+430);const label=svgTa("text",{x:lx,y:ly+4,"text-anchor":Math.abs(lx-cx)<12?"middle":lx>cx?"start":"end",class:"ta-radar-label"},t.label.length>23?t.label.slice(0,21)+"…":t.label);label.append(svgTa("title",{},`${t.label} · 团队 ${numberTa(t.rating)} · ${t.coverageLabel}${t.referenceRating!=null?` · 单人参考 ${t.referenceRating}`:""}`));svg.append(label);});
   svg.append(svgTa("polygon",{points:points(axes.map(()=>dataTa.target)),class:"ta-radar-target"}));
   [...shownPlayers].sort().forEach(series=>{
-    const values=axes.map(t=>series===3?t.rating:t.members[series].rating);
-    // A missing estimate breaks the line; it never creates a spurious zero-valued polygon.
-    if(values.every(v=>v!=null)) svg.append(svgTa("polygon",{points:points(values.map(v=>Math.min(max,v))),fill:colors[series],"fill-opacity":series===3?.1:.025,stroke:colors[series],"stroke-width":series===3?2.5:1.5}));
-    else axes.forEach((t,i)=>{const j=(i+1)%axes.length;if(values[i]!=null && values[j]!=null){const a=point(i,Math.min(max,values[i])),b=point(j,Math.min(max,values[j]));svg.append(svgTa("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:colors[series],"stroke-width":2}));}});
-    values.forEach((value,i)=>{const [x,y]=point(i,value==null?max:Math.min(max,value));const circle=svgTa("circle",{cx:x,cy:y,r:value==null?4:3,fill:value==null?"white":colors[series],stroke:colors[series],"stroke-width":1.5});circle.append(svgTa("title",{},`${axes[i].label} · ${series===3?"团队":dataTa.members[series].displayName}：${value==null?"证据不足":value}`));svg.append(circle);});
+    const entries=axes.map(t=>radarValueTa(t,series));
+    if(entries.every(p=>p.value!=null && !p.tentative)) svg.append(svgTa("polygon",{points:points(entries.map(p=>Math.min(max,p.value))),fill:colors[series],"fill-opacity":series===3?.1:.025,stroke:colors[series],"stroke-width":series===3?2.5:1.5}));
+    else axes.forEach((t,i)=>{const j=(i+1)%axes.length,a=entries[i],b=entries[j];if(a.value!=null && b.value!=null){const [x1,y1]=point(i,Math.min(max,a.value)),[x2,y2]=point(j,Math.min(max,b.value));svg.append(svgTa("line",{x1,y1,x2,y2,stroke:colors[series],"stroke-width":2,...(a.tentative||b.tentative?{"stroke-dasharray":"5 4"}:{})}));}});
+    entries.forEach(({value,tentative},i)=>{
+      const name=series===3?"团队":dataTa.members[series].displayName;
+      if(value==null){const [x,y]=point(i,max+200);const missing=svgTa("text",{x,y:y+4,"text-anchor":"middle",fill:colors[series],"font-size":13},"?");missing.append(svgTa("title",{},`${axes[i].label} · ${name}：暂无可用估计`));svg.append(missing);return;}
+      const [x,y]=point(i,Math.min(max,value)),circle=svgTa("circle",{cx:x,cy:y,r:tentative?4:3,fill:tentative?"white":colors[series],stroke:colors[series],"stroke-width":1.5});
+      circle.append(svgTa("title",{},`${axes[i].label} · ${name}：${value}${tentative?series===3?"（单人参考，非稳定团队评级）":"（少样本暂估）":""}`));svg.append(circle);
+    });
   });
   wrap.append(svg);
 }
-function renderRecommendationsTa() {
-  const rows=dataTa.families, order={weak:0,specialist:1,unknown:2,developing:3,covered:4};
+function renderRecommendationsTa(axes=dataTa.families) {
+  const rows=axes, order={weak:0,specialist:1,unknown:2,developing:3,covered:4};
   const chosen=[...rows].sort((a,b)=>order[a.status]-order[b.status] || (a.rating??0)-(b.rating??0)).slice(0,5);
   $ta("recommendations").innerHTML=chosen.map(t=>{
     const ranked=t.members.map((m,i)=>({...m,name:dataTa.members[i].displayName})).sort((a,b)=>(b.rating??0)-(a.rating??0));
@@ -126,29 +152,44 @@ function renderRecommendationsTa() {
 }
 function detailTa(m) {
   const dist=Object.entries(m.distribution).sort((a,b)=>Number(a[0])-Number(b[0])), max=Math.max(1,...dist.map(([,v])=>v));
-  return `<details><summary>${numberTa(m.rating)} <span class="ta-muted">· AC ${m.solved} / 练 ${m.practiced}</span></summary><div class="ta-member-detail"><p>评级 AC ${m.ratedSolved} · 置信度 ${Math.round(m.confidence*100)}%${m.reliable?"":" · 样本偏少"}</p><p>WA ${m.wa} · 首过前错误 ${m.errors}<br>未过 ${m.unresolved} · 平均尝试 ${numberTa(m.averageTries)}</p><p>最近练习 ${dateTa(m.lastPractice)}<br>${m.ratingSource==="training-anchored-tags"?`能力基线 ${m.abilityBaseline} · 相对调整 ${m.relativeAdjustment==null?"证据不足":m.relativeAdjustment>0?"+"+m.relativeAdjustment:m.relativeAdjustment}`:`错误扣分 ${m.errorPenalty} · 衰减扣分 ${m.memoryPenalty}`}</p>${dist.length?`<div class="ta-mini-hist" aria-label="过题评级分布">${dist.map(([bucket,n])=>`<span style="height:${Math.max(4,n/max*100)}%" title="${bucket}–${Number(bucket)+199}：${n} 题"></span>`).join("")}</div><p>${dist.map(([bucket,n])=>`${bucket}–${Number(bucket)+199}: ${n}`).join(" · ")}</p>`:""}</div></details>`;
+  return `<details><summary>${numberTa(m.rating)} <span class="ta-muted">· AC ${m.solved} / 练 ${m.practiced}</span></summary><div class="ta-member-detail"><p>评级 AC ${m.ratedSolved} · 有效样本 ${m.effectiveSolved} · 置信度 ${Math.round(m.confidence*100)}%${m.reliable?"":" · 样本偏少"}</p><p>WA ${m.wa} · 首过前错误 ${m.errors}<br>未过 ${m.unresolved} · 平均尝试 ${numberTa(m.averageTries)}</p><p>最近练习 ${dateTa(m.lastPractice)}<br>${m.ratingSource==="training-anchored-tags"?`能力基线 ${m.abilityBaseline} · 相对调整 ${m.relativeAdjustment==null?"证据不足":m.relativeAdjustment>0?"+"+m.relativeAdjustment:m.relativeAdjustment}`:`错误扣分 ${m.errorPenalty} · 衰减扣分 ${m.memoryPenalty}`}</p>${dist.length?`<div class="ta-mini-hist" aria-label="过题评级分布">${dist.map(([bucket,n])=>`<span style="height:${Math.max(4,n/max*100)}%" title="${bucket}–${Number(bucket)+199}：${n} 题"></span>`).join("")}</div><p>${dist.map(([bucket,n])=>`${bucket}–${Number(bucket)+199}: ${n}`).join(" · ")}</p>`:""}</div></details>`;
 }
 function renderTableTa() {
   if(!dataTa)return;
   const query=$ta("tagSearch").value.toLowerCase().trim(), evidence=$ta("tagEvidence").value, sort=$ta("tagSort").value;
+  const categories=dataTa.categories||dataTa.families;
   const minInput=$ta("tagRatingMin"), maxInput=$ta("tagRatingMax");
   const min=minInput.value===""?null:minInput.valueAsNumber, max=maxInput.value===""?null:maxInput.valueAsNumber;
   const invalid=!minInput.checkValidity() || !maxInput.checkValidity() || (min!=null && max!=null && min>max);
-  const rows=invalid?[]:dataTa.tags.filter(t=>
-    `${t.label} ${t.key}`.toLowerCase().includes(query) &&
-    (evidence==="all" || t.status!=="unknown") &&
-    (min==null || (t.rating!=null && t.rating>=min)) &&
-    (max==null || (t.rating!=null && t.rating<=max))
-  ).sort((a,b)=>{
+  const compare=(a,b)=>{
     if(sort!=="name") {
       if(a.rating==null && b.rating!=null)return 1;
       if(b.rating==null && a.rating!=null)return -1;
       if(a.rating!=null && b.rating!=null && a.rating!==b.rating)return sort==="rating-asc"?a.rating-b.rating:b.rating-a.rating;
     }
     return a.label.localeCompare(b.label,"zh-CN") || a.key.localeCompare(b.key);
-  });
+  };
+  const rows=invalid?[]:dataTa.tags.filter(t=>
+    (`${t.label} ${t.key}`.toLowerCase().includes(query) || categories.some(c=>c.sourceTags.includes(t.key) && `${c.label} ${c.key}`.toLowerCase().includes(query))) &&
+    (evidence==="all" || t.status!=="unknown") &&
+    (min==null || (t.rating!=null && t.rating>=min)) &&
+    (max==null || (t.rating!=null && t.rating<=max))
+  ).sort(compare);
   $ta("tagFilterStatus").textContent=invalid?"请输入 0–4000 的有效评级，最低值不能高于最高值。":`显示 ${rows.length} / ${dataTa.tags.length} 个标签。按团队估计评级筛选，区间包含边界；限定区间时不包含暂无团队评级的标签。`;
-  $ta("tagTable").innerHTML=`<table class="ta-table"><thead><tr><th scope="col">标签</th><th scope="col">团队估计评级 / 覆盖</th>${dataTa.members.map(m=>`<th scope="col">${escapeTa(m.displayName)}</th>`).join("")}</tr></thead><tbody>${rows.map(t=>`<tr><td title="${escapeTa(t.key)}">${escapeTa(t.label)}</td><td><strong>${numberTa(t.rating)}</strong> ${chipTa(t)}<small>双人通路 ${numberTa(t.consensusRating)}<br>专长通路 ${numberTa(t.specialistRating)}</small></td>${t.members.map(m=>`<td>${detailTa(m)}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="5">${invalid?"请调整评级区间。":"没有匹配的标签，请调整筛选条件。"}</td></tr>`}</tbody></table>`;
+  const empty=invalid?"请调整评级区间。":"没有匹配的标签，请调整筛选条件。";
+  if($ta("tagView").value==="flat") {$ta("tagTable").innerHTML=evidenceTableTa(rows,empty);return;}
+  const openGroups=new Set([...$ta("tagTable").querySelectorAll("details[data-evidence-group][open]")].map(el=>el.dataset.evidenceGroup));
+  const classified=new Set(categories.flatMap(c=>c.sourceTags));
+  const groups=categories.map(c=>({...c,children:rows.filter(t=>c.sourceTags.includes(t.key))}));
+  const other=rows.filter(t=>!classified.has(t.key));
+  if(other.length)groups.push({key:"unclassified",label:"其他 / 未归类标签",rating:null,children:other});
+  const filtering=query!=="" || evidence!=="all" || min!=null || max!=null;
+  const visible=invalid?[]:groups.filter(g=>!filtering || g.children.length);
+  if(sort!=="name")visible.sort(compare);
+  $ta("tagTable").innerHTML=visible.map(g=>`<details class="ta-evidence-group" data-evidence-group="${escapeTa(g.key)}"${openGroups.has(g.key)?" open":""}><summary><span><strong>${escapeTa(g.label)}${g.key==="counting"?"（动态规划 / 组合数学）":""}</strong><small>${g.children.length} 个子标签${g.members?` · ${g.members.map((m,i)=>`${escapeTa(dataTa.members[i].displayName)} AC ${m.ratedSolved}`).join(" / ")}`:""}</small></span><span class="ta-group-rating">${g.coverageLabel?`${numberTa(g.rating)} ${chipTa(g)}`:"未合成大类评级"}</span></summary><p class="ta-muted ta-small">${g.members?"大类汇总按题去重；以下筛选与排序作用于子标签，不重算大类评级。":"这些标签尚未归入标准 12 类，保留原始训练证据。"}${g.sourceNote?` ${escapeTa(g.sourceNote)}`:""}</p><div class="ta-table-wrap">${evidenceTableTa(g.children,"暂无匹配的子标签。")}</div></details>`).join("")||`<p class="ta-empty">${empty}</p>`;
+}
+function evidenceTableTa(rows,empty) {
+  return `<table class="ta-table"><thead><tr><th scope="col">标签</th><th scope="col">团队估计评级 / 覆盖</th>${dataTa.members.map(m=>`<th scope="col">${escapeTa(m.displayName)}</th>`).join("")}</tr></thead><tbody>${rows.map(t=>`<tr><td title="${escapeTa(t.key)}">${escapeTa(t.label)}</td><td><strong>${numberTa(t.rating)}</strong> ${chipTa(t)}${t.referenceRating!=null?`<small>${escapeTa(dataTa.members[t.referenceMember].displayName)} 单人参考 ${t.referenceRating}</small>`:""}${t.evidenceReason?`<small>${escapeTa(t.evidenceReason)}</small>`:""}<small>双人通路 ${numberTa(t.consensusRating)}<br>专长通路 ${numberTa(t.specialistRating)}</small></td>${t.members.map(m=>`<td>${detailTa(m)}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="${dataTa.members.length+2}">${empty}</td></tr>`}</tbody></table>`;
 }
 function renderRetriesTa() {
   const rows=dataTa.tags.map(t=>{const solved=t.members.reduce((s,m)=>s+m.solved,0);return {...t,solved,avg:t.members.reduce((s,m)=>s+(m.averageTries||0)*m.solved,0)/Math.max(1,solved)};}).filter(t=>t.solved>=3).sort((a,b)=>b.avg-a.avg).slice(0,16),max=Math.max(1,...rows.map(t=>t.avg));
@@ -183,7 +224,7 @@ document.querySelectorAll("[data-radar-mode]").forEach(button=>button.addEventLi
 $ta("radarModePicker").addEventListener("keydown",event=>{if(event.key==="Escape"){$ta("radarModePicker").open=false;$ta("radarModePicker").querySelector("summary").focus();}});
 document.addEventListener("click",event=>{if(!$ta("radarModePicker").contains(event.target))$ta("radarModePicker").open=false;});
 for(const id of ["tagSearch","tagRatingMin","tagRatingMax"]) $ta(id).addEventListener("input",renderTableTa);
-for(const id of ["tagEvidence","tagSort"]) $ta(id).addEventListener("change",renderTableTa);
+for(const id of ["tagEvidence","tagSort","tagView"]) $ta(id).addEventListener("change",renderTableTa);
 $ta("tagReset").addEventListener("click",()=>{
   for(const id of ["tagSearch","tagRatingMin","tagRatingMax"]) $ta(id).value="";
   $ta("tagEvidence").value="all";$ta("tagSort").value="name";renderTableTa();

@@ -55,22 +55,46 @@ TAG_LABELS = {
     "ternary search": "三分查找",
     "trees": "树",
     "two pointers": "双指针",
+    "segment tree": "线段树",
+    "segment trees": "线段树",
+    "segtree": "线段树",
+    "fenwick tree": "树状数组",
+    "binary indexed tree": "树状数组",
+    "sparse table": "稀疏表",
+    "offline algorithms": "离线算法",
+    "cdq": "CDQ 分治",
+    "thinking": "思维题",
+    "expectation": "期望",
+    "expected value": "期望",
 }
+# Standard and selectable radar modes use exactly the same twelve categories.
+# A broad data-structures tag cannot establish a specific technique.
+KNOWN_TAGS = set(TAG_LABELS)
+SEGMENT_TREE_TAGS = {"segment tree", "segment trees", "segtree", "线段树"}
 FAMILIES = {
-    "implementation": ("实现 / 模拟", {"implementation", "brute force"}),
-    "greedy": ("贪心", {"greedy", "sortings", "two pointers"}),
-    "math": ("数学 / 数论", {"math", "number theory", "chinese remainder theorem"}),
-    "combinatorics": ("组合 / 概率", {"combinatorics", "probabilities"}),
-    "dp": ("动态规划", {"dp", "bitmasks"}),
-    "graphs": ("图论 / 搜索", {"graphs", "dfs and similar", "bfs", "shortest paths", "flows", "graph matchings", "2-sat", "dsu"}),
-    "trees": ("树", {"trees"}),
-    "data-structures": ("数据结构", {"data structures"}),
-    "strings": ("字符串", {"strings", "string suffix structures", "hashing"}),
-    "geometry": ("几何", {"geometry"}),
+    "thinking": ("思维题", {"greedy", "thinking", "思维", "implementation", "brute force", "binary search", "sortings", "two pointers", "ternary search", "divide and conquer", "interactive"}),
     "constructive": ("构造", {"constructive algorithms"}),
-    "search": ("二分 / 分治", {"binary search", "divide and conquer", "ternary search", "meet-in-the-middle", "fft", "expression parsing", "games", "interactive"}),
+    "games": ("博弈", {"games"}),
+    "counting": ("计数", {"dp", "combinatorics"}),
+    "probability": ("概率 / 期望", {"probabilities", "expectation", "expected value", "概率", "期望"}),
+    "number-theory": ("数论", {"number theory", "chinese remainder theorem"}),
+    "geometry": ("计算几何", {"geometry"}),
+    "search": ("搜索", {"bfs", "dfs and similar", "meet-in-the-middle"}),
+    "graphs-trees": ("图论与树", {"graphs", "trees", "shortest paths", "dsu", "2-sat", "flows", "graph matchings", "bfs", "dfs and similar"}),
+    "strings": ("字符串", {"strings", "string suffix structures", "hashing", "expression parsing"}),
+    "data-structures": ("数据结构", {"data structures", "dsu", "fenwick tree", "binary indexed tree", "sparse table"} | SEGMENT_TREE_TAGS),
+    "other": ("其他", set()),
 }
-KNOWN_TAGS = set.union(*(tags for _, tags in FAMILIES.values())) | {"*special", "schedules"}
+# Compatibility field for the selectable subset, with no independent taxonomy.
+CATEGORIES = FAMILIES
+
+
+def category_sources(tags):
+    sources = {key: source_tags for key, (_, source_tags) in FAMILIES.items()}
+    sources["other"] = set(tags) - set.union(*sources.values())
+    return sources
+
+
 ERRORS = {"WA", "WRONG_ANSWER", "TLE", "TIME_LIMIT_EXCEEDED", "MLE", "MEMORY_LIMIT_EXCEEDED",
           "RE", "RTE", "RUNTIME_ERROR", "OUTPUT_LIMIT_EXCEEDED", "IDLENESS_LIMIT_EXCEEDED", "FAILED", "PE", "PRESENTATION_ERROR"}
 WRONG = {"WA", "WRONG_ANSWER"}
@@ -393,8 +417,17 @@ def combine(members, target):
         status, label = "weak", "优先补强"
     else:
         status, label = "developing", "接近目标"
+    # A known individual's estimate remains useful even without a qualified team path.
+    # It is a display reference, never a team rating or a forecasting input.
+    reference = reliable[0] if rating is None and reliable else None
+    reason = ""
+    if rating is None:
+        reason = ("仅一人有可靠估计，尚未满足双人合成或单人专长条件。" if reference else
+                  "暂无成员有足够评级练习支持可靠估计；个人数值仅为少样本暂估。")
     return {"rating": rating, "consensusRating": round(consensus) if consensus is not None else None,
         "specialistRating": round(specialist) if specialist is not None else None, "status": status,
+        "referenceRating": reference["rating"] if reference else None,
+        "referenceMember": members.index(reference) if reference else None, "evidenceReason": reason,
         "coverageLabel": label, "support": support, "reliableMembers": len(reliable),
         "confidence": round(sum(m["confidence"] for m in reliable[:2])/2, 3), "members": members}
 
@@ -402,8 +435,8 @@ def combine(members, target):
 def profile(problems, cutoff, target, rating_history=None, rating_basis="hybrid"):
     tags = KNOWN_TAGS | {t for p in problems for t in p["tags"]}
     raw = {tag: estimate([p for p in problems if tag in p["tags"]], cutoff) for tag in sorted(tags)}
-    families = {key: estimate([p for p in problems if set(p["tags"]) & tags], cutoff)
-                for key, (_, tags) in FAMILIES.items()}
+    families = {key: estimate([p for p in problems if set(p["tags"]) & source_tags], cutoff)
+                for key, source_tags in category_sources(tags).items()}
     overall = estimate(problems, cutoff)
     overall["trainingRating"] = overall["rating"]
     overall["ratingSource"] = "practice-proxy"
@@ -443,13 +476,23 @@ def profile(problems, cutoff, target, rating_history=None, rating_basis="hybrid"
         overall.update(rating=anchor, baseRating=anchor,
             trainingErrorPenalty=overall["errorPenalty"], trainingMemoryPenalty=overall["memoryPenalty"],
             errorPenalty=0, memoryPenalty=0)
-    return {"tags": raw, "families": families, "overall": overall, "official": official, "_ratingHistory": history}
+    return {"tags": raw, "families": families, "categories": families,
+        "overall": overall, "official": official, "_ratingHistory": history}
 
 
 def team_profiles(profiles, target):
     tags = sorted(set().union(*(p["tags"] for p in profiles)))
+    sources = category_sources(tags)
+    families = []
+    for key, (label, _) in FAMILIES.items():
+        source_tags = sorted(sources[key])
+        families.append({"key": key, "label": label, "sourceTags": source_tags,
+            "sourceLabels": list(dict.fromkeys(TAG_LABELS.get(t, t) for t in source_tags)),
+            "sourceNote": ("包含线段树、树状数组、并查集、稀疏表及未细分的数据结构题。" if key == "data-structures" else
+                           "收纳不在前 11 类的所有剩余标签；多种题型混合，展开子标签查看具体证据。无标签题不猜测归类。" if key == "other" else ""),
+            **combine([p["families"][key] for p in profiles], target)})
     return {"tags": [{"key": t, "label": TAG_LABELS.get(t, t), **combine([p["tags"].get(t, estimate([], 0)) for p in profiles], target)} for t in tags],
-        "families": [{"key": k, "label": label, **combine([p["families"][k] for p in profiles], target)} for k, (label, _) in FAMILIES.items()],
+        "families": families, "categories": families,
         "overall": combine([p["overall"] for p in profiles], target)}
 
 
