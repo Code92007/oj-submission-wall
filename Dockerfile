@@ -14,6 +14,7 @@ COPY cpc_common.py /app/cpc_common.py
 COPY cpc_integration.py /app/cpc_integration.py
 COPY cpc_scoreboard.py /app/cpc_scoreboard.py
 COPY cpc_sources.py /app/cpc_sources.py
+COPY team_analysis.py /app/team_analysis.py
 COPY catalog /app/catalog
 COPY tools /app/tools
 COPY web /app/web

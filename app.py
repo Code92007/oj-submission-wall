@@ -30,6 +30,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from cpc_integration import Integration as CpcIntegration, handle as cpc_handle
 from codeforces_auth import CodeforcesAuth, ManagerAccessUnavailable, load_auth, signed_api_get
+from team_analysis import build_analysis, analysis_options
 
 
 APP_NAME = "OJ Submission Wall"
@@ -6481,6 +6482,24 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.serve_static("regionals.html")
             if path == "/regionals.js":
                 return self.serve_static("regionals.js")
+            if path in {"/team-analysis", "/team-analysis.html"}:
+                return self.serve_static("team-analysis.html")
+            if path in {"/team-analysis.js", "/team-analysis.css"}:
+                return self.serve_static(path.lstrip("/"))
+            if path in {"/api/team-analysis/options", "/api/team-analysis"}:
+                principal = get_current_principal(self)
+                service = get_cpc_service()
+                if path.endswith("/options"):
+                    return self.send_json(200, {"ok": True, **analysis_options(sys.modules[__name__], service, principal)})
+                params = urllib.parse.parse_qs(parsed.query)
+                try:
+                    result = build_analysis(sys.modules[__name__], service, principal,
+                        params.get("member", []), params.get("platform", ["codeforces"])[0],
+                        params.get("target", ["1900"])[0], params.get("contest", [None])[0],
+                        params.get("budget", ["300"])[0])
+                except ValueError as exc:
+                    return self.send_error_json(400, str(exc))
+                return self.send_json(200, {"ok": True, **result})
             if path in {"/luogu-sync.user.js", "/qoj-sync.user.js"}:
                 base = PUBLIC_BASE_URL.rstrip("/") or ("http://" + self.headers.get("Host", "localhost:8000"))
                 parsed_base = urllib.parse.urlparse(base)

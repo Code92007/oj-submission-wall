@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "经题解核对的区域赛标签。以规范题目 ID 为键，每项包含 tags 和可追溯 source；不依据题名猜测。也会使用已保存的 Codeforces 题目 tags。",
+  "problems": {}
+}

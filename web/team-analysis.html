@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>组队分析 · OJ 训练墙</title>
+  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/team-analysis.css?v=1">
+  <script src="/team-analysis.js?v=1" defer></script>
+</head>
+<body>
+  <header class="topbar"><div><h1>组队分析</h1><p>找到三个人的交集，也看见队伍的空缺。</p></div><nav class="top-actions"><a class="button ghost" href="/regionals">区域赛进度</a><a class="button ghost" href="/">返回训练墙</a></nav></header>
+  <main class="ta-main">
+    <section class="panel ta-picker" aria-labelledby="pickerTitle">
+      <div class="ta-heading"><div><p class="ta-eyebrow">TEAM LAB · 区域赛备战</p><h2 id="pickerTitle">三个人，一张能力地图</h2><p class="ta-muted">用个人训练估计团队覆盖。至少两人有积累，或一人有足够深的专长。</p></div><span class="ta-badge">CF 风格经验评级</span></div>
+      <form id="analysisForm">
+        <label class="ta-search">筛选成员<input id="memberSearch" type="search" placeholder="昵称 / 分组" autocomplete="off"></label>
+        <div class="ta-selectors"><label><span><i class="ta-dot player-0"></i>队员一</span><select id="member0" required aria-label="队员一"></select></label><label><span><i class="ta-dot player-1"></i>队员二</span><select id="member1" required aria-label="队员二"></select></label><label><span><i class="ta-dot player-2"></i>队员三</span><select id="member2" required aria-label="队员三"></select></label><label>训练来源<select id="platform"><option value="codeforces">Codeforces</option><option value="all">全部可比数据</option></select></label><label>目标题目评级<input id="target" type="number" min="800" max="3500" step="100" value="1900" required></label><button id="analyze" class="button primary" type="submit">分析队伍</button></div>
+      </form>
+      <p class="ta-muted ta-small">全部可比数据包含有 CF 官方评级或 CF Bot 区域赛经验评级的个人提交。不同 OJ 的难度刻度不直接相加。</p>
+    </section>
+    <p id="analysisStatus" class="ta-status" role="status" aria-live="polite">正在加载成员…</p>
+    <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">CONTEST SIMULATOR</p><h2>用历史题目，推演这支队伍</h2><p class="ta-muted">预测逐题通过倾向与首过时间区间；排除所选比赛的练习记录。</p></div></div><div class="ta-forecast-controls"><label>区域赛<select id="forecastContest" aria-label="选择推演比赛"></select></label><label>比赛限时（分钟）<input id="forecastBudget" type="number" min="30" max="600" step="30" value="300"></label></div><p class="ta-muted ta-small">选好比赛后点击上方“分析队伍”，同时生成雷达、推演和历史回测。</p></section>
+    <div id="analysisResult" hidden>
+      <section id="summary" class="ta-summary" aria-label="队伍概览"></section>
+      <div class="ta-chart-layout">
+        <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">COVERAGE MAP</p><h2>团队 tag 雷达</h2></div><div class="ta-compact ta-mode-control"><span id="radarModeCaption">维度</span><input id="radarMode" type="hidden" value="families"><details id="radarModePicker" class="ta-mode-picker"><summary aria-labelledby="radarModeCaption radarModeLabel"><span id="radarModeLabel">综合 12 维</span></summary><div class="ta-mode-choices" role="group" aria-label="选择雷达维度"><button type="button" data-radar-mode="families" aria-pressed="true">综合 12 维</button><button type="button" data-radar-mode="tags" aria-pressed="false">原始 tags</button></div></details></div></div><div id="radarTags" class="ta-tag-picker" hidden></div><div id="radarLegend" class="ta-legend"></div><div id="radar"></div><p class="ta-muted ta-small">中心为 0，刻度统一到 3500。虚线为目标题目评级；空心点表示证据不足，不能当作零能力。综合维度按题去重。</p></section>
+        <section class="panel"><p class="ta-eyebrow">NEXT PRACTICE</p><h2>下一步练什么</h2><div id="recommendations"></div></section>
+      </div>
+      <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">TRAINING EVIDENCE</p><h2>每个 tag 的训练证据</h2></div><label class="ta-compact">筛选 tag<input id="tagSearch" type="search" placeholder="例如 dp / geometry"></label></div><p class="ta-muted ta-small">展开成员数据查看过题分布、WA、首过前错误和最近练习。无可比评级的题仍保留在练习量中。</p><div id="tagTable" class="ta-table-wrap" tabindex="0" role="region" aria-label="tag 训练明细，可横向滚动"></div></section>
+      <section class="panel"><div class="ta-heading"><div><p class="ta-eyebrow">RETRY PATTERNS</p><h2>平均尝试次数</h2></div><span class="ta-muted ta-small">只计算已通过题 · 首次 AC 为止</span></div><p class="ta-muted">结合题目难度看调试成本；高尝试次数也可能来自主动挑战。仅展示至少 3 道已通过题的 tag。</p><div id="retryBars"></div></section>
+      <section class="panel"><p class="ta-eyebrow">PRE-CONTEST ESTIMATE</p><h2 id="forecastTitle">逐题赛前推演</h2><div id="forecast"></div></section>
+      <section class="panel"><p class="ta-eyebrow">HISTORICAL CHECK</p><h2>历史区域赛回测</h2><p id="backtestStatus" class="ta-muted"></p><div id="backtest"></div></section>
+      <section class="panel"><details><summary class="ta-method-title">评分方法与数据覆盖</summary><div class="ta-method"><p>个人评级取已过题难度的加权 70% 分位数，扣除错误成本（最多 120 分）、记忆衰减（最多 100 分）和小样本不确定性（最多 200 分）。多标签题分摊证据权重；重复 AC 不增加题数，重复练习只更新熟悉程度。</p><p>近期权重 = (0.8 + 0.2 × exp(−距上次 AC 天数 / 365)) / 标签数。置信度 = 1 − exp(−有效题数 / 8)。至少 5 道评级 AC 且有效题数至少 3，才有可靠个人估计。</p><p>将可靠队员从强到弱记作 A、B、C。双人覆盖评级 = B + 0.15 × min(400, A − B)；第三人也有可靠估计时，加上 0.1 × max(0, 400 − (B − C))，最多奖励 40 分作为备份深度。A 至少有 8 道评级 AC 且置信度 ≥ 65% 时，专长评级 = A − 250。团队取两条通路的较高值；两人达到目标标为双人覆盖，专长通路达到目标则提示需要备份。三人不会简单求和，第三人的积累提供有限的备份奖励，也可能改变队内前两位的排序。</p><p>错误成本使用首过前错误和难度不超过个人分位数 + 200 的未过题；CE、系统错误和待判不扣分。记忆衰减以距上次 AC 的指数函数计算，旧经验仍保留大部分权重。</p><div id="coverage"></div><div id="modelNotes"></div></div></details></section>
+    </div>
+  </main>
+</body>
+</html>
