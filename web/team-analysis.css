@@ -23,8 +23,12 @@
 .ta-mode-choices button:hover, .ta-mode-choices button:focus-visible { background: #eff5f1; }
 .ta-mode-choices button[aria-pressed="true"] { background: #e0eee5; color: #26734f; font-weight: 600; }
 .ta-mode-picker summary:focus-visible { outline: 2px solid #28775c; outline-offset: 3px; }
-.ta-selectors { display: grid; grid-template-columns: repeat(3,minmax(120px,1fr)) minmax(140px,.85fr) 120px auto; gap: 14px; align-items: end; }
+.ta-selectors { display: grid; grid-template-columns: repeat(3,minmax(120px,1fr)) minmax(140px,.85fr) auto; gap: 14px; align-items: end; }
 .ta-selectors .button { min-height: 42px; white-space: nowrap; }
+.ta-target-setting { margin-top: 18px; }
+.ta-target-setting summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.ta-target-setting label { max-width: 200px; margin-top: 14px; }
+#teamAccounts[hidden] { display: none; }
 .ta-forecast-controls { display: grid; grid-template-columns: minmax(150px,400px) 160px; gap: 16px; }
 .ta-dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; margin-right: 4px; }
 .player-0 { background: #4b79d1; }.player-1 { background: #bb8c41; }.player-2 { background: #9a73bd; }

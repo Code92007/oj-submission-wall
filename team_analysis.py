@@ -13,7 +13,7 @@ from pathlib import Path
 
 from cpc_integration import problem_key
 
-MODEL_VERSION = "team-tags-v1"
+MODEL_VERSION = "team-tags-v1.1"
 FAMILIES = {
     "implementation": ("实现 / 模拟", {"implementation", "brute force"}),
     "greedy": ("贪心", {"greedy", "sortings", "two pointers"}),
@@ -78,11 +78,45 @@ def metadata(service, release, rows, app):
     return result
 
 
-def personal_handles(conn):
+def handle_sources(platform, handle):
+    # Nowcoder supports a normalized personal+team profile ID binding.
+    return [s.strip() for s in str(handle).split("+") if s.strip()] if platform == "nowcoder" else [handle]
+
+
+def account_groups(conn):
     rows = conn.execute("""SELECT h.*, k.kind FROM handles h LEFT JOIN cpc_handle_kinds k ON k.handle_id=h.id
         WHERE h.active=1""").fetchall()
-    return {(str(r["owner_type"])+":"+str(r["owner_id"]), r["platform"], r["handle"]) for r in rows
-            if r["kind"] != "team" and not str(r["handle"]).lower().startswith("ucup-team")}
+    groups = {}
+    for r in rows:
+        owner = f"{r['owner_type']}:{r['owner_id']}"
+        for source in handle_sources(r["platform"], r["handle"]):
+            key = (r["platform"], source.casefold())
+            group = groups.setdefault(key, {"platform": r["platform"], "handle": source,
+                "owners": set(), "bindings": set(), "team": False, "shared": False})
+            group["owners"].add(owner)
+            group["bindings"].add((owner, r["platform"], source))
+            group["team"] |= r["kind"] == "team" or source.lower().startswith("ucup-team")
+    for group in groups.values():
+        group["shared"] = len(group["owners"]) > 1
+        # Shared Nowcoder profiles are team evidence, never several independent players.
+        group["team"] |= group["platform"] == "nowcoder" and group["shared"]
+    return groups
+
+
+def personal_handles(conn, groups=None):
+    groups = account_groups(conn) if groups is None else groups
+    return {b for g in groups.values() if not g["team"] for b in g["bindings"]}
+
+
+def submission_source(row, raw):
+    if row["platform"] != "nowcoder":
+        return row["handle"]
+    source = raw.get("nowcoderSourceId")
+    if type(source) in {str, int} and str(source).strip():
+        return str(source).strip()
+    sources = handle_sources(row["platform"], row["handle"])
+    # Legacy combined bindings without a source cannot be attributed to one player.
+    return sources[0] if len(sources) == 1 else None
 
 
 def analysis_options(app, service, principal):
@@ -98,28 +132,32 @@ def analysis_options(app, service, principal):
             "families": [{"key": k, "label": label} for k, (label, _) in FAMILIES.items()]}
 
 
-def problem_records(app, service, rows, handles, meta, platform, cutoff, excluded_contest=None):
+def problem_records(app, service, rows, handles, meta, platform, cutoff, excluded_contest=None, team_evidence=False):
     problems = {}
     coverage = {"submissions": 0, "problems": 0, "rated": 0, "tagged": 0, "usable": 0, "unrated": 0,
                 "untagged": 0, "firstSubmission": None, "lastSubmission": None}
     seen_submissions = set()
     for r in rows:
         owner = f"{r['owner_type']}:{r['owner_id']}"
-        if (owner, r["platform"], r["handle"]) not in handles or (platform != "all" and r["platform"] != platform):
+        raw = app.raw_json_dict(r)
+        source = submission_source(r, raw)
+        if (owner, r["platform"], source) not in handles or (platform != "all" and r["platform"] != platform):
             continue
         if r["submitted_at"] >= cutoff or not r["problem_id"]:
             continue
-        raw = app.raw_json_dict(r)
         author = raw.get("author") if isinstance(raw.get("author"), dict) else {}
         # CF team submissions can appear in a personal handle's user.status.
-        if len(author.get("members") or []) > 1 or raw.get("syntheticFromCalendar"):
+        if (not team_evidence and len(author.get("members") or []) > 1) or raw.get("syntheticFromCalendar"):
             continue
         key = problem_key(r["platform"], r["problem_id"])
         pid = service.aliases.get(key, key)
         m = meta.get(pid, {"rating": None, "tags": [], "contest": None})
         if excluded_contest and m.get("contest") == excluded_contest:
             continue
-        submission_key = (r["platform"], r["remote_id"])
+        remote_id = str(r["remote_id"])
+        if r["platform"] == "nowcoder" and remote_id.startswith(source + "-"):
+            remote_id = remote_id[len(source)+1:]
+        submission_key = (r["platform"], source if r["platform"] == "nowcoder" else "", remote_id)
         if submission_key in seen_submissions:
             continue
         seen_submissions.add(submission_key)
@@ -151,6 +189,22 @@ def problem_records(app, service, rows, handles, meta, platform, cutoff, exclude
         coverage["unrated"] += int(p["rating"] is None)
         coverage["untagged"] += int(not p["tags"])
     return list(problems.values()), coverage
+
+
+def team_account_evidence(app, service, groups, rows, keys, owners, meta, now, platform):
+    accounts = []
+    selected = set(keys)
+    for _, group in sorted(groups.items()):
+        if not group["team"] or not group["owners"] & selected:
+            continue
+        bindings = {b for b in group["bindings"] if b[0] in selected}
+        records, coverage = problem_records(app, service, rows, bindings, meta, "all", now+1, team_evidence=True)
+        accounts.append({"platform": group["platform"], "handle": group["handle"],
+            "members": [owners[k]["displayName"] for k in keys if k in group["owners"]],
+            "shared": group["shared"], "inSelectedSource": platform == "all" or platform == group["platform"],
+            "coverage": coverage, "solved": sum(p["solved"] for p in records),
+            "wa": sum(p["wa"] for p in records)})
+    return accounts
 
 
 def quantile(values, q):
@@ -551,8 +605,10 @@ def build_analysis(app, service, principal, keys, platform="codeforces", target=
         owners = app.visible_battle_owners(conn, principal)
         if any(k not in owners for k in keys):
             raise ValueError("找不到所选成员")
-        handles = personal_handles(conn)
-        selected_accounts = [(k, p, h.casefold()) for k, p, h in handles if k in keys]
+        groups = account_groups(conn)
+        handles = personal_handles(conn, groups)
+        selected_accounts = [(k, p, h.casefold()) for k, p, h in handles
+                             if k in keys and (platform == "all" or platform == p)]
         seen_accounts = {}
         for key, p, h in selected_accounts:
             if (p, h) in seen_accounts and seen_accounts[p, h] != key:
@@ -583,9 +639,11 @@ def build_analysis(app, service, principal, keys, platform="codeforces", target=
     forecast_profiles = [profile(r, now, target) for r in forecast_records]
     return {"modelVersion": MODEL_VERSION, "generatedAt": app.iso_from_ts(now), "target": target, "platform": platform,
         "members": members, **team_profiles(profiles, target),
+        "teamAccounts": team_account_evidence(app, service, groups, rows, keys, owners, meta, now, platform),
         "forecast": forecast_contest(app, service, contest_id, forecast_profiles, forecast_records, meta, target, budget, release),
         "backtest": backtest(app, service, principal, keys, platform, target, meta, release, by_owner, handles, remote, checked, now),
         "ratingRelease": {"method": release.get("method"), "revision": release.get("source_revision"), "problems": len(release["problems"])},
         "notes": ["评级为 CF 风格训练估计，不是官方 Rating；平台缺少兼容评级或 tags 的题不会补造数值。",
                   "只统计活跃个人绑定账号；已标记的团队账号及 CF 多人提交不计为个人训练。",
-                  "无样本表示证据不足。请选择目标题目评级查看覆盖与补强建议。"]}
+                  "多人共享的牛客 profile 按队伍账号单列；合并相同提交和题目，只计一份，不重复归到个人或形成双人覆盖。",
+                  "无样本表示证据不足。训练目标参考线只影响覆盖与补强建议，不影响战力、概率或时间。"]}

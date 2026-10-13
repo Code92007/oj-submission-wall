@@ -163,6 +163,89 @@ class TeamAnalysisTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'相同'):
             self.analysis()
 
+    def bind(self, owner, platform, handle, kind=None, active=1):
+        with app.connect_db() as conn:
+            row = conn.execute("INSERT INTO handles(owner_type,owner_id,platform,handle,active,created_at) VALUES('user',?,?,?,?,?)",
+                (str(owner), platform, handle, active, self.now))
+            if kind:
+                conn.execute('INSERT INTO cpc_handle_kinds VALUES(?,?)',(row.lastrowid,kind))
+
+    def test_shared_nowcoder_team_is_counted_once_and_never_becomes_personal_power(self):
+        before = self.analysis(platform='all')
+        self.service.aliases['nowcoder:900'] = self.cid+':A'
+        for i in range(1,4):
+            self.bind(i,'nowcoder','778088490')
+            self.add(i, '778088490-60001' if i==2 else '60001', '900', self.cutoff-100,
+                verdict='WA', platform='nowcoder', handle='778088490', raw_extra={'nowcoderSourceId':'778088490'})
+            self.add(i, '60002', '900', self.cutoff-50,
+                platform='nowcoder', handle='778088490', raw_extra={'nowcoderSourceId':'778088490'})
+        # Both CF-only and all comparable sources accept the shared team binding.
+        cf = self.analysis()
+        data = self.analysis(platform='all')
+        self.assertEqual(before['members'], data['members'])
+        self.assertEqual(before['overall'], data['overall'])
+        self.assertEqual(before['backtest'], data['backtest'])
+        self.assertEqual(before['forecast'], data['forecast'])
+        self.assertEqual(len(data['teamAccounts']), 1)
+        team = data['teamAccounts'][0]
+        self.assertEqual(team['members'], ['成员1','成员2','成员3'])
+        self.assertEqual(team['coverage']['submissions'], 2)
+        self.assertEqual(team['coverage']['problems'], 1)
+        self.assertEqual(team['solved'], 1)
+        self.assertEqual(team['wa'], 1)
+        self.assertTrue(team['inSelectedSource'])
+        self.assertFalse(cf['teamAccounts'][0]['inSelectedSource'])
+
+    def test_nowcoder_combined_bindings_keep_personal_sources_and_merge_team_sources(self):
+        self.service.aliases.update({'nowcoder:900':self.cid+':A','nowcoder:901':self.cid+':B'})
+        self.bind(1,'nowcoder','111111+778088490')
+        self.bind(2,'nowcoder','222222+778088490')
+        for i, handle in ((1,'111111+778088490'),(2,'222222+778088490')):
+            self.add(i,'778088490-70001','900',self.now-50,platform='nowcoder',handle=handle,
+                raw_extra={'nowcoderSourceId':'778088490'})
+        self.add(1,'70002','901',self.now-40,platform='nowcoder',handle='111111+778088490',
+            raw_extra={'nowcoderSourceId':'111111'})
+        self.add(1,'unknown-source','900',self.now-30,platform='nowcoder',handle='111111+778088490')
+        data = self.analysis(platform='all')
+        self.assertEqual(data['members'][0]['overall']['solved'], 13)
+        self.assertEqual(data['members'][1]['overall']['solved'], 12)
+        self.assertEqual(data['teamAccounts'][0]['coverage']['submissions'], 1)
+        self.assertEqual(data['teamAccounts'][0]['solved'], 1)
+
+    def test_marked_team_and_inactive_bindings_are_classified_consistently(self):
+        self.bind(1,'nowcoder','778088490',kind='team')
+        self.bind(2,'nowcoder','778088490')
+        self.bind(1,'nowcoder','111111')
+        self.bind(2,'nowcoder','111111',active=0)
+        self.add(1,'personal-only','900',self.now-20,platform='nowcoder',handle='111111')
+        data = self.analysis(platform='all')
+        self.assertEqual(len(data['teamAccounts']), 1)
+        self.assertEqual(data['members'][0]['overall']['solved'], 13)
+        self.assertEqual(data['members'][1]['overall']['solved'], 12)
+
+    def test_explicit_cf_team_evidence_stays_separate_from_personal_training(self):
+        self.bind(1,'codeforces','cf-team',kind='team')
+        self.add(1,'cf-team-ac','900A',self.now-20,handle='cf-team',
+            raw_extra={'author':{'members':[{'handle':'a'},{'handle':'b'}]}})
+        data = self.analysis()
+        self.assertEqual(data['members'][0]['overall']['solved'], 12)
+        self.assertEqual(data['teamAccounts'][0]['solved'], 1)
+
+    def test_duplicate_validation_only_checks_selected_platform(self):
+        self.bind(1,'atcoder','same-person')
+        self.bind(2,'atcoder','same-person')
+        self.assertEqual(self.analysis()['overall']['reliableMembers'], 3)
+        with self.assertRaisesRegex(ValueError,'相同'):
+            self.analysis(platform='all')
+
+    def test_training_target_only_changes_coverage_not_predictions(self):
+        low, high = self.analysis(target=1500), self.analysis(target=3000)
+        self.assertEqual(low['members'], high['members'])
+        self.assertEqual(low['overall']['rating'], high['overall']['rating'])
+        self.assertEqual(low['forecast'], high['forecast'])
+        self.assertEqual(low['backtest'], high['backtest'])
+        self.assertNotEqual(low['overall']['status'], high['overall']['status'])
+
     def test_invalid_inputs(self):
         for kwargs in [{'platform':'atcoder'},{'target':'nan'},{'target':9000},{'budget':0},{'budget':'nan'},{'contest_id':'unknown'}]:
             with self.assertRaises(ValueError): self.analysis(**kwargs)

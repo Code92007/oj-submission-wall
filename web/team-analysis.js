@@ -28,6 +28,7 @@ async function analyzeTa(event) {
   if (keys.some(k=>!k) || new Set(keys).size!==3) { setStatusTa("请选择三位不同成员。",true); return; }
   const id=++requestTa;
   if(!$ta("forecastBudget").checkValidity()){setStatusTa("预测限时应为 30–600 分钟。",true);return;}
+  if(!$ta("target").value)$ta("target").value="1900";
   const params=new URLSearchParams({platform:$ta("platform").value,target:$ta("target").value,contest:$ta("forecastContest").value,budget:$ta("forecastBudget").value});
   keys.forEach(k=>params.append("member",k));
   $ta("analyze").disabled=true; $ta("analysisResult").hidden=true;
@@ -44,7 +45,7 @@ async function analyzeTa(event) {
 function chipTa(row) { return `<span class="ta-chip ${escapeTa(row.status)}">${escapeTa(row.coverageLabel)}</span>`; }
 function renderTa() {
   const d=dataTa, usable=d.members.reduce((s,m)=>s+m.coverage.usable,0);
-  $ta("summary").innerHTML=`<article class="ta-stat"><span class="ta-name">团队综合估计</span><strong>${numberTa(d.overall.rating)}</strong><p>目标 ${d.target} · ${d.families.filter(t=>t.status==="covered").length}/12 维双人覆盖</p><p>${usable} 道有评级且有标签的个人练习</p></article>`+d.members.map((m,i)=>`<article class="ta-stat"><span class="ta-name"><i class="ta-dot player-${i}"></i>${escapeTa(m.displayName)}</span><strong>${numberTa(m.overall.rating)}</strong><p>${m.overall.solved} 题 AC · ${m.coverage.usable}/${m.coverage.problems} 题支持 tag 分析</p><p>${m.overall.wa} 次首过前 WA · ${m.overall.reliable?"样本可用":"样本偏少"}</p></article>`).join("");
+  $ta("summary").innerHTML=`<article class="ta-stat"><span class="ta-name">团队综合估计</span><strong>${numberTa(d.overall.rating)}</strong><p>参考线 ${d.target} · ${d.families.filter(t=>t.status==="covered").length}/12 维双人覆盖</p><p>${usable} 道有评级且有标签的个人练习</p></article>`+d.members.map((m,i)=>`<article class="ta-stat"><span class="ta-name"><i class="ta-dot player-${i}"></i>${escapeTa(m.displayName)}</span><strong>${numberTa(m.overall.rating)}</strong><p>${m.overall.solved} 题 AC · ${m.coverage.usable}/${m.coverage.problems} 题支持 tag 分析</p><p>${m.overall.wa} 次首过前 WA · ${m.overall.reliable?"样本可用":"样本偏少"}</p></article>`).join("");
   $ta("radarLegend").replaceChildren();
   [...d.members.map(m=>m.displayName),"团队"].forEach((name,i)=>{
     const label=document.createElement("label"), box=document.createElement("input"), dot=document.createElement("i");
@@ -57,9 +58,13 @@ function renderTa() {
     box.addEventListener("change",()=>{if(box.checked && radarSelected.size>=12){box.checked=false;setStatusTa("原始 tag 雷达最多选择 12 个维度。",true);return;}box.checked?radarSelected.add(t.key):radarSelected.delete(t.key);renderRadarTa();});
     label.append(box,document.createTextNode(t.label));$ta("radarTags").append(label);
   });
-  renderRadarTa();renderRecommendationsTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
+  renderTeamAccountsTa();renderRadarTa();renderRecommendationsTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
   $ta("coverage").innerHTML=`<h3>本次数据覆盖</h3><ul>${d.members.map(m=>`<li>${escapeTa(m.displayName)}：${m.coverage.problems} 道个人练习，${m.coverage.unrated} 道缺兼容评级、${m.coverage.untagged} 道缺标签（两者可重叠）。可见提交从 ${dateTa(m.coverage.firstSubmission)} 至 ${dateTa(m.coverage.lastSubmission)}，只代表已同步范围。</li>`).join("")}</ul><p>区域赛评级快照：${escapeTa(d.ratingRelease.method)} · ${d.ratingRelease.problems} 题 · ${escapeTa(d.ratingRelease.revision)}。标签缺失时不猜测题型。</p>`;
   $ta("modelNotes").innerHTML=`<ul>${d.notes.map(s=>`<li>${escapeTa(s)}</li>`).join("")}</ul>`;
+}
+function renderTeamAccountsTa() {
+  const accounts=dataTa.teamAccounts||[], section=$ta("teamAccounts");section.hidden=!accounts.length;
+  section.innerHTML=accounts.length?`<p class="ta-eyebrow">TEAM ACCOUNT EVIDENCE</p><h2>队伍账号 · 去重记录</h2><p class="ta-muted ta-small">共享牛客号和已标记的队伍号单独列示。相同提交与题目合并后只计一份，不重复归到个人，也不据此判断双人覆盖。战力与预测使用上方三位成员的个人训练。</p><div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>队伍账号</th><th>当前选中绑定成员</th><th>去重提交 / 练习 / AC</th><th>首过前 WA</th><th>当前来源</th></tr></thead><tbody>${accounts.map(a=>`<tr><td>${escapeTa(a.platform==="nowcoder"?"牛客":a.platform)} · ${escapeTa(a.handle)}<small>${a.shared?"共享账号":"已标记团队账号"}</small></td><td>${a.members.map(escapeTa).join(" / ")}</td><td>${a.coverage.submissions} / ${a.coverage.problems} / ${a.solved}</td><td>${a.wa}</td><td>${a.inSelectedSource?"队伍证据单列":"不在当前训练来源内"}</td></tr>`).join("")}</tbody></table></div>`:"";
 }
 function svgTa(tag, attributes={}, text="") { const node=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attributes).forEach(([k,v])=>node.setAttribute(k,v));if(text)node.textContent=text;return node; }
 function renderRadarTa() {
