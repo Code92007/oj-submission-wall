@@ -14,6 +14,8 @@
 .ta-main select { text-overflow: ellipsis; font-size: 16px; line-height: 1.6; min-height: 46px; }
 .ta-main select option { font-size: 16px; line-height: 1.8; }
 .ta-mode-control { display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: 12px; }
+.ta-radar-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; max-width: 100%; }
+.ta-radar-controls .ta-compact { max-width: 100%; }
 .ta-mode-picker { position: relative; color: var(--ink); font-size: 16px; }
 .ta-mode-picker summary { display: flex; align-items: center; justify-content: space-between; min-height: 46px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: #fff; cursor: pointer; list-style: none; }
 .ta-mode-picker summary::-webkit-details-marker { display: none; }

@@ -48,7 +48,7 @@ async function analyzeTa(event) {
 function chipTa(row) { return `<span class="ta-chip ${escapeTa(row.status)}">${escapeTa(row.coverageLabel)}</span>`; }
 function memberSummaryTa(member,i) {
   const m=member.overall, trend=m.momentum;
-  return `<article class="ta-stat"><span class="ta-name"><i class="ta-dot player-${i}"></i>${escapeTa(member.displayName)}</span><strong>${numberTa(m.rating)}</strong><p>综合能力估计 · ${m.ratingSource==="cf-training-hybrid"?"官方历史 + 近期训练":m.ratingSource==="recent-training"?"近期训练代理":"训练代理"}</p>${m.officialRating!=null?`<p>官方最新 ${m.officialRating} · 历史峰值 ${m.peakRating}</p>`:""}${trend?.recent20Count?`<p>Recent 20 AC 均值 ${trend.recent20Mean} · ${trend.recent20Count} 题</p><p>近半年移动均值 ${numberTa(trend.monthsWeightedMean)}</p>`:""}<p>${m.solved} 题 AC · ${member.coverage.usable}/${member.coverage.problems} 题支持标签分析</p><p>${m.wa} 次首过前 WA · ${m.reliable?"样本可用":"样本偏少"}</p></article>`;
+  return `<article class="ta-stat"><span class="ta-name"><i class="ta-dot player-${i}"></i>${escapeTa(member.displayName)}</span><strong>${numberTa(m.rating)}</strong><p>综合能力估计 · ${m.ratingSource==="cf-training-hybrid"?"官方历史 + 近期训练":m.ratingSource==="multi-source-training"?"含洛谷的近期训练代理":m.ratingSource==="recent-training"?"近期训练代理":"训练代理"}</p>${m.officialRating!=null?`<p>官方最新 ${m.officialRating} · 历史峰值 ${m.peakRating}</p>`:""}${trend?.recent20Count?`<p>CF Recent 20 AC 均值 ${trend.recent20Mean} · ${trend.recent20Count} 题</p><p>近半年移动均值 ${numberTa(trend.monthsWeightedMean)}</p>`:""}${m.luoguMomentum?.recent20Count?`<p>洛谷近 20 AC 换算均值 ${numberTa(m.luoguMomentum.recent20Mean)} · ${m.luoguMomentum.recent20Count} 题<small>近半年移动均值 ${numberTa(m.luoguMomentum.monthsWeightedMean)} · 近似换算，半权重</small></p>`:""}<p>${m.solved} 题 AC · ${member.coverage.usable}/${member.coverage.problems} 题支持标签分析</p><p>${m.wa} 次首过前 WA · ${m.reliable?"样本可用":"样本偏少"}</p></article>`;
 }
 function renderTa() {
   const d=dataTa, usable=d.members.reduce((s,m)=>s+m.coverage.usable,0);
@@ -73,7 +73,7 @@ function renderTa() {
   });
   $ta("radarCategorySources").innerHTML=`<ul>${(d.categories||[]).map(t=>`<li><strong>${escapeTa(t.label)}</strong>：${(t.sourceLabels||t.sourceTags).map(escapeTa).join("、")}${t.sourceNote?`。${escapeTa(t.sourceNote)}`:""}</li>`).join("")}</ul>`;
   renderTeamAccountsTa();renderOnsiteReferenceTa();renderRadarTa();renderTableTa();renderRetriesTa();renderForecastTa();renderBacktestTa();
-  $ta("coverage").innerHTML=`<h3>本次数据覆盖</h3><ul>${d.members.map(m=>`<li>${escapeTa(m.displayName)}：${m.coverage.problems} 道个人练习，${m.coverage.unrated} 道缺兼容评级、${m.coverage.untagged} 道缺标签（两者可重叠）。可见提交从 ${dateTa(m.coverage.firstSubmission)} 至 ${dateTa(m.coverage.lastSubmission)}，只代表已同步范围。</li>`).join("")}</ul><p>区域赛评级快照：${escapeTa(d.ratingRelease.method)} · ${d.ratingRelease.problems} 题 · ${escapeTa(d.ratingRelease.revision)}。标签缺失时不猜测题型。</p>`;
+  $ta("coverage").innerHTML=`<h3>本次数据覆盖</h3><ul>${d.members.map(m=>`<li>${escapeTa(m.displayName)}：${m.coverage.problems} 道个人练习，${m.coverage.unrated} 道缺兼容评级、${m.coverage.untagged} 道缺标签（两者可重叠），${m.coverage.approximate||0} 道采用洛谷颜色换算。<br>${Object.entries(m.coverage.byPlatform||{}).map(([p,c])=>`${escapeTa(({codeforces:"CF",luogu:"洛谷",nowcoder:"牛客"})[p]||p)}：练 ${c.problems} / 支持标签 ${c.usable}`).join("；")}。可见提交从 ${dateTa(m.coverage.firstSubmission)} 至 ${dateTa(m.coverage.lastSubmission)}，只代表已同步范围。</li>`).join("")}</ul><p>区域赛评级快照：${escapeTa(d.ratingRelease.method)} · ${d.ratingRelease.problems} 题 · ${escapeTa(d.ratingRelease.revision)}。标签缺失时不猜测题型。分来源题量各自去重、可重叠；个人总题量已跨来源去重。</p>${d.luoguCalibration?`<details><summary>洛谷颜色 → CF 近似区间</summary><p>来源：${escapeTa(d.luoguCalibration.source.file)} · ${escapeTa(d.luoguCalibration.source.sheet)}。下表为样本难度的 10%–90% 分布，不是逐题官方评级或统计置信区间。未知难度不换算，缺标签不猜测。</p><div class="ta-table-wrap"><table class="ta-table"><thead><tr><th>洛谷难度</th><th>换算均值 / 区间</th><th>样本数</th></tr></thead><tbody>${d.luoguCalibration.bands.map(b=>`<tr><td>${escapeTa(b.label)}</td><td>${b.mean} / ${b.range.join("–")}</td><td>${b.samples}</td></tr>`).join("")}</tbody></table></div></details>`:""}`;
   $ta("modelNotes").innerHTML=`<ul>${d.notes.map(s=>`<li>${escapeTa(s)}</li>`).join("")}</ul>`;
 }
 function renderTeamAccountsTa() {
@@ -120,23 +120,30 @@ function renderRadarTa() {
   $ta("radarTags").hidden=mode!=="tags";$ta("radarCategories").hidden=mode!=="categories";$ta("radarCategoryHelp").hidden=mode==="tags";$ta("radarCategoryMap").hidden=mode==="tags";
   const axes=mode==="tags"?dataTa.tags.filter(t=>radarSelected.has(t.key)):mode==="categories"?(dataTa.categories||[]).filter(t=>categorySelected.has(t.key)):dataTa.families;
   const wrap=$ta("radar");wrap.replaceChildren();radarEvidenceTa(axes);renderRecommendationsTa(axes);
+  const full=$ta("radarScale").value==="full",min=full?0:1000,max=full?4000:3000,step=full?500:200;
+  $ta("radarScaleNote").textContent=`${full?"完整刻度":"聚焦刻度"} ${min}–${max}，每 ${step} 分一格，中心为 ${min}。灰色虚线是训练参考线；彩色虚线与空心点表示少样本暂估或单人参考，问号表示暂无可用估计。实心点也只是模型估计。各维度按题去重。`;
+  const clipped=[];
+  [...shownPlayers].forEach(series=>axes.forEach(axis=>{const {value}=radarValueTa(axis,series);if(value!=null && (value<min || value>max))clipped.push(`${series===3?"团队":dataTa.members[series].displayName} · ${axis.label}：${value}（${value<min?"低于下限":"高于上限"}，标在边界）`);}));
+  if(dataTa.target<min || dataTa.target>max)clipped.push(`训练参考线 ${dataTa.target} 在当前刻度之外，切换完整刻度查看。`);
+  $ta("radarScaleStatus").textContent=clipped.join("；");$ta("radarScaleStatus").hidden=!clipped.length;
   if(axes.length<3) {wrap.innerHTML='<p class="ta-empty">请选择至少 3 个维度查看雷达图。</p>';return;}
-  const svg=svgTa("svg",{viewBox:"0 0 600 500",role:"img","aria-label":"团队及个人标签能力雷达图；空心点为暂估，证据说明见图下方"});
-  const cx=300,cy=245,r=165,max=3500;
-  const point=(i,value)=>{const a=-Math.PI/2+i*Math.PI*2/axes.length;return [cx+Math.cos(a)*r*value/max,cy+Math.sin(a)*r*value/max];};
+  const svg=svgTa("svg",{viewBox:"0 0 600 500",role:"img","aria-label":`团队及个人标签能力雷达图，刻度 ${min} 至 ${max}，中心为 ${min}；空心点为暂估，证据说明见图下方`});
+  const cx=300,cy=245,r=165;
+  const point=(i,value,extra=0)=>{const a=-Math.PI/2+i*Math.PI*2/axes.length,radius=r*(Math.max(min,Math.min(max,value))-min)/(max-min)+extra;return [cx+Math.cos(a)*radius,cy+Math.sin(a)*radius];};
   const points=(values)=>values.map((v,i)=>point(i,v).join(",")).join(" ");
-  for(const value of [700,1400,2100,2800,3500]) {svg.append(svgTa("polygon",{points:points(axes.map(()=>value)),class:"ta-radar-grid"}));svg.append(svgTa("text",{x:cx+6,y:cy-r*value/max-3,class:"ta-radar-scale"},String(value)));}
-  axes.forEach((t,i)=>{const [x,y]=point(i,max);svg.append(svgTa("line",{x1:cx,y1:cy,x2:x,y2:y,class:"ta-radar-axis"}));const [lx,ly]=point(i,max+430);const label=svgTa("text",{x:lx,y:ly+4,"text-anchor":Math.abs(lx-cx)<12?"middle":lx>cx?"start":"end",class:"ta-radar-label"},t.label.length>23?t.label.slice(0,21)+"…":t.label);label.append(svgTa("title",{},`${t.label} · 团队 ${numberTa(t.rating)} · ${t.coverageLabel}${t.referenceRating!=null?` · 单人参考 ${t.referenceRating}`:""}`));svg.append(label);});
-  svg.append(svgTa("polygon",{points:points(axes.map(()=>dataTa.target)),class:"ta-radar-target"}));
+  svg.append(svgTa("text",{x:cx+6,y:cy-3,class:"ta-radar-scale"},String(min)));
+  for(let value=min+step;value<=max;value+=step) {svg.append(svgTa("polygon",{points:points(axes.map(()=>value)),class:"ta-radar-grid"}));svg.append(svgTa("text",{x:cx+6,y:cy-r*(value-min)/(max-min)-3,class:"ta-radar-scale"},String(value)));}
+  axes.forEach((t,i)=>{const [x,y]=point(i,max);svg.append(svgTa("line",{x1:cx,y1:cy,x2:x,y2:y,class:"ta-radar-axis"}));const [lx,ly]=point(i,max,22);const label=svgTa("text",{x:lx,y:ly+4,"text-anchor":Math.abs(lx-cx)<12?"middle":lx>cx?"start":"end",class:"ta-radar-label"},t.label.length>23?t.label.slice(0,21)+"…":t.label);label.append(svgTa("title",{},`${t.label} · 团队 ${numberTa(t.rating)} · ${t.coverageLabel}${t.referenceRating!=null?` · 单人参考 ${t.referenceRating}`:""}`));svg.append(label);});
+  if(dataTa.target>=min && dataTa.target<=max)svg.append(svgTa("polygon",{points:points(axes.map(()=>dataTa.target)),class:"ta-radar-target"}));
   [...shownPlayers].sort().forEach(series=>{
     const entries=axes.map(t=>radarValueTa(t,series));
     if(entries.every(p=>p.value!=null && !p.tentative)) svg.append(svgTa("polygon",{points:points(entries.map(p=>Math.min(max,p.value))),fill:colors[series],"fill-opacity":series===3?.1:.025,stroke:colors[series],"stroke-width":series===3?2.5:1.5}));
     else axes.forEach((t,i)=>{const j=(i+1)%axes.length,a=entries[i],b=entries[j];if(a.value!=null && b.value!=null){const [x1,y1]=point(i,Math.min(max,a.value)),[x2,y2]=point(j,Math.min(max,b.value));svg.append(svgTa("line",{x1,y1,x2,y2,stroke:colors[series],"stroke-width":2,...(a.tentative||b.tentative?{"stroke-dasharray":"5 4"}:{})}));}});
     entries.forEach(({value,tentative},i)=>{
       const name=series===3?"团队":dataTa.members[series].displayName;
-      if(value==null){const [x,y]=point(i,max+200);const missing=svgTa("text",{x,y:y+4,"text-anchor":"middle",fill:colors[series],"font-size":13},"?");missing.append(svgTa("title",{},`${axes[i].label} · ${name}：暂无可用估计`));svg.append(missing);return;}
+      if(value==null){const [x,y]=point(i,max,10);const missing=svgTa("text",{x,y:y+4,"text-anchor":"middle",fill:colors[series],"font-size":13},"?");missing.append(svgTa("title",{},`${axes[i].label} · ${name}：暂无可用估计`));svg.append(missing);return;}
       const [x,y]=point(i,Math.min(max,value)),circle=svgTa("circle",{cx:x,cy:y,r:tentative?4:3,fill:tentative?"white":colors[series],stroke:colors[series],"stroke-width":1.5});
-      circle.append(svgTa("title",{},`${axes[i].label} · ${name}：${value}${tentative?series===3?"（单人参考，非稳定团队评级）":"（少样本暂估）":""}`));svg.append(circle);
+      circle.append(svgTa("title",{},`${axes[i].label} · ${name}：${value}${tentative?series===3?"（单人参考，非稳定团队评级）":"（少样本暂估）":""}${value<min||value>max?`（超出 ${min}–${max} 显示范围，标在边界）`:""}`));svg.append(circle);
     });
   });
   wrap.append(svg);
@@ -152,7 +159,7 @@ function renderRecommendationsTa(axes=dataTa.families) {
 }
 function detailTa(m) {
   const dist=Object.entries(m.distribution).sort((a,b)=>Number(a[0])-Number(b[0])), max=Math.max(1,...dist.map(([,v])=>v));
-  return `<details><summary>${numberTa(m.rating)} <span class="ta-muted">· AC ${m.solved} / 练 ${m.practiced}</span></summary><div class="ta-member-detail"><p>评级 AC ${m.ratedSolved} · 有效样本 ${m.effectiveSolved} · 置信度 ${Math.round(m.confidence*100)}%${m.reliable?"":" · 样本偏少"}</p><p>WA ${m.wa} · 首过前错误 ${m.errors}<br>未过 ${m.unresolved} · 平均尝试 ${numberTa(m.averageTries)}</p><p>最近练习 ${dateTa(m.lastPractice)}<br>${m.ratingSource==="training-anchored-tags"?`能力基线 ${m.abilityBaseline} · 相对调整 ${m.relativeAdjustment==null?"证据不足":m.relativeAdjustment>0?"+"+m.relativeAdjustment:m.relativeAdjustment}`:`错误扣分 ${m.errorPenalty} · 衰减扣分 ${m.memoryPenalty}`}</p>${dist.length?`<div class="ta-mini-hist" aria-label="过题评级分布">${dist.map(([bucket,n])=>`<span style="height:${Math.max(4,n/max*100)}%" title="${bucket}–${Number(bucket)+199}：${n} 题"></span>`).join("")}</div><p>${dist.map(([bucket,n])=>`${bucket}–${Number(bucket)+199}: ${n}`).join(" · ")}</p>`:""}</div></details>`;
+  return `<details><summary>${numberTa(m.rating)} <span class="ta-muted">· AC ${m.solved} / 练 ${m.practiced}</span></summary><div class="ta-member-detail"><p>评级 AC ${m.ratedSolved} · 有效样本 ${m.effectiveSolved} · 置信度 ${Math.round(m.confidence*100)}%${m.reliable?"":" · 样本偏少"}</p>${m.approximateSolved?`<p>含洛谷颜色换算 AC ${m.approximateSolved} 题 · 半权重<br>换算不确定度参考 ±${m.calibrationUncertainty} 分</p>`:""}<p>WA ${m.wa} · 首过前错误 ${m.errors}<br>未过 ${m.unresolved} · 平均尝试 ${numberTa(m.averageTries)}</p><p>最近练习 ${dateTa(m.lastPractice)}<br>${m.ratingSource==="training-anchored-tags"?`能力基线 ${m.abilityBaseline} · 相对调整 ${m.relativeAdjustment==null?"证据不足":m.relativeAdjustment>0?"+"+m.relativeAdjustment:m.relativeAdjustment}`:`错误扣分 ${m.errorPenalty} · 衰减扣分 ${m.memoryPenalty}`}</p>${dist.length?`<div class="ta-mini-hist" aria-label="过题评级分布">${dist.map(([bucket,n])=>`<span style="height:${Math.max(4,n/max*100)}%" title="${bucket}–${Number(bucket)+199}：${n} 题"></span>`).join("")}</div><p>${dist.map(([bucket,n])=>`${bucket}–${Number(bucket)+199}: ${n}`).join(" · ")}</p>`:""}</div></details>`;
 }
 function renderTableTa() {
   if(!dataTa)return;
@@ -223,6 +230,7 @@ document.querySelectorAll("[data-radar-mode]").forEach(button=>button.addEventLi
 }));
 $ta("radarModePicker").addEventListener("keydown",event=>{if(event.key==="Escape"){$ta("radarModePicker").open=false;$ta("radarModePicker").querySelector("summary").focus();}});
 document.addEventListener("click",event=>{if(!$ta("radarModePicker").contains(event.target))$ta("radarModePicker").open=false;});
+$ta("radarScale").addEventListener("change",renderRadarTa);
 for(const id of ["tagSearch","tagRatingMin","tagRatingMax"]) $ta(id).addEventListener("input",renderTableTa);
 for(const id of ["tagEvidence","tagSort","tagView"]) $ta(id).addEventListener("change",renderTableTa);
 $ta("tagReset").addEventListener("click",()=>{

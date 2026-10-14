@@ -1,0 +1,2105 @@
+{
+  "source": "https://www.luogu.com.cn/_lfe/tags",
+  "sourceVersion": "zh-CN/2026101401",
+  "tags": {
+    "-2": {
+      "label": "语言入门",
+      "parent": null,
+      "key": "luogu:-2",
+      "categories": [
+        "other"
+      ]
+    },
+    "1": {
+      "label": "模拟",
+      "parent": 110,
+      "key": "implementation",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "2": {
+      "label": "字符串",
+      "parent": null,
+      "key": "strings",
+      "categories": [
+        "strings"
+      ]
+    },
+    "3": {
+      "label": "动态规划 DP",
+      "parent": null,
+      "key": "dp",
+      "categories": [
+        "counting"
+      ]
+    },
+    "4": {
+      "label": "搜索",
+      "parent": null,
+      "key": "luogu:4",
+      "categories": [
+        "search"
+      ]
+    },
+    "5": {
+      "label": "数学",
+      "parent": null,
+      "key": "math",
+      "categories": [
+        "other"
+      ]
+    },
+    "6": {
+      "label": "图论",
+      "parent": null,
+      "key": "graphs",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "7": {
+      "label": "贪心",
+      "parent": 110,
+      "key": "greedy",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "8": {
+      "label": "计算几何",
+      "parent": null,
+      "key": "geometry",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "9": {
+      "label": "暴力数据结构",
+      "parent": 308,
+      "key": "luogu:9",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "10": {
+      "label": "高精度",
+      "parent": 308,
+      "key": "luogu:10",
+      "categories": [
+        "other"
+      ]
+    },
+    "11": {
+      "label": "树形数据结构",
+      "parent": null,
+      "key": "luogu:11",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "12": {
+      "label": "递推",
+      "parent": 110,
+      "key": "luogu:12",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "13": {
+      "label": "博弈论",
+      "parent": null,
+      "key": "games",
+      "categories": [
+        "games"
+      ]
+    },
+    "41": {
+      "label": "莫队",
+      "parent": 308,
+      "key": "luogu:41",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "42": {
+      "label": "线段树",
+      "parent": 11,
+      "key": "segment tree",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "43": {
+      "label": "倍增",
+      "parent": 110,
+      "key": "luogu:43",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "44": {
+      "label": "线性数据结构",
+      "parent": null,
+      "key": "luogu:44",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "45": {
+      "label": "二分",
+      "parent": 110,
+      "key": "binary search",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "47": {
+      "label": "并查集",
+      "parent": 11,
+      "key": "dsu",
+      "categories": [
+        "graphs-trees",
+        "data-structures"
+      ]
+    },
+    "49": {
+      "label": "点分治",
+      "parent": 230,
+      "key": "luogu:49",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "50": {
+      "label": "平衡树",
+      "parent": 11,
+      "key": "luogu:50",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "51": {
+      "label": "堆",
+      "parent": 11,
+      "key": "luogu:51",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "53": {
+      "label": "树状数组",
+      "parent": 11,
+      "key": "fenwick tree",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "54": {
+      "label": "递归",
+      "parent": 110,
+      "key": "luogu:54",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "55": {
+      "label": "树上启发式合并",
+      "parent": 230,
+      "key": "luogu:55",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "56": {
+      "label": "单调队列",
+      "parent": 44,
+      "key": "luogu:56",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "63": {
+      "label": "LGV 引理",
+      "parent": 271,
+      "key": "luogu:63",
+      "categories": [
+        "other"
+      ]
+    },
+    "64": {
+      "label": "矩阵树定理",
+      "parent": 271,
+      "key": "luogu:64",
+      "categories": [
+        "other"
+      ]
+    },
+    "65": {
+      "label": "颜色段均摊（珂朵莉树 ODT）",
+      "parent": 44,
+      "key": "luogu:65",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "66": {
+      "label": "原根",
+      "parent": 72,
+      "key": "luogu:66",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "67": {
+      "label": "三分",
+      "parent": 308,
+      "key": "ternary search",
+      "categories": [
+        "other"
+      ]
+    },
+    "68": {
+      "label": "Kruskal 重构树",
+      "parent": 6,
+      "key": "luogu:68",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "69": {
+      "label": "多项式",
+      "parent": null,
+      "key": "luogu:69",
+      "categories": [
+        "other"
+      ]
+    },
+    "71": {
+      "label": "矩阵运算",
+      "parent": 271,
+      "key": "matrices",
+      "categories": [
+        "other"
+      ]
+    },
+    "72": {
+      "label": "数论",
+      "parent": null,
+      "key": "number theory",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "78": {
+      "label": "离散化",
+      "parent": 308,
+      "key": "luogu:78",
+      "categories": [
+        "other"
+      ]
+    },
+    "79": {
+      "label": "网络流",
+      "parent": 6,
+      "key": "flows",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "100": {
+      "label": "cdq 分治",
+      "parent": 11,
+      "key": "cdq",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "101": {
+      "label": "后缀自动机 SAM",
+      "parent": 2,
+      "key": "string suffix structures",
+      "categories": [
+        "strings"
+      ]
+    },
+    "110": {
+      "label": "基础算法",
+      "parent": null,
+      "key": "luogu:110",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "111": {
+      "label": "枚举",
+      "parent": 110,
+      "key": "brute force",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "112": {
+      "label": "分治",
+      "parent": 110,
+      "key": "divide and conquer",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "113": {
+      "label": "排序",
+      "parent": 110,
+      "key": "sortings",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "122": {
+      "label": "信息论",
+      "parent": 5,
+      "key": "luogu:122",
+      "categories": [
+        "other"
+      ]
+    },
+    "126": {
+      "label": "广度优先搜索 BFS",
+      "parent": 4,
+      "key": "bfs",
+      "categories": [
+        "search",
+        "graphs-trees"
+      ]
+    },
+    "127": {
+      "label": "深度优先搜索 DFS",
+      "parent": 4,
+      "key": "dfs and similar",
+      "categories": [
+        "search",
+        "graphs-trees"
+      ]
+    },
+    "128": {
+      "label": "剪枝",
+      "parent": 4,
+      "key": "luogu:128",
+      "categories": [
+        "search"
+      ]
+    },
+    "129": {
+      "label": "记忆化搜索",
+      "parent": 4,
+      "key": "luogu:129",
+      "categories": [
+        "search"
+      ]
+    },
+    "130": {
+      "label": "启发式搜索",
+      "parent": 4,
+      "key": "luogu:130",
+      "categories": [
+        "search"
+      ]
+    },
+    "131": {
+      "label": "迭代加深搜索",
+      "parent": 4,
+      "key": "luogu:131",
+      "categories": [
+        "search"
+      ]
+    },
+    "132": {
+      "label": "启发式迭代加深搜索 IDA*",
+      "parent": 4,
+      "key": "luogu:132",
+      "categories": [
+        "search"
+      ]
+    },
+    "133": {
+      "label": "Dancing Links",
+      "parent": 4,
+      "key": "luogu:133",
+      "categories": [
+        "search"
+      ]
+    },
+    "134": {
+      "label": "爬山算法 Local search",
+      "parent": 4,
+      "key": "luogu:134",
+      "categories": [
+        "search"
+      ]
+    },
+    "135": {
+      "label": "模拟退火",
+      "parent": 4,
+      "key": "luogu:135",
+      "categories": [
+        "search"
+      ]
+    },
+    "136": {
+      "label": "随机调整",
+      "parent": 4,
+      "key": "luogu:136",
+      "categories": [
+        "search"
+      ]
+    },
+    "137": {
+      "label": "遗传算法",
+      "parent": 4,
+      "key": "luogu:137",
+      "categories": [
+        "search"
+      ]
+    },
+    "139": {
+      "label": "背包 DP",
+      "parent": 3,
+      "key": "luogu:139",
+      "categories": [
+        "counting"
+      ]
+    },
+    "141": {
+      "label": "数位 DP",
+      "parent": 3,
+      "key": "luogu:141",
+      "categories": [
+        "counting"
+      ]
+    },
+    "144": {
+      "label": "区间 DP",
+      "parent": 3,
+      "key": "luogu:144",
+      "categories": [
+        "counting"
+      ]
+    },
+    "146": {
+      "label": "动态规划优化",
+      "parent": null,
+      "key": "luogu:146",
+      "categories": [
+        "counting"
+      ]
+    },
+    "148": {
+      "label": "优先队列",
+      "parent": 146,
+      "key": "luogu:148",
+      "categories": [
+        "counting"
+      ]
+    },
+    "149": {
+      "label": "矩阵加速",
+      "parent": 146,
+      "key": "luogu:149",
+      "categories": [
+        "counting"
+      ]
+    },
+    "150": {
+      "label": "斜率优化",
+      "parent": 146,
+      "key": "luogu:150",
+      "categories": [
+        "counting"
+      ]
+    },
+    "151": {
+      "label": "状态合并",
+      "parent": 146,
+      "key": "luogu:151",
+      "categories": [
+        "counting"
+      ]
+    },
+    "152": {
+      "label": "树形 DP",
+      "parent": 3,
+      "key": "luogu:152",
+      "categories": [
+        "counting"
+      ]
+    },
+    "153": {
+      "label": "凸完全单调性（wqs 二分）",
+      "parent": 146,
+      "key": "luogu:153",
+      "categories": [
+        "counting"
+      ]
+    },
+    "154": {
+      "label": "四边形不等式",
+      "parent": 146,
+      "key": "luogu:154",
+      "categories": [
+        "counting"
+      ]
+    },
+    "155": {
+      "label": "图论建模",
+      "parent": 6,
+      "key": "luogu:155",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "158": {
+      "label": "图遍历",
+      "parent": 6,
+      "key": "luogu:158",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "159": {
+      "label": "拓扑排序",
+      "parent": 6,
+      "key": "luogu:159",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "160": {
+      "label": "最短路",
+      "parent": 6,
+      "key": "shortest paths",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "166": {
+      "label": "生成树",
+      "parent": 6,
+      "key": "luogu:166",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "172": {
+      "label": "平面图",
+      "parent": 6,
+      "key": "luogu:172",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "173": {
+      "label": "最小环",
+      "parent": 6,
+      "key": "luogu:173",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "174": {
+      "label": "负权环",
+      "parent": 6,
+      "key": "luogu:174",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "175": {
+      "label": "连通块",
+      "parent": 6,
+      "key": "luogu:175",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "176": {
+      "label": "2-SAT",
+      "parent": 6,
+      "key": "2-sat",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "177": {
+      "label": "平面图欧拉公式",
+      "parent": 6,
+      "key": "luogu:177",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "179": {
+      "label": "强连通分量",
+      "parent": 6,
+      "key": "luogu:179",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "180": {
+      "label": "Tarjan",
+      "parent": 6,
+      "key": "luogu:180",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "181": {
+      "label": "双连通分量",
+      "parent": 6,
+      "key": "luogu:181",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "182": {
+      "label": "欧拉回路",
+      "parent": 6,
+      "key": "luogu:182",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "185": {
+      "label": "差分约束",
+      "parent": 6,
+      "key": "luogu:185",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "186": {
+      "label": "仙人掌",
+      "parent": 6,
+      "key": "luogu:186",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "187": {
+      "label": "二分图",
+      "parent": 6,
+      "key": "graph matchings",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "189": {
+      "label": "一般图的最大匹配",
+      "parent": 6,
+      "key": "graph matchings",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "197": {
+      "label": "上下界网络流",
+      "parent": 6,
+      "key": "flows",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "198": {
+      "label": "最小割",
+      "parent": 6,
+      "key": "flows",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "202": {
+      "label": "分数规划",
+      "parent": 467,
+      "key": "luogu:202",
+      "categories": [
+        "other"
+      ]
+    },
+    "204": {
+      "label": "费用流",
+      "parent": 6,
+      "key": "flows",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "208": {
+      "label": "树的遍历",
+      "parent": 230,
+      "key": "luogu:208",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "211": {
+      "label": "最近公共祖先 LCA",
+      "parent": 230,
+      "key": "luogu:211",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "213": {
+      "label": "树的直径",
+      "parent": 230,
+      "key": "luogu:213",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "214": {
+      "label": "霍夫曼树",
+      "parent": 308,
+      "key": "luogu:214",
+      "categories": [
+        "other"
+      ]
+    },
+    "215": {
+      "label": "可并堆",
+      "parent": 11,
+      "key": "luogu:215",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "228": {
+      "label": "树链剖分",
+      "parent": 230,
+      "key": "luogu:228",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "229": {
+      "label": "动态树 LCT",
+      "parent": 11,
+      "key": "luogu:229",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "230": {
+      "label": "树论",
+      "parent": null,
+      "key": "trees",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "232": {
+      "label": "树套树",
+      "parent": 11,
+      "key": "luogu:232",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "233": {
+      "label": "可持久化线段树",
+      "parent": 11,
+      "key": "luogu:233",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "234": {
+      "label": "可持久化",
+      "parent": 11,
+      "key": "luogu:234",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "235": {
+      "label": "哈希 hashing",
+      "parent": 308,
+      "key": "hashing",
+      "categories": [
+        "strings"
+      ]
+    },
+    "239": {
+      "label": "素数判断",
+      "parent": 72,
+      "key": "luogu:239",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "241": {
+      "label": "最大公约数 gcd",
+      "parent": 72,
+      "key": "luogu:241",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "242": {
+      "label": "扩展欧几里德算法",
+      "parent": 72,
+      "key": "luogu:242",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "243": {
+      "label": "不定方程",
+      "parent": 72,
+      "key": "luogu:243",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "244": {
+      "label": "进制",
+      "parent": 72,
+      "key": "luogu:244",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "246": {
+      "label": "群论",
+      "parent": null,
+      "key": "luogu:246",
+      "categories": [
+        "other"
+      ]
+    },
+    "247": {
+      "label": "置换",
+      "parent": 246,
+      "key": "luogu:247",
+      "categories": [
+        "other"
+      ]
+    },
+    "248": {
+      "label": "Pólya 定理",
+      "parent": 246,
+      "key": "luogu:248",
+      "categories": [
+        "other"
+      ]
+    },
+    "249": {
+      "label": "虚树",
+      "parent": 230,
+      "key": "luogu:249",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "250": {
+      "label": "中国剩余定理 CRT",
+      "parent": 72,
+      "key": "chinese remainder theorem",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "251": {
+      "label": "莫比乌斯反演",
+      "parent": 72,
+      "key": "luogu:251",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "252": {
+      "label": "组合数学",
+      "parent": null,
+      "key": "combinatorics",
+      "categories": [
+        "counting"
+      ]
+    },
+    "253": {
+      "label": "排列组合",
+      "parent": 252,
+      "key": "luogu:253",
+      "categories": [
+        "counting"
+      ]
+    },
+    "254": {
+      "label": "前缀和",
+      "parent": 44,
+      "key": "luogu:254",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "255": {
+      "label": "二项式定理",
+      "parent": 252,
+      "key": "luogu:255",
+      "categories": [
+        "counting"
+      ]
+    },
+    "256": {
+      "label": "康托展开",
+      "parent": 252,
+      "key": "luogu:256",
+      "categories": [
+        "counting"
+      ]
+    },
+    "258": {
+      "label": "鸽笼原理",
+      "parent": 252,
+      "key": "luogu:258",
+      "categories": [
+        "counting"
+      ]
+    },
+    "259": {
+      "label": "容斥原理",
+      "parent": 252,
+      "key": "luogu:259",
+      "categories": [
+        "counting"
+      ]
+    },
+    "260": {
+      "label": "Fibonacci 数列",
+      "parent": 252,
+      "key": "luogu:260",
+      "categories": [
+        "counting"
+      ]
+    },
+    "261": {
+      "label": "Catalan 数",
+      "parent": 252,
+      "key": "luogu:261",
+      "categories": [
+        "counting"
+      ]
+    },
+    "262": {
+      "label": "Stirling 数",
+      "parent": 252,
+      "key": "luogu:262",
+      "categories": [
+        "counting"
+      ]
+    },
+    "263": {
+      "label": "A*  算法",
+      "parent": 4,
+      "key": "luogu:263",
+      "categories": [
+        "search"
+      ]
+    },
+    "264": {
+      "label": "生成函数",
+      "parent": 252,
+      "key": "luogu:264",
+      "categories": [
+        "counting"
+      ]
+    },
+    "265": {
+      "label": "线性规划",
+      "parent": 467,
+      "key": "luogu:265",
+      "categories": [
+        "other"
+      ]
+    },
+    "266": {
+      "label": "概率论",
+      "parent": null,
+      "key": "probabilities",
+      "categories": [
+        "probability"
+      ]
+    },
+    "270": {
+      "label": "期望",
+      "parent": 266,
+      "key": "expectation",
+      "categories": [
+        "probability"
+      ]
+    },
+    "271": {
+      "label": "线性代数",
+      "parent": null,
+      "key": "luogu:271",
+      "categories": [
+        "other"
+      ]
+    },
+    "272": {
+      "label": "矩阵乘法",
+      "parent": 271,
+      "key": "matrices",
+      "categories": [
+        "other"
+      ]
+    },
+    "273": {
+      "label": "线性递推",
+      "parent": 271,
+      "key": "luogu:273",
+      "categories": [
+        "other"
+      ]
+    },
+    "274": {
+      "label": "高斯消元",
+      "parent": 271,
+      "key": "luogu:274",
+      "categories": [
+        "other"
+      ]
+    },
+    "276": {
+      "label": "逆元",
+      "parent": 72,
+      "key": "luogu:276",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "277": {
+      "label": "线性基",
+      "parent": 271,
+      "key": "luogu:277",
+      "categories": [
+        "other"
+      ]
+    },
+    "278": {
+      "label": "微积分",
+      "parent": null,
+      "key": "luogu:278",
+      "categories": [
+        "other"
+      ]
+    },
+    "280": {
+      "label": "导数",
+      "parent": 278,
+      "key": "luogu:280",
+      "categories": [
+        "other"
+      ]
+    },
+    "281": {
+      "label": "积分",
+      "parent": 278,
+      "key": "luogu:281",
+      "categories": [
+        "other"
+      ]
+    },
+    "282": {
+      "label": "定积分",
+      "parent": 278,
+      "key": "luogu:282",
+      "categories": [
+        "other"
+      ]
+    },
+    "283": {
+      "label": "三维计算几何",
+      "parent": 8,
+      "key": "luogu:283",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "284": {
+      "label": "级数",
+      "parent": 278,
+      "key": "luogu:284",
+      "categories": [
+        "other"
+      ]
+    },
+    "286": {
+      "label": "向量",
+      "parent": 8,
+      "key": "luogu:286",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "287": {
+      "label": "栈",
+      "parent": 44,
+      "key": "luogu:287",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "288": {
+      "label": "队列",
+      "parent": 44,
+      "key": "luogu:288",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "289": {
+      "label": "分块",
+      "parent": 44,
+      "key": "luogu:289",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "290": {
+      "label": "ST 表",
+      "parent": 44,
+      "key": "sparse table",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "291": {
+      "label": "凸包",
+      "parent": 8,
+      "key": "luogu:291",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "292": {
+      "label": "叉积",
+      "parent": 8,
+      "key": "luogu:292",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "293": {
+      "label": "线段相交",
+      "parent": 8,
+      "key": "luogu:293",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "295": {
+      "label": "半平面交",
+      "parent": 8,
+      "key": "luogu:295",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "298": {
+      "label": "扫描线",
+      "parent": 308,
+      "key": "luogu:298",
+      "categories": [
+        "other"
+      ]
+    },
+    "299": {
+      "label": "旋转卡壳",
+      "parent": 8,
+      "key": "luogu:299",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "300": {
+      "label": "字典树 Trie",
+      "parent": 2,
+      "key": "luogu:300",
+      "categories": [
+        "strings"
+      ]
+    },
+    "301": {
+      "label": "AC 自动机",
+      "parent": 2,
+      "key": "luogu:301",
+      "categories": [
+        "strings"
+      ]
+    },
+    "302": {
+      "label": "KMP 算法",
+      "parent": 2,
+      "key": "luogu:302",
+      "categories": [
+        "strings"
+      ]
+    },
+    "303": {
+      "label": "后缀数组 SA",
+      "parent": 2,
+      "key": "string suffix structures",
+      "categories": [
+        "strings"
+      ]
+    },
+    "304": {
+      "label": "后缀树",
+      "parent": 2,
+      "key": "string suffix structures",
+      "categories": [
+        "strings"
+      ]
+    },
+    "305": {
+      "label": "有限状态自动机",
+      "parent": 2,
+      "key": "luogu:305",
+      "categories": [
+        "strings"
+      ]
+    },
+    "308": {
+      "label": "其它技巧",
+      "parent": null,
+      "key": "luogu:308",
+      "categories": [
+        "other"
+      ]
+    },
+    "309": {
+      "label": "随机化",
+      "parent": 308,
+      "key": "luogu:309",
+      "categories": [
+        "other"
+      ]
+    },
+    "311": {
+      "label": "博弈树",
+      "parent": 13,
+      "key": "luogu:311",
+      "categories": [
+        "games"
+      ]
+    },
+    "313": {
+      "label": "快速傅里叶变换 FFT",
+      "parent": 69,
+      "key": "fft",
+      "categories": [
+        "other"
+      ]
+    },
+    "314": {
+      "label": "位运算",
+      "parent": 308,
+      "key": "bitmasks",
+      "categories": [
+        "other"
+      ]
+    },
+    "316": {
+      "label": "整体二分",
+      "parent": 11,
+      "key": "luogu:316",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "318": {
+      "label": "构造",
+      "parent": 308,
+      "key": "constructive algorithms",
+      "categories": [
+        "constructive"
+      ]
+    },
+    "320": {
+      "label": "基环树",
+      "parent": 230,
+      "key": "luogu:320",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "321": {
+      "label": "K-D Tree",
+      "parent": 11,
+      "key": "luogu:321",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "322": {
+      "label": "Lucas 定理",
+      "parent": 72,
+      "key": "luogu:322",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "323": {
+      "label": "轮廓线 DP",
+      "parent": 3,
+      "key": "luogu:323",
+      "categories": [
+        "counting"
+      ]
+    },
+    "324": {
+      "label": "快速数论变换 NTT",
+      "parent": 69,
+      "key": "luogu:324",
+      "categories": [
+        "other"
+      ]
+    },
+    "325": {
+      "label": "回文自动机 PAM",
+      "parent": 2,
+      "key": "luogu:325",
+      "categories": [
+        "strings"
+      ]
+    },
+    "326": {
+      "label": "快速沃尔什变换 FWT",
+      "parent": 69,
+      "key": "luogu:326",
+      "categories": [
+        "other"
+      ]
+    },
+    "327": {
+      "label": "快速莫比乌斯变换 FMT",
+      "parent": 69,
+      "key": "luogu:327",
+      "categories": [
+        "other"
+      ]
+    },
+    "329": {
+      "label": "Manacher 算法",
+      "parent": 2,
+      "key": "luogu:329",
+      "categories": [
+        "strings"
+      ]
+    },
+    "330": {
+      "label": "差分",
+      "parent": 44,
+      "key": "luogu:330",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "345": {
+      "label": "双指针 two-pointer",
+      "parent": 308,
+      "key": "two pointers",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "350": {
+      "label": "圆方树",
+      "parent": 6,
+      "key": "luogu:350",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "353": {
+      "label": "顺序结构",
+      "parent": -2,
+      "key": "luogu:353",
+      "categories": [
+        "other"
+      ]
+    },
+    "354": {
+      "label": "分支结构",
+      "parent": -2,
+      "key": "luogu:354",
+      "categories": [
+        "other"
+      ]
+    },
+    "355": {
+      "label": "循环结构",
+      "parent": -2,
+      "key": "luogu:355",
+      "categories": [
+        "other"
+      ]
+    },
+    "356": {
+      "label": "数组",
+      "parent": -2,
+      "key": "luogu:356",
+      "categories": [
+        "other"
+      ]
+    },
+    "357": {
+      "label": "字符串（入门）",
+      "parent": -2,
+      "key": "luogu:357",
+      "categories": [
+        "other"
+      ]
+    },
+    "358": {
+      "label": "结构体",
+      "parent": -2,
+      "key": "luogu:358",
+      "categories": [
+        "other"
+      ]
+    },
+    "359": {
+      "label": "函数与递归",
+      "parent": -2,
+      "key": "luogu:359",
+      "categories": [
+        "other"
+      ]
+    },
+    "360": {
+      "label": "链表",
+      "parent": 44,
+      "key": "luogu:360",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "364": {
+      "label": "Dilworth 定理",
+      "parent": 252,
+      "key": "luogu:364",
+      "categories": [
+        "counting"
+      ]
+    },
+    "365": {
+      "label": "Ad-hoc",
+      "parent": 308,
+      "key": "thinking",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "368": {
+      "label": "笛卡尔树",
+      "parent": 308,
+      "key": "luogu:368",
+      "categories": [
+        "other"
+      ]
+    },
+    "369": {
+      "label": "拟阵",
+      "parent": 467,
+      "key": "luogu:369",
+      "categories": [
+        "other"
+      ]
+    },
+    "370": {
+      "label": "Nim 积",
+      "parent": 13,
+      "key": "luogu:370",
+      "categories": [
+        "games"
+      ]
+    },
+    "371": {
+      "label": "根号分治",
+      "parent": 308,
+      "key": "luogu:371",
+      "categories": [
+        "other"
+      ]
+    },
+    "372": {
+      "label": "拉格朗日反演",
+      "parent": 252,
+      "key": "luogu:372",
+      "categories": [
+        "counting"
+      ]
+    },
+    "373": {
+      "label": "模拟费用流",
+      "parent": 308,
+      "key": "luogu:373",
+      "categories": [
+        "other"
+      ]
+    },
+    "374": {
+      "label": "分散层叠",
+      "parent": 308,
+      "key": "luogu:374",
+      "categories": [
+        "other"
+      ]
+    },
+    "375": {
+      "label": "均摊分析",
+      "parent": 308,
+      "key": "luogu:375",
+      "categories": [
+        "other"
+      ]
+    },
+    "376": {
+      "label": "分类讨论",
+      "parent": 308,
+      "key": "luogu:376",
+      "categories": [
+        "other"
+      ]
+    },
+    "377": {
+      "label": "李超线段树",
+      "parent": 11,
+      "key": "luogu:377",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "378": {
+      "label": "吉司机线段树 segment tree beats",
+      "parent": 11,
+      "key": "luogu:378",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "379": {
+      "label": "线段树合并",
+      "parent": 11,
+      "key": "luogu:379",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "380": {
+      "label": "折半搜索 meet in the middle",
+      "parent": 4,
+      "key": "meet-in-the-middle",
+      "categories": [
+        "search"
+      ]
+    },
+    "382": {
+      "label": "动态树分治",
+      "parent": 230,
+      "key": "luogu:382",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "385": {
+      "label": "单调栈",
+      "parent": 44,
+      "key": "luogu:385",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "387": {
+      "label": "杨表",
+      "parent": 252,
+      "key": "luogu:387",
+      "categories": [
+        "counting"
+      ]
+    },
+    "388": {
+      "label": "类欧几里得算法",
+      "parent": 72,
+      "key": "luogu:388",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "391": {
+      "label": "Berlekamp-Massey(BM) 算法",
+      "parent": 69,
+      "key": "luogu:391",
+      "categories": [
+        "other"
+      ]
+    },
+    "396": {
+      "label": "梯度下降法",
+      "parent": 4,
+      "key": "luogu:396",
+      "categories": [
+        "search"
+      ]
+    },
+    "410": {
+      "label": "Prüfer 序列",
+      "parent": 230,
+      "key": "luogu:410",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "411": {
+      "label": "调和级数",
+      "parent": 72,
+      "key": "luogu:411",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "412": {
+      "label": "拉格朗日乘数法",
+      "parent": 5,
+      "key": "luogu:412",
+      "categories": [
+        "other"
+      ]
+    },
+    "413": {
+      "label": "近似算法",
+      "parent": 308,
+      "key": "luogu:413",
+      "categories": [
+        "other"
+      ]
+    },
+    "415": {
+      "label": "欧拉降幂",
+      "parent": 72,
+      "key": "luogu:415",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "416": {
+      "label": "集合幂级数，子集卷积",
+      "parent": 69,
+      "key": "luogu:416",
+      "categories": [
+        "other"
+      ]
+    },
+    "417": {
+      "label": "拉格朗日插值法",
+      "parent": 5,
+      "key": "luogu:417",
+      "categories": [
+        "other"
+      ]
+    },
+    "419": {
+      "label": "Lyndon 分解",
+      "parent": 2,
+      "key": "luogu:419",
+      "categories": [
+        "strings"
+      ]
+    },
+    "423": {
+      "label": "Stern-Brocot 树",
+      "parent": 72,
+      "key": "luogu:423",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "435": {
+      "label": "DP 套 DP",
+      "parent": 146,
+      "key": "luogu:435",
+      "categories": [
+        "counting"
+      ]
+    },
+    "443": {
+      "label": "动态 DP",
+      "parent": 146,
+      "key": "luogu:443",
+      "categories": [
+        "counting"
+      ]
+    },
+    "444": {
+      "label": "线性 DP",
+      "parent": 3,
+      "key": "luogu:444",
+      "categories": [
+        "counting"
+      ]
+    },
+    "445": {
+      "label": "SG 函数",
+      "parent": 13,
+      "key": "luogu:445",
+      "categories": [
+        "games"
+      ]
+    },
+    "446": {
+      "label": "线段树分治",
+      "parent": 308,
+      "key": "luogu:446",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "447": {
+      "label": "离线处理",
+      "parent": 308,
+      "key": "luogu:447",
+      "categories": [
+        "other"
+      ]
+    },
+    "448": {
+      "label": "整除分块",
+      "parent": 72,
+      "key": "luogu:448",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "449": {
+      "label": "极角排序",
+      "parent": 8,
+      "key": "luogu:449",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "450": {
+      "label": "弦图",
+      "parent": 6,
+      "key": "luogu:450",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "451": {
+      "label": "Dirichlet 卷积",
+      "parent": 72,
+      "key": "luogu:451",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "452": {
+      "label": "大步小步算法 BSGS",
+      "parent": 72,
+      "key": "luogu:452",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "453": {
+      "label": "二次剩余",
+      "parent": 72,
+      "key": "luogu:453",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "454": {
+      "label": "行列式",
+      "parent": 271,
+      "key": "luogu:454",
+      "categories": [
+        "other"
+      ]
+    },
+    "455": {
+      "label": "Bézout 定理",
+      "parent": 72,
+      "key": "luogu:455",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "457": {
+      "label": "随机游走 Markov Chain",
+      "parent": 266,
+      "key": "luogu:457",
+      "categories": [
+        "probability"
+      ]
+    },
+    "458": {
+      "label": "鞅的停时定理",
+      "parent": 266,
+      "key": "luogu:458",
+      "categories": [
+        "probability"
+      ]
+    },
+    "461": {
+      "label": "杜教筛",
+      "parent": 72,
+      "key": "luogu:461",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "462": {
+      "label": "欧拉函数",
+      "parent": 72,
+      "key": "luogu:462",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "463": {
+      "label": "决策单调性",
+      "parent": 146,
+      "key": "luogu:463",
+      "categories": [
+        "counting"
+      ]
+    },
+    "464": {
+      "label": "状压 DP",
+      "parent": 3,
+      "key": "luogu:464",
+      "categories": [
+        "counting"
+      ]
+    },
+    "465": {
+      "label": "bitset",
+      "parent": 308,
+      "key": "luogu:465",
+      "categories": [
+        "other"
+      ]
+    },
+    "466": {
+      "label": "特征值",
+      "parent": 271,
+      "key": "luogu:466",
+      "categories": [
+        "other"
+      ]
+    },
+    "467": {
+      "label": "组合优化",
+      "parent": null,
+      "key": "luogu:467",
+      "categories": [
+        "other"
+      ]
+    },
+    "468": {
+      "label": "整数规划",
+      "parent": 467,
+      "key": "luogu:468",
+      "categories": [
+        "other"
+      ]
+    },
+    "470": {
+      "label": "原始对偶",
+      "parent": 467,
+      "key": "luogu:470",
+      "categories": [
+        "other"
+      ]
+    },
+    "471": {
+      "label": "最大流最小割定理",
+      "parent": 467,
+      "key": "luogu:471",
+      "categories": [
+        "other"
+      ]
+    },
+    "472": {
+      "label": "全局平衡二叉树",
+      "parent": 230,
+      "key": "luogu:472",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "473": {
+      "label": "哈希表",
+      "parent": 44,
+      "key": "luogu:473",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "474": {
+      "label": "Z 函数",
+      "parent": 2,
+      "key": "luogu:474",
+      "categories": [
+        "strings"
+      ]
+    },
+    "475": {
+      "label": "线性筛法",
+      "parent": 72,
+      "key": "luogu:475",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "476": {
+      "label": "Floyd 算法",
+      "parent": 6,
+      "key": "luogu:476",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "477": {
+      "label": "启发式合并",
+      "parent": 308,
+      "key": "luogu:477",
+      "categories": [
+        "other"
+      ]
+    },
+    "480": {
+      "label": "单位根反演",
+      "parent": 5,
+      "key": "luogu:480",
+      "categories": [
+        "other"
+      ]
+    },
+    "482": {
+      "label": "平面几何",
+      "parent": 8,
+      "key": "luogu:482",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "483": {
+      "label": "树的重心",
+      "parent": 230,
+      "key": "luogu:483",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "484": {
+      "label": "保序回归",
+      "parent": 467,
+      "key": "luogu:484",
+      "categories": [
+        "other"
+      ]
+    },
+    "496": {
+      "label": "后缀平衡树",
+      "parent": 2,
+      "key": "luogu:496",
+      "categories": [
+        "strings"
+      ]
+    },
+    "504": {
+      "label": "STL",
+      "parent": 110,
+      "key": "luogu:504",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "507": {
+      "label": "整体转移",
+      "parent": 146,
+      "key": "luogu:507",
+      "categories": [
+        "counting"
+      ]
+    },
+    "508": {
+      "label": "斜率维护技巧 slope trick",
+      "parent": 146,
+      "key": "luogu:508",
+      "categories": [
+        "counting"
+      ]
+    },
+    "524": {
+      "label": "反悔贪心",
+      "parent": 308,
+      "key": "luogu:524",
+      "categories": [
+        "thinking"
+      ]
+    },
+    "525": {
+      "label": "闵可夫斯基和 Minkowski sum",
+      "parent": 8,
+      "key": "luogu:525",
+      "categories": [
+        "geometry"
+      ]
+    },
+    "530": {
+      "label": "广义串并联图",
+      "parent": 6,
+      "key": "luogu:530",
+      "categories": [
+        "graphs-trees"
+      ]
+    },
+    "531": {
+      "label": "二区间合并（猫树分治）",
+      "parent": 11,
+      "key": "luogu:531",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "539": {
+      "label": "KTT / Kinetic Tournament Tree",
+      "parent": 11,
+      "key": "luogu:539",
+      "categories": [
+        "data-structures"
+      ]
+    },
+    "540": {
+      "label": "亚线性快速求和算法",
+      "parent": 72,
+      "key": "luogu:540",
+      "categories": [
+        "number-theory"
+      ]
+    },
+    "541": {
+      "label": "Hall 定理",
+      "parent": 6,
+      "key": "luogu:541",
+      "categories": [
+        "graphs-trees"
+      ]
+    }
+  }
+}

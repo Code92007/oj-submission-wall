@@ -12,8 +12,9 @@ import statistics
 from pathlib import Path
 
 from cpc_integration import problem_key
+from luogu_analysis import ALGORITHMS, CALIBRATION, problem_catalog, problem_metadata
 
-MODEL_VERSION = "team-tags-v2"
+MODEL_VERSION = "team-tags-v3"
 # Keep source keys stable for aggregation; labels are only for display.
 TAG_LABELS = {
     "*special": "特殊题目",
@@ -87,10 +88,16 @@ FAMILIES = {
 }
 # Compatibility field for the selectable subset, with no independent taxonomy.
 CATEGORIES = FAMILIES
+for _entry in ALGORITHMS.values():
+    TAG_LABELS.setdefault(_entry["key"], _entry["label"])
+    if _entry["key"].startswith("luogu:"):
+        for _category in _entry["categories"]:
+            if _category != "other":
+                FAMILIES[_category][1].add(_entry["key"])
 
 
 def category_sources(tags):
-    sources = {key: source_tags for key, (_, source_tags) in FAMILIES.items()}
+    sources = {key: source_tags & set(tags) for key, (_, source_tags) in FAMILIES.items()}
     sources["other"] = set(tags) - set.union(*sources.values())
     return sources
 
@@ -98,7 +105,7 @@ def category_sources(tags):
 ERRORS = {"WA", "WRONG_ANSWER", "TLE", "TIME_LIMIT_EXCEEDED", "MLE", "MEMORY_LIMIT_EXCEEDED",
           "RE", "RTE", "RUNTIME_ERROR", "OUTPUT_LIMIT_EXCEEDED", "IDLENESS_LIMIT_EXCEEDED", "FAILED", "PE", "PRESENTATION_ERROR"}
 WRONG = {"WA", "WRONG_ANSWER"}
-PLATFORMS = [("codeforces", "Codeforces"), ("all", "全部可比数据")]
+PLATFORMS = [("codeforces", "Codeforces"), ("all", "全部训练来源（含洛谷）")]
 
 
 def load_release(root):
@@ -117,7 +124,7 @@ def valid_rating(value):
 
 
 def metadata(service, release, rows, app):
-    """Regional aliases deduplicate cross-platform replays; no ratings from other scales."""
+    """Exact CF/CF Bot ratings take priority over approximate Luogu color bands."""
     result = {}
     for contest in service.contests.values():
         for p in contest["problems"]:
@@ -141,6 +148,27 @@ def metadata(service, release, rows, app):
             if rating is not None and entry["source"] != "cf-bot":
                 entry.update(rating=rating, source="codeforces")
             entry["tags"] = sorted(set(entry["tags"]) | set(normalized_tags(problem.get("tags"))))
+    cached = problem_catalog(app)
+    for row in rows:
+        if row["platform"] != "luogu":
+            continue
+        key = problem_key("luogu", row["problem_id"])
+        # CF mirrors reuse the original rating and tags, never a second color rating.
+        if not key.startswith("luogu:"):
+            continue
+        pid = service.aliases.get(key, key)
+        raw = app.raw_json_dict(row)
+        problem = raw.get("problem") if isinstance(raw.get("problem"), dict) else {}
+        mapped = problem_metadata(problem, cached.get(str(row["problem_id"]).upper()))
+        old = result.get(pid)
+        if old and old.get("source") in {"codeforces", "cf-bot"}:
+            continue
+        if old:
+            # Incomplete older submissions cannot erase metadata from a complete one.
+            mapped["tags"] = sorted(set(old["tags"]) | set(mapped["tags"]))
+            if mapped["rating"] is None:
+                mapped.update({k: v for k, v in old.items() if k != "tags"})
+        result[pid] = mapped
     return result
 
 
@@ -201,7 +229,7 @@ def analysis_options(app, service, principal):
 def problem_records(app, service, rows, handles, meta, platform, cutoff, excluded_contest=None, team_evidence=False):
     problems = {}
     coverage = {"submissions": 0, "problems": 0, "rated": 0, "tagged": 0, "usable": 0, "unrated": 0,
-                "untagged": 0, "firstSubmission": None, "lastSubmission": None}
+                "untagged": 0, "approximate": 0, "byPlatform": {}, "firstSubmission": None, "lastSubmission": None}
     seen_submissions = set()
     for r in rows:
         owner = f"{r['owner_type']}:{r['owner_id']}"
@@ -234,9 +262,12 @@ def problem_records(app, service, rows, handles, meta, platform, cutoff, exclude
         coverage["firstSubmission"] = min(coverage["firstSubmission"] or r["submitted_at"], r["submitted_at"])
         coverage["lastSubmission"] = max(coverage["lastSubmission"] or 0, r["submitted_at"])
         p = problems.setdefault(pid, {"id": pid, **m, "solved": False, "errors": 0, "wa": 0,
-            "firstAc": None, "lastAc": None, "lastPractice": r["submitted_at"], "contestMinutes": None})
+            "firstAc": None, "lastAc": None, "lastPractice": r["submitted_at"], "contestMinutes": None,
+            "platforms": set(), "solvedPlatforms": set()})
+        p["platforms"].add(r["platform"])
         p["lastPractice"] = max(p["lastPractice"], r["submitted_at"])
         if verdict == "AC":
+            p["solvedPlatforms"].add(r["platform"])
             if p["firstAc"] is None:
                 elapsed = raw.get("relativeTimeSeconds")
                 if author.get("participantType") in {"CONTESTANT", "VIRTUAL"} and type(elapsed) in {int, float} and 0 < elapsed <= 21600:
@@ -254,6 +285,13 @@ def problem_records(app, service, rows, handles, meta, platform, cutoff, exclude
         coverage["usable"] += int(p["rating"] is not None and bool(p["tags"]))
         coverage["unrated"] += int(p["rating"] is None)
         coverage["untagged"] += int(not p["tags"])
+        coverage["approximate"] += int(p.get("source") == "luogu-color")
+        solved_platforms = p.pop("solvedPlatforms")
+        for origin in p.pop("platforms"):
+            counts = coverage["byPlatform"].setdefault(origin, {"problems": 0, "usable": 0, "solved": 0})
+            counts["problems"] += 1
+            counts["usable"] += int(p["rating"] is not None and bool(p["tags"]))
+            counts["solved"] += int(origin in solved_platforms)
     return list(problems.values()), coverage
 
 
@@ -319,10 +357,10 @@ def official_baseline(history, cutoff, basis="current"):
         "reliable": count >= 3, "basis": basis}
 
 
-def training_momentum(problems, cutoff):
+def training_momentum(problems, cutoff, source="codeforces"):
     # First AC of a distinct CF-rated problem: repeat submissions cannot farm the window.
     solved = sorted([p for p in problems if p["solved"] and p["rating"] is not None
-                     and p.get("source") == "codeforces" and p["firstAc"] < cutoff], key=lambda p: (p["firstAc"], p["id"]))
+                     and p.get("source") == source and p["firstAc"] < cutoff], key=lambda p: (p["firstAc"], p["id"]))
     recent = solved[-20:]
     result = {"recent20Count": len(recent), "recent20Mean": None, "recent20WeightedMean": None,
         "monthsWeightedMean": None, "trend": None, "recent180Count": 0, "confidence": 0,
@@ -364,7 +402,7 @@ def estimate(problems, cutoff):
     solved = [p for p in problems if p["solved"] and p["rating"] is not None]
     rated = [p for p in problems if p["rating"] is not None]
     weights = [(p, (0.8 + 0.2 * math.exp(-max(0, cutoff - p["lastAc"]) / (365 * 86400)))
-                / max(1, len(p["tags"]))) for p in solved]
+                * p.get("evidenceWeight", 1) / max(1, len(p["tags"]))) for p in solved]
     effective = sum(w for _, w in weights)
     confidence = 1 - math.exp(-effective / 8)
     rating = None
@@ -375,7 +413,7 @@ def estimate(problems, cutoff):
         memory = sum(100 * (1 - math.exp(-max(0, cutoff-p["lastAc"]) / (365*86400))) * w for p, w in weights) / effective
         # Errors on harder unsolved tasks are not evidence of weakness at easier levels.
         near = [p for p in rated if p["rating"] <= base + 200]
-        unresolved = sum(not p["solved"] for p in near) / max(1, len(near))
+        unresolved = sum(p.get("evidenceWeight", 1) for p in near if not p["solved"]) / max(1, sum(p.get("evidenceWeight", 1) for p in near))
         retry = sum(min(5, p["errors"]) * 20 * w for p, w in weights) / effective
         penalty = min(120, retry + 80 * unresolved)
         rating = round(max(800, base - penalty - memory - 200 * (1-confidence)))
@@ -390,6 +428,9 @@ def estimate(problems, cutoff):
         "unresolved": sum(not p["solved"] for p in problems),
         "averageTries": round(sum(1+p["errors"] for p in problems if p["solved"]) / max(1, sum(p["solved"] for p in problems)), 2) if any(p["solved"] for p in problems) else None,
         "lastPractice": max((p["lastPractice"] for p in problems), default=None),
+        "approximateSolved": sum(p.get("source") == "luogu-color" for p in solved),
+        "calibrationUncertainty": round(sum(max(abs(p["rating"]-p["ratingRange"][0]), abs(p["ratingRange"][1]-p["rating"])) * w
+            for p, w in weights if p.get("source") == "luogu-color" and p.get("ratingRange"))/effective) if effective else 0,
         "memoryPenalty": round(memory), "errorPenalty": round(penalty), "distribution": hist}
 
 
@@ -429,6 +470,7 @@ def combine(members, target):
         "referenceRating": reference["rating"] if reference else None,
         "referenceMember": members.index(reference) if reference else None, "evidenceReason": reason,
         "coverageLabel": label, "support": support, "reliableMembers": len(reliable),
+        "calibrationUncertainty": max((m.get("calibrationUncertainty", 0) for m in reliable[:2]), default=0),
         "confidence": round(sum(m["confidence"] for m in reliable[:2])/2, 3), "members": members}
 
 
@@ -443,23 +485,32 @@ def profile(problems, cutoff, target, rating_history=None, rating_basis="hybrid"
     history = rating_history or []
     official = official_baseline(history, cutoff, rating_basis)
     momentum = training_momentum(problems, cutoff)
+    luogu = training_momentum(problems, cutoff, "luogu-color")
+    luogu["confidence"] = round(luogu["confidence"]*.5, 3)
     overall["momentum"] = momentum
+    overall["luoguMomentum"] = luogu
     anchor = None
     if official:
-        last_evidence = max(momentum["lastAc"] or 0, official["updatedAt"])
+        last_evidence = max(momentum["lastAc"] or 0, luogu["lastAc"] or 0, official["updatedAt"])
         memory = 100*(1-math.exp(-max(0, cutoff-last_evidence)/(365*86400)))
         retained = max(0, official["peakRating"]-200-memory)
         reference = max(official["currentRating"], retained)
         uplift = .7*momentum["confidence"]*max(0, min(400, (momentum["trend"] or reference)-momentum["recentErrorPenalty"]-reference))
+        uplift = max(uplift, .7*luogu["confidence"]*max(0, min(400, (luogu["trend"] or reference)-luogu["recentErrorPenalty"]-reference)))
         anchor = official["peakRating"] if rating_basis == "peak" else round(reference+uplift)
         overall.update(officialRating=official["currentRating"], peakRating=official["peakRating"],
             cfHandle=official["handle"], ratingUpdatedAt=official["updatedAt"], officialContests=official["ratedContests"],
             retainedPeak=round(retained), trainingUplift=round(uplift),
-            confidence=max(momentum["confidence"], round(official["confidence"]*.85, 3)),
+            confidence=max(momentum["confidence"], luogu["confidence"], round(official["confidence"]*.85, 3)),
             reliable=official["reliable"] or overall["reliable"], ratingSource="cf-training-hybrid")
     elif momentum["trend"] is not None:
         anchor = round(max(800, momentum["trend"]-momentum["recentErrorPenalty"]-100*(1-momentum["confidence"])))
         overall.update(ratingSource="recent-training", confidence=momentum["confidence"])
+    if not official and luogu["trend"] is not None:
+        proxy = round(max(800, luogu["trend"]-luogu["recentErrorPenalty"]-100*(1-luogu["confidence"])))
+        if anchor is None or proxy > anchor:
+            anchor = proxy
+            overall.update(ratingSource="multi-source-training", confidence=luogu["confidence"])
     if anchor is not None:
         # The training mix locates relative strengths, not the absolute CF scale.
         for value in list(raw.values())+list(families.values()):
@@ -545,13 +596,13 @@ def timing_reference(records, profiles):
         "samples": len(observations), "source": "personal-contest-history"}
 
 
-def predict(ability, confidence, difficulty, budget, timing, difficulty_range=None):
+def predict(ability, confidence, difficulty, budget, timing, difficulty_range=None, calibration_uncertainty=0):
     """A solve/unsolved mixture with lognormal conditional elapsed times.
 
     Bounds are sensitivity ranges, not statistically calibrated confidence intervals.
     The censored expectation assigns the whole budget to an unsuccessful attempt.
     """
-    uncertainty = 150 + 350*(1-confidence)
+    uncertainty = 150 + 350*(1-confidence) + calibration_uncertainty
     if difficulty_range:
         uncertainty += max(abs(difficulty-difficulty_range[0]), abs(difficulty_range[1]-difficulty))
     sigma = .8
@@ -611,6 +662,7 @@ def forecast_contest(app, service, cid, profiles, records, meta, target, budget,
         tagged = bool(abilities) and len(abilities) == len(tags) and all(a is not None for a in abilities)
         ability = min(abilities) if tagged else overall["rating"]
         confidence = min(scores[t]["confidence"] for t in tags) if tagged else overall["confidence"]
+        calibration_uncertainty = max(scores[t].get("calibrationUncertainty", 0) for t in tags) if tagged else overall.get("calibrationUncertainty", 0)
         row = {"problemId": p["id"], "index": p["index"], "name": p["name"], "tags": tags,
             "tagLabels": [TAG_LABELS.get(t, t) for t in tags],
             "rating": m.get("rating"), "tagged": tagged, "ratingSource": m.get("source"),
@@ -619,7 +671,7 @@ def forecast_contest(app, service, cid, profiles, records, meta, target, budget,
         if ability is None or m.get("rating") is None:
             row.update(probability=None, reason="训练证据不足" if ability is None else "缺少兼容评级")
         else:
-            row.update(predict(ability, confidence, m["rating"], budget, timing, row["ratingRange"]))
+            row.update(predict(ability, confidence, m["rating"], budget, timing, row["ratingRange"], calibration_uncertainty))
             if overall["rating"] is not None:
                 row["baseline"] = predict(overall["rating"], overall["confidence"], m["rating"], budget, timing)["probability"]
         rows.append(row)
@@ -854,7 +906,13 @@ def build_analysis(app, service, principal, keys, platform="codeforces", target=
         "peakForecast": forecast_contest(app, service, contest_id, peak_profiles, forecast_records, meta, target, budget, release, "peak") if any(p["official"] for p in peak_profiles) else None,
         "backtest": backtest(app, service, principal, keys, platform, target, meta, release, by_owner, handles, remote, checked, now, rating_histories),
         "ratingRelease": {"method": release.get("method"), "revision": release.get("source_revision"), "problems": len(release["problems"])},
+        "luoguCalibration": {k: v for k, v in CALIBRATION.items() if k != "bands"} | {
+            "bands": [{"difficulty": int(k), **{f: b[f] for f in ("label", "samples", "mean", "range", "evidenceWeight")}}
+                      for k, b in CALIBRATION["bands"].items()]},
         "notes": ["评级为 CF 风格训练估计，不是官方 Rating；平台缺少兼容评级或 tags 的题不会补造数值。",
+                  "全部训练来源纳入洛谷真实提交：颜色按用户提供的 CF/洛谷样本表近似换算，权重为直接评级题的一半；10%–90% 分布区间仅供敏感性分析，不是逐题官方评级或能力保证。",
+                  "洛谷算法标签取自官方题库与算法字典，不从题名猜测；只有总题数或无日期的个人主页过题列表不补造成训练。CF 原题跨平台只计一次。",
+                  "洛谷颜色与算法标签采用当前题库快照；历史回测截断真实提交日期，不代表复原当年的题库难度版本。",
                   "个人整体结合官方当前/历史峰值、Recent 20 AC 和近半年移动均值；已过题难度分位数只用于 tag 相对强弱。多账号官方当前值取各自最新值中的最高值，综合估计不是官方 Rating。",
                   "只统计活跃个人绑定账号；已标记的团队账号及 CF 多人提交不计为个人训练。",
                   "多人共享的牛客 profile 按队伍账号单列；合并相同提交和题目，只计一份，不重复归到个人或形成双人覆盖。",

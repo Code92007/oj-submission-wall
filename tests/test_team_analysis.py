@@ -70,6 +70,78 @@ class TeamAnalysisTests(unittest.TestCase):
     def analysis(self, **kwargs):
         return ta.build_analysis(app, self.service, self.principal, self.keys, **kwargs)
 
+    def luogu_binding(self, owner=1):
+        with app.connect_db() as conn:
+            conn.execute("INSERT INTO handles(owner_type,owner_id,platform,handle,created_at) VALUES('user',?,'luogu',?,?)",
+                         (str(owner), f'lg{owner}', self.now))
+
+    def luogu_record(self, owner, sid, pid, timestamp, difficulty=5, tags=None, verdict='AC'):
+        self.add(owner, sid, pid, timestamp, verdict=verdict, platform='luogu', handle=f'lg{owner}',
+                 raw_extra={'problem': {'pid': pid, 'difficulty': difficulty, 'tags': [3] if tags is None else tags}})
+
+    def test_all_sources_uses_real_luogu_training_without_changing_cf_only(self):
+        before = self.analysis(platform='codeforces')
+        self.luogu_binding()
+        for j in range(20):
+            self.luogu_record(1, f'lg-{j}', f'P9900{j}', self.now-10000+j)
+        self.luogu_record(1, 'lg-wa', 'P99000', self.now-11000, verdict='WA')
+        with patch.object(app, 'http_get', side_effect=AssertionError('analysis must read local snapshots')):
+            cf = self.analysis(platform='codeforces')
+            all_sources = self.analysis(platform='all')
+        self.assertEqual(before['members'], cf['members'])
+        self.assertEqual(before['forecast'], cf['forecast'])
+        m = all_sources['members'][0]
+        self.assertEqual(m['coverage']['approximate'], 20)
+        self.assertEqual(m['coverage']['byPlatform']['luogu']['usable'], 20)
+        self.assertEqual(m['overall']['luoguMomentum']['recent20Mean'], 2208)
+        self.assertAlmostEqual(m['overall']['luoguMomentum']['confidence'], .5, delta=.002)
+        self.assertEqual(m['overall']['momentum'], cf['members'][0]['overall']['momentum'])
+        self.assertGreater(m['overall']['rating'], cf['members'][0]['overall']['rating'])
+        dp = next(t for t in all_sources['tags'] if t['key']=='dp')['members'][0]
+        self.assertEqual(dp['approximateSolved'], 20)
+        self.assertGreater(dp['calibrationUncertainty'], 0)
+        self.assertEqual(dp['wa'], 1)
+        self.assertAlmostEqual(dp['effectiveSolved']-next(t for t in cf['tags'] if t['key']=='dp')['members'][0]['effectiveSolved'], 10, delta=.01)
+
+    def test_luogu_cf_mirror_reuses_original_metadata_and_is_deduplicated(self):
+        self.luogu_binding()
+        self.luogu_record(1, 'mirror-1', 'CF100A', self.now-1000, difficulty=7, tags=[8])
+        data = self.analysis(platform='all')['members'][0]
+        self.assertEqual(data['coverage']['problems'], 12)
+        self.assertEqual(data['coverage']['approximate'], 0)
+        self.assertEqual(data['overall']['solved'], 12)
+        self.assertEqual(data['overall']['momentum']['recent20Mean'], 2000)
+
+    def test_luogu_unknown_metadata_and_profile_lists_do_not_fabricate_evidence(self):
+        self.luogu_binding()
+        self.luogu_record(1, 'unknown', 'P99111', self.now-200, difficulty=0)
+        self.luogu_record(1, 'untagged', 'P99112', self.now-100, tags=[])
+        with app.connect_db() as conn:
+            conn.execute("UPDATE handles SET stats_json=? WHERE platform='luogu'", (json.dumps({'solvedProblems': [{'problemId':'P99113'}]}),))
+        m = self.analysis(platform='all')['members'][0]
+        self.assertEqual(m['coverage']['problems'], 14)
+        self.assertEqual(m['coverage']['unrated'], 1)
+        self.assertEqual(m['coverage']['untagged'], 1)
+        self.assertEqual(m['overall']['luoguMomentum']['recent20Count'], 1)
+
+    def test_luogu_future_ac_and_repeated_ac_cannot_leak_into_past(self):
+        self.luogu_binding()
+        self.luogu_record(1, 'before', 'P99200', self.cutoff-100, verdict='WA')
+        self.luogu_record(1, 'after', 'P99200', self.cutoff+100)
+        self.luogu_record(1, 'repeat', 'P99200', self.now-100)
+        with app.connect_db() as conn:
+            rows = conn.execute("SELECT * FROM submissions WHERE owner_id='1' ORDER BY submitted_at,id").fetchall()
+            handles = ta.personal_handles(conn)
+        meta = ta.metadata(self.service, self.release, rows, app)
+        past, _ = ta.problem_records(app, self.service, rows, handles, meta, 'all', self.cutoff)
+        current, _ = ta.problem_records(app, self.service, rows, handles, meta, 'all', self.now+1)
+        p = next(p for p in past if p['id']=='luogu:P99200')
+        self.assertFalse(p['solved'])
+        self.assertEqual(p['wa'], 1)
+        self.assertEqual(ta.training_momentum(past, self.cutoff, 'luogu-color')['recent20Count'], 0)
+        self.assertEqual(ta.training_momentum(current, self.now, 'luogu-color')['recent20Count'], 1)
+        self.assertEqual(next(p for p in current if p['id']=='luogu:P99200')['firstAc'], self.cutoff+100)
+
     def official(self, owner, cid, rating, updated, handle=None, participated=None):
         raw = {'ratingChange': {'contestId': cid, 'newRating': rating, 'ratingUpdateTimeSeconds': updated}}
         with app.connect_db() as conn:

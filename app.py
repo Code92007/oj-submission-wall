@@ -7093,6 +7093,8 @@ def run_luogu_backfill_cli(argv: list[str]) -> int:
 
 def main() -> None:
     init_db()
+    from luogu_analysis import start_refresh
+    start_refresh(sys.modules[__name__])
     get_cpc_service().start()
     thread = threading.Thread(target=background_sync_loop, daemon=True)
     thread.start()
