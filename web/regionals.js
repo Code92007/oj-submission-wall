@@ -2,6 +2,11 @@
 const el=id=>document.getElementById(id);
 const escapeCpc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cpcData=null;
+function cpcDifficultyClass(r){return !r?'difficulty-unknown':r<1200?'difficulty-brown':r<1600?'difficulty-green':r<1900?'difficulty-cyan':r<2100?'difficulty-blue':r<2400?'difficulty-purple':r<2700?'difficulty-orange':'difficulty-red';}
+function cpcDifficultyText(d){
+  if(!d)return '难度未评级';
+  return [`难度 ${d.rating} · ${d.source}`,d.range?`参考区间 ${d.range[0]}–${d.range[1]}`:'',d.official_teams?`赛时通过 ${d.accepted_teams} / ${d.official_teams} 支正式队`:''].filter(Boolean).join('\n');
+}
 async function cpcRequest(path,body){
   const response=await fetch(path,{credentials:'same-origin',cache:'no-store',...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
   const data=await response.json();if(!response.ok)throw new Error(data.error||'请求失败');return data;
@@ -32,21 +37,23 @@ function cpcWall(){
   el('cpcYearLabel').textContent=el('cpcYear').value;
   el('cpcYearChoices').innerHTML=[...new Set(cpcData.contests.map(c=>c.year))].sort((a,b)=>b-a).map(y=>`<button type="button" data-year="${y}" aria-pressed="${String(y)===el('cpcYear').value}">${y}</button>`).join('');
   const contests=cpcData.contests.filter(c=>String(c.year)===el('cpcYear').value);
-  const max=Math.max(1,...contests.map(c=>c.problems.length));let done=0,total=0;
+  const max=Math.max(1,...contests.map(c=>c.problems.length));let done=0,total=0,rated=0;
   el('cpcHead').innerHTML='<tr><th class="cpc-contest" scope="col">比赛 / 赛站</th><th scope="col">我的进度</th>'+Array.from({length:max},(_,i)=>`<th scope="col">${String.fromCharCode(65+i)}</th>`).join('')+'</tr>';
   el('cpcRows').innerHTML=contests.map(c=>{
     let solved=0;const cells=c.problems.map(p=>{
       const s=cpcData.problems[p.id]||{},ok=s.personal||s.onsite||(el('cpcTeams').checked&&s.team);solved+=Number(Boolean(ok));
       const mark=[s.personal?'个':'',s.team?'团':'',s.onsite?'现':''].filter(Boolean).join('');
       const sources=(s.evidence||[]).map(e=>e.team+' · '+e.source).join('\n');
-      const title=[p.name,ok?'已完成':'暂无通过记录',mark,sources].filter(Boolean).join('\n');
-      return `<td><span class="cpc-tile${ok?' is-done':''}" tabindex="0" title="${escapeCpc(title)}" aria-label="${escapeCpc(p.index+' · '+title)}"><span class="cpc-letter">${escapeCpc(p.index)}</span><span class="cpc-mark">${escapeCpc(mark)}</span></span></td>`;
+      const diff=cpcData.difficulty?.[p.id];rated+=Number(Boolean(diff));
+      const title=[p.name,cpcDifficultyText(diff),ok?'已完成':'暂无通过记录',mark,sources].filter(Boolean).join('\n');
+      return `<td><span class="cpc-tile ${cpcDifficultyClass(diff?.rating)}${ok?' is-done':''}" tabindex="0" title="${escapeCpc(title)}" aria-label="${escapeCpc(p.index+' · '+title)}"><span class="cpc-letter" aria-hidden="true"><i class="cpc-rating-circle"></i>${escapeCpc(p.index)}</span><span class="cpc-rating" aria-hidden="true">${diff?escapeCpc(diff.rating):'—'}</span><span class="cpc-mark" aria-hidden="true">${escapeCpc(mark)}</span></span></td>`;
     }).join('');done+=solved;total+=c.problems.length;
     const series=['ICPC','CCPC'].includes(c.series)?c.series:'';
     const name=series?c.name.replace(`${c.year} ${series} `,`${c.year} · `):c.name;
     return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}<a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">${escapeCpc(name)}</a></span></th><td class="cpc-progress"><strong>${solved}/${c.problems.length}</strong><small>题目完成</small><progress value="${solved}" max="${c.problems.length}" aria-label="${escapeCpc(c.name+' 完成进度')}"></progress></td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
   }).join('');
   el('cpcSummary').textContent=`${contests.length} 场比赛 · ${done}/${total} 题完成`;
+  el('cpcRatingCoverage').textContent=`本年已评级 ${rated}/${total} · 与 CF Bot 使用同一份评级 · ${cpcData.ratingRelease?.scale||'CF 风格经验分数，非官方 Rating'}。${rated<total?' — 表示暂未评级。':''}`;
   el('cpcCoverage').textContent=`名单更新 ${cpcData.roster_checked?new Date(cpcData.roster_checked*1000).toLocaleString():'尚未同步'} · ${cpcData.unmapped_count} 个通过题号待映射`;
 }
 async function loadCpc(){

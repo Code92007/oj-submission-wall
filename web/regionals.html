@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js?v=5" defer></script><style>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js?v=6" defer></script><style>
 
 /* Regional progress styles are isolated from the main submission wall. */
 .cpc-regionals { padding: 28px; border-radius: 12px; box-shadow: none; }
@@ -48,10 +48,21 @@
 .cpc-progress progress::-webkit-progress-bar { background: #e9efec; }
 .cpc-progress progress::-webkit-progress-value { background: #6cab86; border-radius: 3px; }
 .cpc-progress progress::-moz-progress-bar { background: #6cab86; border-radius: 3px; }
-.cpc-tile { display: inline-flex; width: 42px; min-height: 45px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 6px; background: #f0f3f5; color: #7b8790; vertical-align: middle; }
-.cpc-tile.is-done { background: #d5eedb; color: #277348; }
-.cpc-tile .cpc-letter { font: 600 14px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.cpc-tile .cpc-mark { min-height: 11px; font-size: 9px; line-height: 11px; letter-spacing: 1px; }
+.cpc-tile { position: relative; display: inline-flex; width: 46px; min-height: 46px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 6px; background: #f0f3f5; vertical-align: middle; }
+.cpc-tile.is-done { background: #d5eedb; }
+.cpc-tile.difficulty-unknown { color: #69737e; }
+.cpc-tile.difficulty-brown { color: #855231; }
+.cpc-tile.difficulty-green { color: #267343; }
+.cpc-tile.difficulty-cyan { color: #167b86; }
+.cpc-tile.difficulty-blue { color: #315bbb; }
+.cpc-tile.difficulty-purple { color: #8743ac; }
+.cpc-tile.difficulty-orange { color: #b5680c; }
+.cpc-tile.difficulty-red { color: #bd3444; }
+.cpc-tile .cpc-letter { display: inline-flex; align-items: center; gap: 4px; font: 600 14px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.cpc-rating-circle { width: 9px; height: 9px; border: 1.5px solid currentColor; border-radius: 50%; background: currentColor; }
+.difficulty-unknown .cpc-rating-circle { background: transparent; }
+.cpc-tile .cpc-rating { color: #718091; font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.cpc-tile .cpc-mark { position: absolute; right: -3px; bottom: -3px; border-radius: 2px; background: #ffffffd9; color: #277348; font-size: 8px; line-height: 10px; letter-spacing: 1px; }
 .cpc-tile:focus-visible { outline: 2px solid #28775c; outline-offset: 3px; }
 .cpc-regionals .cpc-coverage { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
 .cpc-regionals .cpc-account-settings { margin-top: 22px; padding-top: 18px; border-top: 1px solid #e8edef; }
@@ -117,8 +128,9 @@
   <div class="cpc-table-wrap" tabindex="0" role="region" aria-label="区域赛题目进度，可横向滚动">
     <table class="cpc-table"><thead id="cpcHead"></thead><tbody id="cpcRows"></tbody></table>
   </div>
+  <p id="cpcRatingCoverage" class="cpc-coverage"></p>
   <p id="cpcCoverage" class="cpc-coverage"></p>
-  <p class="cpc-coverage">未着色表示暂无通过证据，历史仍可能待补。本页不计口胡。</p>
+  <p class="cpc-coverage">题号颜色表示难度，绿色底色表示已完成；灰色底色表示暂无通过证据，历史仍可能待补。本页不计口胡。</p>
   <details class="cpc-account-settings"><summary>确认绑定账号类型</summary><div id="cpcHandles"></div></details>
 </section>
 <section class="panel cpc-history" aria-labelledby="cpcHistoryTitle"><h2 id="cpcHistoryTitle">现场比赛通过</h2><p id="cpcOnsiteStatus" role="status"></p><div id="cpcOnsiteContests"></div><p class="cpc-history-note">正式与打星队伍的赛中通过均计入。按 DLUT 已确认名单及比赛原榜单链接同步；尚未进入区域赛目录的题目先保存现场记录，待映射后合并到上方题目进度。</p></section>

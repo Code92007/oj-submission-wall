@@ -29,6 +29,28 @@ class CpcTests(unittest.TestCase):
         self.assertEqual(self.service.token_owner(second),'1')
         self.assertIsNone(self.service.token_owner('invalid'))
 
+    def test_regional_page_exposes_release_without_changing_ac_snapshot(self):
+        class Handler:
+            path='/api/cpc/me'
+            headers={}
+            def send_json(self,status,body):self.status,self.body=status,body
+        handler=Handler()
+        release=json.loads((app.ROOT/'catalog/regional_ratings.json').read_text())
+        self.service.rating_release['problems']['unknown:A']={'rating':3000}
+        before=self.service.progress('1')
+        with patch.object(app,'get_current_principal',return_value={'type':'user','id':'1'}):
+            self.assertTrue(handle(handler,self.service))
+        self.assertEqual(handler.status,200)
+        self.assertEqual(handler.body['difficulty'],{pid:d for pid,d in release['problems'].items() if pid in self.service.problem_ids})
+        self.assertEqual(handler.body['ratingRelease']['source_revision'],release['source_revision'])
+        self.assertEqual(handler.body['problems'],before['problems'])
+        self.assertEqual(handler.body['record_count'],before['record_count'])
+        handler.path='/api/integration/v1/me/progress/snapshot'
+        handler.headers={'Authorization':'Bearer '+self.service.issue_token('1')['token']}
+        self.assertTrue(handle(handler,self.service))
+        self.assertNotIn('difficulty',handler.body)
+        self.assertEqual(handler.body['problems'],before['problems'])
+
     def test_cross_origin_write_does_not_issue_token(self):
         class Handler:
             path='/api/cpc/token'

@@ -29,6 +29,8 @@ class Integration:
         self.catalog, self.aliases = catalog(os.environ.get('CPC_CATALOG_PATH', app.ROOT / 'catalog/regionals.json'))
         self.contests = {c['id']: c for c in self.catalog['contests']}
         self.problem_ids = {p['id'] for c in self.contests.values() for p in c['problems']}
+        ratings_path = app.ROOT / 'catalog/regional_ratings.json'
+        self.rating_release = json.loads(ratings_path.read_text(encoding='utf-8')) if ratings_path.exists() else {}
         with self.db() as db:
             self.authority = uid(db, 'authority', 'self')
         self.wake = threading.Event()
@@ -360,7 +362,11 @@ def handle(handler, service, post=False):
             result = service.progress(owner)
             with service.db() as db:
                 remote, _ = service.remote(db)
-            result.update({'members': remote['roster']['members'], 'contests': service.catalog['contests']})
+            result.update({'members': remote['roster']['members'], 'contests': service.catalog['contests'],
+                           'difficulty': {pid: value for pid, value in service.rating_release.get('problems', {}).items()
+                                          if pid in service.problem_ids},
+                           'ratingRelease': {key: service.rating_release.get(key, {}) for key in
+                                             ('method', 'source_revision', 'scale', 'contests', 'unrated_contests')}})
         elif post:
             origin = handler.headers.get('Origin', '')
             expected = service.app.PUBLIC_BASE_URL.rstrip('/') or 'http://' + handler.headers.get('Host', '')
