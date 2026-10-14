@@ -141,3 +141,9 @@ docker compose exec oj-submission-wall python tools/configure_codeforces.py --ow
 整批补刷进一步发现历史 Gym 100371 的接口返回 HTTP 400；改为单场完整分页成功后合并，避免一个历史接口不可用阻塞济南等其他比赛。签名 user.status 的成功回补标记仅代表该接口历史完成，不代表所有 Gym 私有记录完整；Gym 失败由 last_error 警告单独呈现并每轮重试。
 
 实际补刷完成：最终运行版本 15bf006，备份 `/root/backups/cpc-coach-manager-final-20261010-223036/`。100 场已知 Gym 共补入 170 条 MANAGER；济南 2022 已核验为 A/C/D/E/G/J/K/M，8/13，截图中五条 AC ID 全部存在，原四道 VP 保留，G 两次 AC 按题去重。备份前 115106 条提交缺失 0，补刷后 115276 条。另有 26 场历史 Gym 的 Coach 记录暂不可读，已有记录保留并继续重试；不影响成功场次导入。核验报告位于备份目录 `backfill-verification.json`，不含凭据。
+
+## 2026-10-14 决赛与历史题单
+
+公共目录新增 2019–2025 每年的 CCPC Final / ICPC EC Final，共 14 场、178 题；总计 89 场、1132 题。与 CF Bot 保持规范 ID 一致，延期决赛按原赛季归档，排除热身。逐题字母与平台编号来自官方 Gym、QOJ / Universal Cup 正式题单，2020 CCPC 决赛辅以命题方 PROBLEMS 顺序核验。来源见 `catalog/regional_finals_sources.json`。新增决赛暂未评级。原有 954 题规范 ID、别名和题序保留。
+
+2019 南昌的比赛入口改为计蒜客 5530，沈阳改为 PTA 1231102432326602752 题单；原榜单仍保存在 ranklist_url。区域赛页面赛名可直接跳转看题。现场来源的 final / ecfinal / ecf 标识按赛事、赛季匹配到相应决赛，支持现有现场成绩重刷后的合并。

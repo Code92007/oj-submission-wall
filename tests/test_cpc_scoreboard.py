@@ -109,7 +109,7 @@ class ScoreboardTests(unittest.TestCase):
         self.assertEqual(edition_path({'contestName':'第 45 届 ICPC','place':'银川'}),('icpc',2020,'icpc/2020/yinchuan'))
         self.assertEqual(edition_path({'contestName':'第 46 届 ICPC','place':'济南'}),('icpc',2021,'icpc/46th/jinan'))
         self.assertEqual(edition_path({'contestName':'第 8 届 CCPC','place':'广州'}),('ccpc',2022,'ccpc/8th/guangzhou'))
-        for key, series, season, site in [('icpc2020yinchuan','ICPC',2020,'银川'),('icpc2019nanchang','ICPC',2019,'南昌'),('ccpc2019haerbin','CCPC',2019,'哈尔滨')]:
+        for key, series, season, site in [('icpc2020yinchuan','ICPC',2020,'银川'),('icpc2019nanchang','ICPC',2019,'南昌'),('ccpc2019haerbin','CCPC',2019,'哈尔滨'),('icpc2024ecfinal','ICPC',2024,'EC Final'),('ccpc2025final','CCPC',2025,'CCPC Final')]:
             with self.subTest(key=key):
                 srk={'type':'general','contest':{'startAt':'2021-05-16T11:00:00+08:00','duration':[5,'h']},
                      'problems':[{'alias':'A'},{'alias':'B'}], 'rows':[{'user':{'id':'old','name':'打星队','organization':'大连理工大学','official':False},

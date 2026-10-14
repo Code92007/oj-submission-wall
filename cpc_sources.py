@@ -191,7 +191,9 @@ class Scoreboards:
             series, edition, site = path.split('/')
             season = int(edition[:-2]) + (2014 if series == 'ccpc' else 1975) if edition.endswith('th') else int(edition)
         site_name = award.get('place') or participation.get('location')
+        site_key = None
         if xcpc:
+            site_key = site
             site_name = next((cn for cn, en in SITES.items() if en == site), site_name)
         elif rankland:
             parsed = urlsplit(rankland)
@@ -202,6 +204,8 @@ class Scoreboards:
                 season = int(year)
                 site_key = site.replace('_','').replace('haerbin','harbin')
                 site_name = next((cn for cn, en in SITES.items() if en == site_key), site_name)
+        if site_key in {'final', 'ecfinal', 'ecf', 'ec-final'}:
+            site_name = 'EC Final' if series == 'icpc' else 'CCPC Final'
         contest = next((c for c in contests.values() if c['series'].lower() == series
                         and c['year'] == season and c['site'] == site_name), None)
         # Prefer the original board chosen by DLUT, including archived RankLand events.

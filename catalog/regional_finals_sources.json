@@ -1,0 +1,413 @@
+{
+  "verified_at": "2026-10-14",
+  "scope": "2019–2025 CCPC Final / ICPC EC Final 正赛；按赛季归档，排除热身题",
+  "contests": [
+    {
+      "id": "icpc-2019-ECFinal",
+      "season": 2019,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/463",
+        "https://qoj.ac/contest/1039",
+        "https://codeforces.com/gym/102471"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {}
+    },
+    {
+      "id": "icpc-2020-ECFinal",
+      "season": 2020,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/462",
+        "https://qoj.ac/contest/1040",
+        "https://codeforces.com/gym/103069"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {}
+    },
+    {
+      "id": "icpc-2021-ECFinal",
+      "season": 2021,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/461",
+        "https://qoj.ac/contest/1041",
+        "https://codeforces.com/gym/103861"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {}
+    },
+    {
+      "id": "icpc-2022-ECFinal",
+      "season": 2022,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/460",
+        "https://qoj.ac/contest/1197",
+        "https://contest.ucup.ac/contest/1197"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "26ee944935cf51db7e2c33a02421f8e2f9a05ac205c717597b6010b3da6bb419"
+      }
+    },
+    {
+      "id": "icpc-2023-ECFinal",
+      "season": 2023,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/459",
+        "https://qoj.ac/contest/1522",
+        "https://contest.ucup.ac/contest/1522"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "9bed5d4a80bfa637764eaa30fbf664dfe18d978dafad65d2b82d83af0ee4a294"
+      }
+    },
+    {
+      "id": "icpc-2024-ECFinal",
+      "season": 2024,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/458",
+        "https://qoj.ac/contest/1894",
+        "https://contest.ucup.ac/contest/1894"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "93200666c6c0ddaa3125684e2d539056107ad731f817f7b2371690c73cc357ef"
+      }
+    },
+    {
+      "id": "icpc-2025-ECFinal",
+      "season": 2025,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/576",
+        "https://qoj.ac/contest/3295",
+        "https://contest.ucup.ac/contest/3295"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "8374d68d73329cf203e8b61250deecb3ca9d62cd49e8add6f0211136e3dc17c9"
+      }
+    },
+    {
+      "id": "ccpc-2019-Final",
+      "season": 2019,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/364",
+        "https://qoj.ac/contest/2027",
+        "https://codeforces.com/gym/102431"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L"
+      ],
+      "online_mapping": "verified",
+      "sha256": {}
+    },
+    {
+      "id": "ccpc-2020-Final",
+      "season": 2020,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/278",
+        "https://qoj.ac/contest/845",
+        "https://github.com/ftiasch/ccpc-final-2020/blob/main/main/PROBLEMS",
+        "https://qoj.ac/problems?order=asc&sort=id&tag=CCPC+Final+2020"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "author_problem_order": "b79c654872256827df88950e712c7e489f6d1efdfd6eb1a879e967408cbaf159"
+      }
+    },
+    {
+      "id": "ccpc-2021-Final",
+      "season": 2021,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/277",
+        "https://qoj.ac/contest/1869",
+        "https://codeforces.com/gym/103860"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L"
+      ],
+      "online_mapping": "verified",
+      "sha256": {}
+    },
+    {
+      "id": "ccpc-2022-Final",
+      "season": 2022,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/276",
+        "https://qoj.ac/contest/1244",
+        "https://contest.ucup.ac/contest/1244"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "617f80a02df7f97aaa289e7561ef0e142064e1d00a46bf9df9c67ceb137782ef"
+      }
+    },
+    {
+      "id": "ccpc-2023-Final",
+      "season": 2023,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/275",
+        "https://qoj.ac/contest/1596",
+        "https://contest.ucup.ac/contest/1596"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "1f1a8848ce0444437034161e45ae6bf2c6c7189cd427a15b4ae49aa21473fb2c"
+      }
+    },
+    {
+      "id": "ccpc-2024-Final",
+      "season": 2024,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/379",
+        "https://qoj.ac/contest/2036",
+        "https://contest.ucup.ac/contest/2036"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "f281ca35eab13cd30f12ac78eb8e6d836c9e57552f18aa4d05a1387fc806f73f"
+      }
+    },
+    {
+      "id": "ccpc-2025-Final",
+      "season": 2025,
+      "stage": "final",
+      "source_urls": [
+        "https://qoj.ac/category/581",
+        "https://qoj.ac/contest/3727",
+        "https://contest.ucup.ac/contest/3727"
+      ],
+      "problem_labels": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "online_mapping": "verified",
+      "sha256": {
+        "official_mirror_dashboard": "1482af0b3dc583011be6b8ac9143c70515e345d6d4bdb28be0e060a0efdc4cc2"
+      }
+    }
+  ],
+  "reading_fallbacks": [
+    {
+      "id": "icpc-2019-南昌",
+      "url": "https://www.jisuanke.com/contest/5530",
+      "online_mapping": "pending",
+      "note": "提供题单入口，未猜测单题编号。"
+    },
+    {
+      "id": "icpc-2019-沈阳",
+      "url": "https://pintia.cn/problem-sets/1231102432326602752/exam/problems",
+      "online_mapping": "pending",
+      "note": "PTA 历史题单入口，未保证仍能提交；未猜测单题编号。"
+    }
+  ]
+}

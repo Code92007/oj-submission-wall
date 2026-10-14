@@ -44,7 +44,7 @@ function cpcWall(){
     }).join('');done+=solved;total+=c.problems.length;
     const series=['ICPC','CCPC'].includes(c.series)?c.series:'';
     const name=series?c.name.replace(`${c.year} ${series} `,`${c.year} · `):c.name;
-    return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}${escapeCpc(name)}</span></th><td class="cpc-progress"><strong>${solved}/${c.problems.length}</strong><small>题目完成</small><progress value="${solved}" max="${c.problems.length}" aria-label="${escapeCpc(c.name+' 完成进度')}"></progress></td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
+    return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}<a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">${escapeCpc(name)}</a></span></th><td class="cpc-progress"><strong>${solved}/${c.problems.length}</strong><small>题目完成</small><progress value="${solved}" max="${c.problems.length}" aria-label="${escapeCpc(c.name+' 完成进度')}"></progress></td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
   }).join('');
   el('cpcSummary').textContent=`${contests.length} 场比赛 · ${done}/${total} 题完成`;
   el('cpcCoverage').textContent=`名单更新 ${cpcData.roster_checked?new Date(cpcData.roster_checked*1000).toLocaleString():'尚未同步'} · ${cpcData.unmapped_count} 个通过题号待映射`;

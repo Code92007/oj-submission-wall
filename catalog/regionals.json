@@ -1,7 +1,148 @@
 {
-  "verified_at": "2026-10-10",
-  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API",
+  "verified_at": "2026-10-14",
+  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links",
   "contests": [
+    {
+      "id": "ccpc-2025-Final",
+      "year": 2025,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2025 CCPC Final",
+      "source_url": "https://qoj.ac/contest/3727",
+      "qoj_contest_id": 3727,
+      "qoj_url": "https://qoj.ac/contest/3727",
+      "category_source": "https://qoj.ac/category/581",
+      "mapping_source": "https://contest.ucup.ac/contest/3727",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 18001,
+          "name": "White Night",
+          "aliases": [
+            "qoj:18001"
+          ],
+          "id": "ccpc-2025-Final:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 18002,
+          "name": "Yearning for Yonder 2",
+          "aliases": [
+            "qoj:18002"
+          ],
+          "id": "ccpc-2025-Final:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 18003,
+          "name": "Four Kubic Theorem 2",
+          "aliases": [
+            "qoj:18003"
+          ],
+          "id": "ccpc-2025-Final:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 18004,
+          "name": "Call You With Your Name",
+          "aliases": [
+            "qoj:18004"
+          ],
+          "id": "ccpc-2025-Final:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 18005,
+          "name": "Call You With Your Name 2",
+          "aliases": [
+            "qoj:18005"
+          ],
+          "id": "ccpc-2025-Final:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 18006,
+          "name": "Many Many Heads 2",
+          "aliases": [
+            "qoj:18006"
+          ],
+          "id": "ccpc-2025-Final:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 18007,
+          "name": "Puzzle: The Artisan of Glimmith",
+          "aliases": [
+            "qoj:18007"
+          ],
+          "id": "ccpc-2025-Final:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 18008,
+          "name": "Strange Sorting 2",
+          "aliases": [
+            "qoj:18008"
+          ],
+          "id": "ccpc-2025-Final:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 18009,
+          "name": "Not a Work of Idol 2",
+          "aliases": [
+            "qoj:18009"
+          ],
+          "id": "ccpc-2025-Final:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 18010,
+          "name": "Slay the Spire 2",
+          "aliases": [
+            "qoj:18010"
+          ],
+          "id": "ccpc-2025-Final:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 18011,
+          "name": "Sequence Operation",
+          "aliases": [
+            "qoj:18011"
+          ],
+          "id": "ccpc-2025-Final:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 18012,
+          "name": "Spirited Away",
+          "aliases": [
+            "qoj:18012"
+          ],
+          "id": "ccpc-2025-Final:L"
+        },
+        {
+          "index": "M",
+          "qoj_id": 18013,
+          "name": "Rectangle Flip 3",
+          "aliases": [
+            "qoj:18013"
+          ],
+          "id": "ccpc-2025-Final:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/3727",
+          "label": "Universal Cup 题单"
+        }
+      ]
+    },
     {
       "id": "ccpc-2025-哈尔滨",
       "year": 2025,
@@ -521,6 +662,138 @@
       "qoj_contest_id": 3387,
       "qoj_url": "https://qoj.ac/contest/3387",
       "mapping_source": "https://vjudge.net/contest/799675"
+    },
+    {
+      "id": "icpc-2025-ECFinal",
+      "year": 2025,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2025 ICPC EC Final",
+      "source_url": "https://qoj.ac/contest/3295",
+      "qoj_contest_id": 3295,
+      "qoj_url": "https://qoj.ac/contest/3295",
+      "category_source": "https://qoj.ac/category/576",
+      "mapping_source": "https://contest.ucup.ac/contest/3295",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 16328,
+          "name": "Outstanding Outlines",
+          "aliases": [
+            "qoj:16328"
+          ],
+          "id": "icpc-2025-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 16329,
+          "name": "Batching Badges",
+          "aliases": [
+            "qoj:16329"
+          ],
+          "id": "icpc-2025-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 16330,
+          "name": "Potential Peak",
+          "aliases": [
+            "qoj:16330"
+          ],
+          "id": "icpc-2025-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 16331,
+          "name": "Strategic Stones",
+          "aliases": [
+            "qoj:16331"
+          ],
+          "id": "icpc-2025-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 16332,
+          "name": "Efficient Express",
+          "aliases": [
+            "qoj:16332"
+          ],
+          "id": "icpc-2025-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 16333,
+          "name": "Set of Intervals 2",
+          "aliases": [
+            "qoj:16333"
+          ],
+          "id": "icpc-2025-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 16334,
+          "name": "Revolver Roulette",
+          "aliases": [
+            "qoj:16334"
+          ],
+          "id": "icpc-2025-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 16335,
+          "name": "Hextech High-roll",
+          "aliases": [
+            "qoj:16335"
+          ],
+          "id": "icpc-2025-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 16336,
+          "name": "Redundancy Refrain",
+          "aliases": [
+            "qoj:16336"
+          ],
+          "id": "icpc-2025-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 16337,
+          "name": "Tree-mendous Transmission",
+          "aliases": [
+            "qoj:16337"
+          ],
+          "id": "icpc-2025-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 16338,
+          "name": "Magically Marked Matching Master",
+          "aliases": [
+            "qoj:16338"
+          ],
+          "id": "icpc-2025-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 16339,
+          "name": "Logical Resonance",
+          "aliases": [
+            "qoj:16339"
+          ],
+          "id": "icpc-2025-ECFinal:L"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/3295",
+          "label": "Universal Cup 题单"
+        }
+      ]
     },
     {
       "id": "icpc-2025-上海",
@@ -1491,6 +1764,147 @@
       "mapping_source": "https://vjudge.net/contest/805570"
     },
     {
+      "id": "ccpc-2024-Final",
+      "year": 2024,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2024 CCPC Final",
+      "source_url": "https://qoj.ac/contest/2036",
+      "qoj_contest_id": 2036,
+      "qoj_url": "https://qoj.ac/contest/2036",
+      "category_source": "https://qoj.ac/category/379",
+      "mapping_source": "https://contest.ucup.ac/contest/2036",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 11105,
+          "name": "Requiem for Qingyu",
+          "aliases": [
+            "qoj:11105"
+          ],
+          "id": "ccpc-2024-Final:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 11106,
+          "name": "Add One 3",
+          "aliases": [
+            "qoj:11106"
+          ],
+          "id": "ccpc-2024-Final:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 11107,
+          "name": "Iridescent Universe",
+          "aliases": [
+            "qoj:11107"
+          ],
+          "id": "ccpc-2024-Final:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 11108,
+          "name": "Nocturne without a Moon",
+          "aliases": [
+            "qoj:11108"
+          ],
+          "id": "ccpc-2024-Final:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 11109,
+          "name": "Omniscient Artist",
+          "aliases": [
+            "qoj:11109"
+          ],
+          "id": "ccpc-2024-Final:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 11110,
+          "name": "Witnessing the Miracle",
+          "aliases": [
+            "qoj:11110"
+          ],
+          "id": "ccpc-2024-Final:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 11111,
+          "name": "$+$ and $\\times$ with a sugar",
+          "aliases": [
+            "qoj:11111"
+          ],
+          "id": "ccpc-2024-Final:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 11112,
+          "name": "Qingyu's Little Training Center",
+          "aliases": [
+            "qoj:11112"
+          ],
+          "id": "ccpc-2024-Final:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 11113,
+          "name": "Ineffable Cycle",
+          "aliases": [
+            "qoj:11113"
+          ],
+          "id": "ccpc-2024-Final:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 11114,
+          "name": "Not a work of Idol",
+          "aliases": [
+            "qoj:11114"
+          ],
+          "id": "ccpc-2024-Final:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 11115,
+          "name": "Grotesque Team Reconstruction",
+          "aliases": [
+            "qoj:11115"
+          ],
+          "id": "ccpc-2024-Final:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 11116,
+          "name": "Yearning for Yonder",
+          "aliases": [
+            "qoj:11116"
+          ],
+          "id": "ccpc-2024-Final:L"
+        },
+        {
+          "index": "M",
+          "qoj_id": 11117,
+          "name": "Under the Epilogue",
+          "aliases": [
+            "qoj:11117"
+          ],
+          "id": "ccpc-2024-Final:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/2036",
+          "label": "Universal Cup 题单"
+        }
+      ]
+    },
+    {
       "id": "ccpc-2024-哈尔滨",
       "year": 2024,
       "series": "CCPC",
@@ -2121,6 +2535,138 @@
       "qoj_contest_id": 1840,
       "qoj_url": "https://qoj.ac/contest/1840",
       "mapping_source": "https://vjudge.net/contest/673000"
+    },
+    {
+      "id": "icpc-2024-ECFinal",
+      "year": 2024,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2024 ICPC EC Final",
+      "source_url": "https://qoj.ac/contest/1894",
+      "qoj_contest_id": 1894,
+      "qoj_url": "https://qoj.ac/contest/1894",
+      "category_source": "https://qoj.ac/category/458",
+      "mapping_source": "https://contest.ucup.ac/contest/1894",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 9975,
+          "name": "Hitoshizuku",
+          "aliases": [
+            "qoj:9975"
+          ],
+          "id": "icpc-2024-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 9976,
+          "name": "Guess the Polygon 2",
+          "aliases": [
+            "qoj:9976"
+          ],
+          "id": "icpc-2024-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 9977,
+          "name": "Norte da Universidade",
+          "aliases": [
+            "qoj:9977"
+          ],
+          "id": "icpc-2024-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 9978,
+          "name": "Keystone Correction",
+          "aliases": [
+            "qoj:9978"
+          ],
+          "id": "icpc-2024-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 9979,
+          "name": "Corrupted Scoreboard Log",
+          "aliases": [
+            "qoj:9979"
+          ],
+          "id": "icpc-2024-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 9980,
+          "name": "Boolean Function Reconstruction",
+          "aliases": [
+            "qoj:9980"
+          ],
+          "id": "icpc-2024-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 9981,
+          "name": "Collatz Conjecture",
+          "aliases": [
+            "qoj:9981"
+          ],
+          "id": "icpc-2024-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 9982,
+          "name": "Staircase Museum",
+          "aliases": [
+            "qoj:9982"
+          ],
+          "id": "icpc-2024-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 9983,
+          "name": "Color-Balanced Tree",
+          "aliases": [
+            "qoj:9983"
+          ],
+          "id": "icpc-2024-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 9984,
+          "name": "The Mysterious Shop",
+          "aliases": [
+            "qoj:9984"
+          ],
+          "id": "icpc-2024-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 9985,
+          "name": "Exploration Boundary",
+          "aliases": [
+            "qoj:9985"
+          ],
+          "id": "icpc-2024-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 9986,
+          "name": "Shiori",
+          "aliases": [
+            "qoj:9986"
+          ],
+          "id": "icpc-2024-ECFinal:L"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/1894",
+          "label": "Universal Cup 题单"
+        }
+      ]
     },
     {
       "id": "icpc-2024-上海",
@@ -3168,6 +3714,147 @@
       "mapping_source": "https://vjudge.net/contest/684424"
     },
     {
+      "id": "ccpc-2023-Final",
+      "year": 2023,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2023 CCPC Final",
+      "source_url": "https://qoj.ac/contest/1596",
+      "qoj_contest_id": 1596,
+      "qoj_url": "https://qoj.ac/contest/1596",
+      "category_source": "https://qoj.ac/category/275",
+      "mapping_source": "https://contest.ucup.ac/contest/1596",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 8542,
+          "name": "Add One 2",
+          "aliases": [
+            "qoj:8542"
+          ],
+          "id": "ccpc-2023-Final:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 8543,
+          "name": "Periodic Sequence",
+          "aliases": [
+            "qoj:8543"
+          ],
+          "id": "ccpc-2023-Final:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 8544,
+          "name": "Colorful Graph 2",
+          "aliases": [
+            "qoj:8544"
+          ],
+          "id": "ccpc-2023-Final:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 8545,
+          "name": "Min or Max",
+          "aliases": [
+            "qoj:8545"
+          ],
+          "id": "ccpc-2023-Final:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 8546,
+          "name": "Min or Max 2",
+          "aliases": [
+            "qoj:8546"
+          ],
+          "id": "ccpc-2023-Final:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 8547,
+          "name": "Whose Land?",
+          "aliases": [
+            "qoj:8547"
+          ],
+          "id": "ccpc-2023-Final:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 8548,
+          "name": "China Convex Polygon Contest",
+          "aliases": [
+            "qoj:8548"
+          ],
+          "id": "ccpc-2023-Final:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 8549,
+          "name": "The Game",
+          "aliases": [
+            "qoj:8549"
+          ],
+          "id": "ccpc-2023-Final:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 8550,
+          "name": "All the Way Left",
+          "aliases": [
+            "qoj:8550"
+          ],
+          "id": "ccpc-2023-Final:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 8551,
+          "name": "DFS Order 5",
+          "aliases": [
+            "qoj:8551"
+          ],
+          "id": "ccpc-2023-Final:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 8552,
+          "name": "Sticks",
+          "aliases": [
+            "qoj:8552"
+          ],
+          "id": "ccpc-2023-Final:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 8553,
+          "name": "Exchanging Kubic",
+          "aliases": [
+            "qoj:8553"
+          ],
+          "id": "ccpc-2023-Final:L"
+        },
+        {
+          "index": "M",
+          "qoj_id": 8554,
+          "name": "Bot Friends",
+          "aliases": [
+            "qoj:8554"
+          ],
+          "id": "ccpc-2023-Final:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/1596",
+          "label": "Universal Cup 题单"
+        }
+      ]
+    },
+    {
       "id": "ccpc-2023-哈尔滨",
       "year": 2023,
       "series": "CCPC",
@@ -3741,6 +4428,147 @@
       "qoj_url": "https://qoj.ac/contest/1411",
       "cf_contest_id": 104787,
       "mapping_source": "https://vjudge.net/contest/664228"
+    },
+    {
+      "id": "icpc-2023-ECFinal",
+      "year": 2023,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2023 ICPC EC Final",
+      "source_url": "https://qoj.ac/contest/1522",
+      "qoj_contest_id": 1522,
+      "qoj_url": "https://qoj.ac/contest/1522",
+      "category_source": "https://qoj.ac/category/459",
+      "mapping_source": "https://contest.ucup.ac/contest/1522",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 8047,
+          "name": "DFS Order 4",
+          "aliases": [
+            "qoj:8047"
+          ],
+          "id": "icpc-2023-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 8048,
+          "name": "Roman Master",
+          "aliases": [
+            "qoj:8048"
+          ],
+          "id": "icpc-2023-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 8049,
+          "name": "Equal Sums",
+          "aliases": [
+            "qoj:8049"
+          ],
+          "id": "icpc-2023-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 8050,
+          "name": "Random Permutation",
+          "aliases": [
+            "qoj:8050"
+          ],
+          "id": "icpc-2023-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 8051,
+          "name": "Colorful Graph",
+          "aliases": [
+            "qoj:8051"
+          ],
+          "id": "icpc-2023-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 8052,
+          "name": "Dot Product",
+          "aliases": [
+            "qoj:8052"
+          ],
+          "id": "icpc-2023-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 8053,
+          "name": "Flow 2",
+          "aliases": [
+            "qoj:8053"
+          ],
+          "id": "icpc-2023-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 8054,
+          "name": "Map 2",
+          "aliases": [
+            "qoj:8054"
+          ],
+          "id": "icpc-2023-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 8055,
+          "name": "Balance",
+          "aliases": [
+            "qoj:8055"
+          ],
+          "id": "icpc-2023-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 8056,
+          "name": "Travel 2",
+          "aliases": [
+            "qoj:8056"
+          ],
+          "id": "icpc-2023-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 8057,
+          "name": "Best Carry Player 4",
+          "aliases": [
+            "qoj:8057"
+          ],
+          "id": "icpc-2023-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 8058,
+          "name": "Binary vs Ternary",
+          "aliases": [
+            "qoj:8058"
+          ],
+          "id": "icpc-2023-ECFinal:L"
+        },
+        {
+          "index": "M",
+          "qoj_id": 8059,
+          "name": "Circular Route",
+          "aliases": [
+            "qoj:8059"
+          ],
+          "id": "icpc-2023-ECFinal:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/1522",
+          "label": "Universal Cup 题单"
+        }
+      ]
     },
     {
       "id": "icpc-2023-南京",
@@ -4818,6 +5646,147 @@
       "qoj_url": "https://qoj.ac/contest/1784"
     },
     {
+      "id": "ccpc-2022-Final",
+      "year": 2022,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2022 CCPC Final",
+      "source_url": "https://qoj.ac/contest/1244",
+      "qoj_contest_id": 1244,
+      "qoj_url": "https://qoj.ac/contest/1244",
+      "category_source": "https://qoj.ac/category/276",
+      "mapping_source": "https://contest.ucup.ac/contest/1244",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 6501,
+          "name": "Graph Partitioning",
+          "aliases": [
+            "qoj:6501"
+          ],
+          "id": "ccpc-2022-Final:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 6502,
+          "name": "Disjoint Set Union",
+          "aliases": [
+            "qoj:6502"
+          ],
+          "id": "ccpc-2022-Final:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 6503,
+          "name": "DFS Order 3",
+          "aliases": [
+            "qoj:6503"
+          ],
+          "id": "ccpc-2022-Final:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 6504,
+          "name": "Flower's Land 2",
+          "aliases": [
+            "qoj:6504"
+          ],
+          "id": "ccpc-2022-Final:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 6505,
+          "name": "CCPC String",
+          "aliases": [
+            "qoj:6505"
+          ],
+          "id": "ccpc-2022-Final:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 6506,
+          "name": "Chase Game 3",
+          "aliases": [
+            "qoj:6506"
+          ],
+          "id": "ccpc-2022-Final:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 6507,
+          "name": "Recover the String",
+          "aliases": [
+            "qoj:6507"
+          ],
+          "id": "ccpc-2022-Final:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 6508,
+          "name": "This is not an Abnormal Team!",
+          "aliases": [
+            "qoj:6508"
+          ],
+          "id": "ccpc-2022-Final:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 6509,
+          "name": "Not Another Range Query Problem",
+          "aliases": [
+            "qoj:6509"
+          ],
+          "id": "ccpc-2022-Final:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 6510,
+          "name": "Best Carry Player 3",
+          "aliases": [
+            "qoj:6510"
+          ],
+          "id": "ccpc-2022-Final:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 6511,
+          "name": "Balancing Sequences",
+          "aliases": [
+            "qoj:6511"
+          ],
+          "id": "ccpc-2022-Final:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 6512,
+          "name": "Completely Multiplicative Function",
+          "aliases": [
+            "qoj:6512"
+          ],
+          "id": "ccpc-2022-Final:L"
+        },
+        {
+          "index": "M",
+          "qoj_id": 6513,
+          "name": "Expression 3",
+          "aliases": [
+            "qoj:6513"
+          ],
+          "id": "ccpc-2022-Final:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/1244",
+          "label": "Universal Cup 题单"
+        }
+      ]
+    },
+    {
       "id": "ccpc-2022-威海",
       "year": 2022,
       "series": "CCPC",
@@ -5468,6 +6437,147 @@
       "rating_evidence": {
         "standings_path": "data/ccpc/8th/mianyang"
       }
+    },
+    {
+      "id": "icpc-2022-ECFinal",
+      "year": 2022,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2022 ICPC EC Final",
+      "source_url": "https://qoj.ac/contest/1197",
+      "qoj_contest_id": 1197,
+      "qoj_url": "https://qoj.ac/contest/1197",
+      "category_source": "https://qoj.ac/category/460",
+      "mapping_source": "https://contest.ucup.ac/contest/1197",
+      "problems": [
+        {
+          "index": "A",
+          "qoj_id": 6298,
+          "name": "Coloring",
+          "aliases": [
+            "qoj:6298"
+          ],
+          "id": "icpc-2022-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "qoj_id": 6299,
+          "name": "Binary String",
+          "aliases": [
+            "qoj:6299"
+          ],
+          "id": "icpc-2022-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "qoj_id": 6300,
+          "name": "Best Carry Player 2",
+          "aliases": [
+            "qoj:6300"
+          ],
+          "id": "icpc-2022-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "qoj_id": 6301,
+          "name": "Minimum Suffix",
+          "aliases": [
+            "qoj:6301"
+          ],
+          "id": "icpc-2022-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "qoj_id": 6302,
+          "name": "Map",
+          "aliases": [
+            "qoj:6302"
+          ],
+          "id": "icpc-2022-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "qoj_id": 6303,
+          "name": "Inversion",
+          "aliases": [
+            "qoj:6303"
+          ],
+          "id": "icpc-2022-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "qoj_id": 6304,
+          "name": "Rectangle",
+          "aliases": [
+            "qoj:6304"
+          ],
+          "id": "icpc-2022-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "qoj_id": 6305,
+          "name": "Chinese Checker",
+          "aliases": [
+            "qoj:6305"
+          ],
+          "id": "icpc-2022-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "qoj_id": 6306,
+          "name": "Chase Game",
+          "aliases": [
+            "qoj:6306"
+          ],
+          "id": "icpc-2022-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "qoj_id": 6307,
+          "name": "Chase Game 2",
+          "aliases": [
+            "qoj:6307"
+          ],
+          "id": "icpc-2022-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "qoj_id": 6308,
+          "name": "Magic",
+          "aliases": [
+            "qoj:6308"
+          ],
+          "id": "icpc-2022-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "qoj_id": 6309,
+          "name": "Aqre",
+          "aliases": [
+            "qoj:6309"
+          ],
+          "id": "icpc-2022-ECFinal:L"
+        },
+        {
+          "index": "M",
+          "qoj_id": 6310,
+          "name": "Dining Professors",
+          "aliases": [
+            "qoj:6310"
+          ],
+          "id": "icpc-2022-ECFinal:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "source_links": [
+        {
+          "url": "https://contest.ucup.ac/contest/1197",
+          "label": "Universal Cup 题单"
+        }
+      ]
     },
     {
       "id": "icpc-2022-南京",
@@ -6556,6 +7666,133 @@
       }
     },
     {
+      "id": "ccpc-2021-Final",
+      "year": 2021,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2021 CCPC Final",
+      "source_url": "https://codeforces.com/gym/103860",
+      "qoj_contest_id": 1869,
+      "qoj_url": "https://qoj.ac/contest/1869",
+      "category_source": "https://qoj.ac/category/277",
+      "mapping_source": "https://codeforces.com/gym/103860",
+      "problems": [
+        {
+          "index": "A",
+          "name": "Mash",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860A"
+          ],
+          "id": "ccpc-2021-Final:A"
+        },
+        {
+          "index": "B",
+          "name": "Shuttle Bus",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860B"
+          ],
+          "id": "ccpc-2021-Final:B"
+        },
+        {
+          "index": "C",
+          "name": "Selection Sort Count",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860C"
+          ],
+          "id": "ccpc-2021-Final:C"
+        },
+        {
+          "index": "D",
+          "name": "Tree Partition",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860D"
+          ],
+          "id": "ccpc-2021-Final:D"
+        },
+        {
+          "index": "E",
+          "name": "Elegant Tetris",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860E"
+          ],
+          "id": "ccpc-2021-Final:E"
+        },
+        {
+          "index": "F",
+          "name": "Modulo",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860F"
+          ],
+          "id": "ccpc-2021-Final:F"
+        },
+        {
+          "index": "G",
+          "name": "Integer Game",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860G"
+          ],
+          "id": "ccpc-2021-Final:G"
+        },
+        {
+          "index": "H",
+          "name": "Harie Programming Contest",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860H"
+          ],
+          "id": "ccpc-2021-Final:H"
+        },
+        {
+          "index": "I",
+          "name": "Reverse LIS",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860I"
+          ],
+          "id": "ccpc-2021-Final:I"
+        },
+        {
+          "index": "J",
+          "name": "jwfw.harie.edu",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860J"
+          ],
+          "id": "ccpc-2021-Final:J"
+        },
+        {
+          "index": "K",
+          "name": "Security Plan",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860K"
+          ],
+          "id": "ccpc-2021-Final:K"
+        },
+        {
+          "index": "L",
+          "name": "Paid Leave",
+          "cf_contest_id": 103860,
+          "aliases": [
+            "codeforces:103860L"
+          ],
+          "id": "ccpc-2021-Final:L"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "cf_contest_id": 103860
+    },
+    {
       "id": "ccpc-2021-哈尔滨",
       "year": 2021,
       "series": "CCPC",
@@ -7113,6 +8350,142 @@
       "rating_evidence": {
         "standings_path": "data/ccpc/7th/guilin"
       }
+    },
+    {
+      "id": "icpc-2021-ECFinal",
+      "year": 2021,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2021 ICPC EC Final",
+      "source_url": "https://codeforces.com/gym/103861",
+      "qoj_contest_id": 1041,
+      "qoj_url": "https://qoj.ac/contest/1041",
+      "category_source": "https://qoj.ac/category/461",
+      "mapping_source": "https://codeforces.com/gym/103861",
+      "problems": [
+        {
+          "index": "A",
+          "name": "DFS Order",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861A"
+          ],
+          "id": "icpc-2021-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "name": "Beautiful String",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861B"
+          ],
+          "id": "icpc-2021-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "name": "String-dle Count",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861C"
+          ],
+          "id": "icpc-2021-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "name": "Two Walls",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861D"
+          ],
+          "id": "icpc-2021-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "name": "Prof. Pang and Poker",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861E"
+          ],
+          "id": "icpc-2021-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "name": "Vacation",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861F"
+          ],
+          "id": "icpc-2021-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "name": "Check Pattern is Bad",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861G"
+          ],
+          "id": "icpc-2021-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "name": "Check Pattern is Good",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861H"
+          ],
+          "id": "icpc-2021-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "name": "Future Coder",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861I"
+          ],
+          "id": "icpc-2021-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "name": "Elden Ring",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861J"
+          ],
+          "id": "icpc-2021-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "name": "Vision Test",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861K"
+          ],
+          "id": "icpc-2021-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "name": "Fenwick Tree",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861L"
+          ],
+          "id": "icpc-2021-ECFinal:L"
+        },
+        {
+          "index": "M",
+          "name": "Prof. Pang and Ants",
+          "cf_contest_id": 103861,
+          "aliases": [
+            "codeforces:103861M"
+          ],
+          "id": "icpc-2021-ECFinal:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "cf_contest_id": 103861
     },
     {
       "id": "icpc-2021-上海",
@@ -8015,6 +9388,141 @@
       }
     },
     {
+      "id": "ccpc-2020-Final",
+      "year": 2020,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2020 CCPC Final",
+      "source_url": "https://qoj.ac/contest/845",
+      "qoj_contest_id": 845,
+      "qoj_url": "https://qoj.ac/contest/845",
+      "category_source": "https://qoj.ac/category/278",
+      "mapping_source": "https://github.com/ftiasch/ccpc-final-2020/blob/main/main/PROBLEMS",
+      "problems": [
+        {
+          "qoj_id": 2827,
+          "name": "Autobiography",
+          "index": "A",
+          "aliases": [
+            "qoj:2827"
+          ],
+          "id": "ccpc-2020-Final:A"
+        },
+        {
+          "qoj_id": 2828,
+          "name": "Algebra",
+          "index": "B",
+          "aliases": [
+            "qoj:2828"
+          ],
+          "id": "ccpc-2020-Final:B"
+        },
+        {
+          "qoj_id": 2829,
+          "name": "Cryptography",
+          "index": "C",
+          "aliases": [
+            "qoj:2829"
+          ],
+          "id": "ccpc-2020-Final:C"
+        },
+        {
+          "qoj_id": 2830,
+          "name": "Data Structure",
+          "index": "D",
+          "aliases": [
+            "qoj:2830"
+          ],
+          "id": "ccpc-2020-Final:D"
+        },
+        {
+          "qoj_id": 2831,
+          "name": "Game Theory",
+          "index": "E",
+          "aliases": [
+            "qoj:2831"
+          ],
+          "id": "ccpc-2020-Final:E"
+        },
+        {
+          "qoj_id": 2832,
+          "name": "Graph Theory",
+          "index": "F",
+          "aliases": [
+            "qoj:2832"
+          ],
+          "id": "ccpc-2020-Final:F"
+        },
+        {
+          "qoj_id": 2833,
+          "name": "Hamilton",
+          "index": "G",
+          "aliases": [
+            "qoj:2833"
+          ],
+          "id": "ccpc-2020-Final:G"
+        },
+        {
+          "qoj_id": 2834,
+          "name": "Nonsense",
+          "index": "H",
+          "aliases": [
+            "qoj:2834"
+          ],
+          "id": "ccpc-2020-Final:H"
+        },
+        {
+          "qoj_id": 2835,
+          "name": "Number Theory",
+          "index": "I",
+          "aliases": [
+            "qoj:2835"
+          ],
+          "id": "ccpc-2020-Final:I"
+        },
+        {
+          "qoj_id": 2836,
+          "name": "Permutation Pattern",
+          "index": "J",
+          "aliases": [
+            "qoj:2836"
+          ],
+          "id": "ccpc-2020-Final:J"
+        },
+        {
+          "qoj_id": 2837,
+          "name": "Stringology",
+          "index": "K",
+          "aliases": [
+            "qoj:2837"
+          ],
+          "id": "ccpc-2020-Final:K"
+        },
+        {
+          "qoj_id": 2838,
+          "name": "2D Geometry",
+          "index": "L",
+          "aliases": [
+            "qoj:2838"
+          ],
+          "id": "ccpc-2020-Final:L"
+        },
+        {
+          "qoj_id": 2839,
+          "name": "3D Geometry",
+          "index": "M",
+          "aliases": [
+            "qoj:2839"
+          ],
+          "id": "ccpc-2020-Final:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      }
+    },
+    {
       "id": "ccpc-2020-威海",
       "year": 2020,
       "series": "CCPC",
@@ -8562,6 +10070,142 @@
       "rating_evidence": {
         "standings_path": "data/ccpc/2020/changchun"
       }
+    },
+    {
+      "id": "icpc-2020-ECFinal",
+      "year": 2020,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2020 ICPC EC Final",
+      "source_url": "https://codeforces.com/gym/103069",
+      "qoj_contest_id": 1040,
+      "qoj_url": "https://qoj.ac/contest/1040",
+      "category_source": "https://qoj.ac/category/462",
+      "mapping_source": "https://codeforces.com/gym/103069",
+      "problems": [
+        {
+          "index": "A",
+          "name": "Namomo Subsequence",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069A"
+          ],
+          "id": "icpc-2020-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "name": "Rectangle Flip 2",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069B"
+          ],
+          "id": "icpc-2020-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "name": "Random Shuffle",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069C"
+          ],
+          "id": "icpc-2020-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "name": "City Brain",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069D"
+          ],
+          "id": "icpc-2020-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "name": "Tube Master III",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069E"
+          ],
+          "id": "icpc-2020-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "name": "Rooks",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069F"
+          ],
+          "id": "icpc-2020-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "name": "Prof. Pang's sequence",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069G"
+          ],
+          "id": "icpc-2020-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "name": "Prof. Pang Earning Aus",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069H"
+          ],
+          "id": "icpc-2020-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "name": "Plants vs Zombies",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069I"
+          ],
+          "id": "icpc-2020-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "name": "Circle",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069J"
+          ],
+          "id": "icpc-2020-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "name": "Allin",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069K"
+          ],
+          "id": "icpc-2020-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "name": "Square",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069L"
+          ],
+          "id": "icpc-2020-ECFinal:L"
+        },
+        {
+          "index": "M",
+          "name": "Fillomino",
+          "cf_contest_id": 103069,
+          "aliases": [
+            "codeforces:103069M"
+          ],
+          "id": "icpc-2020-ECFinal:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "cf_contest_id": 103069
     },
     {
       "id": "icpc-2020-上海",
@@ -9622,6 +11266,133 @@
       }
     },
     {
+      "id": "ccpc-2019-Final",
+      "year": 2019,
+      "series": "CCPC",
+      "stage": "final",
+      "site": "CCPC Final",
+      "name": "2019 CCPC Final",
+      "source_url": "https://codeforces.com/gym/102431",
+      "qoj_contest_id": 2027,
+      "qoj_url": "https://qoj.ac/contest/2027",
+      "category_source": "https://qoj.ac/category/364",
+      "mapping_source": "https://codeforces.com/gym/102431",
+      "problems": [
+        {
+          "index": "A",
+          "name": "Kick Start",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431A"
+          ],
+          "id": "ccpc-2019-Final:A"
+        },
+        {
+          "index": "B",
+          "name": "Infimum of Paths",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431B"
+          ],
+          "id": "ccpc-2019-Final:B"
+        },
+        {
+          "index": "C",
+          "name": "Mr. Panda and Typewriter",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431C"
+          ],
+          "id": "ccpc-2019-Final:C"
+        },
+        {
+          "index": "D",
+          "name": "Pulse Nova",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431D"
+          ],
+          "id": "ccpc-2019-Final:D"
+        },
+        {
+          "index": "E",
+          "name": "Non-Maximum Suppression",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431E"
+          ],
+          "id": "ccpc-2019-Final:E"
+        },
+        {
+          "index": "F",
+          "name": "Ferry",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431F"
+          ],
+          "id": "ccpc-2019-Final:F"
+        },
+        {
+          "index": "G",
+          "name": "Game on the Tree",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431G"
+          ],
+          "id": "ccpc-2019-Final:G"
+        },
+        {
+          "index": "H",
+          "name": "Mr. Panda and SAD",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431H"
+          ],
+          "id": "ccpc-2019-Final:H"
+        },
+        {
+          "index": "I",
+          "name": "Mr. Panda and Blocks",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431I"
+          ],
+          "id": "ccpc-2019-Final:I"
+        },
+        {
+          "index": "J",
+          "name": "Wire-compatible Protocol buffer",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431J"
+          ],
+          "id": "ccpc-2019-Final:J"
+        },
+        {
+          "index": "K",
+          "name": "Russian Dolls on the Christmas Tree",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431K"
+          ],
+          "id": "ccpc-2019-Final:K"
+        },
+        {
+          "index": "L",
+          "name": "Spiral Matrix",
+          "cf_contest_id": 102431,
+          "aliases": [
+            "codeforces:102431L"
+          ],
+          "id": "ccpc-2019-Final:L"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "cf_contest_id": 102431
+    },
+    {
       "id": "ccpc-2019-厦门",
       "year": 2019,
       "series": "CCPC",
@@ -10024,6 +11795,142 @@
       }
     },
     {
+      "id": "icpc-2019-ECFinal",
+      "year": 2019,
+      "series": "ICPC",
+      "stage": "final",
+      "site": "EC Final",
+      "name": "2019 ICPC EC Final",
+      "source_url": "https://codeforces.com/gym/102471",
+      "qoj_contest_id": 1039,
+      "qoj_url": "https://qoj.ac/contest/1039",
+      "category_source": "https://qoj.ac/category/463",
+      "mapping_source": "https://codeforces.com/gym/102471",
+      "problems": [
+        {
+          "index": "A",
+          "name": "City",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471A"
+          ],
+          "id": "icpc-2019-ECFinal:A"
+        },
+        {
+          "index": "B",
+          "name": "Black and White",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471B"
+          ],
+          "id": "icpc-2019-ECFinal:B"
+        },
+        {
+          "index": "C",
+          "name": "Dirichlet $k$-th root",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471C"
+          ],
+          "id": "icpc-2019-ECFinal:C"
+        },
+        {
+          "index": "D",
+          "name": "Fire",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471D"
+          ],
+          "id": "icpc-2019-ECFinal:D"
+        },
+        {
+          "index": "E",
+          "name": "Flow",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471E"
+          ],
+          "id": "icpc-2019-ECFinal:E"
+        },
+        {
+          "index": "F",
+          "name": "Game",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471F"
+          ],
+          "id": "icpc-2019-ECFinal:F"
+        },
+        {
+          "index": "G",
+          "name": "Happiness",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471G"
+          ],
+          "id": "icpc-2019-ECFinal:G"
+        },
+        {
+          "index": "H",
+          "name": "King",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471H"
+          ],
+          "id": "icpc-2019-ECFinal:H"
+        },
+        {
+          "index": "I",
+          "name": "Moon",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471I"
+          ],
+          "id": "icpc-2019-ECFinal:I"
+        },
+        {
+          "index": "J",
+          "name": "Permutation",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471J"
+          ],
+          "id": "icpc-2019-ECFinal:J"
+        },
+        {
+          "index": "K",
+          "name": "All Pair Maximum Flow",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471K"
+          ],
+          "id": "icpc-2019-ECFinal:K"
+        },
+        {
+          "index": "L",
+          "name": "Travel",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471L"
+          ],
+          "id": "icpc-2019-ECFinal:L"
+        },
+        {
+          "index": "M",
+          "name": "Value",
+          "cf_contest_id": 102471,
+          "aliases": [
+            "codeforces:102471M"
+          ],
+          "id": "icpc-2019-ECFinal:M"
+        }
+      ],
+      "rating_evidence": {
+        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+      },
+      "cf_contest_id": 102471
+    },
+    {
       "id": "icpc-2019-上海",
       "year": 2019,
       "series": "ICPC",
@@ -10306,7 +12213,7 @@
       "series": "ICPC",
       "site": "南昌",
       "name": "2019 ICPC 南昌站",
-      "source_url": "https://rl.algoux.cn/ranklist/icpc2019nanchang",
+      "source_url": "https://www.jisuanke.com/contest/5530",
       "problems": [
         {
           "id": "icpc-2019-南昌:A",
@@ -10417,7 +12324,14 @@
       "rating_evidence": {
         "standings_path": "data/icpc/2019/nanchang",
         "unavailable_reason": "XCPCIO 赛时记录及 RankLand 存档均缺少可核验奖牌分界，保留未评级。"
-      }
+      },
+      "source_label": "计蒜客题单",
+      "source_links": [
+        {
+          "url": "https://rl.algoux.cn/ranklist/icpc2019nanchang",
+          "label": "原榜单"
+        }
+      ]
     },
     {
       "id": "icpc-2019-徐州",
@@ -10561,7 +12475,7 @@
       "series": "ICPC",
       "site": "沈阳",
       "name": "2019 ICPC 沈阳站",
-      "source_url": "https://rl.algoux.cn/ranklist/icpc2019shenyang",
+      "source_url": "https://pintia.cn/problem-sets/1231102432326602752/exam/problems",
       "problems": [
         {
           "id": "icpc-2019-沈阳:A",
@@ -10671,7 +12585,14 @@
       "ranklist_url": "https://rl.algoux.cn/ranklist/icpc2019shenyang",
       "rating_evidence": {
         "unavailable_reason": "当前固定版本 XCPCIO 赛时导出未收录本站；其他榜单尚未完成评级口径核验，保留未评级。"
-      }
+      },
+      "source_label": "PTA 题单",
+      "source_links": [
+        {
+          "url": "https://rl.algoux.cn/ranklist/icpc2019shenyang",
+          "label": "原榜单"
+        }
+      ]
     },
     {
       "id": "icpc-2019-银川",
@@ -10988,5 +12909,5 @@
       }
     }
   ],
-  "scope": "2019–2025 中国 ICPC / CCPC 区域赛正赛目录（不含热身、预选、邀请赛和总决赛）"
+  "scope": "2019–2025 中国 ICPC / CCPC 区域赛及 EC Final / CCPC Final 正赛目录（不含热身、预选和邀请赛）"
 }
