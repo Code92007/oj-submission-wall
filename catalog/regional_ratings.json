@@ -2408,6 +2408,556 @@
         "team": "8cf9a2ee1fae0ecf8c26c7e103caecf924be26a78b225354cfc42f9360f3e167",
         "run": "a13d289e0379774191a8258fa642aa62c10ba194376b221986b4b87277755b37"
       }
+    },
+    "ccpc-2025-Final": {
+      "official_teams": 132,
+      "effective_teams": 132,
+      "excluded_teams": 6,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": null,
+          "counts": {
+            "gold": 14,
+            "silver": 23,
+            "bronze": 39
+          },
+          "rank_limits": {
+            "gold": 14,
+            "silver": 37,
+            "bronze": 76
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 14,
+          "last_solved": 4,
+          "last_penalty_minutes": 670
+        },
+        "silver": {
+          "teams": 23,
+          "last_solved": 3,
+          "last_penalty_minutes": 468
+        },
+        "bronze": {
+          "teams": 39,
+          "last_solved": 2,
+          "last_penalty_minutes": 234
+        }
+      },
+      "source_name": "第十一届中国大学生程序设计竞赛总决赛",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2025final",
+      "sha256": {
+        "rankland": "4b3d56837bee10c68aed96d161b08d4a576dc39ba1238f7168a08dcd96a8f861"
+      }
+    },
+    "icpc-2025-ECFinal": {
+      "official_teams": 280,
+      "effective_teams": 278,
+      "excluded_teams": 26,
+      "unlisted_team_runs": 0,
+      "duration_seconds": 18000.0,
+      "medal_rule": "XCPCIO config.medal.official：金银铜分别枚数，累计为名次分界",
+      "medal_rank_limits": {
+        "gold": 28,
+        "silver": 84,
+        "bronze": 168
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 28,
+          "last_solved": 7,
+          "last_penalty_minutes": 1225
+        },
+        "silver": {
+          "teams": 56,
+          "last_solved": 5,
+          "last_penalty_minutes": 879
+        },
+        "bronze": {
+          "teams": 84,
+          "last_solved": 3,
+          "last_penalty_minutes": 275
+        }
+      },
+      "source_name": "The \"Huawei Cup\" 50th ICPC Asia East Continent Final Contest",
+      "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/50th/ecfinal",
+      "sha256": {
+        "config": "e3a0c7f15386bc3b2ec9dac133d1f516f418b875da6e187b15bd31804479b000",
+        "team": "381b352a6e06bfccc1f0b8be38d5427854824f89bb810d4e477870adf982c80c",
+        "run": "c522a8434ed293632f9d4ef941f88c2c60ea60ab0bd7101c57306c2fc96f4a33"
+      }
+    },
+    "ccpc-2024-Final": {
+      "official_teams": 122,
+      "effective_teams": 118,
+      "excluded_teams": 2,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": "4",
+          "counts": {
+            "gold": 12,
+            "silver": 21,
+            "bronze": 34
+          },
+          "rank_limits": {
+            "gold": 12,
+            "silver": 33,
+            "bronze": 67
+          },
+          "no_tied": false
+        },
+        {
+          "marker": "5",
+          "counts": {
+            "gold": 1,
+            "silver": 2,
+            "bronze": 2
+          },
+          "rank_limits": {
+            "gold": 1,
+            "silver": 3,
+            "bronze": 5
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 13,
+          "last_solved": 3,
+          "last_penalty_minutes": 543
+        },
+        "silver": {
+          "teams": 23,
+          "last_solved": 2,
+          "last_penalty_minutes": 725
+        },
+        "bronze": {
+          "teams": 36,
+          "last_solved": 1,
+          "last_penalty_minutes": 356
+        }
+      },
+      "source_name": "第十届中国大学生程序设计竞赛总决赛",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2024final",
+      "sha256": {
+        "rankland": "5cd025f1d7641cfbdae73a255a314ce52b953ecffdfe19defdfea3ebd66cb469"
+      }
+    },
+    "icpc-2024-ECFinal": {
+      "official_teams": 280,
+      "effective_teams": 279,
+      "excluded_teams": 123,
+      "unlisted_team_runs": 0,
+      "duration_seconds": 18000.0,
+      "medal_rule": "XCPCIO config.medal.official：金银铜分别枚数，累计为名次分界",
+      "medal_rank_limits": {
+        "gold": 28,
+        "silver": 84,
+        "bronze": 168
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 28,
+          "last_solved": 6,
+          "last_penalty_minutes": 1116
+        },
+        "silver": {
+          "teams": 56,
+          "last_solved": 4,
+          "last_penalty_minutes": 556
+        },
+        "bronze": {
+          "teams": 84,
+          "last_solved": 3,
+          "last_penalty_minutes": 357
+        }
+      },
+      "source_name": "The 49th ICPC Asia East Continent Final Contest",
+      "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/49th/ecfinal",
+      "sha256": {
+        "config": "09205199c28614009e0338de4524d0473598a8e489ac96827dbc98ebec67a9f7",
+        "team": "2d2e2cfed411a7a9a6d25fd91c256a59f07cbb6266ec8dcda5a7bc8c10b4d4a4",
+        "run": "62a2b498ccdfe3c790863a47214dd884523d5448e89f59141e65839430177184"
+      }
+    },
+    "ccpc-2023-Final": {
+      "official_teams": 127,
+      "effective_teams": 127,
+      "excluded_teams": 2,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": "undergraduate",
+          "counts": {
+            "gold": 12,
+            "silver": 24,
+            "bronze": 37
+          },
+          "rank_limits": {
+            "gold": 12,
+            "silver": 36,
+            "bronze": 73
+          },
+          "no_tied": false
+        },
+        {
+          "marker": "hv",
+          "counts": {
+            "gold": 1,
+            "silver": 3,
+            "bronze": 3
+          },
+          "rank_limits": {
+            "gold": 1,
+            "silver": 4,
+            "bronze": 7
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 13,
+          "last_solved": 3,
+          "last_penalty_minutes": 264
+        },
+        "silver": {
+          "teams": 27,
+          "last_solved": 3,
+          "last_penalty_minutes": 389
+        },
+        "bronze": {
+          "teams": 40,
+          "last_solved": 2,
+          "last_penalty_minutes": 65
+        }
+      },
+      "source_name": "第 9 届 CCPC 中国大学生程序设计竞赛总决赛",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2023final",
+      "sha256": {
+        "rankland": "5a4fd8c3f1bff24baa0af18fbb57e1846fa077593935146142ecb5e45a28cdf6"
+      }
+    },
+    "icpc-2023-ECFinal": {
+      "official_teams": 280,
+      "effective_teams": 279,
+      "excluded_teams": 40,
+      "unlisted_team_runs": 0,
+      "duration_seconds": 18000.0,
+      "medal_rule": "XCPCIO config.medal.official：金银铜分别枚数，累计为名次分界",
+      "medal_rank_limits": {
+        "gold": 28,
+        "silver": 84,
+        "bronze": 168
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 28,
+          "last_solved": 6,
+          "last_penalty_minutes": 618
+        },
+        "silver": {
+          "teams": 56,
+          "last_solved": 5,
+          "last_penalty_minutes": 392
+        },
+        "bronze": {
+          "teams": 84,
+          "last_solved": 5,
+          "last_penalty_minutes": 838
+        }
+      },
+      "source_name": "The 48th ICPC Asia East Continent Final Contest",
+      "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/48th/ecfinal",
+      "sha256": {
+        "config": "2e95d19f4745e921c477aa33557c91d28178ec8f80eda14320194afe91e7ffcf",
+        "team": "13a1aa270d276fb75b997a17d6ec7f817a68dacfbe5ad15d508f30f0197bd88c",
+        "run": "adb99d16d95d9c3582d11deab1e02e935bc1d168b91cfe235f737686d0e93e5c"
+      }
+    },
+    "ccpc-2022-Final": {
+      "official_teams": 129,
+      "effective_teams": 127,
+      "excluded_teams": 3,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": "undergraduate",
+          "counts": {
+            "gold": 13,
+            "silver": 24,
+            "bronze": 35
+          },
+          "rank_limits": {
+            "gold": 13,
+            "silver": 37,
+            "bronze": 72
+          },
+          "no_tied": false
+        },
+        {
+          "marker": "hv",
+          "counts": {
+            "gold": 1,
+            "silver": 2,
+            "bronze": 3
+          },
+          "rank_limits": {
+            "gold": 1,
+            "silver": 3,
+            "bronze": 6
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 14,
+          "last_solved": 4,
+          "last_penalty_minutes": 505
+        },
+        "silver": {
+          "teams": 26,
+          "last_solved": 2,
+          "last_penalty_minutes": 261
+        },
+        "bronze": {
+          "teams": 38,
+          "last_solved": 2,
+          "last_penalty_minutes": 551
+        }
+      },
+      "source_name": "第八届中国大学生程序设计竞赛总决赛",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2022final",
+      "sha256": {
+        "rankland": "5e10e66ce5261d5ed6005e5b64411b742a057394d351fd853407bf19e697bac4"
+      }
+    },
+    "icpc-2022-ECFinal": {
+      "official_teams": 280,
+      "effective_teams": 279,
+      "excluded_teams": 34,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": null,
+          "counts": {
+            "gold": 28,
+            "silver": 56,
+            "bronze": 84
+          },
+          "rank_limits": {
+            "gold": 28,
+            "silver": 84,
+            "bronze": 168
+          },
+          "no_tied": true
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 28,
+          "last_solved": 7,
+          "last_penalty_minutes": 1045
+        },
+        "silver": {
+          "teams": 56,
+          "last_solved": 5,
+          "last_penalty_minutes": 747
+        },
+        "bronze": {
+          "teams": 84,
+          "last_solved": 4,
+          "last_penalty_minutes": 762
+        }
+      },
+      "source_name": "The 2022 ICPC Asia East Continent Final Contest",
+      "source_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal",
+      "sha256": {
+        "rankland": "90d2553e4e3bdc8795b4f4db5cdfa3d8e911954f5275b2a95cfe7fa69eca3ac3"
+      }
+    },
+    "ccpc-2021-Final": {
+      "official_teams": 115,
+      "effective_teams": 114,
+      "excluded_teams": 1,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": null,
+          "counts": {
+            "gold": 12,
+            "silver": 21,
+            "bronze": 35
+          },
+          "rank_limits": {
+            "gold": 12,
+            "silver": 33,
+            "bronze": 68
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 12,
+          "last_solved": 8,
+          "last_penalty_minutes": 1154
+        },
+        "silver": {
+          "teams": 21,
+          "last_solved": 6,
+          "last_penalty_minutes": 785
+        },
+        "bronze": {
+          "teams": 35,
+          "last_solved": 4,
+          "last_penalty_minutes": 296
+        }
+      },
+      "source_name": "第七届中国大学生程序设计竞赛总决赛",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2021final",
+      "sha256": {
+        "rankland": "290a2d95c3ab540d986b1dd5b567af9177d738fb92d16a11831686332e9b6ff4"
+      }
+    },
+    "icpc-2021-ECFinal": {
+      "official_teams": 363,
+      "effective_teams": 355,
+      "excluded_teams": 4,
+      "unlisted_team_runs": 0,
+      "duration_seconds": 18000.0,
+      "medal_rule": "XCPCIO config.medal.official：金银铜分别枚数，累计为名次分界",
+      "medal_rank_limits": {
+        "gold": 36,
+        "silver": 108,
+        "bronze": 216
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 36,
+          "last_solved": 6,
+          "last_penalty_minutes": 950
+        },
+        "silver": {
+          "teams": 72,
+          "last_solved": 4,
+          "last_penalty_minutes": 341
+        },
+        "bronze": {
+          "teams": 108,
+          "last_solved": 3,
+          "last_penalty_minutes": 102
+        }
+      },
+      "source_name": "The 46th ICPC Asia East Continent Final Contest",
+      "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/46th/ec-final",
+      "sha256": {
+        "config": "f4537a05b8b34fd4e0933836883c0540add5442f4ad862299e113c7fd96b3eed",
+        "team": "0cb1879e8b17559b4bbcc0906a3764a881d9422e834e5ebcaeabc3f82df412d6",
+        "run": "fb23325881016845a709febe4c6edac51e5985a0ba8192b7070f413730b4ef9a"
+      }
+    },
+    "ccpc-2020-Final": {
+      "official_teams": 115,
+      "effective_teams": 115,
+      "excluded_teams": 3,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": null,
+          "counts": {
+            "gold": 13,
+            "silver": 21,
+            "bronze": 35
+          },
+          "rank_limits": {
+            "gold": 13,
+            "silver": 34,
+            "bronze": 69
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 13,
+          "last_solved": 8,
+          "last_penalty_minutes": 1451
+        },
+        "silver": {
+          "teams": 21,
+          "last_solved": 6,
+          "last_penalty_minutes": 539
+        },
+        "bronze": {
+          "teams": 35,
+          "last_solved": 5,
+          "last_penalty_minutes": 549
+        }
+      },
+      "source_name": "2020年中国大学生程序设计竞赛 总决赛",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2020final",
+      "sha256": {
+        "rankland": "95e04e99c7142dc156b78f70f785e8ee13df07fe8e69596ea6b744e75b38493e"
+      }
+    },
+    "ccpc-2019-Final": {
+      "official_teams": 115,
+      "effective_teams": 115,
+      "excluded_teams": 4,
+      "duration_seconds": 18000,
+      "medal_rule": "RankLand SRK 显式金银铜分别枚数及分组规则",
+      "medal_groups": [
+        {
+          "marker": null,
+          "counts": {
+            "gold": 13,
+            "silver": 23,
+            "bronze": 33
+          },
+          "rank_limits": {
+            "gold": 13,
+            "silver": 36,
+            "bronze": 69
+          },
+          "no_tied": false
+        }
+      ],
+      "medal_boundaries": {
+        "gold": {
+          "teams": 13,
+          "last_solved": 4,
+          "last_penalty_minutes": 219
+        },
+        "silver": {
+          "teams": 23,
+          "last_solved": 4,
+          "last_penalty_minutes": 454
+        },
+        "bronze": {
+          "teams": 33,
+          "last_solved": 4,
+          "last_penalty_minutes": 716
+        }
+      },
+      "source_name": "2019年中国大学生程序设计竞赛 总决赛 （中国传媒大学）",
+      "source_url": "https://rl.algoux.cn/ranklist/ccpc2019final",
+      "sha256": {
+        "rankland": "d8940770989e25d4bdaff7e05b8d4278708d125fc5c7ea02433db65d13b99299"
+      }
     }
   },
   "problems": {
@@ -26074,6 +26624,4356 @@
       "contest": "icpc-2019-银川",
       "method": "standings-medal-v1",
       "standings_url": "https://board.xcpcio.com/icpc/2019/yinchuan/"
+    },
+    "ccpc-2025-Final:A": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:B": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 17,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 11,
+        "silver": 4,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:C": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:D": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 2,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 2,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:E": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:F": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:G": {
+      "rating": 1500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1300,
+        1700
+      ],
+      "statistical_rating": 1500,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 87,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 34
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:H": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:I": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:J": {
+      "rating": 2500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2300,
+        2700
+      ],
+      "statistical_rating": 2500,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 13,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 10,
+        "silver": 2,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:K": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 132,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:L": {
+      "rating": 1600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1400,
+        1800
+      ],
+      "statistical_rating": 1600,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 83,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 36
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "ccpc-2025-Final:M": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 2,
+      "official_teams": 132,
+      "medal_accepted": {
+        "gold": 2,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 39
+      },
+      "contest": "ccpc-2025-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2025final"
+    },
+    "icpc-2025-ECFinal:A": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 66,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 26,
+        "silver": 33,
+        "bronze": 6
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:B": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 267,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:C": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:D": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 38,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 27,
+        "silver": 7,
+        "bronze": 3
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:E": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2700
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 20,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 18,
+        "silver": 2,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:F": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:G": {
+      "rating": 3200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3000,
+        3400
+      ],
+      "statistical_rating": 3200,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:H": {
+      "rating": 1700,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1500,
+        1900
+      ],
+      "statistical_rating": 1700,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 160,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 54,
+        "bronze": 69
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:I": {
+      "rating": 2000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1800,
+        2200
+      ],
+      "statistical_rating": 2000,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 92,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 27,
+        "silver": 49,
+        "bronze": 16
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:J": {
+      "rating": 1100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        900,
+        1300
+      ],
+      "statistical_rating": 1100,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 245,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:K": {
+      "rating": 1200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1000,
+        1400
+      ],
+      "statistical_rating": 1200,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 232,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 82
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "icpc-2025-ECFinal:L": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 11,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 10,
+        "silver": 0,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2025-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/50th/ecfinal/"
+    },
+    "ccpc-2024-Final:A": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:B": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 17,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 10,
+        "silver": 6,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:C": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 116,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:D": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:E": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 4,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 4,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:F": {
+      "rating": 1400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1200,
+        1600
+      ],
+      "statistical_rating": 1400,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 87,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 34
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:G": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 116,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:H": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 19,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 10,
+        "silver": 7,
+        "bronze": 2
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:I": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:J": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:K": {
+      "rating": 2500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2300,
+        2700
+      ],
+      "statistical_rating": 2500,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 12,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 9,
+        "silver": 2,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:L": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2300
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 28,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 8,
+        "silver": 15,
+        "bronze": 5
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "ccpc-2024-Final:M": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 122,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 36
+      },
+      "contest": "ccpc-2024-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2024final"
+    },
+    "icpc-2024-ECFinal:A": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 275,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:B": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:C": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 7,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 5,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:D": {
+      "rating": 3200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3000,
+        3400
+      ],
+      "statistical_rating": 3200,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:E": {
+      "rating": 1800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1600,
+        2000
+      ],
+      "statistical_rating": 1800,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 147,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 48,
+        "bronze": 50
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:F": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 59,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 24,
+        "bronze": 6
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:G": {
+      "rating": 1600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1400,
+        1800
+      ],
+      "statistical_rating": 1600,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 178,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 26,
+        "silver": 56,
+        "bronze": 75
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:H": {
+      "rating": 2300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2100,
+        2500
+      ],
+      "statistical_rating": 2300,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 43,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 23,
+        "silver": 15,
+        "bronze": 5
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:I": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 276,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:J": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:K": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2800
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 18,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 4,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "icpc-2024-ECFinal:L": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2800
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 17,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 9,
+        "silver": 6,
+        "bronze": 2
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2024-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/49th/ecfinal/"
+    },
+    "ccpc-2023-Final:A": {
+      "rating": 2500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2300,
+        2700
+      ],
+      "statistical_rating": 2500,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 12,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 8,
+        "silver": 2,
+        "bronze": 2
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:B": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 2,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:C": {
+      "rating": 1400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1200,
+        1600
+      ],
+      "statistical_rating": 1400,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 97,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 27,
+        "bronze": 38
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:D": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 127,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:E": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:F": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2800
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 9,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 6,
+        "silver": 3,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:G": {
+      "rating": 1800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1600,
+        1900
+      ],
+      "statistical_rating": 1800,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 63,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 20,
+        "bronze": 26
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:H": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 126,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:I": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:J": {
+      "rating": 1900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1700,
+        2100
+      ],
+      "statistical_rating": 1900,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 52,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 22,
+        "bronze": 16
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:K": {
+      "rating": 2500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2300,
+        2700
+      ],
+      "statistical_rating": 2500,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 15,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 10,
+        "silver": 4,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:L": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "ccpc-2023-Final:M": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 4,
+      "official_teams": 127,
+      "medal_accepted": {
+        "gold": 4,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 27,
+        "bronze": 40
+      },
+      "contest": "ccpc-2023-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2023final"
+    },
+    "icpc-2023-ECFinal:A": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 2,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 2,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:B": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 279,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:C": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 8,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 7,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:D": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 7,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 7,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:E": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 271,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:F": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 263,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:G": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:H": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:I": {
+      "rating": 2500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2300,
+        2700
+      ],
+      "statistical_rating": 2500,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 28,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 22,
+        "silver": 5,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:J": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2300
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 72,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 26,
+        "silver": 45,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:K": {
+      "rating": 1400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1200,
+        1600
+      ],
+      "statistical_rating": 1400,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 214,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 83
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:L": {
+      "rating": 1400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1200,
+        1600
+      ],
+      "statistical_rating": 1400,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 216,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 83
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "icpc-2023-ECFinal:M": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2023-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/48th/ecfinal/"
+    },
+    "ccpc-2022-Final:A": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 28,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 13,
+        "bronze": 2
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:B": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 3,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 3,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:C": {
+      "rating": 1400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1200,
+        1600
+      ],
+      "statistical_rating": 1400,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 98,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 23,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:D": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:E": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 125,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:F": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 124,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 25,
+        "bronze": 38
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:G": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:H": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 6,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 6,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:I": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 2,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 2,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:J": {
+      "rating": 1200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1000,
+        1400
+      ],
+      "statistical_rating": 1200,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 107,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:K": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:L": {
+      "rating": 2000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1800,
+        2200
+      ],
+      "statistical_rating": 2000,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 47,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 22,
+        "bronze": 11
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "ccpc-2022-Final:M": {
+      "rating": 2700,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2500,
+        2900
+      ],
+      "statistical_rating": 2700,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 7,
+      "official_teams": 129,
+      "medal_accepted": {
+        "gold": 6,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 14,
+        "silver": 26,
+        "bronze": 38
+      },
+      "contest": "ccpc-2022-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2022final"
+    },
+    "icpc-2022-ECFinal:A": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 7,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 6,
+        "silver": 0,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:B": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 10,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 9,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:C": {
+      "rating": 1500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1300,
+        1700
+      ],
+      "statistical_rating": 1500,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 200,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 54,
+        "bronze": 78
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:D": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:E": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 33,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 23,
+        "silver": 9,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:F": {
+      "rating": 1800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1600,
+        2000
+      ],
+      "statistical_rating": 1800,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 138,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 50,
+        "bronze": 48
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:G": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:H": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 41,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 25,
+        "silver": 12,
+        "bronze": 4
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:I": {
+      "rating": 1800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1600,
+        1900
+      ],
+      "statistical_rating": 1800,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 153,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 61
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:J": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 273,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:K": {
+      "rating": 3200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3000,
+        3400
+      ],
+      "statistical_rating": 3200,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:L": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 66,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 26,
+        "silver": 29,
+        "bronze": 8
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "icpc-2022-ECFinal:M": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 279,
+      "official_teams": 280,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "medal_teams": {
+        "gold": 28,
+        "silver": 56,
+        "bronze": 84
+      },
+      "contest": "icpc-2022-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal"
+    },
+    "ccpc-2021-Final:A": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 114,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:B": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:C": {
+      "rating": 2000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1800,
+        2200
+      ],
+      "statistical_rating": 2000,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 37,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 16,
+        "bronze": 9
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:D": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:E": {
+      "rating": 2000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1800,
+        2200
+      ],
+      "statistical_rating": 2000,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 37,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 14,
+        "bronze": 8
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:F": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 114,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:G": {
+      "rating": 1600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1400,
+        1800
+      ],
+      "statistical_rating": 1600,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 74,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 29
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:H": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:I": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 4,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 4,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:J": {
+      "rating": 1700,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1500,
+        1900
+      ],
+      "statistical_rating": 1700,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 65,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 26
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:K": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 24,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 9,
+        "bronze": 3
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "ccpc-2021-Final:L": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 110,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 12,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2021-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2021final"
+    },
+    "icpc-2021-ECFinal:A": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 349,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:B": {
+      "rating": 2000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1800,
+        2200
+      ],
+      "statistical_rating": 2000,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 136,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 36,
+        "silver": 63,
+        "bronze": 36
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:C": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 12,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 11,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:D": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2800
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 24,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 17,
+        "silver": 4,
+        "bronze": 3
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:E": {
+      "rating": 1900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1700,
+        2100
+      ],
+      "statistical_rating": 1900,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 145,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 31,
+        "silver": 56,
+        "bronze": 57
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:F": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:G": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 4,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 3,
+        "silver": 0,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:H": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 8,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 8,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:I": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 354,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:J": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 49,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 34,
+        "silver": 12,
+        "bronze": 3
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:K": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:L": {
+      "rating": 1000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1200
+      ],
+      "statistical_rating": 1000,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 325,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 107
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "icpc-2021-ECFinal:M": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 363,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 36,
+        "silver": 72,
+        "bronze": 108
+      },
+      "contest": "icpc-2021-ECFinal",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/46th/ec-final/"
+    },
+    "ccpc-2020-Final:A": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 115,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:B": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2800
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 8,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 5,
+        "silver": 1,
+        "bronze": 2
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:C": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 114,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:D": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:E": {
+      "rating": 1300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1100,
+        1500
+      ],
+      "statistical_rating": 1300,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 90,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 32
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:F": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 110,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:G": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 25,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 11,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:H": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:I": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:J": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2700
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 10,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 8,
+        "silver": 2,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:K": {
+      "rating": 1800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1600,
+        1900
+      ],
+      "statistical_rating": 1800,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 57,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 20,
+        "bronze": 21
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:L": {
+      "rating": 1100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        900,
+        1300
+      ],
+      "statistical_rating": 1100,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 99,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2020-Final:M": {
+      "rating": 2400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2200,
+        2600
+      ],
+      "statistical_rating": 2400,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 15,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 11,
+        "silver": 3,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 21,
+        "bronze": 35
+      },
+      "contest": "ccpc-2020-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2020final"
+    },
+    "ccpc-2019-Final:A": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 114,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:B": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:C": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:D": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:E": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 5,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 5,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:F": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:G": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 3,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 3,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:H": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2700
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 9,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 9,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:I": {
+      "rating": 1500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1300,
+        1700
+      ],
+      "statistical_rating": 1500,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 80,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:J": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:K": {
+      "rating": 1100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        900,
+        1300
+      ],
+      "statistical_rating": 1100,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 101,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
+    },
+    "ccpc-2019-Final:L": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 111,
+      "official_teams": 115,
+      "medal_accepted": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "medal_teams": {
+        "gold": 13,
+        "silver": 23,
+        "bronze": 33
+      },
+      "contest": "ccpc-2019-Final",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rl.algoux.cn/ranklist/ccpc2019final"
     }
   },
   "unrated_contests": {
@@ -26087,19 +30987,7 @@
     "icpc-2019-徐州": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。",
     "icpc-2019-沈阳": "当前固定版本 XCPCIO 赛时导出未收录本站；其他榜单尚未完成评级口径核验，保留未评级。",
     "icpc-2019-香港": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。",
-    "icpc-2019-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "icpc-2020-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "icpc-2021-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "icpc-2022-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "icpc-2023-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "icpc-2024-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "icpc-2025-ECFinal": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2019-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2020-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2021-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2022-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2023-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2024-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。",
-    "ccpc-2025-Final": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+    "icpc-2019-ECFinal": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。",
+    "icpc-2020-ECFinal": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。"
   }
 }

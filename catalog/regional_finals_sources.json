@@ -27,7 +27,12 @@
         "M"
       ],
       "online_mapping": "verified",
-      "sha256": {}
+      "sha256": {},
+      "rating_evidence": {
+        "unavailable_reason": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。",
+        "source_url": "https://rl.algoux.cn/ranklist/icpc2019ecfinal",
+        "sha256": "6da875bc3615a1543692b25909d560359709757eff2c3efc3a66b428a13df364"
+      }
     },
     {
       "id": "icpc-2020-ECFinal",
@@ -54,7 +59,12 @@
         "M"
       ],
       "online_mapping": "verified",
-      "sha256": {}
+      "sha256": {},
+      "rating_evidence": {
+        "unavailable_reason": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。",
+        "source_url": "https://rl.algoux.cn/ranklist/icpc2020ecfinal",
+        "sha256": "2ff93c7dfa477bac1375697377b94efbdbd1d07573253d3375f4b395bdb4d987"
+      }
     },
     {
       "id": "icpc-2021-ECFinal",
@@ -81,7 +91,10 @@
         "M"
       ],
       "online_mapping": "verified",
-      "sha256": {}
+      "sha256": {},
+      "rating_evidence": {
+        "standings_path": "data/icpc/46th/ec-final"
+      }
     },
     {
       "id": "icpc-2022-ECFinal",
@@ -110,6 +123,16 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "26ee944935cf51db7e2c33a02421f8e2f9a05ac205c717597b6010b3da6bb419"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/icpc2022ecfinal.json",
+        "rankland_key": "icpc2022ecfinal",
+        "source_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal",
+        "sha256": "90d2553e4e3bdc8795b4f4db5cdfa3d8e911954f5275b2a95cfe7fa69eca3ac3",
+        "expected_summary": {
+          "official_teams": 280
+        }
       }
     },
     {
@@ -139,6 +162,9 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "9bed5d4a80bfa637764eaa30fbf664dfe18d978dafad65d2b82d83af0ee4a294"
+      },
+      "rating_evidence": {
+        "standings_path": "data/icpc/48th/ecfinal"
       }
     },
     {
@@ -167,6 +193,9 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "93200666c6c0ddaa3125684e2d539056107ad731f817f7b2371690c73cc357ef"
+      },
+      "rating_evidence": {
+        "standings_path": "data/icpc/49th/ecfinal"
       }
     },
     {
@@ -195,6 +224,9 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "8374d68d73329cf203e8b61250deecb3ca9d62cd49e8add6f0211136e3dc17c9"
+      },
+      "rating_evidence": {
+        "standings_path": "data/icpc/50th/ecfinal"
       }
     },
     {
@@ -221,7 +253,17 @@
         "L"
       ],
       "online_mapping": "verified",
-      "sha256": {}
+      "sha256": {},
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2019final.json",
+        "rankland_key": "ccpc2019final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2019final",
+        "sha256": "d8940770989e25d4bdaff7e05b8d4278708d125fc5c7ea02433db65d13b99299",
+        "expected_summary": {
+          "official_teams": 115
+        }
+      }
     },
     {
       "id": "ccpc-2020-Final",
@@ -251,6 +293,16 @@
       "online_mapping": "verified",
       "sha256": {
         "author_problem_order": "b79c654872256827df88950e712c7e489f6d1efdfd6eb1a879e967408cbaf159"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2020final.json",
+        "rankland_key": "ccpc2020final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2020final",
+        "sha256": "95e04e99c7142dc156b78f70f785e8ee13df07fe8e69596ea6b744e75b38493e",
+        "expected_summary": {
+          "official_teams": 115
+        }
       }
     },
     {
@@ -260,7 +312,8 @@
       "source_urls": [
         "https://qoj.ac/category/277",
         "https://qoj.ac/contest/1869",
-        "https://codeforces.com/gym/103860"
+        "https://codeforces.com/gym/103860",
+        "https://rl.algoux.cn/ranklist/ccpc2021final"
       ],
       "problem_labels": [
         "A",
@@ -277,7 +330,19 @@
         "L"
       ],
       "online_mapping": "verified",
-      "sha256": {}
+      "sha256": {
+        "rankland_problem_links": "69f7521b96459c48a4c408dbe74c552cdac2a1e1fec71d2fbc1d08d45b2e7946"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2021final.json",
+        "rankland_key": "ccpc2021final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2021final",
+        "sha256": "290a2d95c3ab540d986b1dd5b567af9177d738fb92d16a11831686332e9b6ff4",
+        "expected_summary": {
+          "official_teams": 115
+        }
+      }
     },
     {
       "id": "ccpc-2022-Final",
@@ -306,6 +371,16 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "617f80a02df7f97aaa289e7561ef0e142064e1d00a46bf9df9c67ceb137782ef"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2022final.json",
+        "rankland_key": "ccpc2022final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2022final",
+        "sha256": "5e10e66ce5261d5ed6005e5b64411b742a057394d351fd853407bf19e697bac4",
+        "expected_summary": {
+          "official_teams": 129
+        }
       }
     },
     {
@@ -335,6 +410,16 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "1f1a8848ce0444437034161e45ae6bf2c6c7189cd427a15b4ae49aa21473fb2c"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2023final.json",
+        "rankland_key": "ccpc2023final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2023final",
+        "sha256": "5a4fd8c3f1bff24baa0af18fbb57e1846fa077593935146142ecb5e45a28cdf6",
+        "expected_summary": {
+          "official_teams": 127
+        }
       }
     },
     {
@@ -364,6 +449,16 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "f281ca35eab13cd30f12ac78eb8e6d836c9e57552f18aa4d05a1387fc806f73f"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2024final.json",
+        "rankland_key": "ccpc2024final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2024final",
+        "sha256": "5cd025f1d7641cfbdae73a255a314ce52b953ecffdfe19defdfea3ebd66cb469",
+        "expected_summary": {
+          "official_teams": 122
+        }
       }
     },
     {
@@ -393,6 +488,16 @@
       "online_mapping": "verified",
       "sha256": {
         "official_mirror_dashboard": "1482af0b3dc583011be6b8ac9143c70515e345d6d4bdb28be0e060a0efdc4cc2"
+      },
+      "rating_evidence": {
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2025final.json",
+        "rankland_key": "ccpc2025final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2025final",
+        "sha256": "4b3d56837bee10c68aed96d161b08d4a576dc39ba1238f7168a08dcd96a8f861",
+        "expected_summary": {
+          "official_teams": 132
+        }
       }
     }
   ],

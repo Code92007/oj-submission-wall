@@ -1,6 +1,6 @@
 {
   "verified_at": "2026-10-14",
-  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links",
+  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links",
   "contests": [
     {
       "id": "ccpc-2025-Final",
@@ -134,7 +134,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2025final.json",
+        "rankland_key": "ccpc2025final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2025final",
+        "sha256": "4b3d56837bee10c68aed96d161b08d4a576dc39ba1238f7168a08dcd96a8f861",
+        "expected_summary": {
+          "official_teams": 132
+        }
       },
       "source_links": [
         {
@@ -786,7 +793,7 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "standings_path": "data/icpc/50th/ecfinal"
       },
       "source_links": [
         {
@@ -1895,7 +1902,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2024final.json",
+        "rankland_key": "ccpc2024final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2024final",
+        "sha256": "5cd025f1d7641cfbdae73a255a314ce52b953ecffdfe19defdfea3ebd66cb469",
+        "expected_summary": {
+          "official_teams": 122
+        }
       },
       "source_links": [
         {
@@ -2659,7 +2673,7 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "standings_path": "data/icpc/49th/ecfinal"
       },
       "source_links": [
         {
@@ -3845,7 +3859,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2023final.json",
+        "rankland_key": "ccpc2023final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2023final",
+        "sha256": "5a4fd8c3f1bff24baa0af18fbb57e1846fa077593935146142ecb5e45a28cdf6",
+        "expected_summary": {
+          "official_teams": 127
+        }
       },
       "source_links": [
         {
@@ -4561,7 +4582,7 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "standings_path": "data/icpc/48th/ecfinal"
       },
       "source_links": [
         {
@@ -5777,7 +5798,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2022final.json",
+        "rankland_key": "ccpc2022final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2022final",
+        "sha256": "5e10e66ce5261d5ed6005e5b64411b742a057394d351fd853407bf19e697bac4",
+        "expected_summary": {
+          "official_teams": 129
+        }
       },
       "source_links": [
         {
@@ -6570,7 +6598,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/icpc2022ecfinal.json",
+        "rankland_key": "icpc2022ecfinal",
+        "source_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal",
+        "sha256": "90d2553e4e3bdc8795b4f4db5cdfa3d8e911954f5275b2a95cfe7fa69eca3ac3",
+        "expected_summary": {
+          "official_teams": 280
+        }
       },
       "source_links": [
         {
@@ -7683,112 +7718,143 @@
           "name": "Mash",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860A"
+            "codeforces:103860A",
+            "qoj:9837"
           ],
-          "id": "ccpc-2021-Final:A"
+          "id": "ccpc-2021-Final:A",
+          "qoj_id": 9837
         },
         {
           "index": "B",
           "name": "Shuttle Bus",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860B"
+            "codeforces:103860B",
+            "qoj:9838"
           ],
-          "id": "ccpc-2021-Final:B"
+          "id": "ccpc-2021-Final:B",
+          "qoj_id": 9838
         },
         {
           "index": "C",
           "name": "Selection Sort Count",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860C"
+            "codeforces:103860C",
+            "qoj:9839"
           ],
-          "id": "ccpc-2021-Final:C"
+          "id": "ccpc-2021-Final:C",
+          "qoj_id": 9839
         },
         {
           "index": "D",
           "name": "Tree Partition",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860D"
+            "codeforces:103860D",
+            "qoj:9840"
           ],
-          "id": "ccpc-2021-Final:D"
+          "id": "ccpc-2021-Final:D",
+          "qoj_id": 9840
         },
         {
           "index": "E",
           "name": "Elegant Tetris",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860E"
+            "codeforces:103860E",
+            "qoj:9841"
           ],
-          "id": "ccpc-2021-Final:E"
+          "id": "ccpc-2021-Final:E",
+          "qoj_id": 9841
         },
         {
           "index": "F",
           "name": "Modulo",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860F"
+            "codeforces:103860F",
+            "qoj:9842"
           ],
-          "id": "ccpc-2021-Final:F"
+          "id": "ccpc-2021-Final:F",
+          "qoj_id": 9842
         },
         {
           "index": "G",
           "name": "Integer Game",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860G"
+            "codeforces:103860G",
+            "qoj:9843"
           ],
-          "id": "ccpc-2021-Final:G"
+          "id": "ccpc-2021-Final:G",
+          "qoj_id": 9843
         },
         {
           "index": "H",
           "name": "Harie Programming Contest",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860H"
+            "codeforces:103860H",
+            "qoj:9844"
           ],
-          "id": "ccpc-2021-Final:H"
+          "id": "ccpc-2021-Final:H",
+          "qoj_id": 9844
         },
         {
           "index": "I",
           "name": "Reverse LIS",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860I"
+            "codeforces:103860I",
+            "qoj:9845"
           ],
-          "id": "ccpc-2021-Final:I"
+          "id": "ccpc-2021-Final:I",
+          "qoj_id": 9845
         },
         {
           "index": "J",
           "name": "jwfw.harie.edu",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860J"
+            "codeforces:103860J",
+            "qoj:9846"
           ],
-          "id": "ccpc-2021-Final:J"
+          "id": "ccpc-2021-Final:J",
+          "qoj_id": 9846
         },
         {
           "index": "K",
           "name": "Security Plan",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860K"
+            "codeforces:103860K",
+            "qoj:9847"
           ],
-          "id": "ccpc-2021-Final:K"
+          "id": "ccpc-2021-Final:K",
+          "qoj_id": 9847
         },
         {
           "index": "L",
           "name": "Paid Leave",
           "cf_contest_id": 103860,
           "aliases": [
-            "codeforces:103860L"
+            "codeforces:103860L",
+            "qoj:9848"
           ],
-          "id": "ccpc-2021-Final:L"
+          "id": "ccpc-2021-Final:L",
+          "qoj_id": 9848
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2021final.json",
+        "rankland_key": "ccpc2021final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2021final",
+        "sha256": "290a2d95c3ab540d986b1dd5b567af9177d738fb92d16a11831686332e9b6ff4",
+        "expected_summary": {
+          "official_teams": 115
+        }
       },
       "cf_contest_id": 103860
     },
@@ -8483,7 +8549,7 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "standings_path": "data/icpc/46th/ec-final"
       },
       "cf_contest_id": 103861
     },
@@ -9519,7 +9585,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2020final.json",
+        "rankland_key": "ccpc2020final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2020final",
+        "sha256": "95e04e99c7142dc156b78f70f785e8ee13df07fe8e69596ea6b744e75b38493e",
+        "expected_summary": {
+          "official_teams": 115
+        }
       }
     },
     {
@@ -10203,7 +10276,9 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "unavailable_reason": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。",
+        "source_url": "https://rl.algoux.cn/ranklist/icpc2020ecfinal",
+        "sha256": "2ff93c7dfa477bac1375697377b94efbdbd1d07573253d3375f4b395bdb4d987"
       },
       "cf_contest_id": 103069
     },
@@ -11388,7 +11463,14 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "provider": "rankland",
+        "standings_path": "rankland/ccpc2019final.json",
+        "rankland_key": "ccpc2019final",
+        "source_url": "https://rl.algoux.cn/ranklist/ccpc2019final",
+        "sha256": "d8940770989e25d4bdaff7e05b8d4278708d125fc5c7ea02433db65d13b99299",
+        "expected_summary": {
+          "official_teams": 115
+        }
       },
       "cf_contest_id": 102431
     },
@@ -11926,7 +12008,9 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "新增决赛尚未核验完整正式队赛时榜单及奖牌分界，保留未评级。"
+        "unavailable_reason": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。",
+        "source_url": "https://rl.algoux.cn/ranklist/icpc2019ecfinal",
+        "sha256": "6da875bc3615a1543692b25909d560359709757eff2c3efc3a66b428a13df364"
       },
       "cf_contest_id": 102471
     },
