@@ -353,7 +353,10 @@ def handle(handler, service, post=False):
             if not owner:
                 handler.send_error_json(401, '连接码无效、已撤销或已到期')
                 return True
-            handler.send_json(200, service.progress(owner))
+            from knowledge_export import knowledge_snapshot
+            result = service.progress(owner)
+            result['knowledge'] = knowledge_snapshot(service, owner)
+            handler.send_json(200, result)
             return True
         principal = service.app.get_current_principal(handler)
         if not principal or principal['type'] != 'user':
