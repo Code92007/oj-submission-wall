@@ -260,7 +260,7 @@ class Integration:
                 onsite_contests.append({'name':evidence.get('contest_name',row['contest']),
                     'date':participation['date'],'team':participation['team'],'official':participation.get('official'),
                     'accepted':evidence.get('accepted_labels',[p.rsplit(':',1)[-1] for p in evidence['accepted']]),
-                    'source_url':evidence['source_url'],'mapped':row['contest'] in self.contests})
+                    'source_url':evidence['source_url'],'mapped':row['contest'] in self.contests and self.contests[row['contest']].get('catalog_status') != 'pending_problem_list'})
                 for pid in evidence['accepted']:
                     alias = evidence.get('problem_aliases',{}).get(pid)
                     pid = self.aliases.get(alias,pid) if alias else pid
@@ -281,6 +281,8 @@ class Integration:
     def import_auto_onsite(self, body):
         """Provider adapters validated the row; retain unmapped contests for later catalogs."""
         contest = self.contests.get(body['contest_id'])
+        if contest and contest.get('catalog_status') == 'pending_problem_list':
+            contest = None
         labels = body['problem_labels']
         if len(labels) != len(set(labels)) or any(p not in labels for p in body['accepted']):
             raise ValueError('原榜单题序无效')

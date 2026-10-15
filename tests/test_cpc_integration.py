@@ -82,3 +82,19 @@ class CpcTests(unittest.TestCase):
         self.assertEqual(saved['accepted'],[cid+':A',cid+':C'])
         self.assertEqual(saved['problem_aliases'][cid+':A'],'codeforces:102769A')
         self.assertNotIn(cid+':C',saved['problem_aliases'])
+
+    def test_pending_problem_list_keeps_verified_onsite_evidence_without_inventing_catalog(self):
+        cid='icpc-2018-香港'
+        participation={'id':'pending-list','team':'原队伍','date':'2018-11-04'}
+        body={'contest_id':cid,'problem_labels':['A','B'],'accepted':['B'],
+              'reference_urls':[], 'participation_id':participation['id'],'team':participation['team'],
+              'contest_date':participation['date'],'source_url':'https://organizer.example/final'}
+        remote={'roster':{'participations':[participation]}}
+        with patch.object(self.service,'remote',return_value=(remote,0)):
+            key=self.service.import_auto_onsite(body)
+        with self.service.db() as db:
+            saved=json.loads(db.execute('select body from cpc_onsite where id=?',(key,)).fetchone()[0])
+        self.assertEqual(saved['accepted'],[cid+':B'])
+        self.assertEqual(saved['problem_aliases'],{})
+        self.assertEqual(self.service.contests[cid]['problems'],[])
+        self.assertNotIn(cid+':B',self.service.problem_ids)

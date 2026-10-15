@@ -33,6 +33,16 @@ assert.match(element('cpcRows').innerHTML, /difficulty-unknown[^>]*title="[^"]*�
 assert.match(element('cpcRows').innerHTML, /class="cpc-rating" aria-hidden="true">—<\/span>/);
 assert.doesNotMatch(element('cpcRows').innerHTML, /class="cpc-rating" aria-hidden="true">(?:0|undefined|null)<\/span>/);
 assert.match(element('cpcRatingCoverage').textContent, /— 表示暂未评级/);
+assert.match(element('cpcRatingCoverage').textContent, /137\/149/);
+element('cpcYear').value = '2018';
+vm.runInContext('cpcWall()', context);
+assert.match(element('cpcSummary').textContent, /12 场比赛 · 0\/132 题完成/);
+assert.match(element('cpcRatingCoverage').textContent, /97\/132/);
+assert.match(element('cpcYearChoices').innerHTML, /data-year="2018"/);
+assert.match(element('cpcRows').innerHTML, /2018 · 香港站[\s\S]*?题单待核验/);
+assert.doesNotMatch(element('cpcRows').innerHTML, /<strong>0\/0<\/strong>/);
+assert.deepEqual(Array.from(element('cpcRows').innerHTML.matchAll(/class="cpc-rating" aria-hidden="true">(\d+)<\/span>/g), m => Number(m[1])), catalog.contests.filter(c => c.year === 2018).flatMap(c => c.problems.filter(p => release.problems[p.id]).map(p => release.problems[p.id].rating)));
+element('cpcYear').value = '2019';
 vm.runInContext('delete cpcData.difficulty; delete cpcData.ratingRelease; cpcWall();', context);
 assert.match(element('cpcRatingCoverage').textContent, /0\/149/);
 console.log('Regional ratings: released scores, Final colors, AC union, year selection and unrated fallback passed');

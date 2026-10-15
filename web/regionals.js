@@ -50,7 +50,8 @@ function cpcWall(){
     }).join('');done+=solved;total+=c.problems.length;
     const series=['ICPC','CCPC'].includes(c.series)?c.series:'';
     const name=series?c.name.replace(`${c.year} ${series} `,`${c.year} · `):c.name;
-    return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}<a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">${escapeCpc(name)}</a></span></th><td class="cpc-progress"><strong>${solved}/${c.problems.length}</strong><small>题目完成</small><progress value="${solved}" max="${c.problems.length}" aria-label="${escapeCpc(c.name+' 完成进度')}"></progress></td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
+    const progress=c.catalog_status==='pending_problem_list'?'<strong>题单待核验</strong>':`<strong>${solved}/${c.problems.length}</strong><small>题目完成</small><progress value="${solved}" max="${c.problems.length}" aria-label="${escapeCpc(c.name+' 完成进度')}"></progress>`;
+    return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}<a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">${escapeCpc(name)}</a></span></th><td class="cpc-progress">${progress}</td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
   }).join('');
   el('cpcSummary').textContent=`${contests.length} 场比赛 · ${done}/${total} 题完成`;
   el('cpcRatingCoverage').textContent=`本年已评级 ${rated}/${total} · 与 CF Bot 使用同一份评级 · ${cpcData.ratingRelease?.scale||'CF 风格经验分数，非官方 Rating'}。${rated<total?' — 表示暂未评级。':''}`;

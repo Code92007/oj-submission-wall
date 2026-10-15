@@ -147,3 +147,10 @@ docker compose exec oj-submission-wall python tools/configure_codeforces.py --ow
 公共目录新增 2019–2025 每年的 CCPC Final / ICPC EC Final，共 14 场、178 题；总计 89 场、1132 题。与 CF Bot 保持规范 ID 一致，延期决赛按原赛季归档，排除热身。逐题字母与平台编号来自官方 Gym、QOJ / Universal Cup 正式题单，2020 CCPC 决赛辅以命题方 PROBLEMS 顺序核验。来源见 `catalog/regional_finals_sources.json`。新增决赛暂未评级。原有 954 题规范 ID、别名和题序保留。
 
 2019 南昌的比赛入口改为计蒜客 5530，沈阳改为 PTA 1231102432326602752 题单；原榜单仍保存在 ranklist_url。区域赛页面赛名可直接跳转看题。现场来源的 final / ecfinal / ecf 标识按赛事、赛季匹配到相应决赛，支持现有现场成绩重刷后的合并。
+
+
+## 2018–2019 目录与历史评级补充（2026-10-15）
+
+与 CF Bot 同步 `regionals.json`、`regional_ratings.json`、`regional_2018_2019_sources.json` 以及 17 份 `historical_standings` 匿名快照。合计 101 场、1264 道已核验题目，94 场、1192 题已评级；旧 984 题评级及 77 场统计保持原值。2019 补充 9 场、111 题评级，目前 137/149 题有评级。2018 新增 12 场记录、132 道已核验题目，8 场、97 题有评级。Gym 别名依据公开题单逐题核验，未验证的平台题号保持 pending。
+
+2018 香港仅有赛事记录，题目列表为空并标记 `pending_problem_list`，前端显示“题单待核验”，不显示 0/0。2019 厦门缺完整逐题终榜；2018 北京缺完整逐题终榜、沈阳缺奖牌分界、焦作官方获奖表与终榜尚未完全对齐、香港缺完整题单与终榜，因此暂未评级。2020 澳门/EC Final 的旧缺口保留。来源、原文件及快照 SHA-256、历史数据差异说明见新增来源清单；rating 为沿用原公式的 CF 风格经验值，非官方 Rating。目录更新后重新匹配既有现场与线上记录，保留原始历史。

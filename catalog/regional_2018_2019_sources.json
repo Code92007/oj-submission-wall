@@ -1,0 +1,414 @@
+{
+  "verified_at": "2026-10-15",
+  "contests": [
+    {
+      "id": "icpc-2019-上海",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shanghai",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/4233?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2019shanghai.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shanghai",
+          "sha256": "eff43be3eb4d1c99fa429b61eea4d33f783241c43b98c57e6aef04179964aa05"
+        },
+        {
+          "file": "medals-shanghai2019.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/4233?q=&page=1&size=2000",
+          "sha256": "fbe237cf48d38fd5b69ab205c098528f32e0dabb80e971380e222e6fee0c9006"
+        }
+      ],
+      "snapshot_sha256": "a76f1bf93bf8fd06e1d3455bd4aa2bb2740f686700bf320faa498236af26c48e",
+      "notes": []
+    },
+    {
+      "id": "icpc-2019-南京",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanjing",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/4237?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2019nanjing.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanjing",
+          "sha256": "93b33b373bf72f2ce5020f77710c701eebbb6aead6377c5c2976db40e9b014cb"
+        },
+        {
+          "file": "medals-nanjing2019.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/4237?q=&page=1&size=2000",
+          "sha256": "4ffe6ccb089d5c072a5aadbc3faa87da6aaa840097166d65b11fb5b4ffe687ab"
+        }
+      ],
+      "snapshot_sha256": "3909198435d9c290e495eed7a92ae4f02157d05d5e753583b3e4c9785dc34ad1",
+      "notes": [
+        "官网登记 309 队；逐题终榜显式正式队 311 队，全部获奖队的解题数及罚时多重集合一致；统计分母使用完整终榜。"
+      ]
+    },
+    {
+      "id": "icpc-2019-南昌",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanchang",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/4231?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2019nanchang.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanchang",
+          "sha256": "70a5bd55fc80758f01c326621852c8a4112ea3f51ae04699ac11427d511a3ad1"
+        },
+        {
+          "file": "medals-nanchang2019.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/4231?q=&page=1&size=2000",
+          "sha256": "eb7d3dc341185ea9b09e2a13d1f44fba9cb553407f3075b31451f248ef2fb988"
+        }
+      ],
+      "snapshot_sha256": "ca25a1e0beb89e91f18028c5b7c599198cc69a567165376003927efe16d6b5f3",
+      "notes": []
+    },
+    {
+      "id": "icpc-2019-徐州",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019xuzhou",
+      "medal_source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019xuzhou",
+      "source_files": [
+        {
+          "file": "icpc2019xuzhou.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2019xuzhou",
+          "sha256": "4ac824d15bb34a80e92180d31b82f7b77d2e9a2f32744cc2159727c316e107d3"
+        }
+      ],
+      "snapshot_sha256": "65e8c7494c10033d008324cc0a61854c556984a7f8cea5a4cdf3fbd7de14ffea",
+      "notes": []
+    },
+    {
+      "id": "icpc-2019-沈阳",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shenyang",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/4227?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2019shenyang.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shenyang",
+          "sha256": "8974763980e7fe1afe9f595f6e882a00781bf662e28612924c75896cc5f2a006"
+        },
+        {
+          "file": "medals-shenyang2019.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/4227?q=&page=1&size=2000",
+          "sha256": "9e4a10cda371ffb60948811ffb8e8ea461fcd46f364cb3fe5ba31d3d88ee1d16"
+        }
+      ],
+      "snapshot_sha256": "8c71fafeb9ff1f7c1f5956a7c3f307dc8ce19043196e91af1f46af06c906c396",
+      "notes": [
+        "官网登记 199 队；逐题终榜显式正式队 200 队，全部获奖队的解题数及罚时多重集合一致；统计分母使用完整终榜。"
+      ]
+    },
+    {
+      "id": "icpc-2019-ECFinal",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019ecfinal",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/4239?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2019ecfinal.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2019ecfinal",
+          "sha256": "f9037bec7efda33b167d781c0867590706ab4f153f810d1189c40f41eac54b8b"
+        },
+        {
+          "file": "medals-ecfinal2019.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/4239?q=&page=1&size=2000",
+          "sha256": "6f874f1a8e7db2cd3be9a216d2fbab1ddfe292370e4d11116f51f173c5aa4529"
+        }
+      ],
+      "snapshot_sha256": "892fff267c8fd03b1907ffc7da24d0c122e3438a6112d39b96f29409171198ad",
+      "notes": []
+    },
+    {
+      "id": "icpc-2018-南京",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018nanjing",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/3697?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2018nanjing.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2018nanjing",
+          "sha256": "98a87e1c71e55a39393eb6dceee54a6a0b046facff4fa12951e6752069497974"
+        },
+        {
+          "file": "medals-nanjing2018.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/3697?q=&page=1&size=2000",
+          "sha256": "defe6ed0c92426d9a408e9294035370bd349ed912912ad1117bc0872870bc5ec"
+        }
+      ],
+      "snapshot_sha256": "ca98709e37293a7c14fd8d0b176247eb393c87b945e019aab776e54450d63c85",
+      "notes": [
+        "官网登记 315 队；逐题终榜显式正式队 317 队，全部获奖队的解题数及罚时多重集合一致；统计分母使用完整终榜。"
+      ]
+    },
+    {
+      "id": "icpc-2018-青岛",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao",
+      "medal_source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao",
+      "source_files": [
+        {
+          "file": "icpc2018qingdao.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao",
+          "sha256": "d5dc36ea656999ea7cac2176167f59351ef264776459f241bbf35aed4782f237"
+        }
+      ],
+      "snapshot_sha256": "28f05e5a0a80bae7e79838542fbb831cb8c03a12f7744d681326c962c849401a",
+      "notes": []
+    },
+    {
+      "id": "icpc-2018-徐州",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
+      "medal_source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
+      "source_files": [
+        {
+          "file": "icpc2018xuzhou.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
+          "sha256": "dbd255c4994b589c812706758b2845fa1d69bbec7ed009841b6a9f9975e28643"
+        }
+      ],
+      "snapshot_sha256": "fbe2ed68c86374345961ff7793dc5288d314dff44ac211b673bc2549ea216051",
+      "notes": [
+        "ICPC 官网登记仅 276 队且奖牌记录不全；使用完整归档 278 支显式正式队及 SRK 显式奖牌规则（银牌末位并列纳入）。"
+      ]
+    },
+    {
+      "id": "icpc-2018-ECFinal",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018ecfinal",
+      "medal_source_url": "https://icpc.global/api/contest/public/search/contest/3696?q=&page=1&size=2000",
+      "source_files": [
+        {
+          "file": "icpc2018ecfinal.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=icpc2018ecfinal",
+          "sha256": "559cedfe9291521b1d3570dc2e4e1a1aa5b7b5626c4115b92d78b97bbcb2190c"
+        },
+        {
+          "file": "medals-ecfinal2018.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/3696?q=&page=1&size=2000",
+          "sha256": "be65812712827bf3794e626638cbe39aa783d6aef1e5855ab5a238a8882887d8"
+        }
+      ],
+      "snapshot_sha256": "6ab6503a0eee1db053e263e07bc302d9a5a4953da1e7043247e0ad2495633a7f",
+      "notes": []
+    },
+    {
+      "id": "ccpc-2018-桂林",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018guilin",
+      "medal_source_url": "https://ccpc.io/a/136.html",
+      "source_files": [
+        {
+          "file": "ccpc2018guilin.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018guilin",
+          "sha256": "e95d9e133110fa4136a9330911845bcdc62c411485b6a6cee77a8b00d069d4c6"
+        },
+        {
+          "file": "award-136.html",
+          "url": "https://ccpc.io/a/136.html",
+          "sha256": "73490b69e8546744b2750a5b2d45ca7e73aac59644d784e9dcfafb31cd25c97e"
+        }
+      ],
+      "snapshot_sha256": "79187ab03a973fc3d339f3747c7f61b0d92613816c51053ac699b5685b4618d0",
+      "notes": []
+    },
+    {
+      "id": "ccpc-2018-吉林",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+      "medal_source_url": "https://ccpc.io/a/115.html",
+      "source_files": [
+        {
+          "file": "ccpc2018jilin.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+          "sha256": "a920bbaf82c2af13e258b72cbd4697b32bb9b07f99a19831d3b54e4e121baa9b"
+        },
+        {
+          "file": "award-115.html",
+          "url": "https://ccpc.io/a/115.html",
+          "sha256": "cc3c13a9c4eddddaae8302baeabd62209f9b8d4fc535c7e57decbedd7bb0f784"
+        }
+      ],
+      "snapshot_sha256": "1212f84da9151dbb61cbc7a57f8679f33ff753436bd8e2a45a5d07e70b07a356",
+      "notes": []
+    },
+    {
+      "id": "ccpc-2018-Final",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018final",
+      "medal_source_url": "https://ccpc.io/a/137.html",
+      "source_files": [
+        {
+          "file": "ccpc2018final.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018final",
+          "sha256": "dfe2a10ea9e37f195e0085b65b76a6ec24fd9db7d064c107ab52c16ff188234b"
+        },
+        {
+          "file": "award-137.html",
+          "url": "https://ccpc.io/a/137.html",
+          "sha256": "68b20b20198d10a676e066786ecf3b689437c69359d07da34ae67325f2996665"
+        }
+      ],
+      "snapshot_sha256": "2fe4762d4b8fa9488d6dccc7741193b34d4fb752efe08591661836dae227b609",
+      "notes": []
+    },
+    {
+      "id": "ccpc-2018-秦皇岛",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+      "medal_source_url": "https://ccpc.io/a/135.html",
+      "source_files": [
+        {
+          "file": "ccpc2018qinhuangdao.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+          "sha256": "3d33c1d1edc817d39a1cf61534c1801f2eab97b1b9ffd879de2baf1e474a6e3f"
+        },
+        {
+          "file": "award-135.html",
+          "url": "https://ccpc.io/a/135.html",
+          "sha256": "b7a2a697cbb779e469af788b22e27195101fd223d6328673b0f1be55d04597d0"
+        }
+      ],
+      "snapshot_sha256": "589e0a1544bbf6f0e8fb9cd8b65d98c0d7be61e5ffa52efaa3841be042319275",
+      "notes": []
+    },
+    {
+      "id": "ccpc-2019-秦皇岛",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2019qinhuangdao",
+      "medal_source_url": "https://ccpc.io/a/190.html",
+      "source_files": [
+        {
+          "file": "collection-ccpc2019qinhuangdao.html",
+          "url": "https://rl.algoux.cn/collection/official?rankId=ccpc2019qinhuangdao",
+          "sha256": "347d735f42498d76354c900589b3d0f9073ab4863827cf67a3e962fca16f9d9b"
+        },
+        {
+          "file": "award-190.html",
+          "url": "https://ccpc.io/a/190.html",
+          "sha256": "b9b1d3f7d8b174efa3d0c75ac4f6bdbbf51b9926ff64618ec5f7148081edffb1"
+        }
+      ],
+      "snapshot_sha256": "e19e6e6ba6d13029b461e799aacb78d1494bf1f3ace8680efee9aa39b53b82b0",
+      "notes": []
+    },
+    {
+      "id": "ccpc-2019-哈尔滨",
+      "source_url": "https://acm.sdut.edu.cn/acmss/ccpc/2019/haerbin/index.htm",
+      "medal_source_url": "https://acm.sdut.edu.cn/acmss/ccpc/2019/haerbin/index.htm",
+      "source_files": [
+        {
+          "file": "sdut2019harbin.html",
+          "url": "https://acm.sdut.edu.cn/acmss/ccpc/2019/haerbin/index.htm",
+          "sha256": "0fc218c3464571087c3aae06fadf95aa05049f5602d2cf47acbedd7745182eeb"
+        }
+      ],
+      "snapshot_sha256": "6f210aeb890fc4d069ccb4011b2519324d3c6d6c994c8a81932b2fe7ef6f53b7",
+      "notes": []
+    },
+    {
+      "id": "icpc-2019-香港",
+      "source_url": "https://codeforces.com/gym/102452/standings",
+      "medal_source_url": "https://icpc.global/regionals/finder/Hong-Kong-City-2020/standings",
+      "source_files": [
+        {
+          "file": "web-hongkong2019.json",
+          "url": "https://codeforces.com/gym/102452/standings",
+          "sha256": "40809ad872436186efbef84edefb920e4e81027f9e86d3090a62584a8fc33890"
+        },
+        {
+          "file": "medals-hongkong2019.json",
+          "url": "https://icpc.global/api/contest/public/search/contest/4229?q=&page=1&size=2000",
+          "sha256": "95a1617c73bf5ac84a89b2aa2ca2a0ec81bcc7b36a662259827defa2e318d63e"
+        }
+      ],
+      "snapshot_sha256": "35278f3239bf9393c637397bbe78be82a43b738931c8b50b20503ad6ad20a9b8",
+      "notes": [
+        "非获奖队镜像罚时 533 与官网 493 不同；解题数相同，使用官网排序罚时。",
+        "非获奖队镜像罚时 452 与官网 432 不同；解题数相同，使用官网排序罚时。"
+      ]
+    }
+  ],
+  "catalog_2018": [
+    {
+      "id": "ccpc-2018-Final",
+      "problems": 12,
+      "mapping_source": "https://codeforces.com/gym/102055",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018final",
+      "rating_status": "verified"
+    },
+    {
+      "id": "ccpc-2018-吉林",
+      "problems": 12,
+      "mapping_source": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+      "rating_status": "verified"
+    },
+    {
+      "id": "ccpc-2018-桂林",
+      "problems": 12,
+      "mapping_source": "https://codeforces.com/gym/102823",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018guilin",
+      "rating_status": "verified"
+    },
+    {
+      "id": "ccpc-2018-秦皇岛",
+      "problems": 10,
+      "mapping_source": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+      "rating_status": "verified"
+    },
+    {
+      "id": "icpc-2018-ECFinal",
+      "problems": 12,
+      "mapping_source": "https://codeforces.com/gym/102056",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018ecfinal",
+      "rating_status": "verified"
+    },
+    {
+      "id": "icpc-2018-北京",
+      "problems": 10,
+      "mapping_source": "https://qoj.ac/category/464",
+      "ranklist_url": "https://icpc.global/regionals/finder/Beijing-2019/standings",
+      "rating_status": "unavailable",
+      "unavailable_reason": "ICPC 官网有获奖记录，但尚未找到完整逐题终榜。"
+    },
+    {
+      "id": "icpc-2018-南京",
+      "problems": 13,
+      "mapping_source": "https://codeforces.com/gym/101981",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018nanjing",
+      "rating_status": "verified"
+    },
+    {
+      "id": "icpc-2018-徐州",
+      "problems": 13,
+      "mapping_source": "https://codeforces.com/gym/102012",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
+      "rating_status": "verified"
+    },
+    {
+      "id": "icpc-2018-沈阳",
+      "problems": 13,
+      "mapping_source": "https://codeforces.com/gym/101955",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018shenyang",
+      "rating_status": "unavailable",
+      "unavailable_reason": "完整逐题终榜可读，但 ICPC 官网未填写奖牌，尚无可核验的完整金银铜分界。"
+    },
+    {
+      "id": "icpc-2018-焦作",
+      "problems": 12,
+      "mapping_source": "https://codeforces.com/gym/102028",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018jiaozuo",
+      "rating_status": "unavailable",
+      "unavailable_reason": "完整逐题终榜与官网获奖表的队名、罚时和正式队数存在差异，奖牌边界队伍尚未完全对齐。"
+    },
+    {
+      "id": "icpc-2018-青岛",
+      "problems": 13,
+      "mapping_source": "https://codeforces.com/gym/104270",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao",
+      "rating_status": "verified"
+    },
+    {
+      "id": "icpc-2018-香港",
+      "problems": 0,
+      "mapping_source": "https://icpc.global/regionals/finder/Hong-Kong-City-2019/standings",
+      "ranklist_url": "https://icpc.global/regionals/finder/Hong-Kong-City-2019/standings",
+      "rating_status": "unavailable",
+      "unavailable_reason": "ICPC 官网有获奖记录，但完整题单与逐题终榜尚未找到。"
+    }
+  ],
+  "notes": [
+    "2018 香港站保留赛事行并标记题单待核验，不臆造题数或逐题平台别名。",
+    "2018 北京、吉林、秦皇岛尚无可核验逐题平台映射；只收录已核验的题号，保留 pending。",
+    "2018 青岛 Gym 镜像题序核对官方原题 PDF：https://codeforces.com/gym/104270/attachments/download/19460/contest-en.pdf。"
+  ]
+}

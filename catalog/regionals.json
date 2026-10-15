@@ -1,6 +1,6 @@
 {
-  "verified_at": "2026-10-14",
-  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links",
+  "verified_at": "2026-10-15",
+  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links; 2018 Gym dashboards and Qingdao official statements; 2018–2019 ICPC official awards and CCPC full award tables; pinned anonymous historical final scoreboards",
   "contests": [
     {
       "id": "ccpc-2025-Final",
@@ -11598,7 +11598,9 @@
       "ranklist_url": "https://rl.algoux.cn/ranklist/ccpc2019xiamen",
       "mapping_source": "https://qoj.ac/contest/1733/problem/9101",
       "rating_evidence": {
-        "unavailable_reason": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。"
+        "unavailable_reason": "CCPC 官方终榜网页表格被截断，SDUT PDF/RankLand 只含总解题数与奖牌，缺少完整逐题结果；暂不使用赛后练习通过数。",
+        "source_url": "https://ccpc.io/a/186.html",
+        "medal_source_url": "https://ccpc.io/a/192.html"
       }
     },
     {
@@ -11750,7 +11752,31 @@
       "cf_contest_id": 102394,
       "mapping_source": "https://codeforces.com/gym/102394",
       "rating_evidence": {
-        "unavailable_reason": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2019harbin.json",
+        "source_url": "https://acm.sdut.edu.cn/acmss/ccpc/2019/haerbin/index.htm",
+        "sha256": "6f210aeb890fc4d069ccb4011b2519324d3c6d6c994c8a81932b2fe7ef6f53b7",
+        "expected_summary": {
+          "official_teams": 239,
+          "excluded_teams": 33,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 24,
+              "last_solved": 6,
+              "last_penalty_minutes": 499
+            },
+            "silver": {
+              "teams": 48,
+              "last_solved": 5,
+              "last_penalty_minutes": 512
+            },
+            "bronze": {
+              "teams": 72,
+              "last_solved": 4,
+              "last_penalty_minutes": 378
+            }
+          }
+        }
       }
     },
     {
@@ -11873,7 +11899,31 @@
       "ranklist_url": "https://rl.algoux.cn/ranklist/ccpc2019qinhuangdao",
       "cf_contest_id": 102361,
       "rating_evidence": {
-        "unavailable_reason": "当前固定版本 XCPCIO 赛时导出未收录本站；其他榜单尚未完成评级口径核验，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2019qinhuangdao.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2019qinhuangdao",
+        "sha256": "e19e6e6ba6d13029b461e799aacb78d1494bf1f3ace8680efee9aa39b53b82b0",
+        "expected_summary": {
+          "official_teams": 240,
+          "excluded_teams": 24,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 24,
+              "last_solved": 5,
+              "last_penalty_minutes": 546
+            },
+            "silver": {
+              "teams": 48,
+              "last_solved": 4,
+              "last_penalty_minutes": 438
+            },
+            "bronze": {
+              "teams": 72,
+              "last_solved": 3,
+              "last_penalty_minutes": 512
+            }
+          }
+        }
       }
     },
     {
@@ -12008,9 +12058,31 @@
         }
       ],
       "rating_evidence": {
-        "unavailable_reason": "正式队逐题终榜已核对，但 XCPCIO / RankLand 缺少可核验奖牌分界，保留未评级。",
-        "source_url": "https://rl.algoux.cn/ranklist/icpc2019ecfinal",
-        "sha256": "6da875bc3615a1543692b25909d560359709757eff2c3efc3a66b428a13df364"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019ecfinal.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019ecfinal",
+        "sha256": "892fff267c8fd03b1907ffc7da24d0c122e3438a6112d39b96f29409171198ad",
+        "expected_summary": {
+          "official_teams": 378,
+          "excluded_teams": 8,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 36,
+              "last_solved": 5,
+              "last_penalty_minutes": 765
+            },
+            "silver": {
+              "teams": 72,
+              "last_solved": 3,
+              "last_penalty_minutes": 313
+            },
+            "bronze": {
+              "teams": 108,
+              "last_solved": 2,
+              "last_penalty_minutes": 185
+            }
+          }
+        }
       },
       "cf_contest_id": 102471
     },
@@ -12147,7 +12219,31 @@
       "ranklist_url": "https://rl.algoux.cn/ranklist/icpc2019shanghai",
       "mapping_source": "https://qoj.ac/contest/1866/problem/11004",
       "rating_evidence": {
-        "unavailable_reason": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019shanghai.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shanghai",
+        "sha256": "a76f1bf93bf8fd06e1d3455bd4aa2bb2740f686700bf320faa498236af26c48e",
+        "expected_summary": {
+          "official_teams": 300,
+          "excluded_teams": 36,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 30,
+              "last_solved": 6,
+              "last_penalty_minutes": 805
+            },
+            "silver": {
+              "teams": 60,
+              "last_solved": 4,
+              "last_penalty_minutes": 652
+            },
+            "bronze": {
+              "teams": 90,
+              "last_solved": 2,
+              "last_penalty_minutes": 337
+            }
+          }
+        }
       }
     },
     {
@@ -12288,7 +12384,31 @@
       "cf_contest_id": 103466,
       "mapping_source": "https://codeforces.com/gym/103466",
       "rating_evidence": {
-        "unavailable_reason": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019nanjing.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanjing",
+        "sha256": "3909198435d9c290e495eed7a92ae4f02157d05d5e753583b3e4c9785dc34ad1",
+        "expected_summary": {
+          "official_teams": 311,
+          "excluded_teams": 23,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 30,
+              "last_solved": 5,
+              "last_penalty_minutes": 499
+            },
+            "silver": {
+              "teams": 60,
+              "last_solved": 4,
+              "last_penalty_minutes": 529
+            },
+            "bronze": {
+              "teams": 90,
+              "last_solved": 3,
+              "last_penalty_minutes": 434
+            }
+          }
+        }
       }
     },
     {
@@ -12406,8 +12526,31 @@
       ],
       "ranklist_url": "https://rl.algoux.cn/ranklist/icpc2019nanchang",
       "rating_evidence": {
-        "standings_path": "data/icpc/2019/nanchang",
-        "unavailable_reason": "XCPCIO 赛时记录及 RankLand 存档均缺少可核验奖牌分界，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019nanchang.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanchang",
+        "sha256": "ca25a1e0beb89e91f18028c5b7c599198cc69a567165376003927efe16d6b5f3",
+        "expected_summary": {
+          "official_teams": 331,
+          "excluded_teams": 1,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 34,
+              "last_solved": 5,
+              "last_penalty_minutes": 563
+            },
+            "silver": {
+              "teams": 67,
+              "last_solved": 4,
+              "last_penalty_minutes": 436
+            },
+            "bronze": {
+              "teams": 100,
+              "last_solved": 3,
+              "last_penalty_minutes": 280
+            }
+          }
+        }
       },
       "source_label": "计蒜客题单",
       "source_links": [
@@ -12550,7 +12693,31 @@
       "ranklist_url": "https://rl.algoux.cn/ranklist/icpc2019xuzhou",
       "mapping_source": "https://qoj.ac/contest/1834/problem/9701",
       "rating_evidence": {
-        "unavailable_reason": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019xuzhou.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019xuzhou",
+        "sha256": "65e8c7494c10033d008324cc0a61854c556984a7f8cea5a4cdf3fbd7de14ffea",
+        "expected_summary": {
+          "official_teams": 284,
+          "excluded_teams": 17,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 28,
+              "last_solved": 5,
+              "last_penalty_minutes": 596
+            },
+            "silver": {
+              "teams": 57,
+              "last_solved": 4,
+              "last_penalty_minutes": 872
+            },
+            "bronze": {
+              "teams": 86,
+              "last_solved": 3,
+              "last_penalty_minutes": 573
+            }
+          }
+        }
       }
     },
     {
@@ -12668,7 +12835,31 @@
       ],
       "ranklist_url": "https://rl.algoux.cn/ranklist/icpc2019shenyang",
       "rating_evidence": {
-        "unavailable_reason": "当前固定版本 XCPCIO 赛时导出未收录本站；其他榜单尚未完成评级口径核验，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019shenyang.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shenyang",
+        "sha256": "8c71fafeb9ff1f7c1f5956a7c3f307dc8ce19043196e91af1f46af06c906c396",
+        "expected_summary": {
+          "official_teams": 200,
+          "excluded_teams": 4,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 20,
+              "last_solved": 6,
+              "last_penalty_minutes": 540
+            },
+            "silver": {
+              "teams": 40,
+              "last_solved": 5,
+              "last_penalty_minutes": 493
+            },
+            "bronze": {
+              "teams": 60,
+              "last_solved": 4,
+              "last_penalty_minutes": 320
+            }
+          }
+        }
       },
       "source_label": "PTA 题单",
       "source_links": [
@@ -12989,7 +13180,1597 @@
       "cf_contest_id": 102452,
       "mapping_source": "https://codeforces.com/gym/102452",
       "rating_evidence": {
-        "unavailable_reason": "固定版本的赛时榜单存档未收录本站；暂未核实完整正式队榜单及奖牌分界，保留未评级。"
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2019hongkong.json",
+        "source_url": "https://codeforces.com/gym/102452/standings",
+        "sha256": "35278f3239bf9393c637397bbe78be82a43b738931c8b50b20503ad6ad20a9b8",
+        "expected_summary": {
+          "official_teams": 36,
+          "excluded_teams": 2,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 4,
+              "last_solved": 4,
+              "last_penalty_minutes": 523
+            },
+            "silver": {
+              "teams": 7,
+              "last_solved": 3,
+              "last_penalty_minutes": 276
+            },
+            "bronze": {
+              "teams": 11,
+              "last_solved": 3,
+              "last_penalty_minutes": 410
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ccpc-2018-Final",
+      "year": 2018,
+      "series": "CCPC",
+      "site": "CCPC Final",
+      "name": "2018 CCPC CCPC Final",
+      "source_url": "https://codeforces.com/gym/102055",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018final",
+      "problems": [
+        {
+          "id": "ccpc-2018-Final:A",
+          "index": "A",
+          "name": "Mischievous Problem Setter",
+          "aliases": [
+            "codeforces:102055A"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:B",
+          "index": "B",
+          "name": "Balance of the Force",
+          "aliases": [
+            "codeforces:102055B"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:C",
+          "index": "C",
+          "name": "GCD Land",
+          "aliases": [
+            "codeforces:102055C"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:D",
+          "index": "D",
+          "name": "Cube",
+          "aliases": [
+            "codeforces:102055D"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:E",
+          "index": "E",
+          "name": "Mr. Panda and Cactus",
+          "aliases": [
+            "codeforces:102055E"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:F",
+          "index": "F",
+          "name": "Cones",
+          "aliases": [
+            "codeforces:102055F"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:G",
+          "index": "G",
+          "name": "Pastoral Life in Stardew Valley",
+          "aliases": [
+            "codeforces:102055G"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:H",
+          "index": "H",
+          "name": "Game on the Tree",
+          "aliases": [
+            "codeforces:102055H"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:I",
+          "index": "I",
+          "name": "Cockroaches",
+          "aliases": [
+            "codeforces:102055I"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:J",
+          "index": "J",
+          "name": "Mr. Panda and Sequence Puzzle",
+          "aliases": [
+            "codeforces:102055J"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:K",
+          "index": "K",
+          "name": "Mr. Panda and Kakin",
+          "aliases": [
+            "codeforces:102055K"
+          ],
+          "cf_contest_id": 102055
+        },
+        {
+          "id": "ccpc-2018-Final:L",
+          "index": "L",
+          "name": "Ultra Weak Goldbach's Conjecture",
+          "aliases": [
+            "codeforces:102055L"
+          ],
+          "cf_contest_id": 102055
+        }
+      ],
+      "category_source": "https://qoj.ac/category/373",
+      "stage": "final",
+      "cf_contest_id": 102055,
+      "cf_url": "https://codeforces.com/gym/102055",
+      "mapping_source": "https://codeforces.com/gym/102055",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2018final.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018final",
+        "sha256": "2fe4762d4b8fa9488d6dccc7741193b34d4fb752efe08591661836dae227b609",
+        "expected_summary": {
+          "official_teams": 112,
+          "excluded_teams": 2,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 12,
+              "last_solved": 6,
+              "last_penalty_minutes": 639
+            },
+            "silver": {
+              "teams": 25,
+              "last_solved": 5,
+              "last_penalty_minutes": 516
+            },
+            "bronze": {
+              "teams": 32,
+              "last_solved": 4,
+              "last_penalty_minutes": 520
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ccpc-2018-吉林",
+      "year": 2018,
+      "series": "CCPC",
+      "site": "吉林",
+      "name": "2018 CCPC 吉林站",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+      "problems": [
+        {
+          "id": "ccpc-2018-吉林:A",
+          "index": "A",
+          "name": "Problem A",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:B",
+          "index": "B",
+          "name": "Problem B",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:C",
+          "index": "C",
+          "name": "Problem C",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:D",
+          "index": "D",
+          "name": "Problem D",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:E",
+          "index": "E",
+          "name": "Problem E",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:F",
+          "index": "F",
+          "name": "Problem F",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:G",
+          "index": "G",
+          "name": "Problem G",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:H",
+          "index": "H",
+          "name": "Problem H",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:I",
+          "index": "I",
+          "name": "Problem I",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:J",
+          "index": "J",
+          "name": "Problem J",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:K",
+          "index": "K",
+          "name": "Problem K",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-吉林:L",
+          "index": "L",
+          "name": "Problem L",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        }
+      ],
+      "category_source": "https://qoj.ac/category/373",
+      "mapping_status": "pending",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2018jilin.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018jilin",
+        "sha256": "1212f84da9151dbb61cbc7a57f8679f33ff753436bd8e2a45a5d07e70b07a356",
+        "expected_summary": {
+          "official_teams": 223,
+          "excluded_teams": 4,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 23,
+              "last_solved": 7,
+              "last_penalty_minutes": 572
+            },
+            "silver": {
+              "teams": 46,
+              "last_solved": 6,
+              "last_penalty_minutes": 1002
+            },
+            "bronze": {
+              "teams": 68,
+              "last_solved": 3,
+              "last_penalty_minutes": 243
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ccpc-2018-桂林",
+      "year": 2018,
+      "series": "CCPC",
+      "site": "桂林",
+      "name": "2018 CCPC 桂林站",
+      "source_url": "https://codeforces.com/gym/102823",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018guilin",
+      "problems": [
+        {
+          "id": "ccpc-2018-桂林:A",
+          "index": "A",
+          "name": "Array Merge",
+          "aliases": [
+            "codeforces:102823A"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:B",
+          "index": "B",
+          "name": "Array Modify",
+          "aliases": [
+            "codeforces:102823B"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:C",
+          "index": "C",
+          "name": "Binary Tree",
+          "aliases": [
+            "codeforces:102823C"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:D",
+          "index": "D",
+          "name": "Bits Reverse",
+          "aliases": [
+            "codeforces:102823D"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:E",
+          "index": "E",
+          "name": "Cartesian Tree",
+          "aliases": [
+            "codeforces:102823E"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:F",
+          "index": "F",
+          "name": "Equations",
+          "aliases": [
+            "codeforces:102823F"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:G",
+          "index": "G",
+          "name": "Greatest Common Divisor",
+          "aliases": [
+            "codeforces:102823G"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:H",
+          "index": "H",
+          "name": "Hamming Distance",
+          "aliases": [
+            "codeforces:102823H"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:I",
+          "index": "I",
+          "name": "Item Exchange",
+          "aliases": [
+            "codeforces:102823I"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:J",
+          "index": "J",
+          "name": "Stone Game",
+          "aliases": [
+            "codeforces:102823J"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:K",
+          "index": "K",
+          "name": "The Coin",
+          "aliases": [
+            "codeforces:102823K"
+          ],
+          "cf_contest_id": 102823
+        },
+        {
+          "id": "ccpc-2018-桂林:L",
+          "index": "L",
+          "name": "Two Ants",
+          "aliases": [
+            "codeforces:102823L"
+          ],
+          "cf_contest_id": 102823
+        }
+      ],
+      "category_source": "https://qoj.ac/category/373",
+      "cf_contest_id": 102823,
+      "cf_url": "https://codeforces.com/gym/102823",
+      "mapping_source": "https://codeforces.com/gym/102823",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2018guilin.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018guilin",
+        "sha256": "79187ab03a973fc3d339f3747c7f61b0d92613816c51053ac699b5685b4618d0",
+        "expected_summary": {
+          "official_teams": 204,
+          "excluded_teams": 7,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 19,
+              "last_solved": 5,
+              "last_penalty_minutes": 516
+            },
+            "silver": {
+              "teams": 38,
+              "last_solved": 4,
+              "last_penalty_minutes": 297
+            },
+            "bronze": {
+              "teams": 56,
+              "last_solved": 3,
+              "last_penalty_minutes": 401
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ccpc-2018-秦皇岛",
+      "year": 2018,
+      "series": "CCPC",
+      "site": "秦皇岛",
+      "name": "2018 CCPC 秦皇岛站",
+      "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+      "problems": [
+        {
+          "id": "ccpc-2018-秦皇岛:A",
+          "index": "A",
+          "name": "Problem A",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:B",
+          "index": "B",
+          "name": "Problem B",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:C",
+          "index": "C",
+          "name": "Problem C",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:D",
+          "index": "D",
+          "name": "Problem D",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:E",
+          "index": "E",
+          "name": "Problem E",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:F",
+          "index": "F",
+          "name": "Problem F",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:G",
+          "index": "G",
+          "name": "Problem G",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:H",
+          "index": "H",
+          "name": "Problem H",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:I",
+          "index": "I",
+          "name": "Problem I",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2018-秦皇岛:J",
+          "index": "J",
+          "name": "Problem J",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        }
+      ],
+      "category_source": "https://qoj.ac/category/373",
+      "mapping_status": "pending",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2018qinhuangdao.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018qinhuangdao",
+        "sha256": "589e0a1544bbf6f0e8fb9cd8b65d98c0d7be61e5ffa52efaa3841be042319275",
+        "expected_summary": {
+          "official_teams": 245,
+          "excluded_teams": 17,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 26,
+              "last_solved": 5,
+              "last_penalty_minutes": 648
+            },
+            "silver": {
+              "teams": 47,
+              "last_solved": 4,
+              "last_penalty_minutes": 806
+            },
+            "bronze": {
+              "teams": 73,
+              "last_solved": 2,
+              "last_penalty_minutes": 84
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "icpc-2018-ECFinal",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "EC Final",
+      "name": "2018 ICPC EC Final",
+      "source_url": "https://codeforces.com/gym/102056",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018ecfinal",
+      "problems": [
+        {
+          "id": "icpc-2018-ECFinal:A",
+          "index": "A",
+          "name": "Exotic … Ancient City",
+          "aliases": [
+            "codeforces:102056A"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:B",
+          "index": "B",
+          "name": "Mysterious … Host",
+          "aliases": [
+            "codeforces:102056B"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:C",
+          "index": "C",
+          "name": "Heretical … Möbius",
+          "aliases": [
+            "codeforces:102056C"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:D",
+          "index": "D",
+          "name": "Deja vu of … Go Players",
+          "aliases": [
+            "codeforces:102056D"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:E",
+          "index": "E",
+          "name": "Immortal … Universe",
+          "aliases": [
+            "codeforces:102056E"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:F",
+          "index": "F",
+          "name": "Interstellar … Fantasy",
+          "aliases": [
+            "codeforces:102056F"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:G",
+          "index": "G",
+          "name": "Omnipotent … Garland",
+          "aliases": [
+            "codeforces:102056G"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:H",
+          "index": "H",
+          "name": "Saintly … Coins",
+          "aliases": [
+            "codeforces:102056H"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:I",
+          "index": "I",
+          "name": "Misunderstood … Missing",
+          "aliases": [
+            "codeforces:102056I"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:J",
+          "index": "J",
+          "name": "Philosophical … Balance",
+          "aliases": [
+            "codeforces:102056J"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:K",
+          "index": "K",
+          "name": "Desperate … Fire Survive",
+          "aliases": [
+            "codeforces:102056K"
+          ],
+          "cf_contest_id": 102056
+        },
+        {
+          "id": "icpc-2018-ECFinal:L",
+          "index": "L",
+          "name": "Eventual … Journey",
+          "aliases": [
+            "codeforces:102056L"
+          ],
+          "cf_contest_id": 102056
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "stage": "final",
+      "cf_contest_id": 102056,
+      "cf_url": "https://codeforces.com/gym/102056",
+      "mapping_source": "https://codeforces.com/gym/102056",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2018ecfinal.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018ecfinal",
+        "sha256": "6ab6503a0eee1db053e263e07bc302d9a5a4953da1e7043247e0ad2495633a7f",
+        "expected_summary": {
+          "official_teams": 374,
+          "excluded_teams": 8,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 38,
+              "last_solved": 5,
+              "last_penalty_minutes": 734
+            },
+            "silver": {
+              "teams": 76,
+              "last_solved": 4,
+              "last_penalty_minutes": 505
+            },
+            "bronze": {
+              "teams": 114,
+              "last_solved": 3,
+              "last_penalty_minutes": 461
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "icpc-2018-北京",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "北京",
+      "name": "2018 ICPC 北京站",
+      "source_url": "https://qoj.ac/contest/2004",
+      "ranklist_url": "https://icpc.global/regionals/finder/Beijing-2019/standings",
+      "problems": [
+        {
+          "id": "icpc-2018-北京:A",
+          "index": "A",
+          "name": "Problem A",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:B",
+          "index": "B",
+          "name": "Problem B",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:C",
+          "index": "C",
+          "name": "Problem C",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:D",
+          "index": "D",
+          "name": "Problem D",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:E",
+          "index": "E",
+          "name": "Problem E",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:F",
+          "index": "F",
+          "name": "Problem F",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:G",
+          "index": "G",
+          "name": "Problem G",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:H",
+          "index": "H",
+          "name": "Problem H",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:I",
+          "index": "I",
+          "name": "Problem I",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2018-北京:J",
+          "index": "J",
+          "name": "Problem J",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "mapping_status": "pending",
+      "qoj_contest_id": 2004,
+      "qoj_url": "https://qoj.ac/contest/2004",
+      "mapping_source": "https://qoj.ac/category/464",
+      "rating_evidence": {
+        "unavailable_reason": "ICPC 官网有获奖记录，但尚未找到完整逐题终榜。",
+        "source_url": "https://icpc.global/regionals/finder/Beijing-2019/standings"
+      }
+    },
+    {
+      "id": "icpc-2018-南京",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "南京",
+      "name": "2018 ICPC 南京站",
+      "source_url": "https://codeforces.com/gym/101981",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018nanjing",
+      "problems": [
+        {
+          "id": "icpc-2018-南京:A",
+          "index": "A",
+          "name": "Adrien and Austin",
+          "aliases": [
+            "codeforces:101981A"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:B",
+          "index": "B",
+          "name": "Tournament",
+          "aliases": [
+            "codeforces:101981B"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:C",
+          "index": "C",
+          "name": "Cherry and Chocolate",
+          "aliases": [
+            "codeforces:101981C"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:D",
+          "index": "D",
+          "name": "Country Meow",
+          "aliases": [
+            "codeforces:101981D"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:E",
+          "index": "E",
+          "name": "Eva and Euro coins",
+          "aliases": [
+            "codeforces:101981E"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:F",
+          "index": "F",
+          "name": "Frank",
+          "aliases": [
+            "codeforces:101981F"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:G",
+          "index": "G",
+          "name": "Pyramid",
+          "aliases": [
+            "codeforces:101981G"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:H",
+          "index": "H",
+          "name": "Huge Discount",
+          "aliases": [
+            "codeforces:101981H"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:I",
+          "index": "I",
+          "name": "Magic Potion",
+          "aliases": [
+            "codeforces:101981I"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:J",
+          "index": "J",
+          "name": "Prime Game",
+          "aliases": [
+            "codeforces:101981J"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:K",
+          "index": "K",
+          "name": "Kangaroo Puzzle",
+          "aliases": [
+            "codeforces:101981K"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:L",
+          "index": "L",
+          "name": "Lagrange the Chef",
+          "aliases": [
+            "codeforces:101981L"
+          ],
+          "cf_contest_id": 101981
+        },
+        {
+          "id": "icpc-2018-南京:M",
+          "index": "M",
+          "name": "Mediocre String Problem",
+          "aliases": [
+            "codeforces:101981M"
+          ],
+          "cf_contest_id": 101981
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "cf_contest_id": 101981,
+      "cf_url": "https://codeforces.com/gym/101981",
+      "mapping_source": "https://codeforces.com/gym/101981",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2018nanjing.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018nanjing",
+        "sha256": "ca98709e37293a7c14fd8d0b176247eb393c87b945e019aab776e54450d63c85",
+        "expected_summary": {
+          "official_teams": 317,
+          "excluded_teams": 16,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 31,
+              "last_solved": 6,
+              "last_penalty_minutes": 748
+            },
+            "silver": {
+              "teams": 62,
+              "last_solved": 4,
+              "last_penalty_minutes": 268
+            },
+            "bronze": {
+              "teams": 93,
+              "last_solved": 3,
+              "last_penalty_minutes": 480
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "icpc-2018-徐州",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "徐州",
+      "name": "2018 ICPC 徐州站",
+      "source_url": "https://codeforces.com/gym/102012",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
+      "problems": [
+        {
+          "id": "icpc-2018-徐州:A",
+          "index": "A",
+          "name": "Rikka with Minimum Spanning Trees",
+          "aliases": [
+            "codeforces:102012A"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:B",
+          "index": "B",
+          "name": "Rikka with Line Graphs",
+          "aliases": [
+            "codeforces:102012B"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:C",
+          "index": "C",
+          "name": "Rikka with Consistency",
+          "aliases": [
+            "codeforces:102012C"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:D",
+          "index": "D",
+          "name": "Rikka with Subsequences",
+          "aliases": [
+            "codeforces:102012D"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:E",
+          "index": "E",
+          "name": "Rikka with Data Structures",
+          "aliases": [
+            "codeforces:102012E"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:F",
+          "index": "F",
+          "name": "Rikka with Nice Counting Striking Back",
+          "aliases": [
+            "codeforces:102012F"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:G",
+          "index": "G",
+          "name": "Rikka with Intersections of Paths",
+          "aliases": [
+            "codeforces:102012G"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:H",
+          "index": "H",
+          "name": "Rikka with A Long Colour Palette",
+          "aliases": [
+            "codeforces:102012H"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:I",
+          "index": "I",
+          "name": "Rikka with Sorting Networks",
+          "aliases": [
+            "codeforces:102012I"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:J",
+          "index": "J",
+          "name": "Rikka with An Unnamed Temple",
+          "aliases": [
+            "codeforces:102012J"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:K",
+          "index": "K",
+          "name": "Rikka with Ants",
+          "aliases": [
+            "codeforces:102012K"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:L",
+          "index": "L",
+          "name": "Rikka with Grid Graphs",
+          "aliases": [
+            "codeforces:102012L"
+          ],
+          "cf_contest_id": 102012
+        },
+        {
+          "id": "icpc-2018-徐州:M",
+          "index": "M",
+          "name": "Rikka with Illuminations",
+          "aliases": [
+            "codeforces:102012M"
+          ],
+          "cf_contest_id": 102012
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "cf_contest_id": 102012,
+      "cf_url": "https://codeforces.com/gym/102012",
+      "mapping_source": "https://codeforces.com/gym/102012",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2018xuzhou.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
+        "sha256": "fbe2ed68c86374345961ff7793dc5288d314dff44ac211b673bc2549ea216051",
+        "expected_summary": {
+          "official_teams": 278,
+          "excluded_teams": 10,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 27,
+              "last_solved": 3,
+              "last_penalty_minutes": 598
+            },
+            "silver": {
+              "teams": 57,
+              "last_solved": 1,
+              "last_penalty_minutes": 92
+            },
+            "bronze": {
+              "teams": 83,
+              "last_solved": 1,
+              "last_penalty_minutes": 308
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "icpc-2018-沈阳",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "沈阳",
+      "name": "2018 ICPC 沈阳站",
+      "source_url": "https://codeforces.com/gym/101955",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018shenyang",
+      "problems": [
+        {
+          "id": "icpc-2018-沈阳:A",
+          "index": "A",
+          "name": "Sockpuppets",
+          "aliases": [
+            "codeforces:101955A"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:B",
+          "index": "B",
+          "name": "Sequences Generator",
+          "aliases": [
+            "codeforces:101955B"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:C",
+          "index": "C",
+          "name": "Insertion Sort",
+          "aliases": [
+            "codeforces:101955C"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:D",
+          "index": "D",
+          "name": "Diameter of a Tree",
+          "aliases": [
+            "codeforces:101955D"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:E",
+          "index": "E",
+          "name": "The Kouga Ninja Scrolls",
+          "aliases": [
+            "codeforces:101955E"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:F",
+          "index": "F",
+          "name": "Counting Sheep in Ami Dongsuo",
+          "aliases": [
+            "codeforces:101955F"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:G",
+          "index": "G",
+          "name": "Best ACMer Solves the Hardest Problem",
+          "aliases": [
+            "codeforces:101955G"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:H",
+          "index": "H",
+          "name": "Rainbow Graph",
+          "aliases": [
+            "codeforces:101955H"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:I",
+          "index": "I",
+          "name": "Distance Between Sweethearts",
+          "aliases": [
+            "codeforces:101955I"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:J",
+          "index": "J",
+          "name": "How Much Memory Your Code Is Using?",
+          "aliases": [
+            "codeforces:101955J"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:K",
+          "index": "K",
+          "name": "Let the Flames Begin",
+          "aliases": [
+            "codeforces:101955K"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:L",
+          "index": "L",
+          "name": "Machining Disc Rotors",
+          "aliases": [
+            "codeforces:101955L"
+          ],
+          "cf_contest_id": 101955
+        },
+        {
+          "id": "icpc-2018-沈阳:M",
+          "index": "M",
+          "name": "Renaissance Past in Nancy",
+          "aliases": [
+            "codeforces:101955M"
+          ],
+          "cf_contest_id": 101955
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "cf_contest_id": 101955,
+      "cf_url": "https://codeforces.com/gym/101955",
+      "mapping_source": "https://codeforces.com/gym/101955",
+      "rating_evidence": {
+        "unavailable_reason": "完整逐题终榜可读，但 ICPC 官网未填写奖牌，尚无可核验的完整金银铜分界。",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018shenyang"
+      }
+    },
+    {
+      "id": "icpc-2018-焦作",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "焦作",
+      "name": "2018 ICPC 焦作站",
+      "source_url": "https://codeforces.com/gym/102028",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018jiaozuo",
+      "problems": [
+        {
+          "id": "icpc-2018-焦作:A",
+          "index": "A",
+          "name": "Xu Xiake in Henan Province",
+          "aliases": [
+            "codeforces:102028A"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:B",
+          "index": "B",
+          "name": "Ultraman vs. Aodzilla and Bodzilla",
+          "aliases": [
+            "codeforces:102028B"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:C",
+          "index": "C",
+          "name": "Supreme Command",
+          "aliases": [
+            "codeforces:102028C"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:D",
+          "index": "D",
+          "name": "Keiichi Tsuchiya the Drift King",
+          "aliases": [
+            "codeforces:102028D"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:E",
+          "index": "E",
+          "name": "Resistors in Parallel",
+          "aliases": [
+            "codeforces:102028E"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:F",
+          "index": "F",
+          "name": "Honeycomb",
+          "aliases": [
+            "codeforces:102028F"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:G",
+          "index": "G",
+          "name": "Shortest Paths on Random Forests",
+          "aliases": [
+            "codeforces:102028G"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:H",
+          "index": "H",
+          "name": "Can You Solve the Harder Problem?",
+          "aliases": [
+            "codeforces:102028H"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:I",
+          "index": "I",
+          "name": "Distance",
+          "aliases": [
+            "codeforces:102028I"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:J",
+          "index": "J",
+          "name": "Carpets Removal",
+          "aliases": [
+            "codeforces:102028J"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:K",
+          "index": "K",
+          "name": "Counting Failures on a Trie",
+          "aliases": [
+            "codeforces:102028K"
+          ],
+          "cf_contest_id": 102028
+        },
+        {
+          "id": "icpc-2018-焦作:L",
+          "index": "L",
+          "name": "Connected Subgraphs",
+          "aliases": [
+            "codeforces:102028L"
+          ],
+          "cf_contest_id": 102028
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "cf_contest_id": 102028,
+      "cf_url": "https://codeforces.com/gym/102028",
+      "mapping_source": "https://codeforces.com/gym/102028",
+      "rating_evidence": {
+        "unavailable_reason": "完整逐题终榜与官网获奖表的队名、罚时和正式队数存在差异，奖牌边界队伍尚未完全对齐。",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018jiaozuo"
+      }
+    },
+    {
+      "id": "icpc-2018-青岛",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "青岛",
+      "name": "2018 ICPC 青岛站",
+      "source_url": "https://codeforces.com/gym/104270",
+      "ranklist_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao",
+      "problems": [
+        {
+          "id": "icpc-2018-青岛:A",
+          "index": "A",
+          "name": "Sequence and Sequence",
+          "aliases": [
+            "codeforces:104270A"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:B",
+          "index": "B",
+          "name": "Kawa Exam",
+          "aliases": [
+            "codeforces:104270B"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:C",
+          "index": "C",
+          "name": "Flippy Sequence",
+          "aliases": [
+            "codeforces:104270C"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:D",
+          "index": "D",
+          "name": "Magic Multiplication",
+          "aliases": [
+            "codeforces:104270D"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:E",
+          "index": "E",
+          "name": "Plants vs. Zombies",
+          "aliases": [
+            "codeforces:104270E"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:F",
+          "index": "F",
+          "name": "Tournament",
+          "aliases": [
+            "codeforces:104270F"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:G",
+          "index": "G",
+          "name": "Repair the Artwork",
+          "aliases": [
+            "codeforces:104270G"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:H",
+          "index": "H",
+          "name": "Mirror",
+          "aliases": [
+            "codeforces:104270H"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:I",
+          "index": "I",
+          "name": "Soldier Game",
+          "aliases": [
+            "codeforces:104270I"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:J",
+          "index": "J",
+          "name": "Books",
+          "aliases": [
+            "codeforces:104270J"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:K",
+          "index": "K",
+          "name": "Airdrop",
+          "aliases": [
+            "codeforces:104270K"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:L",
+          "index": "L",
+          "name": "Sub-cycle Graph",
+          "aliases": [
+            "codeforces:104270L"
+          ],
+          "cf_contest_id": 104270
+        },
+        {
+          "id": "icpc-2018-青岛:M",
+          "index": "M",
+          "name": "Function and Function",
+          "aliases": [
+            "codeforces:104270M"
+          ],
+          "cf_contest_id": 104270
+        }
+      ],
+      "category_source": "https://qoj.ac/category/464",
+      "cf_contest_id": 104270,
+      "cf_url": "https://codeforces.com/gym/104270",
+      "mapping_source": "https://codeforces.com/gym/104270",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2018qingdao.json",
+        "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao",
+        "sha256": "28f05e5a0a80bae7e79838542fbb831cb8c03a12f7744d681326c962c849401a",
+        "expected_summary": {
+          "official_teams": 356,
+          "excluded_teams": 19,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 36,
+              "last_solved": 6,
+              "last_penalty_minutes": 941
+            },
+            "silver": {
+              "teams": 72,
+              "last_solved": 4,
+              "last_penalty_minutes": 415
+            },
+            "bronze": {
+              "teams": 108,
+              "last_solved": 3,
+              "last_penalty_minutes": 277
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "icpc-2018-香港",
+      "year": 2018,
+      "series": "ICPC",
+      "site": "香港",
+      "name": "2018 ICPC 香港站",
+      "source_url": "https://icpc.global/regionals/finder/Hong-Kong-City-2019/standings",
+      "ranklist_url": "https://icpc.global/regionals/finder/Hong-Kong-City-2019/standings",
+      "problems": [],
+      "category_source": "https://qoj.ac/category/464",
+      "mapping_status": "pending",
+      "catalog_status": "pending_problem_list",
+      "catalog_note": "已核验赛事与官方获奖记录；完整题单尚未找到，暂不猜测题目数量或题号。",
+      "rating_evidence": {
+        "unavailable_reason": "ICPC 官网有获奖记录，但完整题单与逐题终榜尚未找到。",
+        "source_url": "https://icpc.global/regionals/finder/Hong-Kong-City-2019/standings"
       }
     }
   ],

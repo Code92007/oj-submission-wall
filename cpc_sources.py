@@ -231,7 +231,9 @@ class Scoreboards:
                 config = json.loads((directory / 'config.json').read_text())
                 labels = [p['label'] for p in config['problems']]
                 source_id = 'xcpcio-' + path.replace('/', '-')
-                target_contest = contest or {'id': source_id, 'problems': [{'index': p} for p in labels]}
+                target_contest = contest
+                if not contest or contest.get('catalog_status') == 'pending_problem_list':
+                    target_contest = {'id': contest['id'] if contest else source_id, 'problems': [{'index': p} for p in labels]}
                 teams = json.loads((directory / 'team.json').read_text())
                 matching = [t for t in teams if t.get('name') == participation['team']
                             and school_matches(t.get('organization'), participation)]
