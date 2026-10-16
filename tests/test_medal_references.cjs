@@ -1,0 +1,31 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const root = path.join(__dirname, '..');
+const bot = process.env.CPC_BOT_CHECKOUT || path.join(root, '../qq-cf-bot');
+for (const source of [path.join(root, 'web/regionals.js'), path.join(bot, 'src/qq_cf_bot/web/regionals.js')]) {
+  const context = vm.createContext({document:{addEventListener(){}}});
+  vm.runInContext(fs.readFileSync(source,'utf8'), context);
+  const contest = {id:'c',problems:['A','B','C','D'].map(index=>({id:index,index}))};
+  const difficulty = {A:{rating:2500},B:{rating:800},C:{rating:1800},D:{rating:1200}};
+  const stats = {medal_boundaries:{gold:{last_solved:3,last_penalty_minutes:600},silver:{last_solved:2,last_penalty_minutes:400},bronze:{last_solved:1,last_penalty_minutes:100}},medal_safety:{gold:{safe_solved:4},silver:{safe_solved:3},bronze:{safe_solved:1}}};
+  const render = () => context.regionalMedalReference(contest,{contests:{c:stats}},difficulty);
+  assert.match(render(), /3题 · 1800/);
+  assert.match(render(), /4题 · 2500/);
+  assert.match(render(), /末位罚时 600/);
+  assert.match(render(), /非任意一道题达标即可获牌/);
+  const before = render();
+  contest.problems.reverse();
+  assert.equal(render(), before, 'Reference must not depend on displayed problem order');
+  stats.medal_safety.gold.safe_solved=5;
+  assert.match(render(), /题数不可达/);
+  delete difficulty.A;
+  assert.match(render(), /未评级/);
+  assert.doesNotMatch(render(), /NaN|undefined|3题 · 1800/);
+  assert.match(context.regionalMedalReference(contest,{unrated_contests:{c:'<missing>'}},difficulty), /&lt;missing&gt;/);
+  assert.match(context.regionalMedalReference(contest,undefined,undefined), /奖牌线待核验/);
+  stats.medal_reference_groups=[{...stats,label:'本科'},{...stats,label:'专科'}];
+  assert.match(render(), /本科组[\s\S]*专科组/);
+}
+console.log('Both walls: current-rating order statistics, safe bounds, missing data, grouping and escaping passed');

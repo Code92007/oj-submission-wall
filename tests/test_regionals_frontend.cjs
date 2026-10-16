@@ -17,7 +17,14 @@ vm.runInContext(`cpcData={contests:catalog.contests,difficulty:release.problems,
   'icpc-2025-ECFinal:A':{onsite:true}
 },unmapped_count:0};`, context);
 element('cpcYear').value = '2025';
+element('cpcMedals').checked = true;
 vm.runInContext('cpcWall()', context);
+assert.match(element('cpcHead').innerHTML, /奖牌参考/);
+assert.equal((element('cpcRows').innerHTML.match(/<td class="medal-reference">/g)||[]).length,13);
+element('cpcMedals').checked = false;
+vm.runInContext('cpcWall()', context);
+assert.doesNotMatch(element('cpcRows').innerHTML, /medal-reference/);
+assert.equal(element('cpcMedalHelp').hidden, true);
 assert.match(element('cpcSummary').textContent, /13 场比赛 · 2\/167 题完成/);
 assert.match(element('cpcRatingCoverage').textContent, /167\/167.*CF Bot/);
 assert.match(element('cpcRows').innerHTML, /difficulty-red is-done[^>]*title="[^"]*难度 3300[^"]*已完成/);

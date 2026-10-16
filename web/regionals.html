@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js?v=7" defer></script><style>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>区域赛进度 · OJ Wall</title><link rel="stylesheet" href="/styles.css"><script src="/regionals.js?v=8" defer></script><style>
 
 /* Regional progress styles are isolated from the main submission wall. */
 .cpc-regionals { padding: 28px; border-radius: 12px; box-shadow: none; }
@@ -106,6 +106,19 @@
   .cpc-table .cpc-progress { min-width: 100px; }
   .cpc-table th, .cpc-table td { padding: 9px 6px; }
 }
+
+/* Medal references sit beside the contest name and can be hidden. */
+.medal-toggle { display: inline-flex; flex-direction: row; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; color: #607366; }
+.medal-toggle input { width: 15px; height: 15px; min-height: 0; margin: 0; accent-color: #267354; }
+th.medal-reference, td.medal-reference { min-width: 224px; padding: 7px 10px; font-size: 11px; line-height: 1.5; }
+th.medal-reference small { display: block; font-size: 10px; color: #718091; font-weight: 400; }
+.medal-grid { display: grid; grid-template-columns: 16px 1fr 1fr; gap: 2px 8px; align-items: center; font-variant-numeric: tabular-nums; color: #526372; }
+.medal-label { font-size: 10px; font-weight: 600; }
+.medal-gold { color: #997015; }.medal-silver { color: #667885; }.medal-bronze { color: #9b633e; }
+.medal-group { display: block; text-align: left; color: #718091; margin-bottom: 2px; }
+.medal-missing { color: #84919b; }
+.medal-help { color: #718091; font-size: 12px; line-height: 1.6; margin: 8px 0 14px; }
+
 </style></head>
 <body><header class="topbar"><h1>区域赛进度</h1><div class="top-actions"><a class="button" href="/team-analysis">组队分析</a><a class="button" href="/">返回训练墙</a></div></header><main style="max-width:1400px;margin:24px auto;padding:0 16px">
 <p id="cpcMessage" role="status"></p>
@@ -115,6 +128,7 @@
   <p class="cpc-intro">个人线上与现场队伍通过，按题合并。每一点进度都留在这里。</p>
   <div class="cpc-toolbar">
     <div class="cpc-year"><span id="cpcYearCaption">年份</span><input id="cpcYear" type="hidden"><details id="cpcYearPicker" class="cpc-year-picker"><summary aria-labelledby="cpcYearCaption cpcYearLabel"><span id="cpcYearLabel">—</span></summary><div id="cpcYearChoices" class="cpc-year-choices" role="group" aria-label="选择年份"></div></details></div>
+    <label class="medal-toggle"><input id="cpcMedals" type="checkbox" checked><span>显示奖牌参考</span></label>
     <label class="cpc-team-toggle"><input id="cpcTeams" type="checkbox" role="switch"><span>包含我绑定的线上团队账号</span></label>
   </div>
   <div class="cpc-wall-summary">
@@ -125,6 +139,7 @@
       <span>个 · 个人 AC　团 · 团队 AC　现 · 现场通过</span>
     </div>
   </div>
+  <p id="cpcMedalHelp" class="medal-help">手速线按末位获牌题数，稳牌线超过本场终榜所有低于该档奖牌的正式队题数。Rating 按题目从易到难取对应题数的最高分，仅作训练参考。银、铜包含更高奖牌；保证范围为该场终榜、相同获奖资格。悬停数值可看罚时。</p>
   <div class="cpc-table-wrap" tabindex="0" role="region" aria-label="区域赛题目进度，可横向滚动">
     <table class="cpc-table"><thead id="cpcHead"></thead><tbody id="cpcRows"></tbody></table>
   </div>

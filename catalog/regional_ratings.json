@@ -32,6 +32,20 @@
           "last_penalty_minutes": 248
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 11 届 CCPC 中国大学生程序设计竞赛哈尔滨站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/11th/harbin",
       "sha256": {
@@ -67,6 +81,20 @@
           "teams": 78,
           "last_solved": 3,
           "last_penalty_minutes": 377
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 11 届 CCPC 中国大学生程序设计竞赛济南站 - 正式赛",
@@ -106,6 +134,20 @@
           "last_penalty_minutes": 714
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 11 届 CCPC 中国大学生程序设计竞赛郑州站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/11th/zhengzhou",
       "sha256": {
@@ -141,6 +183,20 @@
           "teams": 77,
           "last_solved": 4,
           "last_penalty_minutes": 599
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 11 届 CCPC 中国大学生程序设计竞赛重庆站 - 正式赛",
@@ -180,6 +236,20 @@
           "last_penalty_minutes": 281
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        }
+      },
       "source_name": "「华为杯」第 50 届 ICPC 国际大学生程序设计竞赛区域赛上海站",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/50th/shanghai",
       "sha256": {
@@ -215,6 +285,20 @@
           "teams": 100,
           "last_solved": 3,
           "last_penalty_minutes": 636
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
         }
       },
       "source_name": "「华为杯」第 50 届 ICPC 国际大学生程序设计竞赛区域赛南京站",
@@ -254,6 +338,20 @@
           "last_penalty_minutes": 558
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "「华为杯」第 50 届 ICPC 国际大学生程序设计竞赛区域赛成都站",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/50th/chengdu",
       "sha256": {
@@ -289,6 +387,20 @@
           "teams": 136,
           "last_solved": 3,
           "last_penalty_minutes": 312
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "「华为杯」第 50 届 ICPC 国际大学生程序设计竞赛区域赛武汉站",
@@ -328,6 +440,20 @@
           "last_penalty_minutes": 274
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "「华为杯」第 50 届 ICPC 国际大学生程序设计竞赛区域赛沈阳站",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/50th/shenyang",
       "sha256": {
@@ -363,6 +489,20 @@
           "teams": 120,
           "last_solved": 3,
           "last_penalty_minutes": 165
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 50 届 ICPC 国际大学生程序设计竞赛西安站",
@@ -402,6 +542,20 @@
           "last_penalty_minutes": 279
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        }
+      },
       "source_name": "The 50th ICPC Asia Hong Kong Regional Contest",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/50th/hongkong",
       "sha256": {
@@ -437,6 +591,20 @@
           "teams": 84,
           "last_solved": 5,
           "last_penalty_minutes": 964
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
         }
       },
       "source_name": "第 10 届 CCPC 中国大学生程序设计竞赛哈尔滨站 - 正式赛",
@@ -476,6 +644,20 @@
           "last_penalty_minutes": 935
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 10 届 CCPC 中国大学生程序设计竞赛济南站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/10th/jinan",
       "sha256": {
@@ -511,6 +693,20 @@
           "teams": 83,
           "last_solved": 4,
           "last_penalty_minutes": 856
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 10 届 CCPC 中国大学生程序设计竞赛郑州站 - 正式赛",
@@ -550,6 +746,20 @@
           "last_penalty_minutes": 767
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        }
+      },
       "source_name": "第 10 届 CCPC 中国大学生程序设计竞赛重庆站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/10th/chongqing",
       "sha256": {
@@ -585,6 +795,20 @@
           "teams": 102,
           "last_solved": 3,
           "last_penalty_minutes": 448
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 49 届 ICPC 国际大学生程序设计竞赛区域赛上海站 - 正式赛",
@@ -624,6 +848,20 @@
           "last_penalty_minutes": 406
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 49 届 ICPC 国际大学生程序设计竞赛区域赛南京站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/49th/nanjing",
       "sha256": {
@@ -659,6 +897,20 @@
           "teams": 94,
           "last_solved": 5,
           "last_penalty_minutes": 953
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
         }
       },
       "source_name": "第 49 届 ICPC 国际大学生程序设计竞赛区域赛成都站 - 正式赛",
@@ -698,6 +950,20 @@
           "last_penalty_minutes": 1061
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 49 届 ICPC 国际大学生程序设计竞赛区域赛昆明站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/49th/kunming",
       "sha256": {
@@ -733,6 +999,20 @@
           "teams": 111,
           "last_solved": 4,
           "last_penalty_minutes": 739
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 49 届 ICPC 国际大学生程序设计竞赛区域赛杭州站 - 正式赛",
@@ -772,6 +1052,20 @@
           "last_penalty_minutes": 189
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        }
+      },
       "source_name": "第 49 届 ICPC 国际大学生程序设计竞赛区域赛沈阳站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/49th/shenyang",
       "sha256": {
@@ -807,6 +1101,20 @@
           "teams": 45,
           "last_solved": 2,
           "last_penalty_minutes": 143
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
         }
       },
       "source_name": "The 49th ICPC Asia Hong Kong Regional Contest",
@@ -846,6 +1154,20 @@
           "last_penalty_minutes": 671
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 9 届 CCPC 中国大学生程序设计竞赛哈尔滨站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/9th/harbin",
       "sha256": {
@@ -881,6 +1203,20 @@
           "teams": 72,
           "last_solved": 3,
           "last_penalty_minutes": 436
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 9 届 CCPC 中国大学生程序设计竞赛桂林站 - 正式赛",
@@ -920,6 +1256,20 @@
           "last_penalty_minutes": 401
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 9 届 CCPC 中国大学生程序设计竞赛深圳站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/9th/shenzhen",
       "sha256": {
@@ -955,6 +1305,20 @@
           "teams": 72,
           "last_solved": 4,
           "last_penalty_minutes": 292
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 9 届 CCPC 中国大学生程序设计竞赛秦皇岛站 - 正式赛",
@@ -994,6 +1358,20 @@
           "last_penalty_minutes": 391
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 48 届 ICPC 国际大学生程序设计竞赛区域赛南京站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/48th/nanjing",
       "sha256": {
@@ -1029,6 +1407,20 @@
           "teams": 104,
           "last_solved": 3,
           "last_penalty_minutes": 435
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 48 届 ICPC 国际大学生程序设计竞赛区域赛合肥站 - 正式赛",
@@ -1068,6 +1460,20 @@
           "last_penalty_minutes": 317
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 48 届 ICPC 国际大学生程序设计竞赛区域赛杭州站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/48th/hangzhou",
       "sha256": {
@@ -1103,6 +1509,20 @@
           "teams": 87,
           "last_solved": 3,
           "last_penalty_minutes": 304
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 48 届 ICPC 国际大学生程序设计竞赛区域赛沈阳站 - 正式赛",
@@ -1142,6 +1562,20 @@
           "last_penalty_minutes": 806
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 48 届 ICPC 国际大学生程序设计竞赛区域赛济南站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/48th/jinan",
       "sha256": {
@@ -1177,6 +1611,20 @@
           "teams": 24,
           "last_solved": 2,
           "last_penalty_minutes": 332
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
         }
       },
       "source_name": "2023 - 2024 International Collegiate Programming Contest, Macau Site",
@@ -1216,6 +1664,20 @@
           "last_penalty_minutes": 712
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 48 届 ICPC 国际大学生程序设计竞赛区域赛西安站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/48th/xian",
       "sha256": {
@@ -1251,6 +1713,20 @@
           "teams": 72,
           "last_solved": 5,
           "last_penalty_minutes": 873
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
         }
       },
       "source_name": "2022 中国大学生程序设计竞赛（威海） - 正式赛",
@@ -1290,6 +1766,20 @@
           "last_penalty_minutes": 179
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "2022 中国大学生程序设计竞赛（广州） - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/8th/guangzhou",
       "sha256": {
@@ -1325,6 +1815,20 @@
           "teams": 72,
           "last_solved": 4,
           "last_penalty_minutes": 638
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "2022 年中国大学生程序设计竞赛 (CCPC) 桂林",
@@ -1364,6 +1868,20 @@
           "last_penalty_minutes": 364
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "2022 中国大学生程序设计竞赛（绵阳） - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/8th/mianyang",
       "sha256": {
@@ -1399,6 +1917,20 @@
           "teams": 105,
           "last_solved": 3,
           "last_penalty_minutes": 409
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 47 届国际大学生程序设计竞赛亚洲区域赛南京站（正式赛）",
@@ -1438,6 +1970,20 @@
           "last_penalty_minutes": 712
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 47 届国际大学生程序设计竞赛亚洲区域赛合肥站（正式赛）",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/47th/hefei",
       "sha256": {
@@ -1473,6 +2019,20 @@
           "teams": 105,
           "last_solved": 4,
           "last_penalty_minutes": 553
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 47 届国际大学生程序设计竞赛亚洲区域赛杭州站（正式赛）",
@@ -1512,6 +2072,20 @@
           "last_penalty_minutes": 216
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 47 届国际大学生程序设计竞赛亚洲区域赛沈阳站（正式赛）",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/47th/shenyang",
       "sha256": {
@@ -1547,6 +2121,20 @@
           "teams": 105,
           "last_solved": 4,
           "last_penalty_minutes": 502
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 47 届国际大学生程序设计竞赛亚洲区域赛济南站（正式赛）",
@@ -1586,6 +2174,20 @@
           "last_penalty_minutes": 786
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        }
+      },
       "source_name": "第 47 届国际大学生程序设计竞赛亚洲区域赛西安站（正式赛）",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/47th/xian",
       "sha256": {
@@ -1621,6 +2223,20 @@
           "teams": 34,
           "last_solved": 3,
           "last_penalty_minutes": 258
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "medal_source_url": "https://icpc2023.cse.cuhk.edu.hk/report.pdf",
@@ -1661,6 +2277,20 @@
           "last_penalty_minutes": 363
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 7 届中国大学生程序设计竞赛（CCPC）哈尔滨站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/7th/harbin",
       "sha256": {
@@ -1696,6 +2326,20 @@
           "teams": 72,
           "last_solved": 4,
           "last_penalty_minutes": 435
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 7 届中国大学生程序设计竞赛（CCPC）威海站 - 正式赛",
@@ -1735,6 +2379,20 @@
           "last_penalty_minutes": 647
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 7 届中国大学生程序设计竞赛（CCPC）广州站 - 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/7th/guangzhou",
       "sha256": {
@@ -1770,6 +2428,20 @@
           "teams": 71,
           "last_solved": 4,
           "last_penalty_minutes": 363
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "2021 年中国大学生程序设计竞赛桂林站 正式赛",
@@ -1809,6 +2481,20 @@
           "last_penalty_minutes": 214
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 46 届 ICPC 国际大学生程序设计竞赛亚洲区域赛（上海）正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/46th/shanghai",
       "sha256": {
@@ -1844,6 +2530,20 @@
           "teams": 105,
           "last_solved": 4,
           "last_penalty_minutes": 480
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 46 届 ICPC 国际大学生程序设计竞赛亚洲区域赛（南京）正式赛",
@@ -1883,6 +2583,20 @@
           "last_penalty_minutes": 283
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        }
+      },
       "source_name": "第 46 届 ICPC 亚洲区域赛（昆明）正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/46th/kunming",
       "sha256": {
@@ -1918,6 +2632,20 @@
           "teams": 105,
           "last_solved": 4,
           "last_penalty_minutes": 490
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 46 届 ICPC 国际大学生程序设计竞赛亚洲区域赛（沈阳）正式赛",
@@ -1957,6 +2685,20 @@
           "last_penalty_minutes": 32
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "silver": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        },
+        "bronze": {
+          "max_outside_solved": 1,
+          "safe_solved": 2
+        }
+      },
       "source_name": "The 46th ICPC Asia Jinan Regional Contest - Contest Session",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/46th/jinan",
       "sha256": {
@@ -1992,6 +2734,20 @@
           "teams": 30,
           "last_solved": 3,
           "last_penalty_minutes": 352
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第 46 屆 ICPC 東亞洲區域賽（澳門）正式賽",
@@ -2031,6 +2787,20 @@
           "last_penalty_minutes": 922
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "CCPC2020-第六届中国大学生程序设计竞赛（威海） 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/2020/weihai",
       "sha256": {
@@ -2066,6 +2836,20 @@
           "teams": 72,
           "last_solved": 4,
           "last_penalty_minutes": 426
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "CCPC2020-第六届中国大学生程序设计竞赛（秦皇岛）正式赛",
@@ -2105,6 +2889,20 @@
           "last_penalty_minutes": 561
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "CCPC2020-第六届中国大学生程序设计竞赛（绵阳） 正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/ccpc/2020/mianyang",
       "sha256": {
@@ -2140,6 +2938,20 @@
           "teams": 72,
           "last_solved": 2,
           "last_penalty_minutes": 105
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
         }
       },
       "source_name": "CCPC2020-第六届中国大学生程序设计竞赛（长春） 正式赛",
@@ -2179,6 +2991,20 @@
           "last_penalty_minutes": 731
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 45 届国际大学生程序设计竞赛（ICPC）亚洲区域赛（上海）正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/2020/shanghai",
       "sha256": {
@@ -2214,6 +3040,20 @@
           "teams": 105,
           "last_solved": 4,
           "last_penalty_minutes": 826
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "第 45 届国际大学生程序设计竞赛（ICPC）亚洲区域赛（南京）正式赛",
@@ -2253,6 +3093,20 @@
           "last_penalty_minutes": 272
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "第 45 届国际大学生程序设计竞赛（ICPC）亚洲区域赛（昆明）正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/2020/kunming",
       "sha256": {
@@ -2288,6 +3142,20 @@
           "teams": 78,
           "last_solved": 3,
           "last_penalty_minutes": 325
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "The 45th ICPC Asia Shenyang Regional Programming Contest",
@@ -2327,6 +3195,20 @@
           "last_penalty_minutes": 204
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "第 45 届国际大学生程序设计竞赛（ICPC）亚洲区域赛（济南）正式赛",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/2020/jinan",
       "sha256": {
@@ -2364,6 +3246,20 @@
           "last_penalty_minutes": 228
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "The 45th ICPC Asia Yinchuan Regional Programming Contest",
       "source_url": "https://github.com/xcpcio/board-data/tree/7d626ddad0b98e8f79ddca7072421cee0a9f00e8/data/icpc/2020/yinchuan",
       "sha256": {
@@ -2399,6 +3295,20 @@
           "teams": 120,
           "last_solved": 3,
           "last_penalty_minutes": 157
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "The 44th ICPC Asia Yinchuan Regional Programming Contest",
@@ -2448,6 +3358,54 @@
           "last_penalty_minutes": 234
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": null,
+          "label": "正式队",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 4,
+              "last_penalty_minutes": 670
+            },
+            "silver": {
+              "last_solved": 3,
+              "last_penalty_minutes": 468
+            },
+            "bronze": {
+              "last_solved": 2,
+              "last_penalty_minutes": 234
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            },
+            "silver": {
+              "max_outside_solved": 3,
+              "safe_solved": 4
+            },
+            "bronze": {
+              "max_outside_solved": 2,
+              "safe_solved": 3
+            }
+          }
+        }
+      ],
       "source_name": "第十一届中国大学生程序设计竞赛总决赛",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2025final",
       "sha256": {
@@ -2481,6 +3439,20 @@
           "teams": 84,
           "last_solved": 3,
           "last_penalty_minutes": 275
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "The \"Huawei Cup\" 50th ICPC Asia East Continent Final Contest",
@@ -2544,6 +3516,86 @@
           "last_penalty_minutes": 356
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": "4",
+          "label": "本科",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 5,
+              "last_penalty_minutes": 436
+            },
+            "silver": {
+              "last_solved": 4,
+              "last_penalty_minutes": 516
+            },
+            "bronze": {
+              "last_solved": 3,
+              "last_penalty_minutes": 425
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 5,
+              "safe_solved": 6
+            },
+            "silver": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            },
+            "bronze": {
+              "max_outside_solved": 3,
+              "safe_solved": 4
+            }
+          }
+        },
+        {
+          "marker": "5",
+          "label": "专科",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 3,
+              "last_penalty_minutes": 543
+            },
+            "silver": {
+              "last_solved": 2,
+              "last_penalty_minutes": 725
+            },
+            "bronze": {
+              "last_solved": 1,
+              "last_penalty_minutes": 356
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 2,
+              "safe_solved": 3
+            },
+            "silver": {
+              "max_outside_solved": 2,
+              "safe_solved": 3
+            },
+            "bronze": {
+              "max_outside_solved": 0,
+              "safe_solved": 1
+            }
+          }
+        }
+      ],
       "source_name": "第十届中国大学生程序设计竞赛总决赛",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2024final",
       "sha256": {
@@ -2577,6 +3629,20 @@
           "teams": 84,
           "last_solved": 3,
           "last_penalty_minutes": 357
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "The 49th ICPC Asia East Continent Final Contest",
@@ -2640,6 +3706,86 @@
           "last_penalty_minutes": 65
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": "undergraduate",
+          "label": "本科组",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 6,
+              "last_penalty_minutes": 896
+            },
+            "silver": {
+              "last_solved": 5,
+              "last_penalty_minutes": 848
+            },
+            "bronze": {
+              "last_solved": 4,
+              "last_penalty_minutes": 665
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 6,
+              "safe_solved": 7
+            },
+            "silver": {
+              "max_outside_solved": 5,
+              "safe_solved": 6
+            },
+            "bronze": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            }
+          }
+        },
+        {
+          "marker": "hv",
+          "label": "专科组",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 3,
+              "last_penalty_minutes": 264
+            },
+            "silver": {
+              "last_solved": 3,
+              "last_penalty_minutes": 389
+            },
+            "bronze": {
+              "last_solved": 2,
+              "last_penalty_minutes": 65
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 3,
+              "safe_solved": 4
+            },
+            "silver": {
+              "max_outside_solved": 3,
+              "safe_solved": 4
+            },
+            "bronze": {
+              "max_outside_solved": 2,
+              "safe_solved": 3
+            }
+          }
+        }
+      ],
       "source_name": "第 9 届 CCPC 中国大学生程序设计竞赛总决赛",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2023final",
       "sha256": {
@@ -2673,6 +3819,20 @@
           "teams": 84,
           "last_solved": 5,
           "last_penalty_minutes": 838
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
         }
       },
       "source_name": "The 48th ICPC Asia East Continent Final Contest",
@@ -2736,6 +3896,86 @@
           "last_penalty_minutes": 551
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": "undergraduate",
+          "label": "本科",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 6,
+              "last_penalty_minutes": 810
+            },
+            "silver": {
+              "last_solved": 5,
+              "last_penalty_minutes": 676
+            },
+            "bronze": {
+              "last_solved": 4,
+              "last_penalty_minutes": 510
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 6,
+              "safe_solved": 7
+            },
+            "silver": {
+              "max_outside_solved": 5,
+              "safe_solved": 6
+            },
+            "bronze": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            }
+          }
+        },
+        {
+          "marker": "hv",
+          "label": "专科",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 4,
+              "last_penalty_minutes": 505
+            },
+            "silver": {
+              "last_solved": 2,
+              "last_penalty_minutes": 261
+            },
+            "bronze": {
+              "last_solved": 2,
+              "last_penalty_minutes": 551
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 3,
+              "safe_solved": 4
+            },
+            "silver": {
+              "max_outside_solved": 2,
+              "safe_solved": 3
+            },
+            "bronze": {
+              "max_outside_solved": 1,
+              "safe_solved": 2
+            }
+          }
+        }
+      ],
       "source_name": "第八届中国大学生程序设计竞赛总决赛",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2022final",
       "sha256": {
@@ -2781,6 +4021,54 @@
           "last_penalty_minutes": 762
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": null,
+          "label": "正式队",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 7,
+              "last_penalty_minutes": 1045
+            },
+            "silver": {
+              "last_solved": 5,
+              "last_penalty_minutes": 747
+            },
+            "bronze": {
+              "last_solved": 4,
+              "last_penalty_minutes": 762
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 7,
+              "safe_solved": 8
+            },
+            "silver": {
+              "max_outside_solved": 5,
+              "safe_solved": 6
+            },
+            "bronze": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            }
+          }
+        }
+      ],
       "source_name": "The 2022 ICPC Asia East Continent Final Contest",
       "source_url": "https://rl.algoux.cn/ranklist/icpc2022ecfinal",
       "sha256": {
@@ -2826,6 +4114,54 @@
           "last_penalty_minutes": 296
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 8,
+          "safe_solved": 9
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": null,
+          "label": "正式队",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 8,
+              "last_penalty_minutes": 1154
+            },
+            "silver": {
+              "last_solved": 6,
+              "last_penalty_minutes": 785
+            },
+            "bronze": {
+              "last_solved": 4,
+              "last_penalty_minutes": 296
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 8,
+              "safe_solved": 9
+            },
+            "silver": {
+              "max_outside_solved": 6,
+              "safe_solved": 7
+            },
+            "bronze": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            }
+          }
+        }
+      ],
       "source_name": "第七届中国大学生程序设计竞赛总决赛",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2021final",
       "sha256": {
@@ -2859,6 +4195,20 @@
           "teams": 108,
           "last_solved": 3,
           "last_penalty_minutes": 102
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "The 46th ICPC Asia East Continent Final Contest",
@@ -2908,6 +4258,54 @@
           "last_penalty_minutes": 549
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": null,
+          "label": "正式队",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 8,
+              "last_penalty_minutes": 1451
+            },
+            "silver": {
+              "last_solved": 6,
+              "last_penalty_minutes": 539
+            },
+            "bronze": {
+              "last_solved": 5,
+              "last_penalty_minutes": 549
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 7,
+              "safe_solved": 8
+            },
+            "silver": {
+              "max_outside_solved": 6,
+              "safe_solved": 7
+            },
+            "bronze": {
+              "max_outside_solved": 5,
+              "safe_solved": 6
+            }
+          }
+        }
+      ],
       "source_name": "2020年中国大学生程序设计竞赛 总决赛",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2020final",
       "sha256": {
@@ -2953,6 +4351,54 @@
           "last_penalty_minutes": 716
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
+      "medal_reference_groups": [
+        {
+          "marker": null,
+          "label": "正式队",
+          "medal_boundaries": {
+            "gold": {
+              "last_solved": 4,
+              "last_penalty_minutes": 219
+            },
+            "silver": {
+              "last_solved": 4,
+              "last_penalty_minutes": 454
+            },
+            "bronze": {
+              "last_solved": 4,
+              "last_penalty_minutes": 716
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            },
+            "silver": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            },
+            "bronze": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            }
+          }
+        }
+      ],
       "source_name": "2019年中国大学生程序设计竞赛 总决赛 （中国传媒大学）",
       "source_url": "https://rl.algoux.cn/ranklist/ccpc2019final",
       "sha256": {
@@ -2984,6 +4430,20 @@
           "teams": 72,
           "last_solved": 4,
           "last_penalty_minutes": 378
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
         }
       },
       "source_name": "2019 CCPC 哈尔滨站",
@@ -3020,6 +4480,20 @@
           "last_penalty_minutes": 512
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "2019年中国大学生程序设计竞赛 秦皇岛站 （东北大学秦皇岛分校）",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2019qinhuangdao",
       "sha256": {
@@ -3052,6 +4526,20 @@
           "teams": 108,
           "last_solved": 2,
           "last_penalty_minutes": 185
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
         }
       },
       "source_name": "2019 ICPC Asia-East Continent Final",
@@ -3088,6 +4576,20 @@
           "last_penalty_minutes": 337
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
+        }
+      },
       "source_name": "第44届ICPC国际大学生程序设计竞赛亚洲区域赛（上海） （上海大学）",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shanghai",
       "sha256": {
@@ -3120,6 +4622,20 @@
           "teams": 90,
           "last_solved": 3,
           "last_penalty_minutes": 434
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第44届ICPC国际大学生程序设计竞赛亚洲区域赛（南京） （南京航空航天大学）",
@@ -3156,6 +4672,20 @@
           "last_penalty_minutes": 280
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "The 44th ICPC International Collegiate Programming Contest Asian Regional Contest (Nanchang) （江西师范大学）",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019nanchang",
       "sha256": {
@@ -3187,6 +4717,20 @@
           "teams": 86,
           "last_solved": 3,
           "last_penalty_minutes": 573
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第44届ICPC国际大学生程序设计竞赛亚洲区域赛（徐州站） （中国矿业大学）",
@@ -3223,6 +4767,20 @@
           "last_penalty_minutes": 320
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "2019 ICPC Asia Shenyang Regional Contest",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2019shenyang",
       "sha256": {
@@ -3255,6 +4813,20 @@
           "teams": 11,
           "last_solved": 3,
           "last_penalty_minutes": 410
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "2019 ICPC 香港站",
@@ -3291,6 +4863,20 @@
           "last_penalty_minutes": 520
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
       "source_name": "2018年中国大学生程序设计竞赛 总决赛 （哈尔滨工业大学（深圳））",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018final",
       "sha256": {
@@ -3323,6 +4909,20 @@
           "teams": 68,
           "last_solved": 3,
           "last_penalty_minutes": 243
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "2018年中国大学生程序设计竞赛 吉林站 （北华大学）",
@@ -3359,6 +4959,20 @@
           "last_penalty_minutes": 401
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "2018年中国大学生程序设计竞赛 桂林站 （桂林电子科技大学）",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=ccpc2018guilin",
       "sha256": {
@@ -3391,6 +5005,20 @@
           "teams": 73,
           "last_solved": 2,
           "last_penalty_minutes": 84
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 2,
+          "safe_solved": 3
         }
       },
       "source_name": "2018年中国大学生程序设计竞赛 秦皇岛站 （东北大学秦皇岛分校）",
@@ -3427,6 +5055,20 @@
           "last_penalty_minutes": 461
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
       "source_name": "2018-2019 ACM-ICPC, Asia East Continent Finals",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018ecfinal",
       "sha256": {
@@ -3459,6 +5101,20 @@
           "teams": 93,
           "last_solved": 3,
           "last_penalty_minutes": 480
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第43届ACM-ICPC国际大学生程序设计竞赛亚洲区域赛（南京） （南京航空航天大学）",
@@ -3494,6 +5150,20 @@
           "last_penalty_minutes": 308
         }
       },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        },
+        "silver": {
+          "max_outside_solved": 1,
+          "safe_solved": 2
+        },
+        "bronze": {
+          "max_outside_solved": 1,
+          "safe_solved": 2
+        }
+      },
       "source_name": "第43届ACM-ICPC国际大学生程序设计竞赛亚洲区域赛（徐州站） （中国矿业大学）",
       "source_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018xuzhou",
       "sha256": {
@@ -3525,6 +5195,20 @@
           "teams": 108,
           "last_solved": 3,
           "last_penalty_minutes": 277
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
         }
       },
       "source_name": "第43届ACM国际大学生程序设计竞赛亚洲区域赛（青岛）现场赛 （中国石油大学）",

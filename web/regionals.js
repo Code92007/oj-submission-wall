@@ -2,6 +2,27 @@
 const el=id=>document.getElementById(id);
 const escapeCpc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cpcData=null;
+
+// Both walls use the same published final standings and current rating map.
+function regionalMedalReference(contest, release, difficulty) {
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const stats = release?.contests?.[contest.id];
+  if (!stats?.medal_boundaries) return `<span class="medal-missing" title="${escape(release?.unrated_contests?.[contest.id] || '尚缺可核验奖牌终榜')}">奖牌线待核验</span>`;
+  const ratings = contest.problems.map(p => difficulty?.[p.id]?.rating);
+  const complete = ratings.length > 0 && ratings.every(r => Number.isFinite(r) && r > 0);
+  const sorted = complete ? [...ratings].sort((a,b) => a-b) : [];
+  const threshold = count => count > ratings.length ? '题数不可达' : `${count}题 · ${complete ? sorted[count-1] : '未评级'}`;
+  const groups = stats.medal_reference_groups?.length > 1 ? stats.medal_reference_groups : [stats];
+  return groups.map(group => `${groups.length > 1 ? `<small class="medal-group">${escape(group.label)}组</small>` : ''}<div class="medal-grid">${['gold','silver','bronze'].map((medal, i) => {
+    const boundary = group.medal_boundaries[medal];
+    const safe = group.medal_safety?.[medal]?.safe_solved;
+    const speedText = threshold(boundary.last_solved);
+    const safeText = Number.isInteger(safe) ? threshold(safe) : '待核验';
+    const title = `${['金','银','铜'][i]}牌或更好。手速线：${speedText}，末位罚时 ${boundary.last_penalty_minutes} 分钟，同题数仍需比较罚时。稳牌线：${safeText}，超过本场终榜所有低于该档奖牌的正式队题数。Rating 为从易到难完成对应题数时的最低最高难度，非任意一道题达标即可获牌。`;
+    return `<span class="medal-label medal-${medal}">${['金','银','铜'][i]}</span><span title="${escape(title)}">${escape(speedText)}</span><span title="${escape(title)}">${escape(safeText)}</span>`;
+  }).join('')}</div>`).join('');
+}
+
 function cpcDifficultyClass(r){return !r?'difficulty-unknown':r<1200?'difficulty-brown':r<1600?'difficulty-green':r<1900?'difficulty-cyan':r<2100?'difficulty-blue':r<2400?'difficulty-purple':r<2700?'difficulty-orange':'difficulty-red';}
 function cpcDifficultyText(d){
   if(!d)return '难度未评级';
@@ -37,8 +58,11 @@ function cpcWall(){
   el('cpcYearLabel').textContent=el('cpcYear').value;
   el('cpcYearChoices').innerHTML=[...new Set(cpcData.contests.map(c=>c.year))].sort((a,b)=>b-a).map(y=>`<button type="button" data-year="${y}" aria-pressed="${String(y)===el('cpcYear').value}">${y}</button>`).join('');
   const contests=cpcData.contests.filter(c=>String(c.year)===el('cpcYear').value);
+  const showMedals=el('cpcMedals').checked;
+  el('cpcMedalHelp').hidden=!showMedals;
+  const medalHead=showMedals?'<th class="medal-reference" scope="col">奖牌参考<small>手速线 / 稳牌线（题数 · Rating）</small></th>':'';
   const max=Math.max(1,...contests.map(c=>c.problems.length));let done=0,total=0,rated=0;
-  el('cpcHead').innerHTML='<tr><th class="cpc-contest" scope="col">比赛 / 赛站</th><th scope="col">我的进度</th>'+Array.from({length:max},(_,i)=>`<th scope="col">${String.fromCharCode(65+i)}</th>`).join('')+'</tr>';
+  el('cpcHead').innerHTML='<tr><th class="cpc-contest" scope="col">比赛 / 赛站</th>'+medalHead+'<th scope="col">我的进度</th>'+Array.from({length:max},(_,i)=>`<th scope="col">${String.fromCharCode(65+i)}</th>`).join('')+'</tr>';
   el('cpcRows').innerHTML=contests.map(c=>{
     let solved=0;const cells=c.problems.map(p=>{
       const s=cpcData.problems[p.id]||{},ok=s.personal||s.onsite||(el('cpcTeams').checked&&s.team);solved+=Number(Boolean(ok));
@@ -51,7 +75,7 @@ function cpcWall(){
     const series=['ICPC','CCPC'].includes(c.series)?c.series:'';
     const name=series?c.name.replace(`${c.year} ${series} `,`${c.year} · `):c.name;
     const progress=c.catalog_status==='pending_problem_list'?'<strong>题单待核验</strong>':`<strong>${solved}/${c.problems.length}</strong><small>题目完成</small><progress value="${solved}" max="${c.problems.length}" aria-label="${escapeCpc(c.name+' 完成进度')}"></progress>`;
-    return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}<a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">${escapeCpc(name)}</a></span></th><td class="cpc-progress">${progress}</td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
+    return `<tr><th class="cpc-contest" scope="row"><span class="cpc-site-name">${series?`<span class="cpc-series-badge">${series}</span>`:''}<a href="${escapeCpc(c.source_url)}" target="_blank" rel="noreferrer">${escapeCpc(name)}</a></span></th>${showMedals?`<td class="medal-reference">${regionalMedalReference(c,cpcData.ratingRelease,cpcData.difficulty)}</td>`:''}<td class="cpc-progress">${progress}</td>${cells}${'<td></td>'.repeat(max-c.problems.length)}</tr>`;
   }).join('');
   el('cpcSummary').textContent=`${contests.length} 场比赛 · ${done}/${total} 题完成`;
   el('cpcRatingCoverage').textContent=`本年已评级 ${rated}/${total} · 与 CF Bot 使用同一份评级 · ${cpcData.ratingRelease?.scale||'CF 风格经验分数，非官方 Rating'}。${rated<total?' — 表示暂未评级。':''}`;
@@ -64,6 +88,8 @@ async function loadCpc(){
 }
 async function cpcRun(fn){try{await fn();}catch(e){el('cpcMessage').textContent=e.message;}}
 document.addEventListener('DOMContentLoaded',()=>{
+  try{el('cpcMedals').checked=localStorage.getItem('cpc-medal-reference')!=='hidden';}catch(_){}
+  el('cpcMedals').onchange=()=>{try{localStorage.setItem('cpc-medal-reference',el('cpcMedals').checked?'shown':'hidden');}catch(_){}cpcWall();};
   cpcRun(loadCpc);
   el('cpcMemberSearch').oninput=()=>{if(cpcData)cpcMembers();};
   el('cpcYear').onchange=cpcWall;el('cpcTeams').onchange=cpcWall;
