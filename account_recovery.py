@@ -161,10 +161,10 @@ class RecoveryHandler:
                 ready = self.app.smtp_configured()
             except ValueError:
                 ready = False
-            if not ready:
-                return self.handler.send_json(200, {"ok": True,
-                    "message": "邮箱已保存，尚未验证。邮件服务启用后，请再次点击发送验证邮件。"})
-            token = create_token(self.app, conn, user["id"], email, "bind_email")
+            token = create_token(self.app, conn, user["id"], email, "bind_email") if ready else None
+        if not ready:
+            return self.handler.send_json(200, {"ok": True,
+                "message": "邮箱已保存，尚未验证。邮件服务启用后，请再次点击发送验证邮件。"})
         if not send_token(self.app, token, email, user["display_name"], "bind_email"):
             return self.error(503, "邮件发送失败，请稍后重试或联系管理员")
         return self.handler.send_json(200, {"ok": True, "message": "验证邮件已发送，请打开邮件中的链接完成绑定。"})
