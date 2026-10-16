@@ -31,6 +31,7 @@ from pathlib import Path
 from cpc_integration import Integration as CpcIntegration, handle as cpc_handle
 from codeforces_auth import CodeforcesAuth, ManagerAccessUnavailable, load_auth, signed_api_get
 from team_analysis import build_analysis, analysis_options
+import account_recovery
 
 
 APP_NAME = "OJ Submission Wall"
@@ -451,6 +452,7 @@ def init_db() -> None:
             """
         )
         migrate_db(conn)
+        account_recovery.init_schema(conn)
 
 
 def migrate_db(conn: sqlite3.Connection) -> None:
@@ -3476,31 +3478,34 @@ def is_placeholder_env(value: str) -> bool:
     return not text or text.lower() in SMTP_PLACEHOLDERS
 
 
-def send_verification_email(email: str, display_name: str, verify_url: str) -> bool:
+def smtp_configured() -> bool:
+    return not any(is_placeholder_env(value) for value in (
+        env_value("SMTP_HOST"), env_value("SMTP_FROM") or env_value("SMTP_USER"),
+        env_value("SMTP_PASSWORD"),
+    ))
+
+
+def send_email(email: str, subject: str, content: str) -> bool:
     smtp_host = env_value("SMTP_HOST")
     smtp_user = env_value("SMTP_USER")
     smtp_password = env_value("SMTP_PASSWORD")
-    smtp_from = env_value("SMTP_FROM", smtp_user)
-    if is_placeholder_env(smtp_host) or is_placeholder_env(smtp_from) or is_placeholder_env(smtp_password):
-        print(f"[mail] SMTP 未配置或仍是占位值，验证链接: {verify_url}", flush=True)
+    smtp_from = env_value("SMTP_FROM") or smtp_user
+    if not smtp_configured():
+        print("[mail] SMTP 未配置或仍是占位值", flush=True)
         return False
     try:
         smtp_port = int(env_value("SMTP_PORT", "587"))
     except ValueError:
-        print(f"[mail] SMTP_PORT 配置错误，验证链接: {verify_url}", flush=True)
+        print("[mail] SMTP_PORT 配置错误", flush=True)
         return False
     smtp_ssl = env_value("SMTP_SSL").lower() in {"1", "true", "yes"} or smtp_port == 465
     smtp_tls = env_value("SMTP_TLS", "true").lower() not in {"0", "false", "no"}
 
     msg = EmailMessage()
-    msg["Subject"] = "验证你的 OJ Submission Wall 邮箱"
+    msg["Subject"] = subject
     msg["From"] = smtp_from
     msg["To"] = email
-    msg.set_content(
-        f"{display_name}，你好：\n\n"
-        f"请打开下面的链接完成邮箱验证，链接 24 小时内有效：\n{verify_url}\n\n"
-        f"如果不是你本人注册，可以忽略这封邮件。\n"
-    )
+    msg.set_content(content)
 
     context = ssl.create_default_context()
     smtp_cls = smtplib.SMTP_SSL if smtp_ssl else smtplib.SMTP
@@ -3513,9 +3518,14 @@ def send_verification_email(email: str, display_name: str, verify_url: str) -> b
             smtp.send_message(msg)
         return True
     except Exception as exc:
-        print(f"[mail] SMTP 发送失败: {exc}; 验证链接: {verify_url}", flush=True)
+        print(f"[mail] SMTP 发送失败: {type(exc).__name__}", flush=True)
         return False
 
+
+def send_verification_email(email: str, display_name: str, verify_url: str) -> bool:
+    return send_email(email, "验证你的 OJ Submission Wall 邮箱",
+        f"{display_name}，你好：\n\n请打开下面的链接完成邮箱验证，链接 24 小时内有效：\n{verify_url}\n\n"
+        "如果不是你本人注册，可以忽略这封邮件。\n")
 
 
 def owner_display_name(conn: sqlite3.Connection, owner_type: str, owner_id: str) -> str:
@@ -6589,6 +6599,11 @@ class AppHandler(BaseHTTPRequestHandler):
                 return self.send_json(200, {"ok": True, **competition})
             if path == "/api/auth/verify":
                 return self.handle_verify(parsed)
+            if path == "/api/me/email":
+                return account_recovery.handle(self, sys.modules[__name__], path)
+            if path in {"/account-recovery", "/account-recovery.html", "/account-recovery.js"}:
+                name = "account-recovery.html" if path == "/account-recovery" else path.lstrip("/")
+                return self.serve_static(name)
             if path == "/" or path == "/index.html":
                 return self.serve_static("index.html")
             if path in {"/app.js", "/styles.css"}:
@@ -6601,6 +6616,8 @@ class AppHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urllib.parse.urlparse(self.path)
         try:
+            if parsed.path in account_recovery.ROUTES - {"/api/me/email"}:
+                return account_recovery.handle(self, sys.modules[__name__], parsed.path)
             if parsed.path.startswith(("/api/cpc/", "/api/integration/")) and cpc_handle(self, get_cpc_service(), post=True):
                 return
             if parsed.path in {"/api/luogu-plugin/authorize", "/api/qoj-plugin/authorize"}:
@@ -6740,7 +6757,8 @@ class AppHandler(BaseHTTPRequestHandler):
     def handle_register(self) -> None:
         data = read_json_body(self)
         username = normalize_username(str(data.get("username") or data.get("displayName") or ""))
-        email = local_account_email(username)
+        recovery_email = str(data.get("email") or "").strip()
+        email = account_recovery.normalize_email(recovery_email) if recovery_email else local_account_email(username)
         display_name = normalize_display_name(data.get("displayName") or data.get("username"), username)
         real_name = normalize_real_name(data.get("realName"))
         team_name = normalize_team_name(data.get("teamName"), DEFAULT_TEAM_NAME)
@@ -6755,6 +6773,8 @@ class AppHandler(BaseHTTPRequestHandler):
             ).fetchone()
             if existing:
                 raise ValueError("用户名已经被注册")
+            if recovery_email and conn.execute("SELECT id FROM users WHERE lower(email) = ?", (email,)).fetchone():
+                raise ValueError("该邮箱已绑定其他账号")
             cur = conn.execute(
                 """
                 INSERT INTO users(username, email, display_name, real_name, password_hash, verified, team_name, created_at)
@@ -6764,12 +6784,25 @@ class AppHandler(BaseHTTPRequestHandler):
             )
             user_id = str(cur.lastrowid)
             token = create_session(conn, "user", user_id, days=30)
+        message = "注册成功，已登录。"
+        if recovery_email:
+            message += "邮箱已保存，请在资料区发送验证邮件后启用密码找回。"
+            try:
+                account_recovery.recovery_url(sys.modules[__name__], "verify-email", "")
+                ready = smtp_configured()
+            except ValueError:
+                ready = False
+            if ready and account_recovery.consume_limit(sys.modules[__name__], "signup-mail:" + self.client_address[0], 20, 3600):
+                with connect_db() as conn:
+                    email_token = account_recovery.create_token(sys.modules[__name__], conn, int(user_id), email, "bind_email")
+                if account_recovery.send_token(sys.modules[__name__], email_token, email, display_name, "bind_email"):
+                    message = "注册成功，已登录。验证邮件已发送，请查收并完成邮箱绑定。"
         clear_overview_memory_cache()
         return self.send_json(
             201,
             {
                 "ok": True,
-                "message": "注册成功，已登录。",
+                "message": message,
                 "user": {
                     "type": "user",
                     "id": user_id,

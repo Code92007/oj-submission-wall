@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <title>账号恢复 · OJ 训练墙</title>
+    <link rel="stylesheet" href="/styles.css?v=20261016-account-recovery">
+  </head>
+  <body>
+    <main class="recovery-layout">
+      <section class="panel stack">
+        <h1 id="recoveryTitle">账号恢复</h1>
+        <p id="recoveryMessage" class="form-hint" role="status" aria-live="polite"></p>
+        <form id="resetForm" class="stack hidden">
+          <label><span>新密码</span><input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="1024" required></label>
+          <label><span>确认新密码</span><input name="confirmation" type="password" autocomplete="new-password" minlength="8" maxlength="1024" required></label>
+          <button class="button primary full" type="submit">重置密码</button>
+        </form>
+        <button id="verifyEmailBtn" class="button primary full hidden" type="button">确认绑定此邮箱</button>
+        <a class="button ghost full" href="/#login">返回训练墙登录</a>
+      </section>
+    </main>
+    <script src="/account-recovery.js?v=20261016-account-recovery" defer></script>
+  </body>
+</html>

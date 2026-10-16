@@ -1,5 +1,7 @@
 const state = {
   user: null,
+  accountEmailUserId: null,
+  accountEmailRequestId: 0,
   platforms: [],
   overview: null,
   busy: false,
@@ -163,9 +165,10 @@ function setHandleBusy(id, value) {
 function switchAuthTab(name) {
   clearMessage();
   for (const tab of ["guest", "login", "register"]) {
-    $(`#${tab}Tab`).classList.toggle("active", tab === name);
+    $(`#${tab}Tab`).classList.toggle("active", tab === name || (tab === "login" && name === "forgotPassword"));
     $(`#${tab}Form`).classList.toggle("hidden", tab !== name);
   }
+  $("#forgotPasswordForm").classList.toggle("hidden", name !== "forgotPassword");
 }
 
 async function loadSession() {
@@ -333,6 +336,15 @@ function renderSession() {
   const bindPanel = $("#bindPanel");
   const authPanel = $("#authPanel");
   const logoutBtn = $("#logoutBtn");
+  const isUser = state.user?.type === "user";
+  $("#accountEmailSection").classList.toggle("hidden", !isUser);
+  if (isUser) {
+    loadAccountEmail();
+  } else {
+    state.accountEmailUserId = null;
+    state.accountEmailRequestId += 1;
+    $("#accountEmailForm").reset();
+  }
 
   if (!state.user) {
     badge.textContent = "未登录";
@@ -391,6 +403,69 @@ function renderProfileForm() {
     const input = $(selector);
     if (!input || document.activeElement === input) continue;
     input.value = value;
+  }
+}
+
+async function loadAccountEmail(force = false) {
+  const userId = state.user?.type === "user" ? state.user.id : null;
+  if (!userId || (!force && state.accountEmailUserId === userId)) return;
+  if (state.accountEmailUserId !== userId) $("#accountEmailForm").reset();
+  state.accountEmailUserId = userId;
+  const requestId = ++state.accountEmailRequestId;
+  $("#accountEmailStatus").textContent = "正在读取邮箱…";
+  try {
+    const data = await api("/api/me/email");
+    if (state.user?.id !== userId || requestId !== state.accountEmailRequestId) return;
+    $("#accountEmailStatus").textContent = data.verified
+      ? `已验证：${data.email}`
+      : data.pendingEmail ? `待验证：${data.pendingEmail}，请查收验证邮件。`
+      : data.email ? `未验证：${data.email}，请发送验证邮件。`
+      : "尚未绑定邮箱。绑定并验证后，可用于找回密码。";
+    const input = $("#accountEmailInput");
+    if (document.activeElement !== input) input.value = data.pendingEmail || data.email || "";
+  } catch (error) {
+    if (requestId === state.accountEmailRequestId) $("#accountEmailStatus").textContent = error.message;
+  }
+}
+
+async function submitAccountEmail(event) {
+  event.preventDefault();
+  const formElement = event.currentTarget;
+  const button = formElement.querySelector('[type="submit"]');
+  const form = new FormData(formElement);
+  button.disabled = true;
+  clearMessage();
+  try {
+    const data = await api("/api/auth/bind-email", {
+      method: "POST", body: {email: form.get("email"), password: form.get("password")},
+    });
+    formElement.elements.password.value = "";
+    await loadAccountEmail(true);
+    showMessage(data.message);
+  } catch (error) {
+    await loadAccountEmail(true);
+    showMessage(error.message, "error");
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function submitForgotPassword(event) {
+  event.preventDefault();
+  const formElement = event.currentTarget;
+  const button = formElement.querySelector('[type="submit"]');
+  const form = new FormData(formElement);
+  button.disabled = true;
+  clearMessage();
+  try {
+    const data = await api("/api/auth/forgot-password", {
+      method: "POST", body: {username: form.get("username"), email: form.get("email")},
+    });
+    showMessage(data.message);
+  } catch (error) {
+    showMessage(error.message, "error");
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -3090,6 +3165,7 @@ async function submitRegister(event) {
       method: "POST",
       body: {
         username: form.get("username"),
+        email: form.get("email"),
         displayName: form.get("displayName"),
         realName: form.get("realName"),
         teamName: form.get("teamName"),
@@ -3355,6 +3431,13 @@ function bindEvents() {
   $("#guestTab").addEventListener("click", () => switchAuthTab("guest"));
   $("#loginTab").addEventListener("click", () => switchAuthTab("login"));
   $("#registerTab").addEventListener("click", () => switchAuthTab("register"));
+  $("#forgotPasswordBtn").addEventListener("click", () => {
+    $("#forgotPasswordForm").elements.username.value = $("#loginForm").elements.username.value;
+    switchAuthTab("forgotPassword");
+  });
+  $("#backToLoginBtn").addEventListener("click", () => switchAuthTab("login"));
+  $("#forgotPasswordForm").addEventListener("submit", submitForgotPassword);
+  $("#accountEmailForm").addEventListener("submit", submitAccountEmail);
   $("#guestForm").addEventListener("submit", submitGuest);
   $("#loginForm").addEventListener("submit", submitLogin);
   $("#registerForm").addEventListener("submit", submitRegister);
@@ -3454,6 +3537,7 @@ async function init() {
   try { state.onlySelf = localStorage.getItem("ojwall-only-self") === "1"; } catch (_) {}
   setupLuoguAuthorization();
   bindEvents();
+  if (location.hash === "#login") switchAuthTab("login");
   hydrateOverviewFromBrowserCache();
   try {
     await loadSession();

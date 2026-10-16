@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OJ Submission Wall</title>
-    <link rel="stylesheet" href="/styles.css?v=20261010-button-links">
+    <link rel="stylesheet" href="/styles.css?v=20261016-account-recovery">
   </head>
   <body>
     <header class="topbar">
@@ -60,12 +60,32 @@
               <input name="password" type="password" autocomplete="current-password" required>
             </label>
             <button class="button primary full" type="submit">登录</button>
+            <button id="forgotPasswordBtn" class="button ghost full" type="button">忘记密码</button>
+          </form>
+
+          <form id="forgotPasswordForm" class="stack auth-form hidden">
+            <h3>找回密码</h3>
+            <p class="form-hint">填写用户名和已验证的邮箱，我们会向该邮箱发送重置链接。未绑定邮箱的账号请联系管理员。</p>
+            <label>
+              <span>用户名</span>
+              <input name="username" autocomplete="username" required>
+            </label>
+            <label>
+              <span>邮箱</span>
+              <input name="email" type="email" autocomplete="email" maxlength="254" required>
+            </label>
+            <button class="button primary full" type="submit">发送重置链接</button>
+            <button id="backToLoginBtn" class="button ghost full" type="button">返回登录</button>
           </form>
 
           <form id="registerForm" class="stack auth-form hidden">
             <label>
               <span>用户名</span>
               <input name="username" autocomplete="username" placeholder="比如 yzm007" required>
+            </label>
+            <label>
+              <span>邮箱（选填）</span>
+              <input name="email" type="email" autocomplete="email" maxlength="254" placeholder="验证后可用于找回密码">
             </label>
             <label>
               <span>昵称</span>
@@ -107,6 +127,23 @@
             <button class="button ghost full" type="submit">保存资料</button>
           </form>
           <div class="panel-divider"></div>
+          <section id="accountEmailSection" class="hidden">
+            <h3>找回密码邮箱</h3>
+            <p id="accountEmailStatus" class="form-hint" aria-live="polite"></p>
+            <form id="accountEmailForm" class="stack">
+              <label>
+                <span>邮箱</span>
+                <input id="accountEmailInput" name="email" type="email" autocomplete="email" maxlength="254" required>
+              </label>
+              <label>
+                <span>当前密码</span>
+                <input name="password" type="password" autocomplete="current-password" required>
+              </label>
+              <p class="form-hint">更换邮箱后需要重新验证，验证完成后才能用于找回密码。邮箱仅自己可见。</p>
+              <button class="button ghost full" type="submit">保存邮箱并发送验证邮件</button>
+            </form>
+            <div class="panel-divider"></div>
+          </section>
           <form id="handleForm" class="stack">
             <label>
               <span>平台</span>
@@ -358,6 +395,6 @@
       </aside>
     </main>
 
-    <script src="/app.js?v=20261008-only-self" defer></script>
+    <script src="/app.js?v=20261016-account-recovery" defer></script>
   </body>
 </html>
