@@ -2,13 +2,39 @@
 import json
 import time
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 SHANGHAI = timezone(timedelta(hours=8))
+
+
+def luogu_metadata(app):
+    """Read the same reviewed algorithm dictionary and public cache as OJ Wall."""
+    if not hasattr(app, 'ROOT'):
+        return {}, {}
+    def read(path):
+        try:
+            return json.loads(Path(path).read_text())
+        except (OSError, ValueError):
+            return {}
+    root = Path(app.ROOT)
+    algorithms = read(root / 'catalog/luogu_algorithm_tags.json').get('tags', {})
+    problems = read(root / 'catalog/luogu_problems.json').get('problems', {})
+    if hasattr(app, 'CACHE_DIR'):
+        problems.update(read(Path(app.CACHE_DIR) / 'luogu-analysis.json').get('problems', {}))
+    return algorithms, problems
 
 
 def knowledge_snapshot(service, owner):
     records = {}
     excluded = 0
+    algorithms, luogu = luogu_metadata(service.app)
+    def add_luogu_tags(record, values):
+        for value in values if isinstance(values, list) else []:
+            tag = algorithms.get(str(value)) if type(value) is int else None
+            if tag:
+                record['tags'].add(tag['label'])
+                if not tag['key'].startswith('luogu:'):
+                    record['tags'].add(tag['key'])
     with service.db() as db:
         accounts = {}
         handles = list(db.execute("select h.platform,h.handle,h.stats_json,k.kind from handles h left join cpc_handle_kinds k on k.handle_id=h.id where h.owner_type='user' and h.owner_id=? and h.active=1", (str(owner),)))
@@ -27,6 +53,8 @@ def knowledge_snapshot(service, owner):
             record = records.setdefault((key, kind), {'key': key, 'kind': kind, 'title': row['problem_name'] or pid, 'tags': set(), 'firstAt': None, 'lastAt': None, 'days': set()})
             problem = raw.get('problem') if isinstance(raw.get('problem'), dict) else {}
             for tags in (raw.get('tags'), problem.get('tags')):
+                if row['platform'] == 'luogu':
+                    add_luogu_tags(record, tags)
                 if isinstance(tags, list):
                     for tag in tags:
                         if isinstance(tag, dict):
@@ -53,6 +81,8 @@ def knowledge_snapshot(service, owner):
                 key = service.app.canonical_problem_key(handle['platform'], pid, solved.get('name', ''), raw={'pid':pid, 'type':solved.get('source', '')})
                 records.setdefault((key, kind), {'key': key, 'kind': kind, 'title': solved.get('name') or pid, 'tags': set(), 'firstAt': None, 'lastAt': None, 'days': set()})
     for record in records.values():
+        if record['key'].startswith('luogu:'):
+            add_luogu_tags(record, luogu.get(record['key'].split(':', 1)[1], {}).get('tags'))
         record['tags'] = sorted(record['tags'])
         record['days'] = sorted(record['days'])
     return {'version': 1, 'complete': True, 'records': sorted(records.values(), key=lambda r: (r['key'], r['kind'])), 'excludedActivity': excluded}
