@@ -16,9 +16,14 @@ function regionalMedalReference(contest, release, difficulty) {
   return groups.map(group => `${groups.length > 1 ? `<small class="medal-group">${escape(group.label)}组</small>` : ''}<div class="medal-grid">${['gold','silver','bronze'].map((medal, i) => {
     const boundary = group.medal_boundaries[medal];
     const safe = group.medal_safety?.[medal]?.safe_solved;
+    const higher = ['gold','silver','bronze'].slice(0,i).find(key => {
+      const count = group.medal_safety?.[key]?.safe_solved;
+      return Number.isInteger(safe) && Number.isInteger(count) && safe >= count;
+    });
     const speedText = threshold(boundary.last_solved);
-    const safeText = Number.isInteger(safe) ? threshold(safe) : '待核验';
-    const title = `${['金','银','铜'][i]}牌或更好。手速线：${speedText}，末位罚时 ${boundary.last_penalty_minutes} 分钟，同题数仍需比较罚时。稳牌线：${safeText}，超过本场终榜所有低于该档奖牌的正式队题数。Rating 为从易到难完成对应题数时的最低最高难度，非任意一道题达标即可获牌。`;
+    const safeText = higher ? '—' : Number.isInteger(safe) ? threshold(safe) : '待核验';
+    const safeNote = higher ? `无独立稳${['金','银','铜'][i]}档，达到该题数已稳${{gold:'金',silver:'银'}[higher]}` : '超过本场终榜所有低于该档奖牌的正式队题数';
+    const title = `${['金','银','铜'][i]}牌或更好。手速线：${speedText}，末位罚时 ${boundary.last_penalty_minutes} 分钟，同题数仍需比较罚时。稳牌线：${safeText}，${safeNote}。Rating 为从易到难完成对应题数时的最低最高难度，非任意一道题达标即可获牌。`;
     return `<span class="medal-label medal-${medal}">${['金','银','铜'][i]}</span><span title="${escape(title)}">${escape(speedText)}</span><span title="${escape(title)}">${escape(safeText)}</span>`;
   }).join('')}</div>`).join('');
 }

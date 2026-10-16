@@ -121,6 +121,13 @@ def contest_for(honor, contests):
     return contests.get(cid)
 
 
+def superseding_safe_medal(stats, target):
+    """The highest guarantee reached at this count, if no distinct stage exists."""
+    count = stats['medal_safety'][target]['safe_solved']
+    return next((medal for medal in MEDALS[:MEDALS.index(target)]
+                 if count >= stats['medal_safety'][medal]['safe_solved']), None)
+
+
 def plan_for(row, contest, stats, ratings, target, mode):
     count = stats['medal_boundaries'][target]['last_solved'] if mode == 'speed' else stats['medal_safety'][target]['safe_solved']
     solved = set(row['accepted'])
@@ -133,8 +140,10 @@ def plan_for(row, contest, stats, ratings, target, mode):
     # minimize the maximum difficulty in the resulting solve set.
     max_new = max((ratings[p['id']]['rating'] for p in additions), default=None)
     max_total = max(solved_ratings + [ratings[p['id']]['rating'] for p in additions], default=None)
+    superseded = superseding_safe_medal(stats, target) if mode == 'safe' else None
     return {'count': count, 'additional': max(0, missing), 'new_rating': max_new if available else None,
             'total_rating': max_total if available else None,
+            'stage_available': superseded is None, 'superseded_by': CN.get(superseded),
             'problems': ', '.join(f'{p["index"]}({ratings[p["id"]]["rating"]})' for p in additions) if available else '题数不可达',
             'condition': '按本场终榜题数保证' if mode == 'safe' else ('已达题数，仍需降低罚时' if missing <= 0 else '同题数仍需比较罚时')}
 

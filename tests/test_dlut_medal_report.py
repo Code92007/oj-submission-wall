@@ -35,6 +35,21 @@ class UpgradePlanTest(unittest.TestCase):
         self.assertIsNone(plan['total_rating'])
         self.assertEqual(plan['problems'],'题数不可达')
 
+    def test_overlapping_safe_stages_preserve_raw_guarantees(self):
+        self.stats['medal_safety'].update(silver={'safe_solved':3},bronze={'safe_solved':3})
+        plan=report.plan_for({'accepted':['A']},self.contest,self.stats,self.ratings,'bronze','safe')
+        self.assertFalse(plan['stage_available'])
+        self.assertEqual(plan['superseded_by'],'银牌')
+        self.assertEqual((plan['count'],plan['new_rating']),(3,2000))
+        self.stats['medal_safety']['gold']['safe_solved']=3
+        self.assertEqual(report.superseding_safe_medal(self.stats,'bronze'),'gold')
+        self.assertEqual(report.superseding_safe_medal(self.stats,'silver'),'gold')
+        self.assertIsNone(report.superseding_safe_medal(self.stats,'gold'))
+
+    def test_distinct_safe_stage_is_retained(self):
+        self.stats['medal_safety'].update(silver={'safe_solved':3},bronze={'safe_solved':2})
+        self.assertIsNone(report.superseding_safe_medal(self.stats,'bronze'))
+
 
 if __name__=='__main__':
     unittest.main()
