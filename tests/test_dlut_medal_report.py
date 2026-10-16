@@ -50,6 +50,20 @@ class UpgradePlanTest(unittest.TestCase):
         self.stats['medal_safety'].update(silver={'safe_solved':3},bronze={'safe_solved':2})
         self.assertIsNone(report.superseding_safe_medal(self.stats,'bronze'))
 
+    def test_requested_star_team_reference_preserves_eligibility(self):
+        self.stats['medal_safety'].update(silver={'safe_solved':3},bronze={'safe_solved':2})
+        self.stats['medal_boundaries'].update(silver={'last_solved':2},bronze={'last_solved':1})
+        row={'team':'Attention is all you need','official':False,'medal':'','solved':3}
+        report.add_unofficial_reference(row,{'accepted':['A','B','C']},self.contest,self.stats,self.ratings)
+        self.assertFalse(row['official'])
+        self.assertEqual(row['medal'],'')
+        self.assertEqual(row['reference_medal'],'银牌')
+        self.assertEqual(row['target'],'金牌（参考）')
+        self.assertEqual(row['plans']['safe']['new_rating'],3000)
+        other={'team':'Other star team','official':False,'medal':'','solved':3}
+        report.add_unofficial_reference(other,{'accepted':['A','B','C']},self.contest,self.stats,self.ratings)
+        self.assertNotIn('reference_medal',other)
+
 
 if __name__=='__main__':
     unittest.main()

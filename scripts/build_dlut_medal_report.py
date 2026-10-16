@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MEDALS = ('gold', 'silver', 'bronze')
 CN = {'gold': '金牌', 'silver': '银牌', 'bronze': '铜牌'}
 SCHOOL_ALIASES = {'Dalian University of Technology': '大连理工大学'}
+REFERENCE_UNOFFICIAL_TEAMS = {'Attention is all you need'}
 # This pinned RankLand board has a year typo. The host university dates the
 # 47th EC Final to 2023-03-25, as does the independently curated DLUT record.
 DATE_CORRECTIONS = {'icpc-2022-ECFinal': ('2023-03-25', 'https://www.shu.edu.cn/info/1053/301004.htm')}
@@ -148,6 +149,22 @@ def plan_for(row, contest, stats, ratings, target, mode):
             'condition': '按本场终榜题数保证' if mode == 'safe' else ('已达题数，仍需降低罚时' if missing <= 0 else '同题数仍需比较罚时')}
 
 
+def add_unofficial_reference(record, team, contest, stats, ratings):
+    """Add requested training references without changing award eligibility."""
+    if record['official'] or record['team'] not in REFERENCE_UNOFFICIAL_TEAMS:
+        return
+    medal = next((m for m in MEDALS if record['solved'] >= stats['medal_safety'][m]['safe_solved']), None)
+    if medal is None:
+        return  # A count alone cannot resolve a speed/penalty tie.
+    record['reference_medal'] = CN[medal]
+    record['reference_note'] = '打星队按正式队题数门槛作训练参考，不代表实际获牌'
+    target = {'silver':'gold','bronze':'silver'}.get(medal)
+    record['target'] = CN[target] + '（参考）' if target else '已达金牌题数（参考）'
+    record['all_targets'] = {m: {mode: plan_for(team, contest, stats, ratings, m, mode)
+                               for mode in ('speed','safe')} for m in MEDALS}
+    record['plans'] = record['all_targets'][target] if target else {}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dlut', type=Path, required=True)
@@ -221,6 +238,7 @@ def main():
             if target and honor['official']:
                 row['plans'] = {mode: plan_for(team, contest, stats, ratings, target, mode) for mode in ('speed', 'safe')}
             row['all_targets'] = {m: {mode: plan_for(team, contest, stats, ratings, m, mode) for mode in ('speed', 'safe')} for m in MEDALS} if honor['official'] else {}
+            add_unofficial_reference(row, team, contest, stats, ratings)
             row['status'] = '已核验逐题终榜'
         except (ValueError, KeyError, OSError) as exc:
             row['status'] = str(exc)

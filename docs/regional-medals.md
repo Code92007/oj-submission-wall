@@ -15,6 +15,8 @@
 
 队伍升级方案保留已有 AC，从未解题按 Rating 升序补足下一档奖牌所需题数，同时列出新增题中的最高 Rating，以及保留已有 AC 后全部题目的最高 Rating 最小值。手速方案同题数仍需比较罚时；打星队不计算获牌路径。
 
+按用户要求，打星队 `Attention is all you need` 单独补充正式队门槛下的训练参考：保留打星资格和实际奖牌字段，依据已达到的稳牌题数显示参考阶段及后续补题。其他打星队沿用原口径。
+
 ```sh
 python3 scripts/build_dlut_medal_report.py \
   --dlut /path/to/dlut-public-snapshot.json \
