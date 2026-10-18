@@ -5216,6 +5216,104 @@
       "sha256": {
         "final_scoreboard": "28f05e5a0a80bae7e79838542fbb831cb8c03a12f7744d681326c962c849401a"
       }
+    },
+    "icpc-2026-西安": {
+      "official_teams": 402,
+      "effective_teams": 393,
+      "excluded_teams": 16,
+      "duration_seconds": 18000,
+      "medal_rule": "XCPCIO config.medal.official：金银铜分别枚数，累计为名次分界",
+      "medal_source_url": "https://board.xcpcio.com/data/icpc/51st/xian/config.json",
+      "original_source_sha256": {
+        "config": "4982d8f4e4c88d46d66387c8edea9c36913308d60b7a3837ffe6389bcb8783d0",
+        "team": "a21c2de310529fb1581b60dc6e489283fdbd9d59c20fd84ebf9c27b407986688",
+        "run": "1a534a9c516a3cb6f80568de278fb76e52acacbd8efeb7b5fffe59aad81cc7ee"
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 41,
+          "last_solved": 4,
+          "last_penalty_minutes": 405
+        },
+        "silver": {
+          "teams": 82,
+          "last_solved": 4,
+          "last_penalty_minutes": 709
+        },
+        "bronze": {
+          "teams": 123,
+          "last_solved": 3,
+          "last_penalty_minutes": 736
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "silver": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
+      "source_name": "第 51 届 ICPC 国际大学生程序设计竞赛区域赛西安站 - 正式赛",
+      "source_url": "https://board.xcpcio.com/icpc/51st/xian?group=official",
+      "sha256": {
+        "final_scoreboard": "e66c5abe62754c9900f3a45d8dd24de57c0670afdf1f258e7fbe3f994e3b3b00"
+      }
+    },
+    "ccpc-2026-长春": {
+      "official_teams": 301,
+      "effective_teams": 292,
+      "excluded_teams": 36,
+      "duration_seconds": 18000,
+      "medal_rule": "ICCPC contest.flg_award_base=1：有提交（含 CE）的正式队 299 支；金/银/铜 10%/20%/30%，累计 30/90/180 名，整数向上取整；同解题数及总罚时分钟并列",
+      "medal_source_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
+      "original_source_sha256": {
+        "rank": "a78de23448e7bfabb7081b256f454e8cd7b3bb75a94a9285de48ab0049955a20",
+        "scoring_js": "37691b051b4e0170d16bceafeeaeef3b1029c527672454c06ed765032a6a6d6c",
+        "award_js": "6cea16d92232d69d5cf9173b59fc648bbc4fe9f9fbd3d024cd62cd897dde0e0d"
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 30,
+          "last_solved": 7,
+          "last_penalty_minutes": 775
+        },
+        "silver": {
+          "teams": 60,
+          "last_solved": 6,
+          "last_penalty_minutes": 1068
+        },
+        "bronze": {
+          "teams": 90,
+          "last_solved": 4,
+          "last_penalty_minutes": 590
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 7,
+          "safe_solved": 8
+        },
+        "silver": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "bronze": {
+          "max_outside_solved": 4,
+          "safe_solved": 5
+        }
+      },
+      "source_name": "2026 年第十二届中国大学生程序设计竞赛 长春站 正式赛",
+      "source_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
+      "sha256": {
+        "final_scoreboard": "5d50d152091681d3d4a9e7e001490f72857c25d94db7d65ec6528e5019211837"
+      }
     }
   },
   "problems": {
@@ -39126,6 +39224,740 @@
       "contest": "icpc-2018-青岛",
       "method": "standings-medal-v1",
       "standings_url": "https://rl.algoux.cn/collection/official?rankId=icpc2018qingdao"
+    },
+    "icpc-2026-西安:A": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:B": {
+      "rating": 3200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3000,
+        3400
+      ],
+      "statistical_rating": 3200,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:C": {
+      "rating": 1600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1400,
+        1800
+      ],
+      "statistical_rating": 1600,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 270,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 120
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:D": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 4,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 4,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:E": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:F": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 2,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 2,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:G": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 11,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 10,
+        "silver": 0,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:H": {
+      "rating": 2000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1800,
+        2200
+      ],
+      "statistical_rating": 2000,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 155,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 32
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:I": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:J": {
+      "rating": 1400,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1200,
+        1600
+      ],
+      "statistical_rating": 1400,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 302,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:K": {
+      "rating": 3100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2900,
+        3300
+      ],
+      "statistical_rating": 3100,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 3,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 3,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:L": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 7,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 7,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "icpc-2026-西安:M": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 391,
+      "official_teams": 402,
+      "medal_accepted": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "medal_teams": {
+        "gold": 41,
+        "silver": 82,
+        "bronze": 123
+      },
+      "contest": "icpc-2026-西安",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/xian?group=official"
+    },
+    "ccpc-2026-长春:A": {
+      "rating": 1200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1000,
+        1400
+      ],
+      "statistical_rating": 1200,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 256,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 30,
+        "silver": 59,
+        "bronze": 90
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:B": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 8,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 8,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:C": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 287,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:D": {
+      "rating": 3200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3000,
+        3400
+      ],
+      "statistical_rating": 3200,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:E": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 77,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 24,
+        "silver": 35,
+        "bronze": 16
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:F": {
+      "rating": 2700,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2500,
+        2900
+      ],
+      "statistical_rating": 2700,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 13,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 12,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:G": {
+      "rating": 2300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2100,
+        2500
+      ],
+      "statistical_rating": 2300,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 49,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 28,
+        "silver": 18,
+        "bronze": 3
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:H": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:I": {
+      "rating": 2200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2000,
+        2400
+      ],
+      "statistical_rating": 2200,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 71,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 27,
+        "silver": 33,
+        "bronze": 9
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:J": {
+      "rating": 900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1100
+      ],
+      "statistical_rating": 900,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 288,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:K": {
+      "rating": 1900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1700,
+        2100
+      ],
+      "statistical_rating": 1900,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 129,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 30,
+        "silver": 56,
+        "bronze": 39
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:L": {
+      "rating": 3000,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2800,
+        3200
+      ],
+      "statistical_rating": 3000,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 5,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 5,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "ccpc-2026-长春:M": {
+      "rating": 1700,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1500,
+        1900
+      ],
+      "statistical_rating": 1700,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 181,
+      "official_teams": 301,
+      "medal_accepted": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 73
+      },
+      "medal_teams": {
+        "gold": 30,
+        "silver": 60,
+        "bronze": 90
+      },
+      "contest": "ccpc-2026-长春",
+      "method": "standings-medal-v1",
+      "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
     }
   },
   "unrated_contests": {

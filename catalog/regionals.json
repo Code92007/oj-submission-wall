@@ -1,7 +1,308 @@
 {
-  "verified_at": "2026-10-15",
-  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links; 2018 Gym dashboards and Qingdao official statements; 2018–2019 ICPC official awards and CCPC full award tables; pinned anonymous historical final scoreboards",
+  "verified_at": "2026-10-18",
+  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links; 2018 Gym dashboards and Qingdao official statements; 2018–2019 ICPC official awards and CCPC full award tables; pinned anonymous historical final scoreboards; 2026 final scoreboard snapshots from official XCPCIO Xi’an and ICCPC Changchun",
   "contests": [
+    {
+      "id": "icpc-2026-西安",
+      "year": 2026,
+      "series": "ICPC",
+      "site": "西安",
+      "name": "2026 ICPC 西安站",
+      "date": "2026-10-18",
+      "source_url": "https://qoj.ac/contest/4580",
+      "ranklist_url": "https://board.xcpcio.com/icpc/51st/xian?group=official",
+      "problems": [
+        {
+          "id": "icpc-2026-西安:A",
+          "index": "A",
+          "name": "2026 ICPC 西安站 · A",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:B",
+          "index": "B",
+          "name": "2026 ICPC 西安站 · B",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:C",
+          "index": "C",
+          "name": "2026 ICPC 西安站 · C",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:D",
+          "index": "D",
+          "name": "2026 ICPC 西安站 · D",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:E",
+          "index": "E",
+          "name": "2026 ICPC 西安站 · E",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:F",
+          "index": "F",
+          "name": "2026 ICPC 西安站 · F",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:G",
+          "index": "G",
+          "name": "2026 ICPC 西安站 · G",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:H",
+          "index": "H",
+          "name": "2026 ICPC 西安站 · H",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:I",
+          "index": "I",
+          "name": "2026 ICPC 西安站 · I",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:J",
+          "index": "J",
+          "name": "2026 ICPC 西安站 · J",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:K",
+          "index": "K",
+          "name": "2026 ICPC 西安站 · K",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:L",
+          "index": "L",
+          "name": "2026 ICPC 西安站 · L",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "icpc-2026-西安:M",
+          "index": "M",
+          "name": "2026 ICPC 西安站 · M",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        }
+      ],
+      "qoj_contest_id": 4580,
+      "qoj_url": "https://qoj.ac/contest/4580",
+      "source_label": "QOJ（需受邀账号）",
+      "source_links": [
+        {
+          "url": "https://board.xcpcio.com/icpc/51st/xian?group=official",
+          "label": "原榜单"
+        }
+      ],
+      "mapping_note": "QOJ 4580 当前仅受邀账号可见；待账号登录核验题名和单题编号，保留原榜题序与完整评级。",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2026xian.json",
+        "source_url": "https://board.xcpcio.com/icpc/51st/xian?group=official",
+        "sha256": "e66c5abe62754c9900f3a45d8dd24de57c0670afdf1f258e7fbe3f994e3b3b00",
+        "expected_summary": {
+          "official_teams": 402,
+          "effective_teams": 393,
+          "excluded_teams": 16,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 41,
+              "last_solved": 4,
+              "last_penalty_minutes": 405
+            },
+            "silver": {
+              "teams": 82,
+              "last_solved": 4,
+              "last_penalty_minutes": 709
+            },
+            "bronze": {
+              "teams": 123,
+              "last_solved": 3,
+              "last_penalty_minutes": 736
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ccpc-2026-长春",
+      "year": 2026,
+      "series": "CCPC",
+      "site": "长春",
+      "name": "2026 CCPC 长春站",
+      "date": "2026-10-18",
+      "source_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
+      "ranklist_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
+      "problems": [
+        {
+          "id": "ccpc-2026-长春:A",
+          "index": "A",
+          "name": "又一道纸笔问题",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:B",
+          "index": "B",
+          "name": "别样的选课大战",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:C",
+          "index": "C",
+          "name": "无忧旋律",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:D",
+          "index": "D",
+          "name": "平均",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:E",
+          "index": "E",
+          "name": "遍历",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:F",
+          "index": "F",
+          "name": "删除",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:G",
+          "index": "G",
+          "name": "异或王国",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:H",
+          "index": "H",
+          "name": "数学王国",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:I",
+          "index": "I",
+          "name": "事不过三",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:J",
+          "index": "J",
+          "name": "送给好友的惊喜",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:K",
+          "index": "K",
+          "name": "纸带染色",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:L",
+          "index": "L",
+          "name": "故事",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        },
+        {
+          "id": "ccpc-2026-长春:M",
+          "index": "M",
+          "name": "余镜",
+          "aliases": [],
+          "mapping_status": "pending",
+          "unmapped": true
+        }
+      ],
+      "source_label": "原榜单（题目入口待公布）",
+      "mapping_source": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
+      "mapping_note": "题名与题序取自长春原榜；尚未公布可核验的在线做题链接，平台别名待补。",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2026changchun.json",
+        "source_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
+        "sha256": "5d50d152091681d3d4a9e7e001490f72857c25d94db7d65ec6528e5019211837",
+        "expected_summary": {
+          "official_teams": 301,
+          "effective_teams": 292,
+          "excluded_teams": 36,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 30,
+              "last_solved": 7,
+              "last_penalty_minutes": 775
+            },
+            "silver": {
+              "teams": 60,
+              "last_solved": 6,
+              "last_penalty_minutes": 1068
+            },
+            "bronze": {
+              "teams": 90,
+              "last_solved": 4,
+              "last_penalty_minutes": 590
+            }
+          }
+        }
+      }
+    },
     {
       "id": "ccpc-2025-Final",
       "year": 2025,
@@ -14774,5 +15075,5 @@
       }
     }
   ],
-  "scope": "2019–2025 中国 ICPC / CCPC 区域赛及 EC Final / CCPC Final 正赛目录（不含热身、预选和邀请赛）"
+  "scope": "2018–2026 中国 ICPC / CCPC 区域赛及 EC Final / CCPC Final 正赛目录（不含热身、预选和邀请赛；2026 当前收录西安与长春）"
 }
