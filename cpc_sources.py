@@ -169,6 +169,19 @@ class Scoreboards:
         xcpc = next((u for u in links if urlsplit(u).hostname in {'xcpcio.com', 'board.xcpcio.com'}), None)
         rankland = next((u for u in links if urlsplit(u).hostname == 'rl.algoux.cn'
                          and ('/ranklist/' in u or 'rankId=' in u)), None)
+        if not (xcpc or rankland):
+            # Some confirmed finals link only to PTA. Reuse the catalog's audited
+            # board for that exact edition; the adapter still checks date and team.
+            final = re.search(r'第\s*(\d+)\s*届\s*CCPC.*总决赛', participation.get('event', ''), re.I)
+            matches = [c for c in contests.values() if final and c.get('series') == 'CCPC'
+                       and c.get('year') == int(final[1]) + 2014 and c.get('site') == 'CCPC Final']
+            if len(matches) == 1:
+                source = matches[0].get('rating_evidence', {}).get('source_url', '')
+                parsed = urlsplit(source)
+                if (parsed.scheme == 'https' and parsed.hostname == 'rl.algoux.cn'
+                        and not parsed.username and not parsed.password and parsed.port in {None, 443}
+                        and re.fullmatch(r'/ranklist/[a-zA-Z0-9_-]+', parsed.path)):
+                    rankland = source
         # Direct DLUT links work even when CPC Finder is unavailable or has no profile.
         if cid and not (xcpc or rankland):
             cid = int(cid)

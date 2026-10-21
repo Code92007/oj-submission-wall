@@ -121,3 +121,37 @@ class ScoreboardTests(unittest.TestCase):
                     body=Scoreboards(self.root).prepare(None,participation,[],{contest['id']:contest})
                 self.assertEqual(body['contest_id'],contest['id'])
                 self.assertEqual(body['accepted'],['A'])
+
+    def test_pta_final_uses_audited_catalog_board_with_full_identity_checks(self):
+        url='https://rl.algoux.cn/ranklist/ccpc2025final'
+        participation={**self.participation,'date':'2026-04-26',
+            'event':'第 11 届 CCPC 中国大学生程序设计竞赛总决赛',
+            'ranklist_url':'https://pintia.cn/rankings/2046522266744168448'}
+        contest={**self.contest,'id':'ccpc-2025-Final','year':2025,'series':'CCPC',
+            'site':'CCPC Final','rating_evidence':{'source_url':url}}
+        srk={'type':'general','contest':{'startAt':'2026-04-26T10:00:00+08:00','duration':[5,'h']},
+            'problems':[{'alias':'A'},{'alias':'B'}], 'rows':[{'user':{'id':'row','name':'打星队',
+            'organization':'大连理工大学','teamMembers':['甲','乙','丙']},
+            'statuses':[{'result':'AC','time':[120,'min']},{'result':None}]}]}
+        raw=('<script>window.__INITIAL_STATE__='+json.dumps(json.dumps({'ranklistData':{'srk':srk}}))+';</script>').encode()
+        boards=Scoreboards(self.root)
+        with patch('cpc_sources.public_bytes',return_value=raw) as fetch:
+            body=boards.prepare(None,participation,['甲','乙','丙'],{contest['id']:contest})
+        self.assertEqual(body['contest_id'],'ccpc-2025-Final')
+        self.assertEqual(body['source_url'],url)
+        self.assertEqual(body['dlut_ranklist_url'],participation['ranklist_url'])
+        self.assertEqual(body['accepted'],['A'])
+        fetch.assert_called_once_with(url)
+        for changes,names in [({'date':'2026-04-27'},['甲','乙','丙']),
+                              ({'team':'其他队伍'},['甲','乙','丙']), ({},['甲','乙','其他队员'])]:
+            with self.subTest(changes=changes,names=names), patch('cpc_sources.public_bytes',return_value=raw):
+                with self.assertRaises(ValueError):
+                    boards.prepare(None,{**participation,**changes},names,{contest['id']:contest})
+        for source in ['https://127.0.0.1/private','https://name:password@rl.algoux.cn/ranklist/ccpc2025final']:
+            with self.subTest(source=source), patch('cpc_sources.public_bytes') as fetch:
+                invalid={**contest,'rating_evidence':{'source_url':source}}
+                with self.assertRaises(ValueError):boards.prepare(None,participation,['甲','乙','丙'],{'final':invalid})
+                fetch.assert_not_called()
+        with patch('cpc_sources.public_bytes') as fetch:
+            with self.assertRaises(ValueError):boards.prepare(None,participation,['甲','乙','丙'],{'first':contest,'second':contest})
+            fetch.assert_not_called()
