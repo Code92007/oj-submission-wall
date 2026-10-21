@@ -1,5 +1,6 @@
 import json
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -98,3 +99,121 @@ class CpcTests(unittest.TestCase):
         self.assertEqual(saved['problem_aliases'],{})
         self.assertEqual(self.service.contests[cid]['problems'],[])
         self.assertNotIn(cid+':B',self.service.problem_ids)
+
+    def seed_wall_onsite(self):
+        self.person = 'person'
+        self.contest = {**self.service.contests['icpc-2024-杭州'], 'date': '2024-11-17'}
+        with self.service.db() as db:
+            db.execute("insert into users(id,username,email,display_name,password_hash,created_at) values(1,'member','member@example.com','成员','unused',0)")
+            subject = self.service.subject(db, '1')
+            self.remote = {'roster': {'members': [], 'redirects': {}, 'participations': [
+                {'id': 'participation', 'members': [self.person], 'team': '现场队伍',
+                 'date': self.contest['date'], 'event': self.contest['name'], 'official': False}]},
+                'claims': [{'id': 'claim', 'subject': subject, 'person': self.person, 'status': 'approved', 'updated': 1}]}
+        self.save_wall_remote()
+        self.evidence = {'confirmed': True, 'contest_id': self.contest['id'], 'accepted': ['A', 'B'],
+            'source_url': 'https://example.com/final', 'source_row': 'team-row',
+            'participation_id': 'participation', 'team': '现场队伍'}
+        self.evidence_id = self.service.import_onsite(self.evidence)
+
+    def save_wall_remote(self, checked=None):
+        with self.service.db() as db:
+            db.execute('insert or replace into cpc_remote values(1,?,?)',
+                       (json.dumps(self.remote), int(time.time()) if checked is None else checked))
+
+    def wall_overview(self, feed_limit=0):
+        with patch.object(app, 'get_cpc_service', return_value=self.service), patch.object(app, 'OVERVIEW_FEED_LIMIT', feed_limit):
+            return app.build_overview_from_db(None)
+
+    def test_verified_onsite_appears_in_feed_statistics_and_handle_filter(self):
+        self.seed_wall_onsite()
+        overview = self.wall_overview()
+        member = overview['members'][0]
+        self.assertEqual(member['stats']['allTimeAccepted'], 2)
+        self.assertEqual(member['days'][self.contest['date']], {'accepted': 2, 'total': 2})
+        self.assertEqual(member['handles'][0]['activity']['stats']['allTimeAccepted'], 2)
+        self.assertEqual(len(overview['feed']), 2)
+        row = overview['feed'][0]
+        self.assertEqual((row['platformLabel'], row['handle'], row['source']), ('区域赛现场', '现场队伍', 'cpc-onsite'))
+        self.assertEqual((row['submittedDate'], row['submittedPrecision']), (self.contest['date'], 'date'))
+        self.assertEqual(row['url'], self.evidence['source_url'])
+        with patch.object(app, 'get_cpc_service', return_value=self.service):
+            insights = app.build_insights(None, 'user:1')
+        self.assertEqual(insights['summaries']['all']['careerSolved'], 2)
+        self.assertEqual(insights['summaries']['regional']['acceptedSubmissions'], 2)
+        self.assertIn({'key': 'regional', 'label': '区域赛现场'}, insights['platforms'])
+        # The regional API must retain its onsite attribution and team eligibility.
+        progress = self.service.progress('1')
+        self.assertTrue(progress['problems'][self.contest['id'] + ':A']['onsite'])
+        self.assertFalse(progress['problems'][self.contest['id'] + ':A']['personal'])
+        self.assertFalse(progress['onsite_contests'][0]['official'])
+
+    def test_online_and_onsite_ac_share_solved_key_but_keep_both_records(self):
+        self.seed_wall_onsite()
+        problem = self.contest['problems'][0]
+        aliases = [alias.split(':', 1) for alias in problem['aliases']]
+        for platform, pid in aliases:
+            self.assertEqual(app.canonical_problem_key(platform, pid), app.canonical_problem_key('regional', problem['id']))
+        platform, pid = aliases[0]
+        with self.service.db() as db:
+            db.execute("insert into handles(owner_type,owner_id,platform,handle,created_at) values('user','1',?,'online',0)", (platform,))
+            db.execute("insert into submissions(owner_type,owner_id,platform,handle,remote_id,problem_id,verdict,submitted_at,created_at) values('user','1',?,'online','online-ac',?,'AC',?,0)",
+                       (platform, pid, int(time.time())))
+        overview = self.wall_overview(feed_limit=1)
+        self.assertEqual(len(overview['feed']), 3)
+        self.assertEqual(overview['members'][0]['stats']['allTimeAccepted'], 2)
+        with patch.object(app, 'get_cpc_service', return_value=self.service):
+            insights = app.build_insights(None, 'user:1')
+        self.assertEqual(insights['summaries']['all']['careerSolved'], 2)
+        self.assertEqual(insights['summaries']['all']['acceptedSubmissions'], 3)
+
+    def test_duplicate_evidence_is_idempotent_and_rejudging_removes_old_ac(self):
+        self.seed_wall_onsite()
+        extra = self.service.import_onsite({**self.evidence, 'source_row': 'second-audit'})
+        first = self.wall_overview()['feed']
+        self.assertEqual(len(first), 2)
+        self.assertEqual(self.wall_overview()['feed'], first)
+        self.service.import_onsite({**self.evidence, 'accepted': ['A']})
+        self.assertEqual(len(self.wall_overview()['feed']), 2)
+        self.service.revoke_onsite(extra)
+        rows = self.wall_overview()['feed']
+        self.assertEqual([r['problemId'] for r in rows], [self.contest['id'] + ':A'])
+        with self.service.db() as db:
+            self.assertEqual(db.execute('select count(*) from submissions').fetchone()[0], 0)
+
+    def test_revoked_expired_and_pending_identity_remove_onsite_records(self):
+        self.seed_wall_onsite()
+        with self.service.db() as db:
+            db.execute("insert into submissions(owner_type,owner_id,platform,handle,remote_id,problem_id,verdict,submitted_at,created_at) values('user','1','codeforces','personal','42','1A','AC',1,1)")
+        for status in ['revoked', 'pending', 'rejected']:
+            self.remote['claims'][0]['status'] = status
+            self.save_wall_remote()
+            self.assertEqual([r['remoteId'] for r in self.wall_overview()['feed']], ['42'])
+        self.remote['claims'][0]['status'] = 'approved'
+        self.save_wall_remote(checked=int(time.time()) - 86401)
+        self.assertEqual([r['remoteId'] for r in self.wall_overview()['feed']], ['42'])
+        self.save_wall_remote()
+        self.assertEqual(len(self.wall_overview()['feed']), 3)
+
+    def test_onsite_attribution_is_limited_to_the_approved_account(self):
+        self.seed_wall_onsite()
+        with self.service.db() as db:
+            db.execute("insert into users(id,username,email,display_name,password_hash,created_at) values(2,'other','other@example.com','其他成员','unused',1)")
+            self.service.subject(db, '2')
+        overview = self.wall_overview()
+        members = {m['ownerId']: m for m in overview['members']}
+        self.assertEqual(members['1']['stats']['allTimeAccepted'], 2)
+        self.assertEqual(members['2']['stats']['allTimeAccepted'], 0)
+        self.assertTrue(all(r['ownerId'] == '1' for r in overview['feed']))
+
+    def test_identity_redirect_and_unmapped_problem_keep_verified_onsite_coverage(self):
+        self.seed_wall_onsite()
+        self.remote['roster']['redirects'] = {self.person: 'merged-person'}
+        self.remote['roster']['participations'][0]['members'] = ['merged-person']
+        self.save_wall_remote()
+        with self.service.db() as db:
+            body = {**self.evidence, 'accepted': ['unmapped-contest:Z']}
+            db.execute('update cpc_onsite set body=? where id=?', (json.dumps(body), self.evidence_id))
+        overview = self.wall_overview()
+        self.assertEqual(overview['members'][0]['stats']['allTimeAccepted'], 1)
+        self.assertEqual(overview['feed'][0]['problemId'], 'unmapped-contest:Z')

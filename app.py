@@ -25,6 +25,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from email.message import EmailMessage
+from functools import lru_cache
 from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -1030,7 +1031,7 @@ def is_activity_placeholder(row: sqlite3.Row, raw: dict | None = None) -> bool:
     return False
 
 
-def canonical_problem_key(
+def source_canonical_problem_key(
     platform: str,
     problem_id: str = "",
     problem_name: str = "",
@@ -1092,6 +1093,45 @@ def canonical_problem_key(
 
     fallback = problem_id or problem_name or remote_id
     return f"{platform}:{normalize_problem_text_key(fallback)}"
+
+
+@lru_cache(maxsize=4)
+def regional_problem_aliases(path: str) -> dict[str, str]:
+    from cpc_common import catalog
+    _, aliases = catalog(path)
+    return {source_canonical_problem_key(*alias.split(":", 1)): f"regional:{pid}"
+            for alias, pid in aliases.items()}
+
+
+def canonical_problem_key(platform: str, problem_id: str = "", problem_name: str = "",
+                          remote_id: str = "", raw: dict | None = None) -> str:
+    if platform == "regional":
+        alias = (raw or {}).get("onlineAlias")
+        if alias:
+            return canonical_problem_key(*alias.split(":", 1))
+        return f"regional:{problem_id}"
+    key = source_canonical_problem_key(platform, problem_id, problem_name, remote_id, raw)
+    path = str(os.environ.get("CPC_CATALOG_PATH", ROOT / "catalog/regionals.json"))
+    return regional_problem_aliases(path).get(key, key)
+
+
+def platform_label(platform: str) -> str:
+    adapter = ADAPTERS.get(platform)
+    return "区域赛现场" if platform == "regional" else adapter.label if adapter else platform
+
+
+def prepare_wall_submissions(conn: sqlite3.Connection) -> None:
+    """Keep the shared feed and statistics in SQL, with a per-request onsite projection."""
+    if conn.execute("SELECT 1 FROM sqlite_temp_master WHERE name='wall_submissions'").fetchone():
+        return
+    conn.execute("CREATE TEMP TABLE cpc_wall_submissions AS SELECT * FROM main.submissions WHERE 0")
+    if conn.execute("SELECT 1 FROM sqlite_master WHERE name='cpc_remote'").fetchone():
+        rows = get_cpc_service().wall_submissions(conn)
+        if rows:
+            columns = list(rows[0])
+            conn.executemany(f"INSERT INTO cpc_wall_submissions ({','.join(columns)}) VALUES ({','.join('?' for _ in columns)})",
+                             [[row[column] for column in columns] for row in rows])
+    conn.execute("CREATE TEMP VIEW wall_submissions AS SELECT * FROM main.submissions UNION ALL SELECT * FROM cpc_wall_submissions")
 
 
 class OJAdapter:
@@ -4761,6 +4801,7 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
     start_date = dt.datetime.fromtimestamp(start_ts, DISPLAY_TZ).date()
     month_start_date = today_date - dt.timedelta(days=29)
     with connect_db() as conn:
+        prepare_wall_submissions(conn)
         owners: dict[tuple[str, str], dict] = {}
 
         user_rows = conn.execute(
@@ -4821,10 +4862,20 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
                         owners[key]["_handle_stats"].append(stats)
                         handle_json["activity"]["_handle_stats"].append(dict(stats))
 
+        for row in conn.execute("SELECT DISTINCT owner_type,owner_id,platform,handle FROM cpc_wall_submissions"):
+            key = (row["owner_type"], row["owner_id"])
+            if key not in owners:
+                continue
+            activity = empty_activity()
+            owners[key]["handles"].append({"id": f"regional:{row['owner_id']}:{row['handle']}",
+                "platform": "regional", "platformLabel": platform_label("regional"),
+                "handle": row["handle"], "displayHandle": row["handle"], "activity": activity})
+            owners[key]["_handle_activities"][handle_activity_key("regional", row["handle"])] = activity
+
         sub_rows = conn.execute(
             """
             SELECT owner_type, owner_id, platform, handle, remote_id, problem_id, problem_name, verdict, submitted_at, raw_json
-            FROM submissions
+            FROM wall_submissions
             ORDER BY submitted_at
             """
         ).fetchall()
@@ -4886,6 +4937,9 @@ def build_overview_from_db(principal: dict | None, days: int = 365) -> dict:
             feed_sql += " LIMIT ?"
             feed_params = (feed_limit,)
         feed_rows = conn.execute(feed_sql, feed_params).fetchall()
+        # Audited historical ACs must remain available to the regional/date filters.
+        feed_rows.extend(conn.execute("SELECT * FROM cpc_wall_submissions").fetchall())
+        feed_rows.sort(key=lambda row: (row["submitted_at"], row["id"]), reverse=True)
         feed = []
         for row in feed_rows:
             key = (row["owner_type"], row["owner_id"])
@@ -5039,14 +5093,14 @@ def contest_to_json(row: sqlite3.Row) -> dict:
 
 
 def submission_to_json(conn: sqlite3.Connection, row: sqlite3.Row) -> dict:
-    adapter = ADAPTERS.get(row["platform"])
+    raw = raw_json_dict(row)
     return {
         "id": row["id"],
         "ownerType": row["owner_type"],
         "ownerId": row["owner_id"],
         "displayName": owner_display_name(conn, row["owner_type"], row["owner_id"]),
         "platform": row["platform"],
-        "platformLabel": adapter.label if adapter else row["platform"],
+        "platformLabel": platform_label(row["platform"]),
         "handle": row["handle"],
         "remoteId": row["remote_id"],
         "problemId": row["problem_id"],
@@ -5056,6 +5110,8 @@ def submission_to_json(conn: sqlite3.Connection, row: sqlite3.Row) -> dict:
         "submittedAt": iso_from_ts(row["submitted_at"]),
         "submittedDate": utc_date_from_ts(row["submitted_at"]),
         "url": row["url"],
+        "source": raw.get("source"),
+        "submittedPrecision": raw.get("datePrecision", "second"),
     }
 
 
@@ -5391,6 +5447,7 @@ def build_insights(principal: dict | None, member_key: str = "all") -> dict:
     today = dt.datetime.fromtimestamp(now, DISPLAY_TZ).date()
     earliest = today - dt.timedelta(days=3649)
     with connect_db() as conn:
+        prepare_wall_submissions(conn)
         owners = visible_battle_owners(conn, principal)
         if member_key != "all" and member_key not in owners:
             raise ValueError("找不到这个成员")
@@ -5432,9 +5489,11 @@ def build_insights(principal: dict | None, member_key: str = "all") -> dict:
             (str(row["owner_type"]), str(row["owner_id"]), str(row["platform"]), str(row["handle"]))
             for row in handle_rows
         }
+        active_handles.update((row["owner_type"], row["owner_id"], row["platform"], row["handle"])
+                              for row in conn.execute("SELECT DISTINCT owner_type,owner_id,platform,handle FROM cpc_wall_submissions"))
         submission_rows = battle_union_rows(
             conn,
-            "submissions",
+            "wall_submissions",
             "*",
             owner_tuples,
             order_by="submitted_at, id",
@@ -5579,11 +5638,10 @@ def build_insights(principal: dict | None, member_key: str = "all") -> dict:
             ]
             if not buckets:
                 continue
-            adapter = ADAPTERS.get(platform)
             difficulty.append(
                 {
                     "platform": platform,
-                    "platformLabel": adapter.label if adapter else platform,
+                    "platformLabel": platform_label(platform),
                     "total": sum(item["count"] for item in buckets),
                     "buckets": buckets,
                 }
@@ -5680,8 +5738,7 @@ def build_insights(principal: dict | None, member_key: str = "all") -> dict:
         platform_keys.update(item["platform"] for item in ratings)
         platforms = []
         for platform in sorted(platform_keys, key=lambda key: (platform_order.get(key, 999), key)):
-            adapter = ADAPTERS.get(platform)
-            platforms.append({"key": platform, "label": adapter.label if adapter else platform})
+            platforms.append({"key": platform, "label": platform_label(platform)})
 
         return {
             "memberKey": member_key,
@@ -6444,7 +6501,7 @@ _cpc_lock = threading.Lock()
 def get_cpc_service():
     global _cpc_service
     with _cpc_lock:
-        if _cpc_service is None:
+        if _cpc_service is None or _cpc_service.path != DB_PATH:
             _cpc_service = CpcIntegration(sys.modules[__name__])
         return _cpc_service
 

@@ -1,5 +1,6 @@
-"""Internal regional progress. Existing submissions remain untouched."""
+"""Regional progress and verified onsite records for the submission wall."""
 from __future__ import annotations
+import datetime as dt
 import json
 import os
 import secrets
@@ -202,27 +203,78 @@ class Integration:
             row = db.execute('select owner from cpc_read_tokens where hash=? and expires>?', (digest(token), int(time.time()))).fetchone()
         return row['owner'] if row else None
 
+    def onsite_context(self, db, owner, remote, checked):
+        row = db.execute("select uid from cpc_ids where kind='subject' and local_id=?", (str(owner),)).fetchone()
+        claims = [c for c in remote['claims'] if row and c['subject'] == row['uid']]
+        claim = max(claims, key=lambda c: (c['status']=='approved', c['status']=='pending', c['updated'], c['id']), default=None)
+        identity = dict(claim or {'status': 'unverified'})
+        identity['authority_id'] = remote['roster'].get('authority_id')
+        identity['verified_until'] = checked + 86400
+        person = claim['person'] if claim and claim['status'] == 'approved' and checked + 86400 > time.time() else None
+        redirects = remote['roster']['redirects']
+        visited = set()
+        while person in redirects and person not in visited:
+            visited.add(person)
+            person = redirects[person]
+        identity['person'] = person
+        participations = {p['id']: p for p in remote['roster']['participations'] if person and person in p['members']}
+        rows = [(r, json.loads(r['body'])) for r in db.execute('select * from cpc_onsite where active=1')
+                if r['participation'] in participations]
+        return identity, participations, rows
+
+    def wall_submissions(self, db):
+        """Project one team AC per participation/problem using the current identity snapshot."""
+        remote, checked = self.remote(db)
+        if checked + 86400 <= time.time():
+            return []
+        problems = {p['id']: (c, p) for c in self.contests.values() for p in c['problems']}
+        result = []
+        for owner in db.execute("select id from users"):
+            _, participations, evidence_rows = self.onsite_context(db, owner['id'], remote, checked)
+            grouped = {}
+            for row, evidence in evidence_rows:
+                participation = participations[row['participation']]
+                for original_pid in evidence['accepted']:
+                    alias = evidence.get('problem_aliases', {}).get(original_pid)
+                    pid = self.aliases.get(alias, original_pid) if alias else original_pid
+                    key = (row['participation'], pid)
+                    entry = grouped.setdefault(key, {'evidence': [], 'alias': alias, 'contest': row['contest']})
+                    if alias:
+                        entry['alias'] = alias
+                    entry['evidence'].append(row['id'])
+                    # Stable source selection when multiple audited rows cover the same AC.
+                    if 'source' not in entry or row['id'] < entry['source_id']:
+                        entry.update(source=evidence['source_url'], source_id=row['id'])
+            for (participation_id, pid), entry in grouped.items():
+                participation = participations[participation_id]
+                contest, problem = problems.get(pid, ({}, {}))
+                label = problem.get('index', pid.rsplit(':', 1)[-1])
+                name = contest.get('name') or participation.get('event') or entry['contest']
+                title = problem.get('title') or problem.get('name') or ''
+                date = dt.date.fromisoformat(participation['date'])
+                submitted_at = int(dt.datetime.combine(date, dt.time.min, tzinfo=self.app.DISPLAY_TZ).timestamp())
+                remote_id = digest(participation_id + '|' + pid)
+                raw = {'source': 'cpc-onsite', 'participationId': participation_id,
+                       'evidenceIds': sorted(entry['evidence']), 'team': participation['team'],
+                       'official': participation.get('official'), 'datePrecision': 'date',
+                       'onlineAlias': entry['alias']}
+                result.append({'id': -int(digest(str(owner['id']) + '|' + remote_id)[:13], 16) - 1,
+                    'owner_type': 'user', 'owner_id': str(owner['id']), 'platform': 'regional',
+                    'handle': participation['team'], 'remote_id': remote_id, 'problem_id': pid,
+                    'problem_name': title if title.startswith(name) else f'{name} {label}' + (f' · {title}' if title else ''),
+                    'verdict': 'AC', 'language': None, 'submitted_at': submitted_at,
+                    'url': entry['source'], 'raw_json': json.dumps(raw, ensure_ascii=False),
+                    'created_at': submitted_at})
+        return result
+
     def progress(self, owner):
         with self.db() as db:
             remote, checked = self.remote(db)
             subject = self.subject(db, owner)
-            claims = [c for c in remote['claims'] if c['subject'] == subject]
-            claim = max(claims, key=lambda c: (c['status']=='approved', c['status']=='pending', c['updated'], c['id']), default=None)
-            identity = dict(claim or {'status': 'unverified'})
-            identity['authority_id'] = remote['roster'].get('authority_id')
-            identity['verified_until'] = checked + 86400
-            person = claim['person'] if claim and claim['status'] == 'approved' and checked + 86400 > time.time() else None
-            redirects = remote['roster']['redirects']
-            visited = set()
-            while person in redirects and person not in visited:
-                visited.add(person)
-                person = redirects[person]
-            identity['person'] = person
+            identity, participations, onsite_rows = self.onsite_context(db, owner, remote, checked)
+            person = identity['person']
             result = {}
             unmatched = set()
-            participations = {p['id']: p for p in remote['roster']['participations'] if person and person in p['members']}
-            onsite_rows = [(row, json.loads(row['body'])) for row in db.execute('select * from cpc_onsite where active=1')
-                           if row['participation'] in participations]
             aliases = dict(self.aliases)
             extra_aliases = {}
             for _, evidence in onsite_rows:

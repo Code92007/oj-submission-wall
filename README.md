@@ -150,7 +150,7 @@ LeetCode 公开接口只提供完整活动日历、题量/难度汇总和近期 
 | `HISTORICAL_CACHE_TTL_SECONDS` | `315360000` | 历史页缓存有效期，默认约 10 年 |
 | `OVERVIEW_CACHE_TTL_SECONDS` | `20` | `/api/overview` 页面组装结果的内存缓存秒数 |
 | `BATTLE_MEMORY_CACHE_LIMIT` | `128` | 对战短缓存的最大双人组合数，防止多人排名组合过多占用内存 |
-| `OVERVIEW_FEED_LIMIT` | `1000` | `/api/overview` 返回的最近提交明细条数上限，统计仍基于库内全量历史记录 |
+| `OVERVIEW_FEED_LIMIT` | `1000` | `/api/overview` 返回的最近线上提交明细条数上限；另附全部有效现场 AC，统计仍基于全量历史记录 |
 | `OJ_USER_AGENT` | `OJSubmissionWall/1.0` | 外部 OJ 请求的 User-Agent，生产环境建议包含你的站点地址 |
 | `LUOGU_USER_AGENT` | `OJSubmissionWall/1.0` | 洛谷请求的 User-Agent，生产环境建议包含你的站点地址 |
 | `LUOGU_CF_CLEARANCE` | 空 | 可选：服务器同出口浏览器合法通过 Cloudflare 后拿到的 `cf_clearance` 值，不是登录态 |
@@ -239,7 +239,7 @@ QOJ 只使用浏览器手动导入，不进行服务器抓取。脚本解析提�
 
 ## 可选成员认证与区域赛进度
 
-登录后进入 `/regionals`，查看本人个人/团队线上通过、申请 DLUT CPC 成员认证并生成 CF Bot 只读连接码。成员认证由 DLUT CPC 管理员核验；现场逐题成绩由本站管理员核验榜单后导入，首版不自动抓取外站。默认进度包含个人线上与现场队伍通过，可勾选团队线上记录；口胡仍由 CF Bot 独立负责。
+登录后进入 `/regionals`，查看本人个人/团队线上通过、申请 DLUT CPC 成员认证并生成 CF Bot 只读连接码。成员认证由 DLUT CPC 管理员核验，通过后自动同步已确认参赛名单的逐题现场成绩。现场 AC 同时计入 wall 总提交、解题统计及热力图，标记“区域赛现场”并保留队名和原榜链接，按比赛日期归档；与线上记录按规范题号去重统计解题数。默认区域赛进度包含个人线上与现场队伍通过，可勾选团队线上记录；口胡仍由 CF Bot 独立负责。
 
 配置 `CPC_DLUT_URL`、`CPC_DLUT_AUTHORITY_ID`、`CPC_SYNC_TOKEN` 后启用名单同步；管理员用 `python tools/cpc_admin.py meta|sync|rosters` 查询，`import 文件.json` 预览、追加 `--confirm` 确认导入。运行库包含稳定 UUID、认证快照、现场证据及连接码校验记录，迁移时必须一致备份。
 

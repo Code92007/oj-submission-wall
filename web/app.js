@@ -2460,7 +2460,8 @@ function renderMemberSubmissions(member, view = memberActivityView(member)) {
     const row = document.createElement("tr");
 
     const time = el("td", "feed-time");
-    time.textContent = formatFullDateTime(item.submittedAt);
+    time.textContent = item.submittedPrecision === "date" ? item.submittedDate : formatFullDateTime(item.submittedAt);
+    if (item.source === "cpc-onsite") time.title = "现场成绩按比赛日期归档";
 
     const platform = el("td", "feed-platform");
     const platformLabel = el("span", "platform-badge");
@@ -2490,7 +2491,7 @@ function renderMemberSubmissions(member, view = memberActivityView(member)) {
     const result = el("td", "feed-result");
     const verdict = el("span", `verdict ${verdictClass(item.verdict)}`);
     verdict.textContent = verdictLabel(item.verdict);
-    verdict.title = item.verdict || "UNKNOWN";
+    verdict.title = item.source === "cpc-onsite" ? "已认证的现场队伍通过" : item.verdict || "UNKNOWN";
     result.appendChild(verdict);
 
     row.append(time, platform, account, problem, language, result);
@@ -2873,7 +2874,8 @@ function renderFeed() {
     const row = document.createElement("tr");
 
     const time = el("td", "feed-time");
-    time.textContent = formatFullDateTime(item.submittedAt);
+    time.textContent = item.submittedPrecision === "date" ? item.submittedDate : formatFullDateTime(item.submittedAt);
+    if (item.source === "cpc-onsite") time.title = "现场成绩按比赛日期归档";
 
     const platform = el("td", "feed-platform");
     const platformLabel = el("span", "platform-badge");
@@ -2907,7 +2909,7 @@ function renderFeed() {
     const result = el("td", "feed-result");
     const verdict = el("span", `verdict ${verdictClass(item.verdict)}`);
     verdict.textContent = verdictLabel(item.verdict);
-    verdict.title = item.verdict || "UNKNOWN";
+    verdict.title = item.source === "cpc-onsite" ? "已认证的现场队伍通过" : item.verdict || "UNKNOWN";
     result.appendChild(verdict);
 
     row.append(time, platform, user, account, problem, language, result);
