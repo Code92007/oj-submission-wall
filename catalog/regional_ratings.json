@@ -5314,6 +5314,56 @@
       "sha256": {
         "final_scoreboard": "5d50d152091681d3d4a9e7e001490f72857c25d94db7d65ec6528e5019211837"
       }
+    },
+    "icpc-2026-成都": {
+      "official_teams": 319,
+      "effective_teams": 315,
+      "excluded_teams": 9,
+      "duration_seconds": 18000,
+      "medal_rule": "XCPCIO config.medal.official：金银铜分别枚数，累计为名次分界",
+      "medal_source_url": "https://board.xcpcio.com/data/icpc/51st/chengdu/config.json",
+      "original_source_sha256": {
+        "https://board.xcpcio.com/data/icpc/51st/chengdu/config.json": "c8eb1b245222b142acd258f57a9d1c22c6f3c83e3b0a42128a2e45b0c0cab1bc",
+        "https://board.xcpcio.com/data/icpc/51st/chengdu/team.json": "6eed84cf007f659a3f761cfa5fa8624ed3c1621246a628757e824afab312798f",
+        "https://board.xcpcio.com/data/icpc/51st/chengdu/run.json": "7b09e7b9dc26eabff04de049e1a1ef91fd2bb89996ba043fe0a1eec3db7dae8c",
+        "https://rl.algoux.cn/ranklist/icpc2026chengdu": "be7d3b611a344ac59099a29fe3e7e9d0ad023d952d1e57641bec6d01507fba26"
+      },
+      "medal_boundaries": {
+        "gold": {
+          "teams": 32,
+          "last_solved": 6,
+          "last_penalty_minutes": 833
+        },
+        "silver": {
+          "teams": 64,
+          "last_solved": 5,
+          "last_penalty_minutes": 782
+        },
+        "bronze": {
+          "teams": 96,
+          "last_solved": 3,
+          "last_penalty_minutes": 416
+        }
+      },
+      "medal_safety": {
+        "gold": {
+          "max_outside_solved": 6,
+          "safe_solved": 7
+        },
+        "silver": {
+          "max_outside_solved": 5,
+          "safe_solved": 6
+        },
+        "bronze": {
+          "max_outside_solved": 3,
+          "safe_solved": 4
+        }
+      },
+      "source_name": "「华为杯」第 51 届 ICPC 国际大学生程序设计竞赛区域赛成都站 - 正式赛",
+      "source_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official",
+      "sha256": {
+        "final_scoreboard": "30f06f0b7ee316ace34a5cf0cb031ef011a098b5a8b03e54b20de824cd388b3d"
+      }
     }
   },
   "problems": {
@@ -39958,6 +40008,376 @@
       "contest": "ccpc-2026-长春",
       "method": "standings-medal-v1",
       "standings_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72"
+    },
+    "icpc-2026-成都:A": {
+      "rating": 2800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2600,
+        3000
+      ],
+      "statistical_rating": 2800,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 11,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 11,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:B": {
+      "rating": 3200,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3000,
+        3400
+      ],
+      "statistical_rating": 3200,
+      "model_rating": null,
+      "constraints": [
+        "通过队数不超过 max(2,金牌队数×5%)：下限 2800"
+      ],
+      "accepted_teams": 1,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 1,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:C": {
+      "rating": 1900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1700,
+        2100
+      ],
+      "statistical_rating": 1900,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 129,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 32,
+        "silver": 61,
+        "bronze": 34
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:D": {
+      "rating": 800,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        800,
+        1000
+      ],
+      "statistical_rating": 800,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 312,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:E": {
+      "rating": 2500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2300,
+        2700
+      ],
+      "statistical_rating": 2500,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 31,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 23,
+        "silver": 8,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:F": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:G": {
+      "rating": 2900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2700,
+        3100
+      ],
+      "statistical_rating": 2900,
+      "model_rating": null,
+      "constraints": [],
+      "accepted_teams": 9,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 8,
+        "silver": 1,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:H": {
+      "rating": 2600,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        2400,
+        2700
+      ],
+      "statistical_rating": 2600,
+      "model_rating": null,
+      "constraints": [
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 26,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 20,
+        "silver": 5,
+        "bronze": 1
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:I": {
+      "rating": 1900,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1700,
+        2100
+      ],
+      "statistical_rating": 1900,
+      "model_rating": null,
+      "constraints": [
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 131,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 32,
+        "silver": 62,
+        "bronze": 36
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:J": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:K": {
+      "rating": 1500,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        1300,
+        1700
+      ],
+      "statistical_rating": 1500,
+      "model_rating": null,
+      "constraints": [
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 219,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 93
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:L": {
+      "rating": 3300,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        3100,
+        3500
+      ],
+      "statistical_rating": 3300,
+      "model_rating": null,
+      "constraints": [
+        "正式队零通过：下限 3100，稀疏证据"
+      ],
+      "accepted_teams": 0,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
+    },
+    "icpc-2026-成都:M": {
+      "rating": 1100,
+      "source": "赛时通过队数 + 金银铜牌约束，非官方 Rating",
+      "range": [
+        900,
+        1300
+      ],
+      "statistical_rating": 1100,
+      "model_rating": null,
+      "constraints": [
+        "正式队通过率至少 80%：上限 1400",
+        "bronze 队通过率至少 60%：上限 1900",
+        "silver 队通过率至少 60%：上限 2300",
+        "gold 队通过率至少 60%：上限 2700"
+      ],
+      "accepted_teams": 283,
+      "official_teams": 319,
+      "medal_accepted": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "medal_teams": {
+        "gold": 32,
+        "silver": 64,
+        "bronze": 96
+      },
+      "contest": "icpc-2026-成都",
+      "method": "standings-medal-v1",
+      "standings_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official"
     }
   },
   "unrated_contests": {

@@ -1,4 +1,26 @@
-# 2026 西安 / 长春题目与离线评级
+# 2026 西安 / 长春 / 成都题目与离线评级
+
+2026-10-29：新增 [2026 ICPC 成都站 QOJ 4600](https://qoj.ac/contest/4600)，逐行核验 A–M 题名与单题编号 23592–23604。根据 [XCPCIO 正式赛原榜](https://board.xcpcio.com/icpc/51st/chengdu?group=official)的完整 4004 条提交重建终榜，并与 [RankLand 归档](https://rl.algoux.cn/ranklist/icpc2026chengdu)逐队核对全部 328 队的正式资格、逐题 AC、题数和罚时；319 支正式队中 315 支有 AC，9 支打星队不参与评级。金银铜分别为 32 / 64 / 96 队，末队为 6 题 833 分钟、5 题 782 分钟、3 题 416 分钟，稳牌题数为 7 / 6 / 4。
+
+沿用 `standings-medal-v1`，不加入题面模型估分；旧 1218 题评级及 96 场统计逐项保持原值。合计 104 场、1303 题，其中 97 场、1231 题已评级。
+
+| 题号 | 成都题名 | Rating | 正式通过队数 / 319 |
+| --- | --- | ---: | ---: |
+| A | Average of Averages | 2800 | 11 |
+| B | Bouncing Particles | 3200 | 1 |
+| C | Counting Arrays | 1900 | 129 |
+| D | Duel of Wrath | 800 | 312 |
+| E | Enclose the Point | 2500 | 31 |
+| F | First Word | 3300 | 0 |
+| G | Graph Reconstruction | 2900 | 9 |
+| H | Hidden Order | 2600 | 26 |
+| I | Invisible Edges | 1900 | 131 |
+| J | Joint Relocation | 3300 | 0 |
+| K | Keep Your Distance | 1500 | 219 |
+| L | Long Slides | 3300 | 0 |
+| M | Minimum Records | 1100 | 283 |
+
+成都匿名终榜快照为 `catalog/historical_standings/icpc2026chengdu.json`，原榜 config/team/run 的 URL、SHA-256、交叉核验说明和快照哈希保存在 `catalog/regional_2026_sources.json`。评级回归会从锁定哈希的快照重建全部 13 题，并与发布文件逐项比较。零通过的 F/J/L 沿用 3100–3500 的稀疏证据区间。
 
 2026-10-18：收录 ICPC 西安和 CCPC 长春正式赛，各 13 题。两站沿用 `standings-medal-v1`，根据正式队逐题赛时通过数、金银铜队内通过率计算 CF 风格经验分数（非官方 Rating），不引入新的题面模型先验。旧 1192 题和 94 场统计保持原值，合计 103 场、1290 题，其中 96 场、1218 题已评级。
 
@@ -18,7 +40,11 @@
 | L | 3000 | 故事 | 3000 |
 | M | 900 | 余镜 | 1700 |
 
-西安 [QOJ 4580](https://qoj.ac/contest/4580) 目前需要受邀账号。当前会话未完成登录，题名和单题 QOJ 编号显式保留 pending；原榜 A–M 题序及逐题统计完整，评级不依赖赛后练习数据。长春题名与题序来自[原榜](https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72)，做题入口待公布，平台别名保持 pending。之后补链接沿用既有规范 ID，不影响评分、口胡和已有现场成绩。
+2026-10-24：通过登录会话核验了两站 QOJ 正式赛题单。西安的 A–M 对应 20051–20063；长春 [QOJ 4582](https://qoj.ac/contest/4582) 的 A–M 对应 22910–22922。题名、原题入口和平台别名已补齐，规范 ID 与评级沿用原值。QOJ 题面访问仍可能需要登录或比赛权限。
+
+2026-10-29：西安 VP 入口更新为 [QOJ 4593](https://qoj.ac/contest/4593)。
+
+长春官方题解已扩写成 13 篇本地中文详解，包含先修知识、渐进提示、推导、正确性、复杂度与易错点；可在区域赛工作台按需展开。西安当前比赛附件仅看到题面，尚未取得官方题解，保留待补状态。覆盖、来源与校验范围见 [预置题解说明](regional-editorials.md)。
 
 ## 终榜与奖牌规则
 

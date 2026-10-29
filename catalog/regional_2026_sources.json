@@ -1,7 +1,7 @@
 {
-  "verified_at": "2026-10-18",
+  "verified_at": "2026-10-29",
   "method": "standings-medal-v1",
-  "scope": "2026 ICPC 西安、CCPC 长春正式赛；使用原榜完整赛时提交，排除打星。仅发布匿名终榜行和题目元数据。",
+  "scope": "2026 ICPC 西安、成都、CCPC 长春正式赛；使用原榜完整赛时提交，排除打星。仅发布匿名终榜行和题目元数据。",
   "contests": [
     {
       "id": "icpc-2026-西安",
@@ -13,12 +13,16 @@
       },
       "anonymous_snapshot": "historical_standings/icpc2026xian.json",
       "anonymous_snapshot_sha256": "e66c5abe62754c9900f3a45d8dd24de57c0670afdf1f258e7fbe3f994e3b3b00",
-      "mapping_note": "QOJ 4580 当前仅受邀账号可见；待账号登录核验题名和单题编号，保留原榜题序与完整评级。",
+      "mapping_note": "2026-10-24 通过 QOJ 登录会话核验 A–M 题名和单题编号。",
       "scoring_note": "XCPCIO 毫秒提交时间，逐题按分钟取整，CE 不罚时；金银铜 41/82/123 支。",
-      "problem_access": "invited"
+      "problem_access": "login_required",
+      "qoj_contest_id": 4593,
+      "qoj_url": "https://qoj.ac/contest/4593"
     },
     {
       "id": "ccpc-2026-长春",
+      "qoj_contest_id": 4582,
+      "qoj_url": "https://qoj.ac/contest/4582",
       "ranklist_url": "https://rank.iccpc.cn/r/8a3a28e3-f6b3-4a58-b4ac-fa8039fb2c72",
       "raw_source_sha256": {
         "rank": "a78de23448e7bfabb7081b256f454e8cd7b3bb75a94a9285de48ab0049955a20",
@@ -27,9 +31,32 @@
       },
       "anonymous_snapshot": "historical_standings/ccpc2026changchun.json",
       "anonymous_snapshot_sha256": "5d50d152091681d3d4a9e7e001490f72857c25d94db7d65ec6528e5019211837",
-      "mapping_note": "题名与题序取自长春原榜；尚未公布可核验的在线做题链接，平台别名待补。",
+      "mapping_note": "2026-10-24 通过 QOJ 登录会话核验 A–M 题名和单题编号。",
       "scoring_note": "与原榜 RankCore / RankTool 核对全部 301 支正式队的逐题 AC、解题数、秒级罚时、奖牌；CE 不罚时，PE 罚时；299 支有提交正式队为奖牌分母，累计 30/90/180 名。",
-      "problem_access": "pending"
+      "problem_access": "login_required"
+    },
+    {
+      "id": "icpc-2026-成都",
+      "ranklist_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official",
+      "rankland_url": "https://rl.algoux.cn/ranklist/icpc2026chengdu",
+      "raw_source_sha256": {
+        "config": "c8eb1b245222b142acd258f57a9d1c22c6f3c83e3b0a42128a2e45b0c0cab1bc",
+        "team": "6eed84cf007f659a3f761cfa5fa8624ed3c1621246a628757e824afab312798f",
+        "run": "7b09e7b9dc26eabff04de049e1a1ef91fd2bb89996ba043fe0a1eec3db7dae8c"
+      },
+      "raw_source_urls": {
+        "config": "https://board.xcpcio.com/data/icpc/51st/chengdu/config.json",
+        "team": "https://board.xcpcio.com/data/icpc/51st/chengdu/team.json",
+        "run": "https://board.xcpcio.com/data/icpc/51st/chengdu/run.json"
+      },
+      "rankland_source_sha256": "be7d3b611a344ac59099a29fe3e7e9d0ad023d952d1e57641bec6d01507fba26",
+      "anonymous_snapshot": "historical_standings/icpc2026chengdu.json",
+      "anonymous_snapshot_sha256": "30f06f0b7ee316ace34a5cf0cb031ef011a098b5a8b03e54b20de824cd388b3d",
+      "qoj_contest_id": 4600,
+      "qoj_url": "https://qoj.ac/contest/4600",
+      "problem_access": "login_required",
+      "mapping_note": "2026-10-29 通过 QOJ 登录会话逐行核验正式赛 A–M 题名和单题编号。",
+      "scoring_note": "4004 条完整赛时提交无待判；328 队中正式 319 队，315 队有 AC，打星 9 队。逐题按分钟取整，CE 不罚时；金银铜 32/64/96 队。逐队核对 RankLand 全部 328 队的正式资格、逐题 AC、解题数与罚时一致，正式队逐题统计及奖牌分界一致。"
     }
   ]
 }
