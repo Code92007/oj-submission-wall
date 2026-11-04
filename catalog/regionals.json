@@ -1,7 +1,208 @@
 {
-  "verified_at": "2026-10-29",
+  "verified_at": "2026-11-04",
   "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links; 2018 Gym dashboards and Qingdao official statements; 2018–2019 ICPC official awards and CCPC full award tables; pinned anonymous historical final scoreboards; 2026 final scoreboard snapshots from official XCPCIO Xi’an and ICCPC Changchun; 2026 Chengdu official XCPCIO final submissions cross-checked team by team with RankLand SRK",
   "contests": [
+    {
+      "id": "icpc-2026-武汉",
+      "year": 2026,
+      "series": "ICPC",
+      "site": "武汉",
+      "name": "2026 ICPC 武汉站",
+      "date": "2026-11-01",
+      "source_url": "https://qoj.ac/contest/4616",
+      "qoj_contest_id": 4616,
+      "qoj_url": "https://qoj.ac/contest/4616",
+      "source_label": "QOJ（需受邀账号）",
+      "ranklist_url": "https://board.xcpcio.com/icpc/51st/wuhan?group=official",
+      "source_links": [
+        {
+          "url": "https://board.xcpcio.com/icpc/51st/wuhan?group=official",
+          "label": "原榜单"
+        },
+        {
+          "url": "https://rl.algoux.cn/ranklist/icpc2026wuhan",
+          "label": "终榜归档"
+        }
+      ],
+      "problems": [
+        {
+          "id": "icpc-2026-武汉:A",
+          "index": "A",
+          "name": "It Is Late at Night, Remember to Rest",
+          "aliases": [
+            "qoj:23656"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23656
+        },
+        {
+          "id": "icpc-2026-武汉:B",
+          "index": "B",
+          "name": "When Does BPE Stop Doubling?",
+          "aliases": [
+            "qoj:23657"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23657
+        },
+        {
+          "id": "icpc-2026-武汉:C",
+          "index": "C",
+          "name": "Congruence Equation of Puro",
+          "aliases": [
+            "qoj:23658"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23658
+        },
+        {
+          "id": "icpc-2026-武汉:D",
+          "index": "D",
+          "name": "Travel Plan",
+          "aliases": [
+            "qoj:23659"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23659
+        },
+        {
+          "id": "icpc-2026-武汉:E",
+          "index": "E",
+          "name": "Coffee Record",
+          "aliases": [
+            "qoj:23660"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23660
+        },
+        {
+          "id": "icpc-2026-武汉:F",
+          "index": "F",
+          "name": "Skill Activation Order",
+          "aliases": [
+            "qoj:23661"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23661
+        },
+        {
+          "id": "icpc-2026-武汉:G",
+          "index": "G",
+          "name": "Shuffle Playlist",
+          "aliases": [
+            "qoj:23662"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23662
+        },
+        {
+          "id": "icpc-2026-武汉:H",
+          "index": "H",
+          "name": "Galaxy War",
+          "aliases": [
+            "qoj:23663"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23663
+        },
+        {
+          "id": "icpc-2026-武汉:I",
+          "index": "I",
+          "name": "Karma Gate",
+          "aliases": [
+            "qoj:23664"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23664
+        },
+        {
+          "id": "icpc-2026-武汉:J",
+          "index": "J",
+          "name": "Number Game",
+          "aliases": [
+            "qoj:23665"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23665
+        },
+        {
+          "id": "icpc-2026-武汉:K",
+          "index": "K",
+          "name": "Salary Adjustment",
+          "aliases": [
+            "qoj:23666"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23666
+        },
+        {
+          "id": "icpc-2026-武汉:L",
+          "index": "L",
+          "name": "Jigsaw Puzzle",
+          "aliases": [
+            "qoj:23667"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23667
+        },
+        {
+          "id": "icpc-2026-武汉:M",
+          "index": "M",
+          "name": "Empire of Construction",
+          "aliases": [
+            "qoj:23668"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 23668
+        }
+      ],
+      "mapping_source": "https://qoj.ac/contest/4616",
+      "mapping_note": "2026-11-04 通过受邀账号逐行核验正式赛 A–M 题名与 QOJ 编号 23656–23668。",
+      "problem_access": "login_required",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2026wuhan.json",
+        "source_url": "https://board.xcpcio.com/icpc/51st/wuhan?group=official",
+        "sha256": "bf11cd050b09419b9f0c6caa820166a8dd72e047477d3fb212213cf21ff5520d",
+        "expected_summary": {
+          "official_teams": 369,
+          "effective_teams": 369,
+          "excluded_teams": 69,
+          "duration_seconds": 18000,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 37,
+              "last_solved": 6,
+              "last_penalty_minutes": 930
+            },
+            "silver": {
+              "teams": 74,
+              "last_solved": 4,
+              "last_penalty_minutes": 546
+            },
+            "bronze": {
+              "teams": 111,
+              "last_solved": 3,
+              "last_penalty_minutes": 492
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 6,
+              "safe_solved": 7
+            },
+            "silver": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            },
+            "bronze": {
+              "max_outside_solved": 3,
+              "safe_solved": 4
+            }
+          }
+        }
+      }
+    },
     {
       "id": "icpc-2026-成都",
       "year": 2026,

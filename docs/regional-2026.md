@@ -1,4 +1,32 @@
-# 2026 西安 / 长春 / 成都题目与离线评级
+# 2026 西安 / 长春 / 成都 / 武汉题目与离线评级
+
+## 2026-11-04：武汉站
+
+新增 [QOJ 4616](https://qoj.ac/contest/4616) 的 2026 ICPC 武汉站正式赛 A–M，题号 23656–23668。QOJ 原链接需要受邀账号；组邀请口令及登录信息不写入代码、公开目录或发布数据。
+
+cf-bot 预置全部 13 题的官方中文题面，包含输入输出、逐组样例、样例解释和必要配图。E、L 保留完整交互协议及按原布局截取的样例交互表。读取、练习与口胡判题沿用成都的本地缓存路径，无须再次访问 QOJ。下载 PDF 含完整原题册的页面对象，来源哈希、整理说明和原题册页码写入 `regional_statements.json`。当前补题场无官方题解附件，明确标为待补。
+
+按固定版本 XCPCIO 的 config/team/run（5015 条完整赛时提交）恢复终榜，逐队核对 RankLand 全部 438 队的正式资格、AC 集合、题数与罚时：369 支正式队全部有 AC，69 支打星队排除。原榜金银铜 37/74/111 队，末队分别为 6 题 930、4 题 546、3 题 492 分钟；稳牌题数为 7/5/4。
+
+银牌边界两队同为 4 题 546 分钟，最后 AC 分别在第 244、260 分钟。沿用 XCPCIO 原榜的最后 AC 排序与既有评级规则；RankLand 忽略最后 AC，产生 75 银/110 铜的分组。该差异已记录，两种分组下全部 13 题的最终 Rating 相同。仅使用赛时统计，不添加题面模型分数。
+
+| 题号 | 题名 | Rating | 正式通过队数 / 369 |
+| --- | --- | ---: | ---: |
+| A | It Is Late at Night, Remember to Rest | 800 | 369 |
+| B | When Does BPE Stop Doubling? | 2400 | 55 |
+| C | Congruence Equation of Puro | 3100 | 2 |
+| D | Travel Plan | 1100 | 328 |
+| E | Coffee Record | 3100 | 3 |
+| F | Skill Activation Order | 3100 | 3 |
+| G | Shuffle Playlist | 2200 | 95 |
+| H | Galaxy War | 3300 | 0 |
+| I | Karma Gate | 2700 | 19 |
+| J | Number Game | 2100 | 117 |
+| K | Salary Adjustment | 1600 | 232 |
+| L | Jigsaw Puzzle | 3000 | 4 |
+| M | Empire of Construction | 3300 | 0 |
+
+两个工程同步使用相同目录、评级、来源和匿名终榜快照。新增后合计 105 场、1316 题，其中 98 场、1244 题已评级；既有 1231 题及 97 场统计保持原值。
 
 2026-10-29：新增 [2026 ICPC 成都站 QOJ 4600](https://qoj.ac/contest/4600)，逐行核验 A–M 题名与单题编号 23592–23604。根据 [XCPCIO 正式赛原榜](https://board.xcpcio.com/icpc/51st/chengdu?group=official)的完整 4004 条提交重建终榜，并与 [RankLand 归档](https://rl.algoux.cn/ranklist/icpc2026chengdu)逐队核对全部 328 队的正式资格、逐题 AC、题数和罚时；319 支正式队中 315 支有 AC，9 支打星队不参与评级。金银铜分别为 32 / 64 / 96 队，末队为 6 题 833 分钟、5 题 782 分钟、3 题 416 分钟，稳牌题数为 7 / 6 / 4。
 

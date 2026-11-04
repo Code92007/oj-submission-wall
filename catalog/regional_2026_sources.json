@@ -1,7 +1,7 @@
 {
-  "verified_at": "2026-10-29",
+  "verified_at": "2026-11-04",
   "method": "standings-medal-v1",
-  "scope": "2026 ICPC 西安、成都、CCPC 长春正式赛；使用原榜完整赛时提交，排除打星。仅发布匿名终榜行和题目元数据。",
+  "scope": "2026 ICPC 西安、成都、武汉、CCPC 长春正式赛；使用原榜完整赛时提交，排除打星。仅发布匿名终榜行和题目元数据。",
   "contests": [
     {
       "id": "icpc-2026-西安",
@@ -57,6 +57,30 @@
       "problem_access": "login_required",
       "mapping_note": "2026-10-29 通过 QOJ 登录会话逐行核验正式赛 A–M 题名和单题编号。",
       "scoring_note": "4004 条完整赛时提交无待判；328 队中正式 319 队，315 队有 AC，打星 9 队。逐题按分钟取整，CE 不罚时；金银铜 32/64/96 队。逐队核对 RankLand 全部 328 队的正式资格、逐题 AC、解题数与罚时一致，正式队逐题统计及奖牌分界一致。"
+    },
+    {
+      "id": "icpc-2026-武汉",
+      "ranklist_url": "https://board.xcpcio.com/icpc/51st/wuhan?group=official",
+      "rankland_url": "https://rl.algoux.cn/ranklist/icpc2026wuhan",
+      "raw_source_revision": "ae327835007ac328643444284e9254ef7d40a872",
+      "raw_source_urls": {
+        "config": "https://raw.githubusercontent.com/xcpcio/board-data/ae327835007ac328643444284e9254ef7d40a872/data/icpc/51st/wuhan/config.json",
+        "team": "https://raw.githubusercontent.com/xcpcio/board-data/ae327835007ac328643444284e9254ef7d40a872/data/icpc/51st/wuhan/team.json",
+        "run": "https://raw.githubusercontent.com/xcpcio/board-data/ae327835007ac328643444284e9254ef7d40a872/data/icpc/51st/wuhan/run.json"
+      },
+      "raw_source_sha256": {
+        "config": "58540040cbd98d9a80f04860b7a54c431835bcc00e219c25ae36ee0419ea1f78",
+        "team": "008512c6afb5420d0636ca9b1436c2ede5dd6928cbf16d0a000ec883dd2ff9bc",
+        "run": "d6c9aa32136ee66bb409ff770a7b441d30bfe23d8c1a285a15ad99b56f3dca22"
+      },
+      "rankland_source_sha256": "253d1ef11cb64f95886cf7e97647ade972c8e8dfdcef6c280f05c8b4987efbc3",
+      "anonymous_snapshot": "historical_standings/icpc2026wuhan.json",
+      "anonymous_snapshot_sha256": "bf11cd050b09419b9f0c6caa820166a8dd72e047477d3fb212213cf21ff5520d",
+      "qoj_contest_id": 4616,
+      "qoj_url": "https://qoj.ac/contest/4616",
+      "problem_access": "login_required",
+      "mapping_note": "2026-11-04 通过受邀账号逐行核验正式赛 A–M 题名与 QOJ 编号 23656–23668。",
+      "scoring_note": "完整 5015 条赛时提交；438 队中正式 369 队（全部有 AC）、打星 69 队。逐队核对 RankLand 全部 438 队的正式资格、逐题 AC、解题数和罚时一致。原榜金银铜 37/74/111 队；同题数同罚时按最后一次 AC 分钟排序。RankLand 忽略最后 AC 的并列处理将银牌扩为 75、铜牌减为 110；采用原榜规则并保留此差异。两种奖牌口径下 13 题的最终 rating 相同。"
     }
   ]
 }

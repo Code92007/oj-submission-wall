@@ -34,6 +34,13 @@ assert.deepEqual(numbers, catalog.contests.filter(c => c.year === 2025).flatMap(
 element('cpcTeams').checked = true;
 vm.runInContext('cpcWall()', context);
 assert.match(element('cpcSummary').textContent, /3\/167 题完成/);
+element('cpcYear').value = '2026';
+vm.runInContext('cpcWall()', context);
+assert.match(element('cpcSummary').textContent, /4 场比赛 · 0\/52 题完成/);
+assert.match(element('cpcRows').innerHTML, /武汉站/);
+assert.match(element('cpcRows').innerHTML, /qoj\.ac\/contest\/4616/);
+assert.match(element('cpcRows').innerHTML, /When Does BPE Stop Doubling/);
+assert.match(element('cpcRatingCoverage').textContent, /52\/52/);
 element('cpcYear').value = '2019';
 vm.runInContext('cpcWall()', context);
 assert.match(element('cpcRows').innerHTML, /difficulty-unknown[^>]*title="[^"]*难度未评级/);
