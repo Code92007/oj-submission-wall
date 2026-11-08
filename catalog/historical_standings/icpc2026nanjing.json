@@ -1,0 +1,4658 @@
+{
+  "schema": "regional-final-scoreboard-v1",
+  "contest_id": "icpc-2026-南京",
+  "labels": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M"
+  ],
+  "source_name": "「华为杯」第 51 届 ICPC 国际大学生程序设计竞赛区域赛南京站 - 正式赛",
+  "duration_seconds": 18000,
+  "medal_rule": "XCPCIO config.medal.official：金银铜分别 33/66/99 队，累计 33/99/198 名；逐题分钟罚时，CE 不罚时，同题数同罚时按最后 AC 分钟排序。",
+  "medal_source_url": "https://board.xcpcio.com/icpc/51st/nanjing?group=official",
+  "source_sha256": {
+    "config": "3b01596875f0fe5e7a799157077a266a15a8134b75a17c25795acbde96d4edf3",
+    "team": "f1720aeebc9aa59fab017af4eeb02c1b9733b66621675d22eaab6c02f86fa7ea",
+    "run": "e08fac45a711dbfbb5933f7de3f46957dfbbe772e34405ff898b116a732fd792"
+  },
+  "teams": [
+    {
+      "id": "1",
+      "official": false,
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M"
+      ],
+      "solved": 12,
+      "penalty_seconds": 90060,
+      "medal": null
+    },
+    {
+      "id": "2",
+      "official": true,
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "M"
+      ],
+      "solved": 11,
+      "penalty_seconds": 110700,
+      "medal": "gold"
+    },
+    {
+      "id": "3",
+      "official": false,
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "K",
+        "L",
+        "M"
+      ],
+      "solved": 11,
+      "penalty_seconds": 131700,
+      "medal": null
+    },
+    {
+      "id": "4",
+      "official": false,
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 10,
+      "penalty_seconds": 99180,
+      "medal": null
+    },
+    {
+      "id": "5",
+      "official": false,
+      "accepted": [
+        "A",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 9,
+      "penalty_seconds": 65400,
+      "medal": null
+    },
+    {
+      "id": "6",
+      "official": false,
+      "accepted": [
+        "A",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 9,
+      "penalty_seconds": 69180,
+      "medal": null
+    },
+    {
+      "id": "7",
+      "official": true,
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 8,
+      "penalty_seconds": 59280,
+      "medal": "gold"
+    },
+    {
+      "id": "8",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 8,
+      "penalty_seconds": 60660,
+      "medal": "gold"
+    },
+    {
+      "id": "9",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 8,
+      "penalty_seconds": 62760,
+      "medal": "gold"
+    },
+    {
+      "id": "10",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 8,
+      "penalty_seconds": 65340,
+      "medal": "gold"
+    },
+    {
+      "id": "11",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 8,
+      "penalty_seconds": 78720,
+      "medal": "gold"
+    },
+    {
+      "id": "12",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 8,
+      "penalty_seconds": 80580,
+      "medal": null
+    },
+    {
+      "id": "13",
+      "official": false,
+      "accepted": [
+        "A",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 46140,
+      "medal": null
+    },
+    {
+      "id": "14",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 46860,
+      "medal": "gold"
+    },
+    {
+      "id": "15",
+      "official": false,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 48900,
+      "medal": null
+    },
+    {
+      "id": "16",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 50580,
+      "medal": "gold"
+    },
+    {
+      "id": "17",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 54660,
+      "medal": "gold"
+    },
+    {
+      "id": "18",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 54720,
+      "medal": "gold"
+    },
+    {
+      "id": "19",
+      "official": false,
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H",
+        "K"
+      ],
+      "solved": 7,
+      "penalty_seconds": 58260,
+      "medal": null
+    },
+    {
+      "id": "20",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 58320,
+      "medal": "gold"
+    },
+    {
+      "id": "21",
+      "official": true,
+      "accepted": [
+        "A",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 66060,
+      "medal": "gold"
+    },
+    {
+      "id": "22",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 70020,
+      "medal": "gold"
+    },
+    {
+      "id": "23",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 72720,
+      "medal": "gold"
+    },
+    {
+      "id": "24",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 74160,
+      "medal": "gold"
+    },
+    {
+      "id": "25",
+      "official": false,
+      "accepted": [
+        "A",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 74760,
+      "medal": null
+    },
+    {
+      "id": "26",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 76680,
+      "medal": "gold"
+    },
+    {
+      "id": "27",
+      "official": true,
+      "accepted": [
+        "A",
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 7,
+      "penalty_seconds": 79320,
+      "medal": "gold"
+    },
+    {
+      "id": "28",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 31080,
+      "medal": null
+    },
+    {
+      "id": "29",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 41100,
+      "medal": "gold"
+    },
+    {
+      "id": "30",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 42300,
+      "medal": "gold"
+    },
+    {
+      "id": "31",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 43620,
+      "medal": "gold"
+    },
+    {
+      "id": "32",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "G",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 44580,
+      "medal": "gold"
+    },
+    {
+      "id": "33",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 46860,
+      "medal": "gold"
+    },
+    {
+      "id": "34",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 47400,
+      "medal": "gold"
+    },
+    {
+      "id": "35",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 47640,
+      "medal": "gold"
+    },
+    {
+      "id": "36",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 48300,
+      "medal": null
+    },
+    {
+      "id": "37",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 49860,
+      "medal": "gold"
+    },
+    {
+      "id": "38",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 52860,
+      "medal": "gold"
+    },
+    {
+      "id": "39",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 53340,
+      "medal": "gold"
+    },
+    {
+      "id": "40",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 55140,
+      "medal": "gold"
+    },
+    {
+      "id": "41",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 57360,
+      "medal": "gold"
+    },
+    {
+      "id": "42",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 59520,
+      "medal": "gold"
+    },
+    {
+      "id": "43",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 59580,
+      "medal": "gold"
+    },
+    {
+      "id": "44",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 61260,
+      "medal": "gold"
+    },
+    {
+      "id": "45",
+      "official": true,
+      "accepted": [
+        "A",
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 62520,
+      "medal": "gold"
+    },
+    {
+      "id": "46",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 64740,
+      "medal": "silver"
+    },
+    {
+      "id": "47",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 65340,
+      "medal": null
+    },
+    {
+      "id": "48",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 69180,
+      "medal": "silver"
+    },
+    {
+      "id": "49",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 71520,
+      "medal": "silver"
+    },
+    {
+      "id": "50",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 71520,
+      "medal": null
+    },
+    {
+      "id": "51",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 71820,
+      "medal": "silver"
+    },
+    {
+      "id": "52",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 75780,
+      "medal": "silver"
+    },
+    {
+      "id": "53",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 6,
+      "penalty_seconds": 76440,
+      "medal": null
+    },
+    {
+      "id": "54",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 24000,
+      "medal": "silver"
+    },
+    {
+      "id": "55",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 27060,
+      "medal": null
+    },
+    {
+      "id": "56",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 29580,
+      "medal": "silver"
+    },
+    {
+      "id": "57",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 32160,
+      "medal": "silver"
+    },
+    {
+      "id": "58",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 35160,
+      "medal": null
+    },
+    {
+      "id": "59",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 38160,
+      "medal": "silver"
+    },
+    {
+      "id": "60",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 41100,
+      "medal": "silver"
+    },
+    {
+      "id": "61",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 42060,
+      "medal": "silver"
+    },
+    {
+      "id": "62",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 42600,
+      "medal": "silver"
+    },
+    {
+      "id": "63",
+      "official": false,
+      "accepted": [
+        "C",
+        "H",
+        "I",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 42660,
+      "medal": null
+    },
+    {
+      "id": "64",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 42720,
+      "medal": "silver"
+    },
+    {
+      "id": "65",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 43080,
+      "medal": "silver"
+    },
+    {
+      "id": "66",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 43140,
+      "medal": "silver"
+    },
+    {
+      "id": "67",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 43800,
+      "medal": "silver"
+    },
+    {
+      "id": "68",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 44220,
+      "medal": null
+    },
+    {
+      "id": "69",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 44940,
+      "medal": "silver"
+    },
+    {
+      "id": "70",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 45420,
+      "medal": null
+    },
+    {
+      "id": "71",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 45540,
+      "medal": "silver"
+    },
+    {
+      "id": "72",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 47220,
+      "medal": "silver"
+    },
+    {
+      "id": "73",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 48240,
+      "medal": "silver"
+    },
+    {
+      "id": "74",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 48300,
+      "medal": "silver"
+    },
+    {
+      "id": "75",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 51000,
+      "medal": null
+    },
+    {
+      "id": "76",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 52260,
+      "medal": "silver"
+    },
+    {
+      "id": "77",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 52620,
+      "medal": "silver"
+    },
+    {
+      "id": "78",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 53280,
+      "medal": "silver"
+    },
+    {
+      "id": "79",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 55620,
+      "medal": "silver"
+    },
+    {
+      "id": "80",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 56160,
+      "medal": "silver"
+    },
+    {
+      "id": "81",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 57780,
+      "medal": "silver"
+    },
+    {
+      "id": "82",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 58560,
+      "medal": "silver"
+    },
+    {
+      "id": "83",
+      "official": true,
+      "accepted": [
+        "B",
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 60420,
+      "medal": "silver"
+    },
+    {
+      "id": "84",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 61320,
+      "medal": "silver"
+    },
+    {
+      "id": "85",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 63600,
+      "medal": null
+    },
+    {
+      "id": "86",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 5,
+      "penalty_seconds": 67080,
+      "medal": "silver"
+    },
+    {
+      "id": "87",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 5,
+      "penalty_seconds": 71160,
+      "medal": null
+    },
+    {
+      "id": "88",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 20160,
+      "medal": "silver"
+    },
+    {
+      "id": "89",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 22920,
+      "medal": "silver"
+    },
+    {
+      "id": "90",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 23220,
+      "medal": "silver"
+    },
+    {
+      "id": "91",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 24840,
+      "medal": null
+    },
+    {
+      "id": "92",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 26400,
+      "medal": "silver"
+    },
+    {
+      "id": "93",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 27180,
+      "medal": null
+    },
+    {
+      "id": "94",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 27300,
+      "medal": "silver"
+    },
+    {
+      "id": "95",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 27960,
+      "medal": "silver"
+    },
+    {
+      "id": "96",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 28620,
+      "medal": "silver"
+    },
+    {
+      "id": "97",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 4,
+      "penalty_seconds": 29460,
+      "medal": "silver"
+    },
+    {
+      "id": "98",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 30240,
+      "medal": null
+    },
+    {
+      "id": "99",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 30300,
+      "medal": "silver"
+    },
+    {
+      "id": "100",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 30660,
+      "medal": "silver"
+    },
+    {
+      "id": "101",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 30720,
+      "medal": "silver"
+    },
+    {
+      "id": "102",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 4,
+      "penalty_seconds": 30900,
+      "medal": "silver"
+    },
+    {
+      "id": "103",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 31140,
+      "medal": "silver"
+    },
+    {
+      "id": "104",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 32340,
+      "medal": "silver"
+    },
+    {
+      "id": "105",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 33780,
+      "medal": "silver"
+    },
+    {
+      "id": "106",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 34140,
+      "medal": "silver"
+    },
+    {
+      "id": "107",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 34140,
+      "medal": null
+    },
+    {
+      "id": "108",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 34920,
+      "medal": "silver"
+    },
+    {
+      "id": "109",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 35040,
+      "medal": "silver"
+    },
+    {
+      "id": "110",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 35220,
+      "medal": null
+    },
+    {
+      "id": "111",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 35760,
+      "medal": "silver"
+    },
+    {
+      "id": "112",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 36780,
+      "medal": "silver"
+    },
+    {
+      "id": "113",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 37080,
+      "medal": null
+    },
+    {
+      "id": "114",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 37560,
+      "medal": "silver"
+    },
+    {
+      "id": "115",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 38040,
+      "medal": "silver"
+    },
+    {
+      "id": "116",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 38220,
+      "medal": "silver"
+    },
+    {
+      "id": "117",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "K",
+        "M"
+      ],
+      "solved": 4,
+      "penalty_seconds": 38760,
+      "medal": null
+    },
+    {
+      "id": "118",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "F",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 38880,
+      "medal": null
+    },
+    {
+      "id": "119",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 38880,
+      "medal": "silver"
+    },
+    {
+      "id": "120",
+      "official": false,
+      "accepted": [
+        "B",
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 39000,
+      "medal": null
+    },
+    {
+      "id": "121",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 39000,
+      "medal": "silver"
+    },
+    {
+      "id": "122",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 4,
+      "penalty_seconds": 39480,
+      "medal": "silver"
+    },
+    {
+      "id": "123",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 40980,
+      "medal": "silver"
+    },
+    {
+      "id": "124",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 40980,
+      "medal": "silver"
+    },
+    {
+      "id": "125",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 41340,
+      "medal": null
+    },
+    {
+      "id": "126",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 42480,
+      "medal": "silver"
+    },
+    {
+      "id": "127",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 42600,
+      "medal": "silver"
+    },
+    {
+      "id": "128",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 4,
+      "penalty_seconds": 42660,
+      "medal": "silver"
+    },
+    {
+      "id": "129",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 42900,
+      "medal": "silver"
+    },
+    {
+      "id": "130",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 43740,
+      "medal": "silver"
+    },
+    {
+      "id": "131",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K",
+        "M"
+      ],
+      "solved": 4,
+      "penalty_seconds": 43860,
+      "medal": "silver"
+    },
+    {
+      "id": "132",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 44700,
+      "medal": "silver"
+    },
+    {
+      "id": "133",
+      "official": false,
+      "accepted": [
+        "C",
+        "D",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 45180,
+      "medal": null
+    },
+    {
+      "id": "134",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 45600,
+      "medal": "bronze"
+    },
+    {
+      "id": "135",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 45960,
+      "medal": "bronze"
+    },
+    {
+      "id": "136",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 46560,
+      "medal": "bronze"
+    },
+    {
+      "id": "137",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 47340,
+      "medal": "bronze"
+    },
+    {
+      "id": "138",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 47640,
+      "medal": "bronze"
+    },
+    {
+      "id": "139",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 48000,
+      "medal": "bronze"
+    },
+    {
+      "id": "140",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 48720,
+      "medal": "bronze"
+    },
+    {
+      "id": "141",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 48960,
+      "medal": "bronze"
+    },
+    {
+      "id": "142",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 49260,
+      "medal": "bronze"
+    },
+    {
+      "id": "143",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 49560,
+      "medal": "bronze"
+    },
+    {
+      "id": "144",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 51660,
+      "medal": "bronze"
+    },
+    {
+      "id": "145",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 52920,
+      "medal": "bronze"
+    },
+    {
+      "id": "146",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 56700,
+      "medal": "bronze"
+    },
+    {
+      "id": "147",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 56940,
+      "medal": "bronze"
+    },
+    {
+      "id": "148",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 58260,
+      "medal": "bronze"
+    },
+    {
+      "id": "149",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "H",
+        "K"
+      ],
+      "solved": 4,
+      "penalty_seconds": 65880,
+      "medal": "bronze"
+    },
+    {
+      "id": "150",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 15000,
+      "medal": "bronze"
+    },
+    {
+      "id": "151",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 15060,
+      "medal": "bronze"
+    },
+    {
+      "id": "152",
+      "official": true,
+      "accepted": [
+        "C",
+        "K",
+        "M"
+      ],
+      "solved": 3,
+      "penalty_seconds": 15060,
+      "medal": "bronze"
+    },
+    {
+      "id": "153",
+      "official": false,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 15840,
+      "medal": null
+    },
+    {
+      "id": "154",
+      "official": false,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 17100,
+      "medal": null
+    },
+    {
+      "id": "155",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 18420,
+      "medal": "bronze"
+    },
+    {
+      "id": "156",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 18540,
+      "medal": "bronze"
+    },
+    {
+      "id": "157",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 18900,
+      "medal": "bronze"
+    },
+    {
+      "id": "158",
+      "official": false,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 19920,
+      "medal": null
+    },
+    {
+      "id": "159",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 20040,
+      "medal": "bronze"
+    },
+    {
+      "id": "160",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 20280,
+      "medal": "bronze"
+    },
+    {
+      "id": "161",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 20760,
+      "medal": "bronze"
+    },
+    {
+      "id": "162",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 21660,
+      "medal": "bronze"
+    },
+    {
+      "id": "163",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 21660,
+      "medal": "bronze"
+    },
+    {
+      "id": "164",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 21720,
+      "medal": "bronze"
+    },
+    {
+      "id": "165",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 22020,
+      "medal": "bronze"
+    },
+    {
+      "id": "166",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 22740,
+      "medal": "bronze"
+    },
+    {
+      "id": "167",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 22860,
+      "medal": "bronze"
+    },
+    {
+      "id": "168",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 23040,
+      "medal": "bronze"
+    },
+    {
+      "id": "169",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 23280,
+      "medal": "bronze"
+    },
+    {
+      "id": "170",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 23400,
+      "medal": "bronze"
+    },
+    {
+      "id": "171",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 23820,
+      "medal": "bronze"
+    },
+    {
+      "id": "172",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 24000,
+      "medal": "bronze"
+    },
+    {
+      "id": "173",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 24060,
+      "medal": "bronze"
+    },
+    {
+      "id": "174",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 24120,
+      "medal": "bronze"
+    },
+    {
+      "id": "175",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 24420,
+      "medal": "bronze"
+    },
+    {
+      "id": "176",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 24480,
+      "medal": "bronze"
+    },
+    {
+      "id": "177",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 25080,
+      "medal": "bronze"
+    },
+    {
+      "id": "178",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 25140,
+      "medal": "bronze"
+    },
+    {
+      "id": "179",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 25140,
+      "medal": "bronze"
+    },
+    {
+      "id": "180",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 25500,
+      "medal": "bronze"
+    },
+    {
+      "id": "181",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 25500,
+      "medal": "bronze"
+    },
+    {
+      "id": "182",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 25680,
+      "medal": "bronze"
+    },
+    {
+      "id": "183",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 26400,
+      "medal": "bronze"
+    },
+    {
+      "id": "184",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 26880,
+      "medal": "bronze"
+    },
+    {
+      "id": "185",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 26940,
+      "medal": "bronze"
+    },
+    {
+      "id": "186",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 27660,
+      "medal": "bronze"
+    },
+    {
+      "id": "187",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 27660,
+      "medal": "bronze"
+    },
+    {
+      "id": "188",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 27840,
+      "medal": "bronze"
+    },
+    {
+      "id": "189",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 27900,
+      "medal": "bronze"
+    },
+    {
+      "id": "190",
+      "official": true,
+      "accepted": [
+        "C",
+        "D",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 28020,
+      "medal": "bronze"
+    },
+    {
+      "id": "191",
+      "official": false,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 28140,
+      "medal": null
+    },
+    {
+      "id": "192",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 28740,
+      "medal": "bronze"
+    },
+    {
+      "id": "193",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 29460,
+      "medal": "bronze"
+    },
+    {
+      "id": "194",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 29580,
+      "medal": "bronze"
+    },
+    {
+      "id": "195",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 30180,
+      "medal": "bronze"
+    },
+    {
+      "id": "196",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 31140,
+      "medal": "bronze"
+    },
+    {
+      "id": "197",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 31140,
+      "medal": "bronze"
+    },
+    {
+      "id": "198",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 31320,
+      "medal": "bronze"
+    },
+    {
+      "id": "199",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 31320,
+      "medal": "bronze"
+    },
+    {
+      "id": "200",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 32340,
+      "medal": "bronze"
+    },
+    {
+      "id": "201",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 32640,
+      "medal": "bronze"
+    },
+    {
+      "id": "202",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 32820,
+      "medal": "bronze"
+    },
+    {
+      "id": "203",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 33000,
+      "medal": "bronze"
+    },
+    {
+      "id": "204",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 33240,
+      "medal": "bronze"
+    },
+    {
+      "id": "205",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 33240,
+      "medal": "bronze"
+    },
+    {
+      "id": "206",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 33480,
+      "medal": "bronze"
+    },
+    {
+      "id": "207",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 33960,
+      "medal": "bronze"
+    },
+    {
+      "id": "208",
+      "official": true,
+      "accepted": [
+        "C",
+        "K",
+        "M"
+      ],
+      "solved": 3,
+      "penalty_seconds": 35220,
+      "medal": "bronze"
+    },
+    {
+      "id": "209",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 35460,
+      "medal": "bronze"
+    },
+    {
+      "id": "210",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 35460,
+      "medal": "bronze"
+    },
+    {
+      "id": "211",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 36000,
+      "medal": "bronze"
+    },
+    {
+      "id": "212",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 36540,
+      "medal": "bronze"
+    },
+    {
+      "id": "213",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 36840,
+      "medal": "bronze"
+    },
+    {
+      "id": "214",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 37920,
+      "medal": "bronze"
+    },
+    {
+      "id": "215",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 38340,
+      "medal": "bronze"
+    },
+    {
+      "id": "216",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 38580,
+      "medal": "bronze"
+    },
+    {
+      "id": "217",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 38820,
+      "medal": "bronze"
+    },
+    {
+      "id": "218",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 39060,
+      "medal": "bronze"
+    },
+    {
+      "id": "219",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 41820,
+      "medal": "bronze"
+    },
+    {
+      "id": "220",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 42300,
+      "medal": "bronze"
+    },
+    {
+      "id": "221",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 42420,
+      "medal": "bronze"
+    },
+    {
+      "id": "222",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 44940,
+      "medal": "bronze"
+    },
+    {
+      "id": "223",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 45180,
+      "medal": "bronze"
+    },
+    {
+      "id": "224",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 45900,
+      "medal": "bronze"
+    },
+    {
+      "id": "225",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 47040,
+      "medal": "bronze"
+    },
+    {
+      "id": "226",
+      "official": true,
+      "accepted": [
+        "C",
+        "H",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 48360,
+      "medal": "bronze"
+    },
+    {
+      "id": "227",
+      "official": true,
+      "accepted": [
+        "C",
+        "F",
+        "K"
+      ],
+      "solved": 3,
+      "penalty_seconds": 49320,
+      "medal": "bronze"
+    },
+    {
+      "id": "228",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 5460,
+      "medal": "bronze"
+    },
+    {
+      "id": "229",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 7080,
+      "medal": "bronze"
+    },
+    {
+      "id": "230",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 7200,
+      "medal": "bronze"
+    },
+    {
+      "id": "231",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 7500,
+      "medal": "bronze"
+    },
+    {
+      "id": "232",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 7500,
+      "medal": "bronze"
+    },
+    {
+      "id": "233",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 8400,
+      "medal": "bronze"
+    },
+    {
+      "id": "234",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 8580,
+      "medal": "bronze"
+    },
+    {
+      "id": "235",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 8580,
+      "medal": "bronze"
+    },
+    {
+      "id": "236",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 9120,
+      "medal": "bronze"
+    },
+    {
+      "id": "237",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 9360,
+      "medal": null
+    },
+    {
+      "id": "238",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 9600,
+      "medal": null
+    },
+    {
+      "id": "239",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 10080,
+      "medal": null
+    },
+    {
+      "id": "240",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 10260,
+      "medal": null
+    },
+    {
+      "id": "241",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 10320,
+      "medal": null
+    },
+    {
+      "id": "242",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 10860,
+      "medal": null
+    },
+    {
+      "id": "243",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 11220,
+      "medal": null
+    },
+    {
+      "id": "244",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 11520,
+      "medal": null
+    },
+    {
+      "id": "245",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12000,
+      "medal": null
+    },
+    {
+      "id": "246",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12120,
+      "medal": null
+    },
+    {
+      "id": "247",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12180,
+      "medal": null
+    },
+    {
+      "id": "248",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12360,
+      "medal": null
+    },
+    {
+      "id": "249",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12600,
+      "medal": null
+    },
+    {
+      "id": "250",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12660,
+      "medal": null
+    },
+    {
+      "id": "251",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12720,
+      "medal": null
+    },
+    {
+      "id": "252",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 12720,
+      "medal": null
+    },
+    {
+      "id": "253",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 13020,
+      "medal": null
+    },
+    {
+      "id": "254",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 13440,
+      "medal": null
+    },
+    {
+      "id": "255",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 13500,
+      "medal": null
+    },
+    {
+      "id": "256",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 13800,
+      "medal": null
+    },
+    {
+      "id": "257",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 13800,
+      "medal": null
+    },
+    {
+      "id": "258",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 14040,
+      "medal": null
+    },
+    {
+      "id": "259",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 14100,
+      "medal": null
+    },
+    {
+      "id": "260",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 14700,
+      "medal": null
+    },
+    {
+      "id": "261",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 14760,
+      "medal": null
+    },
+    {
+      "id": "262",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 15240,
+      "medal": null
+    },
+    {
+      "id": "263",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 15240,
+      "medal": null
+    },
+    {
+      "id": "264",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 15600,
+      "medal": null
+    },
+    {
+      "id": "265",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 15840,
+      "medal": null
+    },
+    {
+      "id": "266",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 15840,
+      "medal": null
+    },
+    {
+      "id": "267",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16380,
+      "medal": null
+    },
+    {
+      "id": "268",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16440,
+      "medal": null
+    },
+    {
+      "id": "269",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16500,
+      "medal": null
+    },
+    {
+      "id": "270",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16560,
+      "medal": null
+    },
+    {
+      "id": "271",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16680,
+      "medal": null
+    },
+    {
+      "id": "272",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16740,
+      "medal": null
+    },
+    {
+      "id": "273",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16800,
+      "medal": null
+    },
+    {
+      "id": "274",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 16920,
+      "medal": null
+    },
+    {
+      "id": "275",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17040,
+      "medal": null
+    },
+    {
+      "id": "276",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17340,
+      "medal": null
+    },
+    {
+      "id": "277",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17580,
+      "medal": null
+    },
+    {
+      "id": "278",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17580,
+      "medal": null
+    },
+    {
+      "id": "279",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17580,
+      "medal": null
+    },
+    {
+      "id": "280",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17940,
+      "medal": null
+    },
+    {
+      "id": "281",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 17940,
+      "medal": null
+    },
+    {
+      "id": "282",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 18240,
+      "medal": null
+    },
+    {
+      "id": "283",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 18600,
+      "medal": null
+    },
+    {
+      "id": "284",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 18720,
+      "medal": null
+    },
+    {
+      "id": "285",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 18780,
+      "medal": null
+    },
+    {
+      "id": "286",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 19320,
+      "medal": null
+    },
+    {
+      "id": "287",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 19800,
+      "medal": null
+    },
+    {
+      "id": "288",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 20520,
+      "medal": null
+    },
+    {
+      "id": "289",
+      "official": false,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 20760,
+      "medal": null
+    },
+    {
+      "id": "290",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 20880,
+      "medal": null
+    },
+    {
+      "id": "291",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 21000,
+      "medal": null
+    },
+    {
+      "id": "292",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 21480,
+      "medal": null
+    },
+    {
+      "id": "293",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 21720,
+      "medal": null
+    },
+    {
+      "id": "294",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 22080,
+      "medal": null
+    },
+    {
+      "id": "295",
+      "official": true,
+      "accepted": [
+        "F",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 22500,
+      "medal": null
+    },
+    {
+      "id": "296",
+      "official": true,
+      "accepted": [
+        "H",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 22620,
+      "medal": null
+    },
+    {
+      "id": "297",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 23100,
+      "medal": null
+    },
+    {
+      "id": "298",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 23160,
+      "medal": null
+    },
+    {
+      "id": "299",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 23220,
+      "medal": null
+    },
+    {
+      "id": "300",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 23580,
+      "medal": null
+    },
+    {
+      "id": "301",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 23760,
+      "medal": null
+    },
+    {
+      "id": "302",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 24120,
+      "medal": null
+    },
+    {
+      "id": "303",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 24180,
+      "medal": null
+    },
+    {
+      "id": "304",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 24420,
+      "medal": null
+    },
+    {
+      "id": "305",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 24900,
+      "medal": null
+    },
+    {
+      "id": "306",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 24960,
+      "medal": null
+    },
+    {
+      "id": "307",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 25080,
+      "medal": null
+    },
+    {
+      "id": "308",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 25860,
+      "medal": null
+    },
+    {
+      "id": "309",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 26100,
+      "medal": null
+    },
+    {
+      "id": "310",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 26460,
+      "medal": null
+    },
+    {
+      "id": "311",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 26820,
+      "medal": null
+    },
+    {
+      "id": "312",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 27180,
+      "medal": null
+    },
+    {
+      "id": "313",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 27420,
+      "medal": null
+    },
+    {
+      "id": "314",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 27780,
+      "medal": null
+    },
+    {
+      "id": "315",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 28380,
+      "medal": null
+    },
+    {
+      "id": "316",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 28440,
+      "medal": null
+    },
+    {
+      "id": "317",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 29100,
+      "medal": null
+    },
+    {
+      "id": "318",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 29520,
+      "medal": null
+    },
+    {
+      "id": "319",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 29580,
+      "medal": null
+    },
+    {
+      "id": "320",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 29700,
+      "medal": null
+    },
+    {
+      "id": "321",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 30240,
+      "medal": null
+    },
+    {
+      "id": "322",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 30720,
+      "medal": null
+    },
+    {
+      "id": "323",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 30900,
+      "medal": null
+    },
+    {
+      "id": "324",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 31200,
+      "medal": null
+    },
+    {
+      "id": "325",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 31620,
+      "medal": null
+    },
+    {
+      "id": "326",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 31620,
+      "medal": null
+    },
+    {
+      "id": "327",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 33000,
+      "medal": null
+    },
+    {
+      "id": "328",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 33360,
+      "medal": null
+    },
+    {
+      "id": "329",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 33420,
+      "medal": null
+    },
+    {
+      "id": "330",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 33420,
+      "medal": null
+    },
+    {
+      "id": "331",
+      "official": false,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 34980,
+      "medal": null
+    },
+    {
+      "id": "332",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 40560,
+      "medal": null
+    },
+    {
+      "id": "333",
+      "official": true,
+      "accepted": [
+        "C",
+        "K"
+      ],
+      "solved": 2,
+      "penalty_seconds": 46200,
+      "medal": null
+    },
+    {
+      "id": "334",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 1620,
+      "medal": null
+    },
+    {
+      "id": "335",
+      "official": false,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 2040,
+      "medal": null
+    },
+    {
+      "id": "336",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 2460,
+      "medal": null
+    },
+    {
+      "id": "337",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 2880,
+      "medal": null
+    },
+    {
+      "id": "338",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 3240,
+      "medal": null
+    },
+    {
+      "id": "339",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 3300,
+      "medal": null
+    },
+    {
+      "id": "340",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 3540,
+      "medal": null
+    },
+    {
+      "id": "341",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 3840,
+      "medal": null
+    },
+    {
+      "id": "342",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 3960,
+      "medal": null
+    },
+    {
+      "id": "343",
+      "official": true,
+      "accepted": [
+        "C"
+      ],
+      "solved": 1,
+      "penalty_seconds": 4440,
+      "medal": null
+    },
+    {
+      "id": "344",
+      "official": true,
+      "accepted": [
+        "C"
+      ],
+      "solved": 1,
+      "penalty_seconds": 4500,
+      "medal": null
+    },
+    {
+      "id": "345",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 4560,
+      "medal": null
+    },
+    {
+      "id": "346",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 4980,
+      "medal": null
+    },
+    {
+      "id": "347",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 5700,
+      "medal": null
+    },
+    {
+      "id": "348",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 6120,
+      "medal": null
+    },
+    {
+      "id": "349",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 6480,
+      "medal": null
+    },
+    {
+      "id": "350",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 6780,
+      "medal": null
+    },
+    {
+      "id": "351",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 7320,
+      "medal": null
+    },
+    {
+      "id": "352",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 8160,
+      "medal": null
+    },
+    {
+      "id": "353",
+      "official": true,
+      "accepted": [
+        "C"
+      ],
+      "solved": 1,
+      "penalty_seconds": 8220,
+      "medal": null
+    },
+    {
+      "id": "354",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 8220,
+      "medal": null
+    },
+    {
+      "id": "355",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 8880,
+      "medal": null
+    },
+    {
+      "id": "356",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 9480,
+      "medal": null
+    },
+    {
+      "id": "357",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 9720,
+      "medal": null
+    },
+    {
+      "id": "358",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 10440,
+      "medal": null
+    },
+    {
+      "id": "359",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 10740,
+      "medal": null
+    },
+    {
+      "id": "360",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 12360,
+      "medal": null
+    },
+    {
+      "id": "361",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 14580,
+      "medal": null
+    },
+    {
+      "id": "362",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 15900,
+      "medal": null
+    },
+    {
+      "id": "363",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 16200,
+      "medal": null
+    },
+    {
+      "id": "364",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 16860,
+      "medal": null
+    },
+    {
+      "id": "365",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 18600,
+      "medal": null
+    },
+    {
+      "id": "366",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 18960,
+      "medal": null
+    },
+    {
+      "id": "367",
+      "official": true,
+      "accepted": [
+        "K"
+      ],
+      "solved": 1,
+      "penalty_seconds": 20880,
+      "medal": null
+    },
+    {
+      "id": "368",
+      "official": true,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    },
+    {
+      "id": "369",
+      "official": true,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    },
+    {
+      "id": "370",
+      "official": true,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    },
+    {
+      "id": "371",
+      "official": true,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    },
+    {
+      "id": "372",
+      "official": true,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    },
+    {
+      "id": "373",
+      "official": true,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    },
+    {
+      "id": "374",
+      "official": false,
+      "accepted": [],
+      "solved": 0,
+      "penalty_seconds": 0,
+      "medal": null
+    }
+  ]
+}

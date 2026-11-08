@@ -1,7 +1,7 @@
 {
-  "verified_at": "2026-11-04",
+  "verified_at": "2026-11-09",
   "method": "standings-medal-v1",
-  "scope": "2026 ICPC 西安、成都、武汉、CCPC 长春正式赛；使用原榜完整赛时提交，排除打星。仅发布匿名终榜行和题目元数据。",
+  "scope": "2026 ICPC 西安、成都、武汉、CCPC 长春正式赛；使用原榜完整赛时提交，排除打星。仅发布匿名终榜行和题目元数据。 新增 2026 CCPC 乐山已揭晓正式赛终榜。 新增 2026 ICPC 南京已揭晓正式赛终榜。",
   "contests": [
     {
       "id": "icpc-2026-西安",
@@ -52,8 +52,8 @@
       "rankland_source_sha256": "be7d3b611a344ac59099a29fe3e7e9d0ad023d952d1e57641bec6d01507fba26",
       "anonymous_snapshot": "historical_standings/icpc2026chengdu.json",
       "anonymous_snapshot_sha256": "30f06f0b7ee316ace34a5cf0cb031ef011a098b5a8b03e54b20de824cd388b3d",
-      "qoj_contest_id": 4600,
-      "qoj_url": "https://qoj.ac/contest/4600",
+      "qoj_contest_id": 4607,
+      "qoj_url": "https://qoj.ac/contest/4607",
       "problem_access": "login_required",
       "mapping_note": "2026-10-29 通过 QOJ 登录会话逐行核验正式赛 A–M 题名和单题编号。",
       "scoring_note": "4004 条完整赛时提交无待判；328 队中正式 319 队，315 队有 AC，打星 9 队。逐题按分钟取整，CE 不罚时；金银铜 32/64/96 队。逐队核对 RankLand 全部 328 队的正式资格、逐题 AC、解题数与罚时一致，正式队逐题统计及奖牌分界一致。"
@@ -81,6 +81,43 @@
       "problem_access": "login_required",
       "mapping_note": "2026-11-04 通过受邀账号逐行核验正式赛 A–M 题名与 QOJ 编号 23656–23668。",
       "scoring_note": "完整 5015 条赛时提交；438 队中正式 369 队（全部有 AC）、打星 69 队。逐队核对 RankLand 全部 438 队的正式资格、逐题 AC、解题数和罚时一致。原榜金银铜 37/74/111 队；同题数同罚时按最后一次 AC 分钟排序。RankLand 忽略最后 AC 的并列处理将银牌扩为 75、铜牌减为 110；采用原榜规则并保留此差异。两种奖牌口径下 13 题的最终 rating 相同。"
+    },
+    {
+      "id": "ccpc-2026-乐山",
+      "ranklist_url": "https://rank.iccpc.cn/r/6503f86d-8281-4d33-9da0-b41e6fff4726",
+      "qoj_contest_id": 4685,
+      "qoj_url": "https://qoj.ac/contest/4685",
+      "problem_access": "login_required",
+      "raw_source_urls": {
+        "rank": "https://rank.iccpc.cn/upload/outrank_attach/6503f86d-8281-4d33-9da0-b41e6fff4726/rank.json"
+      },
+      "raw_source_sha256": {
+        "rank": "4e2d1d1493c1eecbdabbd32d0405f5da9f62cc1b2dd22790b809eaa50407931a"
+      },
+      "anonymous_snapshot": "historical_standings/ccpc2026leshan.json",
+      "anonymous_snapshot_sha256": "d9c42eb5e2cd54f3886585c7fd191daa4cc7b646b3747df0a9b24716e3fd5547",
+      "mapping_note": "题号、题名来自 ICCPC 官方终榜。QOJ 单题映射仅收录已核验入口，其余待恢复登录浏览器后逐题核验。",
+      "scoring_note": "5483 条完整赛时提交，348 队中正式 300 队、打星 48 队。独立重算全部 348 队的 AC 集合、解题数、分钟罚时、正式资格和奖牌，与已解榜 API 逐队核对一致。评级统计唯一正式通过队，非 AC 提交数。"
+    },
+    {
+      "id": "icpc-2026-南京",
+      "ranklist_url": "https://board.xcpcio.com/icpc/51st/nanjing?group=official",
+      "rankland_url": "https://rl.algoux.cn/ranklist/icpc2026nanjing",
+      "raw_source_urls": {
+        "config": "https://board.xcpcio.com/data/icpc/51st/nanjing/config.json",
+        "team": "https://board.xcpcio.com/data/icpc/51st/nanjing/team.json",
+        "run": "https://board.xcpcio.com/data/icpc/51st/nanjing/run.json"
+      },
+      "raw_source_sha256": {
+        "config": "3b01596875f0fe5e7a799157077a266a15a8134b75a17c25795acbde96d4edf3",
+        "team": "f1720aeebc9aa59fab017af4eeb02c1b9733b66621675d22eaab6c02f86fa7ea",
+        "run": "e08fac45a711dbfbb5933f7de3f46957dfbbe772e34405ff898b116a732fd792"
+      },
+      "rankland_source_sha256": "c345c6b2be8a569415078f7770212a8c472c3f753eb5af5cd25484a214fa3c14",
+      "anonymous_snapshot": "historical_standings/icpc2026nanjing.json",
+      "anonymous_snapshot_sha256": "cc63442a427c8050635582d7887ce05706e095141c46ef40518c11b5cac334f1",
+      "mapping_note": "已核验官方终榜 A–M 共 13 题；尚无补题入口和已核验题名，仅发布正式赛统计评级，单题平台映射待补。",
+      "scoring_note": "5115 条完整赛时提交，无冻结或待判。374 队中正式 332 队，326 队有 AC，打星 42 队。独立恢复全部队伍的 AC 集合、题数、罚时、正式身份，与已解榜 API 和 RankLand 逐队核对一致；金银铜 33/66/99 队，分界 6题1042分、4题745分、2题152分。"
     }
   ]
 }

@@ -1,7 +1,348 @@
 {
-  "verified_at": "2026-11-04",
-  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links; 2018 Gym dashboards and Qingdao official statements; 2018–2019 ICPC official awards and CCPC full award tables; pinned anonymous historical final scoreboards; 2026 final scoreboard snapshots from official XCPCIO Xi’an and ICCPC Changchun; 2026 Chengdu official XCPCIO final submissions cross-checked team by team with RankLand SRK",
+  "verified_at": "2026-11-09",
+  "source": "QOJ regional categories 463/462/461/460/459/458/576 and 364/278/277/276/275/379/581; QOJ contest problem headings; official Gym dashboards; RankLand original boards; Nowcoder public problem-list API; QOJ final categories, official Universal Cup dashboards, CCPC 2020 author problem order; Jisuanke 5530 and PTA 1231102432326602752 reading links; RankLand SRK finals medal groups and verified QOJ links; 2018 Gym dashboards and Qingdao official statements; 2018–2019 ICPC official awards and CCPC full award tables; pinned anonymous historical final scoreboards; 2026 final scoreboard snapshots from official XCPCIO Xi’an and ICCPC Changchun; 2026 Chengdu official XCPCIO final submissions cross-checked team by team with RankLand SRK; 2026 CCPC Leshan official fully revealed final scoreboard; 2026 ICPC Nanjing official final submissions cross-checked with RankLand",
   "contests": [
+    {
+      "id": "icpc-2026-南京",
+      "year": 2026,
+      "series": "ICPC",
+      "site": "南京",
+      "name": "2026 ICPC 南京站",
+      "date": "2026-11-08",
+      "source_url": "https://board.xcpcio.com/icpc/51st/nanjing?group=official",
+      "source_label": "正式终榜（补题链接待公布）",
+      "ranklist_url": "https://board.xcpcio.com/icpc/51st/nanjing?group=official",
+      "source_links": [
+        {
+          "url": "https://rl.algoux.cn/ranklist/icpc2026nanjing",
+          "label": "终榜归档"
+        }
+      ],
+      "problems": [
+        {
+          "id": "icpc-2026-南京:A",
+          "index": "A",
+          "name": "A（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:B",
+          "index": "B",
+          "name": "B（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:C",
+          "index": "C",
+          "name": "C（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:D",
+          "index": "D",
+          "name": "D（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:E",
+          "index": "E",
+          "name": "E（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:F",
+          "index": "F",
+          "name": "F（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:G",
+          "index": "G",
+          "name": "G（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:H",
+          "index": "H",
+          "name": "H（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:I",
+          "index": "I",
+          "name": "I（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:J",
+          "index": "J",
+          "name": "J（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:K",
+          "index": "K",
+          "name": "K（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:L",
+          "index": "L",
+          "name": "L（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "icpc-2026-南京:M",
+          "index": "M",
+          "name": "M（题名待公布）",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        }
+      ],
+      "mapping_note": "已核验官方终榜 A–M 共 13 题；尚无补题入口和已核验题名，仅发布正式赛统计评级，单题平台映射待补。",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/icpc2026nanjing.json",
+        "source_url": "https://board.xcpcio.com/icpc/51st/nanjing?group=official",
+        "sha256": "cc63442a427c8050635582d7887ce05706e095141c46ef40518c11b5cac334f1",
+        "expected_summary": {
+          "official_teams": 332,
+          "effective_teams": 326,
+          "excluded_teams": 42,
+          "duration_seconds": 18000.0,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 33,
+              "last_solved": 6,
+              "last_penalty_minutes": 1042
+            },
+            "silver": {
+              "teams": 66,
+              "last_solved": 4,
+              "last_penalty_minutes": 745
+            },
+            "bronze": {
+              "teams": 99,
+              "last_solved": 2,
+              "last_penalty_minutes": 152
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 6,
+              "safe_solved": 7
+            },
+            "silver": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            },
+            "bronze": {
+              "max_outside_solved": 2,
+              "safe_solved": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ccpc-2026-乐山",
+      "year": 2026,
+      "series": "CCPC",
+      "site": "乐山",
+      "name": "2026 CCPC 乐山站",
+      "date": "2026-11-08",
+      "source_url": "https://qoj.ac/contest/4685",
+      "qoj_contest_id": 4685,
+      "qoj_url": "https://qoj.ac/contest/4685",
+      "source_label": "QOJ（需补题组权限）",
+      "problem_access": "login_required",
+      "ranklist_url": "https://rank.iccpc.cn/r/6503f86d-8281-4d33-9da0-b41e6fff4726",
+      "source_links": [
+        {
+          "url": "https://rank.iccpc.cn/r/6503f86d-8281-4d33-9da0-b41e6fff4726",
+          "label": "官方终榜"
+        }
+      ],
+      "problems": [
+        {
+          "id": "ccpc-2026-乐山:A",
+          "index": "A",
+          "name": "传送",
+          "aliases": [
+            "qoj:24841"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 24841
+        },
+        {
+          "id": "ccpc-2026-乐山:B",
+          "index": "B",
+          "name": "雨鹿漫步",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:C",
+          "index": "C",
+          "name": "猫狗狗猫",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:D",
+          "index": "D",
+          "name": "自动穿串机器人",
+          "aliases": [
+            "qoj:24844"
+          ],
+          "mapping_status": "verified",
+          "qoj_id": 24844
+        },
+        {
+          "id": "ccpc-2026-乐山:E",
+          "index": "E",
+          "name": "魔法矩阵",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:F",
+          "index": "F",
+          "name": "暴击装备",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:G",
+          "index": "G",
+          "name": "倾斜木棍",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:H",
+          "index": "H",
+          "name": "区间和",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:I",
+          "index": "I",
+          "name": "下一站，终点站",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:J",
+          "index": "J",
+          "name": "有毒药物",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:K",
+          "index": "K",
+          "name": "凸包序列",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:L",
+          "index": "L",
+          "name": "交换字母",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        },
+        {
+          "id": "ccpc-2026-乐山:M",
+          "index": "M",
+          "name": "三元组",
+          "aliases": [],
+          "unmapped": true,
+          "mapping_status": "pending"
+        }
+      ],
+      "mapping_note": "题号、题名来自 ICCPC 官方终榜。QOJ 单题映射仅收录已核验入口，其余待恢复登录浏览器后逐题核验。",
+      "rating_evidence": {
+        "provider": "final-scoreboard",
+        "standings_path": "historical_standings/ccpc2026leshan.json",
+        "source_url": "https://rank.iccpc.cn/r/6503f86d-8281-4d33-9da0-b41e6fff4726",
+        "sha256": "d9c42eb5e2cd54f3886585c7fd191daa4cc7b646b3747df0a9b24716e3fd5547",
+        "expected_summary": {
+          "official_teams": 300,
+          "effective_teams": 299,
+          "excluded_teams": 48,
+          "duration_seconds": 18000,
+          "medal_boundaries": {
+            "gold": {
+              "teams": 30,
+              "last_solved": 7,
+              "last_penalty_minutes": 783
+            },
+            "silver": {
+              "teams": 60,
+              "last_solved": 5,
+              "last_penalty_minutes": 533
+            },
+            "bronze": {
+              "teams": 90,
+              "last_solved": 4,
+              "last_penalty_minutes": 487
+            }
+          },
+          "medal_safety": {
+            "gold": {
+              "max_outside_solved": 7,
+              "safe_solved": 8
+            },
+            "silver": {
+              "max_outside_solved": 5,
+              "safe_solved": 6
+            },
+            "bronze": {
+              "max_outside_solved": 4,
+              "safe_solved": 5
+            }
+          }
+        }
+      }
+    },
     {
       "id": "icpc-2026-武汉",
       "year": 2026,
@@ -210,10 +551,10 @@
       "site": "成都",
       "name": "2026 ICPC 成都站",
       "date": "2026-10-25",
-      "source_url": "https://qoj.ac/contest/4600",
-      "qoj_contest_id": 4600,
-      "qoj_url": "https://qoj.ac/contest/4600",
-      "source_label": "QOJ",
+      "source_url": "https://qoj.ac/contest/4607",
+      "qoj_contest_id": 4607,
+      "qoj_url": "https://qoj.ac/contest/4607",
+      "source_label": "QOJ / Universal Cup",
       "ranklist_url": "https://board.xcpcio.com/icpc/51st/chengdu?group=official",
       "source_links": [
         {
@@ -358,7 +699,7 @@
         }
       ],
       "mapping_source": "https://qoj.ac/contest/4600",
-      "mapping_note": "2026-10-29 通过 QOJ 登录会话逐行核验正式赛 A–M 题名和单题编号。",
+      "mapping_note": "2026-10-29 通过 QOJ 登录会话逐行核验正式赛 A–M 题名和单题编号。 2026-11-09 按维护者提供的公开 UCup 入口将题单切换至 4607；保留已核验的原单题别名及本地缓存。",
       "problem_access": "login_required",
       "rating_evidence": {
         "provider": "final-scoreboard",
