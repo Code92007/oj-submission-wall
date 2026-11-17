@@ -146,6 +146,12 @@ docker compose exec oj-submission-wall python tools/configure_codeforces.py --ow
 
 实际补刷完成：最终运行版本 15bf006，备份 `/root/backups/cpc-coach-manager-final-20261010-223036/`。100 场已知 Gym 共补入 170 条 MANAGER；济南 2022 已核验为 A/C/D/E/G/J/K/M，8/13，截图中五条 AC ID 全部存在，原四道 VP 保留，G 两次 AC 按题去重。备份前 115106 条提交缺失 0，补刷后 115276 条。另有 26 场历史 Gym 的 Coach 记录暂不可读，已有记录保留并继续重试；不影响成功场次导入。核验报告位于备份目录 `backfill-verification.json`，不含凭据。
 
+### 2026-11-17：区分 Coach 可选权限与账号同步失败
+
+CF 的 `asManager: Only contest managers can use "asManager" option` 会通过 HTTP 400 JSON 正文返回，现已解析该响应，避免把普通参赛账号没有 Coach 权限误报成 Key 或账号同步错误。没有权限的 Gym 记录在 `stats_json.codeforcesGymSync.denied` 中；历史 Gym 接口故障记录在 `pending` 中，成功场次仍完整合入，失败场次保留本地历史并在后续同步重试。每轮重新查询权限，获得 Coach 权限后仍能回补旧提交。
+
+`user.status` 和比赛同步成功时更新正常同步时间并清除旧的账号错误。若只有可选 Coach 补查暂不可用，通过 `syncNotice` 展示普通提示及待重试场数，不使 CF 账号标签标红。主提交接口、授权或比赛同步的真实失败仍通过 `lastError` 显示异常。私有 Gym 覆盖不因此宣称完整，账号和比赛归属校验、整场分页成功后合入、签名凭据脱敏均保留。
+
 ## 2026-10-14 决赛与历史题单
 
 公共目录新增 2019–2025 每年的 CCPC Final / ICPC EC Final，共 14 场、178 题；总计 89 场、1132 题。与 CF Bot 保持规范 ID 一致，延期决赛按原赛季归档，排除热身。逐题字母与平台编号来自官方 Gym、QOJ / Universal Cup 正式题单，2020 CCPC 决赛辅以命题方 PROBLEMS 顺序核验。来源见 `catalog/regional_finals_sources.json`。新增决赛暂未评级。原有 954 题规范 ID、别名和题序保留。

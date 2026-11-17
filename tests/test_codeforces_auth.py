@@ -1,10 +1,12 @@
 import hashlib
+import io
 import json
 import runpy
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlparse
 
 import app
@@ -61,6 +63,28 @@ class AuthTests(unittest.TestCase):
                 signed_api_get('contest.status', params, self.auth,
                                lambda *a,**k:(b'{"status":"FAILED","comment":"apiKey: Invalid API key"}', ''))
             self.assertNotIsInstance(error.exception, ManagerAccessUnavailable)
+
+    def test_http_400_manager_denial_is_parsed_and_other_failures_stay_sanitized(self):
+        params = {'handle': 'Yzm007', 'contestId': 104793, 'asManager': 'true'}
+        def denied(url, **kwargs):
+            raise HTTPError(url, 400, 'Bad Request', {}, io.BytesIO(json.dumps({
+                'status': 'FAILED',
+                'comment': 'contestId: Contest with id 104793 not found;asManager: Only contest managers can use "asManager" option',
+            }).encode()))
+        with patch.object(auth_module.time, 'sleep'):
+            with self.assertRaises(ManagerAccessUnavailable):
+                signed_api_get('contest.status', params, self.auth, denied)
+            for code, body in [(400, b'{"status":"FAILED","comment":"apiKey: Invalid test-key"}'),
+                               (400, b'{"status":"FAILED","comment":"apiKey: Invalid test-key;asManager: Only contest managers"}'),
+                               (400, b'<html>test-secret</html>'),
+                               (500, b'{"status":"FAILED","comment":"asManager: Only contest managers"}')]:
+                def failed(url, **kwargs):
+                    raise HTTPError(url, code, 'Failed', {}, io.BytesIO(body))
+                with self.assertRaises(RuntimeError) as error:
+                    signed_api_get('contest.status', params, self.auth, failed)
+                self.assertNotIsInstance(error.exception, ManagerAccessUnavailable)
+                self.assertNotIn('test-key', str(error.exception))
+                self.assertNotIn('test-secret', str(error.exception))
 
     def test_signed_http_disables_shared_cache_and_sanitizes_errors(self):
         calls = []
@@ -159,24 +183,51 @@ class CoachHistoryTests(unittest.TestCase):
         self.sync([self.newest]+self.vp)
         app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
         result, _ = self.sync([self.newest]+self.coach+self.vp, fail=True)
-        self.assertIn('Gym 104076 Coach 提交读取失败', result['warning'])
+        self.assertIn('1 场历史 Gym', result['notice'])
+        self.assertNotIn('warning', result)
         with app.connect_db() as db:
-            row = db.execute('SELECT stats_json FROM handles WHERE id=3').fetchone()
-            self.assertIn('codeforcesAuthHistory', json.loads(row['stats_json'] or '{}'))
+            row = db.execute('SELECT * FROM handles WHERE id=3').fetchone()
+            stats = json.loads(row['stats_json'] or '{}')
+            self.assertIn('codeforcesAuthHistory', stats)
+            self.assertIn('Gym 104076 Coach 提交读取失败', stats['codeforcesGymSync']['pending'][0])
+            self.assertIsNone(row['last_error'])
+            self.assertEqual(app.handle_to_json(row)['syncNotice'], result['notice'])
             self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
         result, pages = self.sync([self.newest]+self.coach+self.vp)
         self.assertEqual(result['inserted'], 4)
         self.assertEqual(pages, [('user.status',1),('contest.status',1),('contest.status',5),('contest.status',9)])
+        with app.connect_db() as db:
+            row = db.execute('SELECT * FROM handles WHERE id=3').fetchone()
+            self.assertEqual(app.handle_to_json(row)['syncNotice'], '')
 
-    def test_manager_permission_denial_keeps_public_history_and_warns(self):
+    def test_manager_permission_denial_keeps_public_history_without_account_error(self):
         self.sync([self.newest]+self.vp)
+        with app.connect_db() as db:
+            db.execute("UPDATE handles SET last_error='Gym 104076 Coach 提交读取失败' WHERE id=3")
         app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
         result, _ = self.sync([self.newest]+self.coach+self.vp, deny=True)
-        self.assertIn('Coach 记录不可读', result['warning'])
+        self.assertNotIn('warning', result)
         with app.connect_db() as db:
+            row = db.execute('SELECT * FROM handles WHERE id=3').fetchone()
+            self.assertIsNone(row['last_error'])
+            self.assertEqual(json.loads(row['stats_json'])['codeforcesGymSync']['denied'], [104076])
             self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
         retried, _ = self.sync([self.newest]+self.coach+self.vp)
         self.assertEqual(retried['inserted'], 4)
+
+    def test_user_status_failure_still_marks_account_error_and_keeps_history(self):
+        self.sync([self.newest]+self.vp)
+        app.CODEFORCES_AUTH_FILE.write_text(json.dumps(self.auth_data))
+        with patch.object(app, 'signed_api_get', side_effect=RuntimeError('Codeforces 授权读取失败')):
+            with app.connect_db() as db:
+                row = db.execute('SELECT * FROM handles WHERE id=3').fetchone()
+                result = app.sync_handle_row(db, row, force=True)
+                current = db.execute('SELECT * FROM handles WHERE id=3').fetchone()
+                self.assertIn('授权读取失败', result['error'])
+                self.assertIn('授权读取失败', app.handle_to_json(current)['lastError'])
+                self.assertNotIn('codeforcesAuthHistory', json.loads(current['stats_json'] or '{}'))
+                self.assertEqual(current['last_sync_at'], row['last_sync_at'])
+                self.assertEqual(db.execute('SELECT count(*) FROM submissions').fetchone()[0], 5)
 
     def test_unavailable_old_gym_does_not_block_other_gyms_coach_history(self):
         self.sync([self.newest]+self.vp)

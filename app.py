@@ -1385,7 +1385,8 @@ class CodeforcesAdapter(OJAdapter):
         }
 
     def fetch_submissions(self, handle: str, since_ts: int, *, auth: CodeforcesAuth | None = None,
-                          known_gym_ids=(), gym_warnings: list[str] | None = None) -> list[dict]:
+                          known_gym_ids=(), gym_warnings: list[str] | None = None,
+                          gym_denied: list[int] | None = None) -> list[dict]:
         submissions = {}
         page_size = min(max(FETCH_LIMIT, 1), 1000)
         gym_ids = set(known_gym_ids)
@@ -1444,9 +1445,13 @@ class CodeforcesAdapter(OJAdapter):
                         if reached_older or len(items) < page_size:
                             break
                         start += page_size
-                except RuntimeError as exc:
-                    reason = "Coach 记录不可读" if isinstance(exc, ManagerAccessUnavailable) else "Coach 提交读取失败"
-                    message = f"Gym {gym_id} {reason}，已保留公开记录，私有补题待核验并将重试"
+                except ManagerAccessUnavailable:
+                    # Participating in a Gym does not grant Coach access. This
+                    # optional permission is unrelated to user.status success.
+                    if gym_denied is not None:
+                        gym_denied.append(int(gym_id))
+                except RuntimeError:
+                    message = f"Gym {gym_id} Coach 提交读取失败，已保留公开记录，私有补题待核验并将重试"
                     if gym_warnings is None:
                         raise RuntimeError(message) from None
                     gym_warnings.append(message)
@@ -3833,15 +3838,16 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
                     if match:
                         known_gym_ids.add(int(match[1]))
             gym_warnings = []
+            gym_denied = []
             submissions = adapter.fetch_submissions(row["handle"], since_ts, auth=cf_auth,
-                                                    known_gym_ids=known_gym_ids, gym_warnings=gym_warnings)
+                                                    known_gym_ids=known_gym_ids, gym_warnings=gym_warnings,
+                                                    gym_denied=gym_denied)
         else:
             submissions = adapter.fetch_submissions(row["handle"], since_ts)
         profile_stats = adapter.fetch_profile_stats(row["handle"], submissions)
         if cf_auth is not None:
             profile_stats = {**previous_profile_stats, **(profile_stats or {}), "codeforcesAuthHistory": cf_auth.history_token}
-            if gym_warnings:
-                profile_stats["_warning"] = "；".join(gym_warnings[:3]) + (f"；共 {len(gym_warnings)} 场待核验" if len(gym_warnings) > 3 else "")
+            profile_stats["codeforcesGymSync"] = {"checkedAt": now, "denied": gym_denied, "pending": gym_warnings}
         profile_warning = ""
         profile_is_fallback = False
         if isinstance(profile_stats, dict):
@@ -3998,6 +4004,8 @@ def sync_handle_row(conn: sqlite3.Connection, row: sqlite3.Row, force: bool = Fa
             "contestsFetched": len(contests),
             "contestsInserted": inserted_contests,
         }
+        if cf_auth is not None and gym_warnings:
+            result.update({"partial": True, "notice": codeforces_gym_notice(profile_stats)})
         if stale_hits:
             cache_as_of = min(int(item.get("fetchedAt") or now) for item in stale_hits)
             warnings.append(f"平台接口异常，使用本地缓存；缓存时间 {iso_from_ts(cache_as_of)}")
@@ -4528,9 +4536,23 @@ def background_luogu_recovery_loop() -> None:
             pass
 
 
+def codeforces_gym_notice(stats: dict) -> str:
+    state = stats.get("codeforcesGymSync")
+    pending = state.get("pending") if isinstance(state, dict) else None
+    if isinstance(pending, list) and pending:
+        return f"{len(pending)} 场历史 Gym 补题暂不可用，已保留记录并将自动重试"
+    return ""
+
+
 def handle_to_json(row: sqlite3.Row, sync_snapshot: dict | None = None) -> dict:
     adapter = ADAPTERS.get(row["platform"])
     display_handle = str(row["handle"] or "")
+    sync_notice = ""
+    if row["platform"] == "codeforces" and row["stats_json"]:
+        with contextlib.suppress(Exception):
+            stats = json.loads(row["stats_json"])
+            if isinstance(stats, dict):
+                sync_notice = codeforces_gym_notice(stats)
     if row["platform"] == "luogu" and row["stats_json"]:
         with contextlib.suppress(Exception):
             stats = json.loads(row["stats_json"])
@@ -4547,6 +4569,7 @@ def handle_to_json(row: sqlite3.Row, sync_snapshot: dict | None = None) -> dict:
         "displayHandle": display_handle,
         "lastSyncAt": iso_from_ts(row["last_sync_at"]),
         "lastError": row["last_error"],
+        "syncNotice": sync_notice,
         "syncStatus": sync_status_for_handle(row, sync_snapshot),
         "manualImport": row["platform"] == "qoj" or (row["platform"] == "luogu" and LUOGU_BROWSER_IMPORT),
     }

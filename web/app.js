@@ -554,7 +554,7 @@ function renderMyHandles() {
       meta.textContent = item.lastError
         ? `同步异常：${item.lastError}`
         : item.lastSyncAt
-          ? `上次同步 ${formatDateTime(item.lastSyncAt)}`
+          ? `上次同步 ${formatDateTime(item.lastSyncAt)}${item.syncNotice ? `；${item.syncNotice}` : ""}`
           : "尚未同步";
     }
     main.append(title, meta);
@@ -2534,7 +2534,7 @@ function renderMemberCard(member, view = memberActivityView(member)) {
       pill.type = "button";
       pill.dataset.memberHandleKey = handleSelectionKey(handle);
       pill.setAttribute("aria-pressed", selected ? "true" : "false");
-      pill.title = handle.lastError || `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
+      pill.title = handle.lastError || handle.syncNotice || `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
       pill.textContent = `${handle.platformLabel}:${handle.displayHandle || handle.handle}`;
       handles.appendChild(pill);
     }

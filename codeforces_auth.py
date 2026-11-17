@@ -9,6 +9,7 @@ import re
 import secrets
 import threading
 import time
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 
 
@@ -88,11 +89,22 @@ def signed_api_get(method: str, params: dict, auth: CodeforcesAuth, http_get) ->
         try:
             url = signed_url(method, params, auth, timestamp=int(time.time()), nonce=secrets.token_hex(3))
             # Signed URLs contain apiKey. Never persist them or reuse stale private data.
-            body, _ = http_get(url, allow_stale_cache=False, cache_write=False)
+            try:
+                body, _ = http_get(url, allow_stale_cache=False, cache_write=False)
+            except HTTPError as exc:
+                # CF returns API failures (including asManager permission denial)
+                # as HTTP 400. urllib otherwise hides the useful JSON response.
+                if exc.code != 400:
+                    raise
+                data = json.loads(exc.read().decode('utf-8'))
+                if not isinstance(data, dict) or data.get('status') != 'FAILED':
+                    raise ValueError()
+                body = json.dumps(data).encode('utf-8')
             data = json.loads(body.decode('utf-8'))
             if isinstance(data, dict) and data.get('status') == 'FAILED' and method == 'contest.status':
                 comment = str(data.get('comment') or '').lower()
-                if 'manager' in comment and any(word in comment for word in ('access', 'permission', 'should', 'must')):
+                auth_error = any(field in comment for field in ('apikey:', 'apisig:', 'time:'))
+                if not auth_error and 'asmanager:' in comment and 'manager' in comment and any(word in comment for word in ('only', 'access', 'permission', 'should', 'must')):
                     raise ManagerAccessUnavailable('该 Gym 不允许本人以 Coach/manager 身份读取')
             if not isinstance(data, dict) or data.get('status') != 'OK' or not isinstance(data.get('result'), list):
                 raise ValueError()
