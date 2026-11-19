@@ -10,6 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 COPY app.py /app/app.py
 COPY account_recovery.py /app/account_recovery.py
+COPY photo_sso.py /app/photo_sso.py
 COPY codeforces_auth.py /app/codeforces_auth.py
 COPY cpc_common.py /app/cpc_common.py
 COPY cpc_integration.py /app/cpc_integration.py

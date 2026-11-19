@@ -33,6 +33,7 @@ from cpc_integration import Integration as CpcIntegration, handle as cpc_handle
 from codeforces_auth import CodeforcesAuth, ManagerAccessUnavailable, load_auth, signed_api_get
 from team_analysis import build_analysis, analysis_options
 import account_recovery
+import photo_sso
 
 
 APP_NAME = "OJ Submission Wall"
@@ -6566,6 +6567,8 @@ class AppHandler(BaseHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         try:
+            if path in {'/api/cpc/photos/authorize', '/api/integration/v1/photos/exchange'} and photo_sso.handle(self, get_cpc_service()):
+                return
             if path.startswith(("/api/cpc/", "/api/integration/")) and cpc_handle(self, get_cpc_service()):
                 return
             if path in {"/regionals", "/regionals.html"}:
@@ -6696,6 +6699,8 @@ class AppHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urllib.parse.urlparse(self.path)
         try:
+            if parsed.path in {'/api/cpc/photos/authorize', '/api/integration/v1/photos/exchange'} and photo_sso.handle(self, get_cpc_service(), post=True):
+                return
             if parsed.path in account_recovery.ROUTES - {"/api/me/email"}:
                 return account_recovery.handle(self, sys.modules[__name__], parsed.path)
             if parsed.path.startswith(("/api/cpc/", "/api/integration/")) and cpc_handle(self, get_cpc_service(), post=True):

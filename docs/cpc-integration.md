@@ -1,5 +1,13 @@
 # OJ Wall 三工程联动说明
 
+## 比赛照片登录（2026-11-19）
+
+DLUT CPC `/photos` 可通过本站正式账号登录。新配置 `CPC_PHOTO_PUBLIC_URL=https://dlut-cpc.wannafly.cn` 是唯一允许的照片回跳 origin，默认关闭；Compose 需传入此配置。`GET /api/cpc/photos/authorize` 签发绑定当前正式用户会话及 PKCE S256 的单次授权码，有效 60 秒。`POST /api/integration/v1/photos/exchange` 要求原 `CPC_SYNC_TOKEN` 与正确 verifier，并复核原用户会话仍有效，仅返回稳定 authority / subject UUID。邮箱认证标志不作为真人认证。
+
+照片列表、缩略图、图像与管理上传均由 DLUT CPC 保存和授权；其每次请求直接核验 DLUT 当前已批准的成员认领。OJ Wall 无需读取 DLUT 数据库，不暴露照片地址或密码，也不改变现有 CF Bot 只读连接码。本站持久库新增 `cpc_photo_codes` 保存临时授权码摘要，迁移沿用原数据库即可。照片登录为独立 8 小时会话，退出 OJ Wall 不联动退出 DLUT 照片会话；DLUT 撤销认证可立即阻止后续照片访问。
+
+测试入口：`python -m unittest discover -s tests -p 'test_photo_sso.py'`。
+
 2026-10-09 · v4.2。此文与本工程代码一同提交；后续调整保留 Git 历史，重大协议变更追加版本记录。
 
 ## 职责与统计口径
